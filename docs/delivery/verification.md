@@ -2,7 +2,7 @@
 
 ## PPTX 이미지 확장 및 게시 요청 · 2026-09-12
 
-사용자의 후속 요청에 따라 이미지 배치를 보완하고 이전 턴의 사이트 개선을 함께 Git 및 GitHub Pages에 반영합니다. 아래 이전 ‘로컬 미배포’ 표기는 당시 작업 완료 시점의 기록입니다.
+사용자의 후속 요청에 따라 이미지 배치를 보완하고 이전 턴의 사이트 개선을 함께 Git 및 GitHub Pages에 반영했습니다. 아래 이전 ‘로컬 미배포’ 표기는 당시 작업 완료 시점의 기록입니다.
 
 ### 최종 이미지 배치
 
@@ -25,7 +25,12 @@
 - 공개 경로·검색·사이트맵·로컬 링크·이미지 검사 통과.
 - git diff --check 통과.
 - 이미지의 화면별 브라우저 시험은 이번 요청 범위에서 별도로 실행하지 않았습니다.
-- Git 반영 및 배포 결과는 실제 워크플로 완료와 공개 URL 응답 확인 후 이 절에 기록합니다.
+- 콘텐츠 커밋: 49aedbae664459c367bd54b89843612e2a2a9bee (main에 푸시 완료).
+- [Documentation 배포 실행](https://github.com/prozac0401/Workspace/actions/runs/34685625567): 완료, success. strict 빌드와 Pages 배포 job 통과.
+- 실제 https://prozac0401.github.io/Workspace/ 에서 공개 페이지 13개 HTTP 200 및 새 홈·원칙·도입·개선안의 콘텐츠 확인.
+- WebP 6개 모두 HTTP 200, 응답 바이트의 SHA-256이 로컬 원본 자산과 일치.
+- PPTX 원본, delivery/verification/, assets/verification.json의 직접 URL은 HTTP 404.
+- 이 결과를 기록하는 후속 커밋은 공개 사이트 원본을 추가로 변경하지 않습니다. 아래의 과거 미배포 표기와 구분합니다.
 
 ## PPTX 콘셉트 기반 웹 디자인 · 2026-09-12
 
