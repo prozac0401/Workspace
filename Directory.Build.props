@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <Version>0.1.0</Version>
+    <Authors>Workspace</Authors>
+    <Product>FolderState</Product>
+    <Copyright>Copyright © 2026 Workspace contributors</Copyright>
+  </PropertyGroup>
+</Project>
