@@ -4,6 +4,7 @@ site_url: https://prozac0401.github.io/Workspace/
 exclude_docs: |
   **
   !/index.md
+  !/principles.md
   !/getting-started.md
   !/quick-reference.md
   !/policies/workspace.md
@@ -17,6 +18,12 @@ exclude_docs: |
   !/tools/folderstate/troubleshooting.md
   !/assets/extra.css
   !/assets/folderstate.png
+  !/assets/handbook/workspace-flow.webp
+  !/assets/handbook/work-lifecycle.webp
+  !/assets/handbook/quiet-workspace.webp
+  !/assets/handbook/focused-folder.webp
+  !/assets/handbook/decision-checklist.webp
+  !/assets/handbook/work-safety.webp
   # Material theme resources; check-site.py rejects unreviewed docs assets here.
   !/assets/images/favicon.png
   !/assets/stylesheets/**
@@ -30,13 +37,13 @@ theme:
   palette:
     - scheme: default
       primary: custom
-      accent: teal
+      accent: custom
       toggle:
         icon: material/weather-night
         name: 어두운 화면으로 전환
     - scheme: slate
       primary: custom
-      accent: teal
+      accent: custom
       toggle:
         icon: material/weather-sunny
         name: 밝은 화면으로 전환
@@ -69,6 +76,7 @@ nav:
   - 시작:
       - 운영 기준 안내: index.md
       - 빠른 판단 기준: quick-reference.md
+      - 10대 기본원칙: principles.md
       - 도입 순서: getting-started.md
       - 결정이 필요한 항목: policies/decisions.md
   - 기본 운영:

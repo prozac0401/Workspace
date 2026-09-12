@@ -8,13 +8,21 @@ import xml.etree.ElementTree as ET
 
 # Keep this explicit: a new page requires a publication-scope review.
 public_routes = {
-    '', 'getting-started/', 'quick-reference/',
+    '', 'getting-started/', 'quick-reference/', 'principles/',
     'policies/workspace/', 'policies/kits/', 'policies/files-email/',
     'policies/archive-security/', 'policies/decisions/', 'policies/folder-workflow/',
     'tools/folderstate/', 'tools/folderstate/installation/',
     'tools/folderstate/troubleshooting/',
 }
-public_assets = {'assets/extra.css', 'assets/folderstate.png'}
+public_assets = {
+    'assets/extra.css', 'assets/folderstate.png',
+    'assets/handbook/workspace-flow.webp',
+    'assets/handbook/work-lifecycle.webp',
+    'assets/handbook/quiet-workspace.webp',
+    'assets/handbook/focused-folder.webp',
+    'assets/handbook/decision-checklist.webp',
+    'assets/handbook/work-safety.webp',
+}
 
 site = Path(sys.argv[1] if len(sys.argv) > 1 else 'site').resolve()
 docs = Path(__file__).resolve().parent.parent / 'docs'

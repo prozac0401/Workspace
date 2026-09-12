@@ -9,9 +9,21 @@
 
 ## 목적과 적용 범위
 
+<div class="guide-intro" markdown>
+<div markdown>
+
 현재 정책은 자료의 위치와 네 가지 상태를 정하지만, 대기 중인 일을 언제 다시 확인할지, 무엇을 확인하고 완료로 바꿀지, 담당자가 바뀌면 어디서 이어갈지는 더 구체화할 수 있습니다. 반복 업무의 단계 폴더와 운영현황에 아래 항목을 필요한 만큼 적용하는 안을 제안합니다.
 
 추가 기록은 기존 Overview·Schedule·Checklist·Issues에 넣습니다. 이미 같은 정보를 관리하는 사내 시스템이 있다면 그 원본의 링크만 연결합니다. 이 문서는 운영 방식에 대한 제안이며 FolderState에 기능이 추가되었다는 의미가 아닙니다.
+
+</div>
+<figure class="guide-figure" markdown>
+
+![업무 바인더 옆에 꼭 필요한 확인사항을 적은 체크리스트](../assets/handbook/decision-checklist.webp){ width="775" height="941" loading="lazy" }
+
+<figcaption>반복해서 놓치는 확인사항만 기존 기록에 보완합니다.</figcaption>
+</figure>
+</div>
 
 ## 추가할 아이템과 우선순위
 

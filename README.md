@@ -2,7 +2,7 @@
 
 **정리가 일이 되지 않아야 합니다.** 필요한 자료를 다시 찾고 업무를 이어갈 수 있도록, 반복 업무는 미착수 상태의 MASTER를 복사해 시작하고 끝난 회차는 통째로 보관합니다. 정리는 새 업무·착수·문제·완료·종료라는 업무 사건에 붙입니다.
 
-[빠른 판단 기준](docs/quick-reference.md)에서 지금 할 행동을 찾고, 처음이라면 [도입 순서](docs/getting-started.md)로 시작하세요. 회신 누락·인수인계 같은 반복 문제가 생기면 [선택 운영 개선안](docs/policies/folder-workflow.md)을 참고합니다.
+[빠른 판단 기준](docs/quick-reference.md)에서 지금 할 행동을 찾고, 처음이라면 [도입 순서](docs/getting-started.md)로 시작하세요. 공통 철학은 [10대 기본원칙](docs/principles.md)에 정리했습니다. 회신 누락·인수인계 같은 반복 문제가 생기면 [선택 운영 개선안](docs/policies/folder-workflow.md)을 참고합니다.
 
 - **FolderState**: Windows Explorer 폴더 상태표시 도구. C# / .NET 10 / WPF, 사용자별 MSI 설치.
 - **운영 정책**: 파일·폴더·이메일, 원본 시스템, MASTER 키트, 진행·인수인계 기준.
