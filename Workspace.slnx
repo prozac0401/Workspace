@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FolderState.Core/FolderState.Core.csproj"/>
+    <Project Path="src/FolderState.App/FolderState.App.csproj"/>
+    <Project Path="src/FolderState.Cli/FolderState.Cli.csproj"/>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FolderState.Tests/FolderState.Tests.csproj"/>
+    <Project Path="tests/FolderState.UiSmoke/FolderState.UiSmoke.csproj"/>
+  </Folder>
+</Solution>

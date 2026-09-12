@@ -1,0 +1,76 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="FolderState" Manufacturer="Workspace" Version="$(var.Version)" UpgradeCode="71B69B50-56F6-4FDC-A225-26B88FA22D50" Language="1042" Codepage="65001" Scope="perUser" InstallerVersion="500">
+    <SummaryInformation Description="FolderState user installation" Manufacturer="Workspace" Codepage="1252"/>
+    <MajorUpgrade DowngradeErrorMessage="더 최신 버전의 FolderState가 설치되어 있습니다." Schedule="afterInstallInitialize"/>
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high"/>
+    <Property Id="WINDOWSBUILD"><RegistrySearch Id="WindowsCurrentBuild" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Name="CurrentBuildNumber" Type="raw" Bitness="always64"/></Property>
+    <Launch Condition="Installed OR (VersionNT64 AND WINDOWSBUILD &gt;= 22000)" Message="FolderState는 Windows 11 x64 이상에서 사용할 수 있습니다."/>
+    <Property Id="ARPPRODUCTICON" Value="FolderStateIcon"/>
+    <Property Id="SAVEDINSTALLFOLDER"><RegistrySearch Id="RememberedInstallFolder" Root="HKCU" Key="Software\Workspace\FolderState" Name="InstallFolder" Type="raw"/></Property>
+    <SetProperty Id="INSTALLFOLDER" Value="[SAVEDINSTALLFOLDER]" After="AppSearch" Sequence="both" Condition="SAVEDINSTALLFOLDER AND NOT INSTALLFOLDER"/>
+    <Property Id="ARPHELPLINK" Value="https://prozac0401.github.io/Workspace/"/>
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/prozac0401/Workspace"/>
+    <Icon Id="FolderStateIcon" SourceFile="$(var.SourceRoot)\assets\icons\app.ico"/>
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="ProgramsFolder" Name="Programs"><Directory Id="INSTALLFOLDER" Name="FolderState"/></Directory>
+      <Directory Id="DATAFOLDER" Name="FolderState"><Directory Id="LOGFOLDER" Name="logs"/></Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder"><Directory Id="SHORTCUTFOLDER" Name="FolderState"/></StandardDirectory>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="InstallLocation" Guid="*">
+        <RegistryValue Root="HKCU" Key="Software\Workspace\FolderState" Name="InstallFolder" Value="[INSTALLFOLDER]" Type="string" KeyPath="yes"/>
+      </Component>
+      <Component Id="ExplorerMenu" Guid="*">
+        <RegistryValue Root="HKCU" Key="Software\Classes\Directory\shell\Workspace.FolderState" Name="MUIVerb" Value="업무 상태" Type="string" KeyPath="yes"/>
+        <RegistryValue Root="HKCU" Key="Software\Classes\Directory\shell\Workspace.FolderState" Name="SubCommands" Value="" Type="string"/>
+        <RegistryValue Root="HKCU" Key="Software\Classes\Directory\shell\Workspace.FolderState" Name="Icon" Value="[INSTALLFOLDER]icons\app.ico" Type="string"/>
+        <RegistryValue Root="HKCU" Key="Software\Classes\Directory\shell\Workspace.FolderState" Name="MultiSelectModel" Value="Single" Type="string"/>
+        <RemoveRegistryKey Root="HKCU" Key="Software\Classes\Directory\shell\Workspace.FolderState" Action="removeOnUninstall"/>
+      </Component>
+      <Component Id="StartMenuShortcut" Guid="*">
+        <Shortcut Id="StartMenu" Directory="SHORTCUTFOLDER" Name="FolderState" Target="[INSTALLFOLDER]FolderState.exe" WorkingDirectory="INSTALLFOLDER" Icon="FolderStateIcon"/>
+        <RegistryValue Root="HKCU" Key="Software\Workspace\FolderState" Name="Shortcut" Type="integer" Value="1" KeyPath="yes"/>
+        <RemoveFolder Id="RemoveShortcutDir" Directory="SHORTCUTFOLDER" On="uninstall"/>
+        <RemoveFolder Id="RemoveInstallDir" Directory="INSTALLFOLDER" On="uninstall"/>
+      </Component>
+    </DirectoryRef>
+    <DirectoryRef Id="LOGFOLDER"><Component Id="LogCleanup" Guid="*">
+      <RegistryValue Root="HKCU" Key="Software\Workspace\FolderState" Name="Logs" Type="integer" Value="1" KeyPath="yes"/>
+      <RemoveFile Id="RemoveCurrentLog" Name="operations.jsonl" On="uninstall"/>
+      <RemoveFile Id="RemovePreviousLog" Name="operations.previous.jsonl" On="uninstall"/>
+      <RemoveFolder Id="RemoveLogDirectory" On="uninstall"/>
+      <RemoveFolder Id="RemoveDataDirectory" Directory="DATAFOLDER" On="uninstall"/>
+    </Component></DirectoryRef>
+    <Feature Id="Main" Title="FolderState" Level="1"><ComponentGroupRef Id="ApplicationFiles"/><ComponentGroupRef Id="StatusMenuCommands"/><ComponentRef Id="InstallLocation"/><ComponentRef Id="ExplorerMenu"/><ComponentRef Id="StartMenuShortcut"/><ComponentRef Id="LogCleanup"/></Feature>
+    <UI>
+      <TextStyle Id="DefaultFont" FaceName="Malgun Gothic" Size="9"/>
+      <TextStyle Id="TitleFont" FaceName="Malgun Gothic" Size="15" Bold="yes"/>
+      <Property Id="DefaultUIFont" Value="DefaultFont"/>
+      <Dialog Id="Welcome" Width="420" Height="280" Title="FolderState 설치">
+        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" Text="{\TitleFont}FolderState 설치"/>
+        <Control Id="Body" Type="Text" X="24" Y="78" Width="370" Height="90" Text="탐색기에서 폴더의 업무 상태를 표시합니다.&#13;&#10;현재 사용자에게 설치하며 관리자 권한이 필요하지 않습니다.&#13;&#10;&#13;&#10;설치 후: 폴더 우클릭 → 더 많은 옵션 표시 → 업무 상태"/>
+        <Control Id="Folder" Type="Text" X="24" Y="180" Width="370" Height="38" Text="설치 위치: [INSTALLFOLDER]"/>
+        <Control Id="Install" Type="PushButton" X="230" Y="238" Width="76" Height="24" Default="yes" Text="설치"><Publish Event="EndDialog" Value="Return"/></Control>
+        <Control Id="Cancel" Type="PushButton" X="316" Y="238" Width="76" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit"/></Control>
+      </Dialog>
+      <Dialog Id="Progress" Width="420" Height="220" Title="FolderState 설치 중" Modeless="yes">
+        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" TabSkip="no" Text="{\TitleFont}FolderState 설치 중"/>
+        <Control Id="Action" Type="Text" X="24" Y="82" Width="370" Height="40"><Subscribe Event="ActionText" Attribute="Text"/></Control>
+        <Control Id="ProgressBar" Type="ProgressBar" X="24" Y="133" Width="370" Height="18" ProgressBlocks="yes"><Subscribe Event="SetProgress" Attribute="Progress"/></Control>
+      </Dialog>
+      <Dialog Id="Maintenance" Width="420" Height="250" Title="FolderState 유지 관리">
+        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" Text="{\TitleFont}FolderState 유지 관리"/>
+        <Control Id="Body" Type="Text" X="24" Y="82" Width="370" Height="85" Text="누락되거나 손상된 프로그램 파일과 메뉴를 복구할 수 있습니다.&#13;&#10;&#13;&#10;제거 시 프로그램과 메뉴가 삭제됩니다.&#13;&#10;업무 폴더의 파일과 상태정보는 보존됩니다."/>
+        <Control Id="Repair" Type="PushButton" X="144" Y="202" Width="76" Height="24" Default="yes" Text="복구"><Publish Property="REINSTALL" Value="ALL"/><Publish Property="REINSTALLMODE" Value="amus"/><Publish Event="EndDialog" Value="Return"/></Control>
+        <Control Id="Remove" Type="PushButton" X="230" Y="202" Width="76" Height="24" Text="제거"><Publish Property="REMOVE" Value="ALL"/><Publish Event="EndDialog" Value="Return"/></Control>
+        <Control Id="Cancel" Type="PushButton" X="316" Y="202" Width="76" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit"/></Control>
+      </Dialog>
+      <Dialog Id="Complete" Width="420" Height="240" Title="FolderState">
+        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" Text="{\TitleFont}작업이 완료되었습니다"/>
+        <Control Id="Body" Type="Text" X="24" Y="80" Width="370" Height="76" Text="설치한 경우 시작 메뉴에서 FolderState를 열 수 있습니다.&#13;&#10;탐색기 메뉴가 보이지 않으면 탐색기 창을 다시 열어 주세요.&#13;&#10;&#13;&#10;업무 폴더의 상태정보는 프로그램 제거 후에도 보존됩니다."/>
+        <Control Id="Close" Type="PushButton" X="316" Y="195" Width="76" Height="24" Default="yes" Cancel="yes" Text="닫기"><Publish Event="EndDialog" Value="Return"/></Control>
+      </Dialog>
+      <InstallUISequence><Show Dialog="Welcome" Before="Maintenance" Condition="NOT Installed"/><Show Dialog="Maintenance" Before="Progress" Condition="Installed AND NOT REMOVE AND NOT REINSTALL"/><Show Dialog="Progress" Before="ExecuteAction"/><Show Dialog="Complete" OnExit="success"/></InstallUISequence>
+    </UI>
+  </Package>
+</Wix>

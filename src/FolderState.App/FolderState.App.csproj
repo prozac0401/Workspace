@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework><UseWPF>true</UseWPF><AssemblyName>FolderState</AssemblyName><ApplicationManifest>../app.manifest</ApplicationManifest><ApplicationIcon>../../assets/icons/app.ico</ApplicationIcon></PropertyGroup>
+  <ItemGroup><ProjectReference Include="../FolderState.Core/FolderState.Core.csproj"/><Content Include="../../assets/icons/*.ico" Link="icons/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest"/></ItemGroup>
+</Project>

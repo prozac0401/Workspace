@@ -1,10 +1,11 @@
 site_name: Workspace · 업무 운영 기준
-site_description: 업무 폴더 운영 정책과 FolderState 사용법
+site_description: 정리가 일이 되지 않는 업무 기준 — 빠른 판단, 최소 도입, 폴더·이메일 운영과 FolderState
 site_url: https://prozac0401.github.io/Workspace/
 exclude_docs: |
   **
   !/index.md
   !/getting-started.md
+  !/quick-reference.md
   !/policies/workspace.md
   !/policies/kits.md
   !/policies/files-email.md
@@ -67,18 +68,20 @@ extra_css:
 nav:
   - 시작:
       - 운영 기준 안내: index.md
+      - 빠른 판단 기준: quick-reference.md
       - 도입 순서: getting-started.md
       - 결정이 필요한 항목: policies/decisions.md
-  - 운영 정책:
+  - 기본 운영:
       - 기본 구조와 원본: policies/workspace.md
       - 업무 키트와 일정: policies/kits.md
       - 파일과 이메일: policies/files-email.md
       - 보관·보안·백업: policies/archive-security.md
-      - 진행·인수인계 개선안: policies/folder-workflow.md
   - FolderState:
       - 사용 안내: tools/folderstate/index.md
       - 설치·제거·업그레이드: tools/folderstate/installation.md
       - 명령줄과 오류 해결: tools/folderstate/troubleshooting.md
+  - 운영 개선 (선택):
+      - 진행·인수인계 개선안: policies/folder-workflow.md
 validation:
   nav:
     omitted_files: info
