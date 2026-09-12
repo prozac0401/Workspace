@@ -1,6 +1,8 @@
 # ADR-0003 · Markdown과 GitHub Pages
 
-상태: 구현에 채택 · 날짜: 2026-09-12 · 관련: GitHub io 게시 요청 / POL-005
+상태: 구현에 채택 · 날짜: 2026-09-12 · 관련: GitHub io 게시 요청 / [정책 문서 작성 규칙](../policies/documentation.md)
+
+후속 결정: [ADR-0004](0004-public-handbook.md)가 사이트 공개 범위를 업무 운영 정책·사용법으로 제한합니다.
 
 ## 결정
 
