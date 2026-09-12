@@ -1,0 +1,239 @@
+{
+  "product": "FolderState",
+  "version": "0.1.0",
+  "classification": "unsigned evaluation",
+  "engine": {
+    "timestamp": "2026-09-12T14:25:46.737462+09:00",
+    "os": "Microsoft Windows NT 10.0.22631.0",
+    "total": 27,
+    "failed": 0,
+    "tests": [
+      {
+        "name": "four states / Unicode / spaces / files unchanged",
+        "passed": true,
+        "milliseconds": 311
+      },
+      {
+        "name": "desktop exact bytes and attributes restored",
+        "passed": true,
+        "milliseconds": 174
+      },
+      {
+        "name": "preexisting folder customization retained",
+        "passed": true,
+        "milliseconds": 37
+      },
+      {
+        "name": "external unrelated edits survive reset",
+        "passed": true,
+        "milliseconds": 74
+      },
+      {
+        "name": "external icon edit is protected",
+        "passed": true,
+        "milliseconds": 48
+      },
+      {
+        "name": "repair lost desktop / timestamp stable",
+        "passed": true,
+        "milliseconds": 57
+      },
+      {
+        "name": "repair local icon after folder copied",
+        "passed": true,
+        "milliseconds": 74
+      },
+      {
+        "name": "portable / mode retained / local transition / reset",
+        "passed": true,
+        "milliseconds": 145
+      },
+      {
+        "name": "unowned portable icon never overwritten",
+        "passed": true,
+        "milliseconds": 5
+      },
+      {
+        "name": "changed portable icon blocks reset without partial deletion",
+        "passed": true,
+        "milliseconds": 52
+      },
+      {
+        "name": "malformed / foreign / future metadata preserved",
+        "passed": true,
+        "milliseconds": 14
+      },
+      {
+        "name": "ambiguous desktop is preserved",
+        "passed": true,
+        "milliseconds": 3
+      },
+      {
+        "name": "oversized metadata does not allocate without bound",
+        "passed": true,
+        "milliseconds": 13
+      },
+      {
+        "name": "missing icon causes no state change",
+        "passed": true,
+        "milliseconds": 2
+      },
+      {
+        "name": "fault after each transaction stage restores exact original",
+        "passed": true,
+        "milliseconds": 293
+      },
+      {
+        "name": "failed reset restores previous state",
+        "passed": true,
+        "milliseconds": 70
+      },
+      {
+        "name": "file lock does not destroy existing state",
+        "passed": true,
+        "milliseconds": 37
+      },
+      {
+        "name": "concurrent operations serialized",
+        "passed": true,
+        "milliseconds": 453
+      },
+      {
+        "name": "long path above 260 characters",
+        "passed": true,
+        "milliseconds": 49
+      },
+      {
+        "name": "files not enumerated or modified with 10000 entries",
+        "passed": true,
+        "milliseconds": 14220
+      },
+      {
+        "name": "mixed batch reports per-folder success",
+        "passed": true,
+        "milliseconds": 31
+      },
+      {
+        "name": "argument errors rejected",
+        "passed": true,
+        "milliseconds": 0
+      },
+      {
+        "name": "invalid path and root do not mutate",
+        "passed": true,
+        "milliseconds": 0
+      },
+      {
+        "name": "JSON audit log emitted outside business folder",
+        "passed": true,
+        "milliseconds": 69
+      },
+      {
+        "name": "process interruption recovers persisted transaction",
+        "passed": true,
+        "milliseconds": 1428
+      },
+      {
+        "name": "hard-linked metadata does not alter business file",
+        "passed": true,
+        "milliseconds": 5
+      },
+      {
+        "name": "damaged journal is retained without changing files",
+        "passed": true,
+        "milliseconds": 36
+      }
+    ]
+  },
+  "installer": {
+    "elevated": false,
+    "timestamp": "2026-09-12T14:34:29.5376599+09:00",
+    "os": "Microsoft Windows NT 10.0.22631.0",
+    "results": [
+      {
+        "exitCode": 0,
+        "name": "install",
+        "passed": true
+      },
+      {
+        "name": "HKCU Explorer menu",
+        "passed": true
+      },
+      {
+        "name": "self-contained CLI present",
+        "passed": true
+      },
+      {
+        "name": "installed CLI works",
+        "passed": true
+      },
+      {
+        "name": "state recorded",
+        "passed": true
+      },
+      {
+        "exitCode": 0,
+        "name": "repair",
+        "passed": true
+      },
+      {
+        "name": "missing icon repaired",
+        "passed": true
+      },
+      {
+        "exitCode": 0,
+        "name": "upgrade",
+        "passed": true
+      },
+      {
+        "exitCode": 1603,
+        "name": "downgrade-blocked",
+        "passed": true
+      },
+      {
+        "name": "downgrade rejected for version reason",
+        "passed": true
+      },
+      {
+        "name": "CLI retained after upgrade",
+        "passed": true
+      },
+      {
+        "name": "saved state readable after upgrade",
+        "passed": true
+      },
+      {
+        "exitCode": 0,
+        "name": "uninstall",
+        "passed": true
+      },
+      {
+        "name": "menu removed",
+        "passed": true
+      },
+      {
+        "name": "program removed",
+        "passed": true
+      },
+      {
+        "name": "business file untouched",
+        "passed": true
+      },
+      {
+        "name": "folder metadata survives uninstall",
+        "passed": true
+      }
+    ]
+  },
+  "package": {
+    "bytes": 50436345,
+    "sha256": "ff50e5d5dfe7d4d2689cdaedb79b47b45961bd1bdf106b95a3d360501d107346",
+    "signature": "NotSigned"
+  },
+  "ui": {
+    "renderer": "WPF offscreen",
+    "requiredControls": true,
+    "statusIcons": 4,
+    "manualExplorerValidation": false
+  }
+}

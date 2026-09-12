@@ -2,6 +2,8 @@
 
 ## 요구 환경
 
+개발 소스가 포함된 로컬 Workspace에서 실행합니다. 공개 문서 저장소만 내려받은 경우에는 아래 문서 빌드 명령만 사용할 수 있습니다.
+
 Windows 11 x64, global.json에 고정된 .NET 10 SDK, PowerShell을 사용합니다. 도구 매니페스트는 WiX 4.0.6을 고정합니다. 처음 복원 시 NuGet 네트워크 접근이 필요합니다. 생성된 아이콘은 저장소에 포함되며 재생성 때만 Pillow가 필요합니다.
 
 ```powershell
@@ -18,6 +20,7 @@ build.ps1은 통합 테스트 → WPF·CLI 자체 포함 publish → 고정 설�
 ```powershell
 python -m pip install -r requirements-docs.txt
 python -m mkdocs build --strict
+python scripts/check-site.py site
 python -m mkdocs serve
 ```
 
