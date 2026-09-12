@@ -1,5 +1,21 @@
 # 검증 기록
 
+## 업무 안내 공개 범위 변경 · 2026-09-12
+
+Windows의 Python 3.11 격리 환경에서 requirements-docs.txt의 MkDocs 1.6.1·Material 9.7.7을 사용했습니다.
+
+| 검사 | 실제 결과 |
+|---|---|
+| python -m mkdocs build --strict | 통과 |
+| python scripts/check-site.py site | 공개 문서 11개 + 404, 로컬 링크·자산 검사 통과 |
+| 검색 인덱스·사이트맵 | 공개 문서 11개 경로만 포함 |
+| 개발 HTML·보조 자산 제외 | design·delivery·forms·specifications 및 개발 정책·구조·대응표, help.html·verification.json 제외 |
+| 새 파일 기본 제외 | 미등록 루트 문서·정책 문서·도구 구조 문서·JSON 자산의 제외 패턴 확인 |
+| 검사기 실패 감지 | 생성물에 개발 HTML·검증 JSON·검색 항목·사이트맵 항목을 각각 임시 삽입했을 때 모두 실패, 원상복구 후 통과 |
+| 브라우저 확인 | 홈의 숫자 없는 두 카드, 시작·운영 정책·FolderState 메뉴와 신규 개선안 표시 확인 |
+
+정책 개선 아이템의 실제 업무 효과는 측정하지 않았으며 POL-007과 DEC-021–025는 제안·미확정입니다. 엔진·WPF·MSI 변경은 없어 해당 제품 검증은 재실행하지 않았습니다. 이 표는 문서 검증 결과이며 제품의 상용 출시 승인을 의미하지 않습니다. Pages 게시 결과는 해당 main 커밋의 Documentation 워크플로와 실제 공개 URL에서 별도로 확인합니다.
+
 검증일: 2026-09-12 · 제품: FolderState 0.1.0 · 환경: Windows 11 x64, OS 10.0.22631.0.
 
 ## 결과
