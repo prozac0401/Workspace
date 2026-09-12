@@ -1,5 +1,17 @@
 # 검증 기록
 
+## 업무효율화 확장 지도 게시 · 2026-09-12
+
+사용자의 후속 게시 요청에 따라 검증한 문서 변경을 GitHub main과 Pages에 반영했습니다. 아래 ‘로컬 미배포’ 표기는 앞선 문서 작성·검증 완료 시점의 기록입니다.
+
+- 콘텐츠 커밋: 0a97f45aa50c8b3dbf4a335b95545fcab2457952, main 푸시 완료.
+- [Documentation 배포 실행](https://github.com/prozac0401/Workspace/actions/runs/34686873470): completed / success. strict 빌드·공개 범위 검사·Pages 배포 통과.
+- 실제 Pages 공개 페이지 14개 모두 HTTP 200. 홈의 ‘05 / 다음 단계’와 새 장의 Work Inbox·업무 지식·AI 및 Agent 절, 마지막 운영 원칙 문구 확인.
+- 자체 자산 8개 모두 HTTP 200이며 응답 바이트의 SHA-256이 로컬 docs 원본과 일치.
+- 공개 검색 인덱스의 경로 집합이 허용 목록 14개와 일치하며 새 확장 장 포함.
+- PPTX 원본, delivery/verification/, assets/verification.json의 직접 URL은 HTTP 404.
+- 이 결과를 기록하는 후속 커밋은 Pages의 공개 콘텐츠와 허용 범위를 추가로 변경하지 않습니다. 조직별 도입·업무 효과의 미검증 상태는 유지합니다.
+
 ## 업무효율화 확장 지도 · 2026-09-12
 
 사용자 피드백에 따라 기존 10대 원칙 본문을 유지하고, 홈의 ‘05 / 다음 단계’와 [업무효율화의 확장 순서](../policies/work-efficiency.md)를 추가했습니다. Work Inbox는 기존 원본을 연결하는 업무 판단 창구로, 지식화는 문제·결정·결과를 다음 업무에 재사용하는 방식으로 설명합니다. 자동화·AI·Agent는 선택 적용 제안이며 구현 또는 조직 승인 완료를 의미하지 않습니다.
