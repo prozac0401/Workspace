@@ -111,6 +111,9 @@ body {
 .role-map > div { border-top: 2px solid var(--handbook-line); padding-top: .8rem; }
 .role-map dt { font-size: .8rem; font-weight: 700; margin: 0; }
 .md-typeset .role-map dd { font-size: .7rem; color: var(--handbook-muted); margin: .35rem 0 0; }
+.md-typeset ol.efficiency-path { display: flex; flex-wrap: wrap; gap: .6rem 0; list-style: none; margin: 1.4rem 0; padding: 1rem 1.2rem; background: var(--handbook-soft); border-left: 3px solid var(--handbook-brass); }
+.md-typeset .efficiency-path li { display: flex; align-items: center; margin: 0; font-size: .95rem; font-weight: 700; }
+.efficiency-path li + li::before { content: "→"; color: var(--handbook-brass); margin: 0 .8rem; font-weight: 400; }
 .handbook-closing { padding: 1.8rem 2rem; background: var(--handbook-soft); border-left: 3px solid var(--handbook-brass); margin: 0 0 2rem; }
 .handbook-closing strong { font-size: 1.1rem; }
 .handbook-closing p { margin: .6em 0; }

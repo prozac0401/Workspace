@@ -11,6 +11,7 @@ public_routes = {
     '', 'getting-started/', 'quick-reference/', 'principles/',
     'policies/workspace/', 'policies/kits/', 'policies/files-email/',
     'policies/archive-security/', 'policies/decisions/', 'policies/folder-workflow/',
+    'policies/work-efficiency/',
     'tools/folderstate/', 'tools/folderstate/installation/',
     'tools/folderstate/troubleshooting/',
 }

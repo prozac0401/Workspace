@@ -148,6 +148,8 @@ MASTER는 다음 업무를 시작할 때 복사하는 표준 틀입니다. 실�
 [한 회차부터 도입하기](getting-started.md){ .md-button .md-button--primary }
 [조직에서 결정할 항목](policies/decisions.md){ .md-button }
 
+기본 흐름을 쓴 뒤 반복되는 불편이 생기면 [업무효율화의 확장 순서](policies/work-efficiency.md)에서 Work Inbox·업무 지식·자동화·Agent로 이어지는 다음 단계를 살펴보세요.
+
 ---
 
 기본원칙 v0.1 · 제안 단계. 제공된 「업무효율화·정리정돈 기본원칙 v0.1」의 10대 원칙을 기존 운영 정책에 연결한 요약 안내입니다. 예시는 가상이며 실제 조직 설정과 업무 효과는 시범 적용 후 확인합니다.

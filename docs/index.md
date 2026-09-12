@@ -1,6 +1,6 @@
 ---
 title: 업무 운영 기준
-description: 다시 찾고, 이어가고, 넘길 수 있는 업무. 정리가 일이 되지 않는 10가지 원칙과 한 회차부터 시작하는 운영 안내.
+description: 다시 찾고, 이어가고, 넘길 수 있는 업무. 10대 원칙에서 Work Inbox, 업무 지식, 자동화와 Agent로 이어지는 운영 안내.
 hide:
   - navigation
   - toc
@@ -147,6 +147,32 @@ hide:
 [FolderState 사용 안내](tools/folderstate/index.md){ .md-button }
 
 </div>
+
+</section>
+
+<section class="handbook-section" aria-labelledby="next-steps" markdown>
+
+<span class="eyebrow">05 / 다음 단계</span>
+
+## 정리에서 업무효율화로 {#next-steps}
+
+다시 찾을 수 있는 업무를 바탕으로, 요청을 놓치지 않고 과거의 해결 경험을 다음 업무에 활용합니다.
+
+<ol class="efficiency-path" aria-label="업무효율화의 확장 순서">
+<li>정리</li>
+<li>흐름</li>
+<li>표준화</li>
+<li>기록</li>
+<li>지식</li>
+<li>자동화</li>
+<li>Agent</li>
+</ol>
+
+**한 단계를 건너뛰기보다, 현재 반복해서 불편한 지점을 다음 단계로 삼습니다.**
+
+[Work Inbox](policies/work-efficiency.md#work-inbox)는 여러 채널의 요청을 다음 행동으로 연결하고, [업무 지식](policies/work-efficiency.md#knowledge)은 문제·결정·결과를 원본과 함께 다시 찾게 합니다. [Agent](policies/work-efficiency.md#ai-agent)에는 정해진 원칙과 업무 흐름 안에서 실행을 맡깁니다.
+
+[업무효율화의 확장 순서 살펴보기](policies/work-efficiency.md){ .text-link }
 
 </section>
 
