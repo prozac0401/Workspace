@@ -1,0 +1,95 @@
+site_name: Workspace · 업무 운영 기준
+site_description: 반복 업무의 정리 정책, 설계 기록, FolderState 사용과 배포 기준
+site_url: https://prozac0401.github.io/Workspace/
+repo_url: https://github.com/prozac0401/Workspace
+repo_name: prozac0401/Workspace
+edit_uri: edit/main/docs/
+theme:
+  name: material
+  language: ko
+  font: false
+  icon:
+    logo: material/folder-check-outline
+  palette:
+    - scheme: default
+      primary: custom
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: 어두운 화면으로 전환
+    - scheme: slate
+      primary: custom
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: 밝은 화면으로 전환
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - content.action.edit
+    - search.highlight
+    - search.suggest
+plugins:
+  - search:
+      lang: en
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+extra_css:
+  - assets/extra.css
+nav:
+  - 시작:
+      - 운영 기준 안내: index.md
+      - 도입 순서: getting-started.md
+      - 결정이 필요한 항목: policies/decisions.md
+  - 운영 정책:
+      - 기본 구조와 원본: policies/workspace.md
+      - 업무 키트와 일정: policies/kits.md
+      - 파일과 이메일: policies/files-email.md
+      - 보관·보안·백업: policies/archive-security.md
+      - 정책 문서 작성 규칙: policies/documentation.md
+      - 추가 도구 개발 기준: policies/tools.md
+  - FolderState:
+      - 사용 안내: tools/folderstate/index.md
+      - 설치·제거·업그레이드: tools/folderstate/installation.md
+      - 명령줄과 오류 해결: tools/folderstate/troubleshooting.md
+      - 구조와 데이터 계약: tools/folderstate/architecture.md
+      - 명세 대응표: tools/folderstate/traceability.md
+  - 설계와 양식:
+      - 설계 결정 목록: design/index.md
+      - ADR-0001 최소 개입 엔진: design/0001-engine.md
+      - ADR-0002 MSI 배포: design/0002-distribution.md
+      - ADR-0003 문서 저장소: design/0003-documentation.md
+      - 재사용 양식: forms/index.md
+      - 정책 양식: forms/policy.md
+      - 설계 결정 양식: forms/adr.md
+      - 도구 명세 양식: forms/tool.md
+      - 운영현황·키트 양식: forms/operation.md
+  - 배포와 검증:
+      - 개발과 빌드: delivery/build.md
+      - 상용 배포 품질 기준: delivery/quality.md
+      - 검증 기록: delivery/verification.md
+      - 변경 이력: delivery/changelog.md
+      - GitHub Pages 운영: delivery/pages.md
+  - 원문 명세:
+      - 01 폴더 상태 도구: specifications/01.md
+      - 02 정리 설계안: specifications/02.md
+validation:
+  nav:
+    omitted_files: info
+    not_found: warn
+  links:
+    not_found: warn
+    anchors: warn
+    unrecognized_links: warn

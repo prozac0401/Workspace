@@ -1,0 +1,13 @@
+:root { --md-primary-fg-color: #14283f; --md-accent-fg-color: #087f8c; }
+body { font-family: "Segoe UI", "Malgun Gothic", sans-serif; }
+.md-typeset { font-size: .79rem; line-height: 1.85; }
+.md-typeset h1 { font-weight: 750; letter-spacing: -.035em; color: var(--md-default-fg-color); }
+.md-typeset h2 { font-weight: 650; letter-spacing: -.025em; margin-top: 2em; }
+.md-header { box-shadow: none; border-bottom: 1px solid #ffffff18; }
+.md-tabs { background: #14283f; }
+.md-typeset table:not([class]) th { background: #edf4f7; color: #14283f; }
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th { background: #223c50; color: #ecf4fa; }
+.md-typeset .grid.cards > ul > li { border-radius: 8px; padding: 1.2em; }
+.md-typeset .admonition { font-size: .74rem; }
+.md-typeset code { font-family: Consolas, monospace; }
+.eyebrow { color: #087f8c; font-size: .72rem; font-weight: 700; letter-spacing: .08em; }
