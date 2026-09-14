@@ -10,7 +10,7 @@ if(Test-Path -LiteralPath $output){throw 'Use a fresh evidence directory.'}
 [void](New-Item -ItemType Directory -Path $output)
 $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $tool 'Setup.ps1'),[ref]$null,[ref]$null)
 foreach($function in $ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst]},$false)) { . ([scriptblock]::Create($function.Extent.Text)) }
-$ProductId='SLC-68A45C44-2026';$Version='0.2.0';$InstallerVersion='0.2.0-rc.2';$ConfirmProduct=$ProductId
+$ProductId='SLC-68A45C44-2026';$Version='0.2.0';$InstallerVersion='0.2.0-rc.3';$ConfirmProduct=$ProductId
 $Root=Join-Path $tool 'Release'
 $sandbox='Software\SLC-Installer-Tests\'+[Guid]::NewGuid().ToString('N')
 $RegistrySandbox=$sandbox+'\Excel'
@@ -97,7 +97,7 @@ try {
     $enable=(Get-Command Enable-TrustedLocation).ScriptBlock
     function Enable-TrustedLocation([string]$OfficeVersion,$Plan){& $enable $OfficeVersion $Plan;throw 'Synthetic failure after activation, before OPEN write.'}
     $rejected=$false;try{Install-Addin}catch{$rejected=$true}
-    Check 'Failure after trust activation rolls back files and trust' ($rejected -and @(Get-ChildItem -LiteralPath $InstallDir -Force).Count -eq 0 -and $null -eq [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey((Trust-RootPath '16.0')))
+    Check 'Failure after trust activation rolls back files, directory and trust' ($rejected -and -not(Test-Path -LiteralPath $InstallDir) -and $null -eq [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey((Trust-RootPath '16.0')))
     Set-Item -LiteralPath Function:Enable-TrustedLocation -Value $enable
 
     New-Case;Install-Addin;$owner=Read-OwnManifest
@@ -105,7 +105,7 @@ try {
     $owner.PSObject.Properties.Remove('trustedLocation');$owner.PSObject.Properties.Remove('installerVersion')
     $owner | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $Manifest -Encoding UTF8
     Install-Addin;$upgraded=Read-OwnManifest
-    Check 'RC1 ownership record upgrades to RC2 trust' ($upgraded.trustedLocation.owned -and $upgraded.installerVersion -eq '0.2.0-rc.2')
+    Check 'RC1 ownership record upgrades to current trust' ($upgraded.trustedLocation.owned -and $upgraded.installerVersion -eq $InstallerVersion)
     Uninstall-Addin
 
     New-Case;[void](New-Item -ItemType Directory -Path $InstallDir)

@@ -42,6 +42,8 @@
 
 ## 3. 제한과 지연 경고
 
+RC3의 실제 대용량·일반 Windows 설치 검증은 [검증 보고서](docs/WINDOWS_ROBUSTNESS_REPORT.md)를 따릅니다. 100,000셀은 안전 상한이며 모든 입력의 처리 완료를 보장하는 성능 수치가 아닙니다.
+
 다음 숫자는 **보수적으로 정한 초기 운영 기본값**이며 Excel 실측 성능 보장치가 아닙니다. 설정 화면은 없고 개발 상수로 관리합니다.
 
 | 조건 | 기본값 / 동작 |
@@ -105,6 +107,8 @@
 사용자별 설치 위치: `%LOCALAPPDATA%\ExcelSmartListCompare`.
 
 관리자 권한은 요구하지 않습니다. 설치는 해당 제품 경로를 HKCU의 Excel `Options/OPEN[n]`에 등록합니다. RC2부터 제품 폴더만 Excel 신뢰 위치로 자동 등록하며 하위 폴더는 제외합니다. 이 폴더의 파일은 매크로 알림 없이 실행될 수 있으므로 제품 파일만 보관하세요. 기존 사용자 신뢰 위치는 보존하고, 제거 시 자기 설치가 만든 변경되지 않은 항목만 삭제합니다. [설계와 요구 변경](docs/ADR-0003-Product-trusted-location.md), [RC2 검증 결과](docs/WINDOWS_TRUST_LOCATION_REPORT.md)를 참고하세요.
+
+RC3는 XLAM과 새 설치 기록의 실제 저장 경로를 확인합니다. AppData가 별도 경로로 리디렉션되는 터미널에서는 기존 설치를 보존하며 종료 코드 6으로 중단합니다. 일반 Windows 파일 탐색기에서 `Release\Install.cmd`를 실행하세요. [경로 검증 설계](docs/ADR-0004-Physical-install-path.md)를 참고하세요.
 
 설치·제거 중 Excel 프로세스를 만들지 않습니다. 제거 시 정확히 일치하는 자기 경로 등록과 소유 파일만 삭제하며 설치 폴더에 추가된 다른 파일은 남깁니다. 다른 추가 기능, `PERSONAL.XLSB`, 사용자 통합문서는 삭제하지 않습니다.
 

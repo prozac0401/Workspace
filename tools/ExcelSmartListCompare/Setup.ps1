@@ -13,7 +13,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProductId = 'SLC-68A45C44-2026'
 $Version = '0.2.0'
-$InstallerVersion = '0.2.0-rc.2'
+$InstallerVersion = '0.2.0-rc.3'
 $Root = $PSScriptRoot
 $InstallDir = Join-Path $env:LOCALAPPDATA 'ExcelSmartListCompare'
 $Target = Join-Path $InstallDir 'ExcelSmartListCompare.xlam'
@@ -71,6 +71,34 @@ function Bytes-Sha256([byte[]]$Bytes) {
     $hash = [Security.Cryptography.SHA256]::Create()
     try { return ([BitConverter]::ToString($hash.ComputeHash($Bytes))).Replace('-', '') }
     finally { $hash.Dispose() }
+}
+function Assert-UnredirectedInstallPath([string]$Path) {
+    # A packaged terminal can redirect AppData while ordinary Excel sees another
+    # filesystem view. Never claim success or trust a different directory.
+    if (-not ('SlcSetupPhysicalPath' -as [type])) {
+        Add-Type @'
+using System;
+using System.Text;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+public static class SlcSetupPhysicalPath {
+    [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)]
+    public static extern uint GetFinalPathNameByHandle(SafeFileHandle handle, StringBuilder path, uint capacity, uint flags);
+}
+'@
+    }
+    $stream = [IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+    try {
+        $buffer = New-Object Text.StringBuilder 32768
+        $length = [SlcSetupPhysicalPath]::GetFinalPathNameByHandle($stream.SafeFileHandle,$buffer,32768,0)
+        if ($length -eq 0 -or $length -ge 32768) { throw (Setup-Failure '설치 파일의 실제 저장 경로를 확인하지 못했습니다. 설치를 취소합니다.' 6) }
+        $actual = $buffer.ToString()
+        if ($actual.StartsWith('\\?\UNC\')) { $actual = '\\'+$actual.Substring(8) }
+        elseif ($actual.StartsWith('\\?\')) { $actual = $actual.Substring(4) }
+        if ($actual -ine [IO.Path]::GetFullPath($Path)) {
+            throw (Setup-Failure '실제 저장 경로가 설치 경로와 다릅니다. 일반 파일 탐색기에서 Release의 Install.cmd를 실행해 주세요. 기존 설치는 유지됩니다.' 6)
+        }
+    } finally { $stream.Dispose() }
 }
 function Write-PackageMetadata([string]$Path) {
     # Write product metadata without Office's default personal author identity.
@@ -481,6 +509,8 @@ function Install-Addin {
         if (Test-Path -LiteralPath $file -PathType Leaf) { $backup[$name] = [IO.File]::ReadAllBytes($file) }
     }
     $temporary = $null
+    $directoryExisted = Test-Path -LiteralPath $InstallDir
+    $installFailed = $false
     try {
         [void](New-Item -ItemType Directory -Path $InstallDir -Force)
         Copy-Item -LiteralPath $payload -Destination $Target -Force
@@ -491,6 +521,7 @@ function Install-Addin {
             if ([IO.Path]::GetFullPath($source) -ine [IO.Path]::GetFullPath($destination)) { Copy-Item -LiteralPath $source -Destination $destination -Force; $written[$name] = File-Sha256 $destination }
         }
         if ((File-Sha256 $Target) -ne $payloadHash) { throw 'Copied XLAM hash mismatch.' }
+        Assert-UnredirectedInstallPath $Target
         $names = @($before.Keys | Sort-Object)
         if ($names.Count) { $openName = $names[0] }
         else {
@@ -501,6 +532,7 @@ function Install-Addin {
         $data = [ordered]@{productId=$ProductId;version=$Version;installerVersion=$InstallerVersion;installDirectory=$InstallDir;installedAt=(Get-Date).ToString('o');excelVersion=$officeVersion;sha256=$payloadHash;openValueName=$openName;ownedFiles=$ownedFiles;trustedLocation=$trustPlan.record}
         $temporary = Join-Path $InstallDir ('slc-install-' + [Guid]::NewGuid().ToString('N') + '.json')
         [IO.File]::WriteAllText($temporary, ($data | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($true))
+        Assert-UnredirectedInstallPath $temporary
         if (Test-Path -LiteralPath $Manifest) { [IO.File]::Replace($temporary,$Manifest,[NullString]::Value) } else { [IO.File]::Move($temporary,$Manifest) }
         $temporary = $null
         $written['install.json'] = File-Sha256 $Manifest
@@ -515,6 +547,7 @@ function Install-Addin {
         Write-Host ('Excel 신뢰 위치: ' + $InstallDir + ' (기존 항목은 보존합니다.)')
         Write-Host ('Uninstall: ' + (Join-Path $InstallDir 'Uninstall.cmd'))
     } catch {
+        $installFailed = $true
         if ($null -ne $trustPlan.PSObject.Properties['created'] -and $trustPlan.created) { Remove-OwnedTrustedLocation $officeVersion $trustPlan.record }
         # Roll back only this exact product path; preserve unrelated OPEN values.
         foreach ($name in @((Own-OpenEntries $options).Keys)) { $options.DeleteValue($name,$false) }
@@ -534,6 +567,10 @@ function Install-Addin {
     } finally {
         $options.Close()
         if ($null -ne $temporary -and (Test-Path -LiteralPath $temporary)) { Remove-Item -LiteralPath $temporary -Force }
+        if ($installFailed -and -not $directoryExisted -and (Test-Path -LiteralPath $InstallDir)) {
+            # Nonrecursive deletion refuses any file added by another process.
+            try { [IO.Directory]::Delete($InstallDir,$false) } catch { Write-Warning '설치 폴더의 추가 파일은 보존했습니다.' }
+        }
     }
 }
 function Uninstall-Addin {

@@ -81,6 +81,20 @@ internal sealed class IniDocument
         if (!text.EndsWith(newline, StringComparison.Ordinal)) text += newline;
         return [.. Encoding.Unicode.GetPreamble(), .. Encoding.Unicode.GetBytes(text)];
     }
+    public bool HasOtherData(IReadOnlyDictionary<string, string[]> owned)
+    {
+        string section = "";
+        foreach (string line in lines)
+        {
+            string value = line.Trim();
+            if (value.Length == 0) continue;
+            if (value.StartsWith('[') && value.EndsWith(']'))
+            { section = value[1..^1]; if (!owned.ContainsKey(section)) return true; }
+            else if (!TryKey(line, out var key) || !owned.TryGetValue(section, out var keys) ||
+                !keys.Contains(key, StringComparer.OrdinalIgnoreCase)) return true;
+        }
+        return false;
+    }
     private (int Start, int End) Range(string section)
     {
         int start = -1;

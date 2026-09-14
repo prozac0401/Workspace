@@ -1,5 +1,9 @@
 # 검증 기록
 
+## 도구 강건성 재검증 · 2026-09-15
+
+FolderState 0.1.1의 아이콘 갱신 수정, 엔진 37개, 실제 MSI·Explorer 검증과 원복은 [실제 검증 기록](robustness-20260914.md)에 기록했다. 실제 재부팅·공유 저장소·설치창 UI는 미실행이며 서명 없는 평가용 후보이다. Excel의 일반 데스크톱 설치와 대용량 재검증은 [Excel RC3 보고서](../../tools/ExcelSmartListCompare/docs/WINDOWS_ROBUSTNESS_REPORT.md)를 따른다.
+
 ## 업무효율화 확장 지도 게시 · 2026-09-12
 
 사용자의 후속 게시 요청에 따라 검증한 문서 변경을 GitHub main과 Pages에 반영했습니다. 아래 ‘로컬 미배포’ 표기는 앞선 문서 작성·검증 완료 시점의 기록입니다.

@@ -1,5 +1,7 @@
 # Excel Smart List Compare · 실제 Windows E2E 보고서
 
+> 후속 범위 정정(2026-09-15): 아래 RC1 기록은 당시 실행 호스트의 파일·레지스트리 보기에서 수행한 실제 Excel 시험이다. 일반 데스크톱 설치의 추가 검증은 [RC3 보고서](WINDOWS_ROBUSTNESS_REPORT.md)를 따른다. 이전 실제 VBA 빌드·기능 실행 결과는 보존한다.
+
 이 문서는 RC1에서 수행한 VBA 엔진·설치 검증의 보존 기록이다. RC2의 제품 폴더 신뢰 위치 자동 등록과 후속 실행 결과는 [RC2 보고서](WINDOWS_TRUST_LOCATION_REPORT.md)에 따로 기록한다. XLAM은 두 후보에서 동일하다.
 
 실행일: 2026-09-14 · 최종 확인: 21:22 KST · 판정: **설치 가능한 평가용 배포 후보**

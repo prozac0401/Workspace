@@ -17,7 +17,7 @@ for relative in set(re.findall(r'<img[^>]+src="([^"]+)"', content)):
 for name, route in [('installation.md', 'installation/'), ('index.md', ''), ('troubleshooting.md', 'troubleshooting/')]:
     content = content.replace('href="' + name + '"', 'href="https://prozac0401.github.io/Workspace/tools/folderstate/' + route + '"')
 page = '''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FolderState 0.1.0 설치·사용 퀵가이드</title><style>
+<title>FolderState 0.1.1 설치·사용 퀵가이드</title><style>
 body{margin:0;background:#edf2f6;color:#172c42;font:17px/1.75 "Malgun Gothic",sans-serif}
 main{max-width:940px;margin:36px auto;background:white;padding:40px 52px;border-radius:16px}
 h1{font-size:32px;line-height:1.4;margin-top:0}h2{font-size:23px;margin-top:38px;border-top:1px solid #dbe4ec;padding-top:24px}
@@ -26,7 +26,7 @@ table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #dbe4ec;
 li{margin-bottom:7px}@media(max-width:650px){main{padding:24px;margin:0;border-radius:0}body{font-size:16px}h1{font-size:27px}}
 @media print{body{background:white;font-size:11pt}main{margin:0;padding:0}img{max-height:150mm;object-fit:contain}h2{break-after:avoid}table,img{break-inside:avoid}}
 </style><main>''' + content + '</main></html>'
-output = root / 'artifacts/release/FolderState-0.1.0-QuickGuide.html'
+output = root / 'artifacts/release/FolderState-0.1.1-QuickGuide.html'
 output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(page, encoding='utf-8')
 print(output.name)

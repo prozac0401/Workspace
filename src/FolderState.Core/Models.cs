@@ -13,8 +13,15 @@ public sealed class StateException(string code, string message) : Exception(mess
 internal sealed record Snapshot(byte[]? Data, FileAttributes Attributes)
 {
     public static readonly Snapshot Missing = new(null, 0);
+    [System.Text.Json.Serialization.JsonExtensionData]
+    public Dictionary<string, JsonElement>? Extensions { get; init; }
 }
-internal sealed record Backup(Snapshot Desktop, bool FolderReadOnly, byte[] ManagedDesktop, string? PortableHash);
+internal sealed record Backup(Snapshot Desktop, bool FolderReadOnly, byte[] ManagedDesktop, string? PortableHash,
+    string? PortableName = null)
+{
+    [System.Text.Json.Serialization.JsonExtensionData]
+    public Dictionary<string, JsonElement>? Extensions { get; init; }
+}
 internal sealed record Metadata(int Version, string Owner, string Status, string Mode, DateTimeOffset Updated, Backup Backup);
 internal sealed record Change(string Name, Snapshot Before, Snapshot After);
 internal sealed record Transaction(int Version, string Owner, bool BeforeReadOnly, bool AfterReadOnly, Change[] Changes);

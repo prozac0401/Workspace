@@ -20,6 +20,7 @@ for filename, target, title in [
     ('QUICK_GUIDE.md', 'QuickGuide.html', 'Excel 명단 비교 설치·사용 퀵가이드'),
     ('WINDOWS_E2E_REPORT.md', 'Windows-E2E-Report.html', 'Excel 실제 Windows 테스트 보고서'),
     ('WINDOWS_TRUST_LOCATION_REPORT.md', 'Trust-Location-Report.html', 'Excel RC2 신뢰 위치 실제 검증 보고서'),
+    ('WINDOWS_ROBUSTNESS_REPORT.md', 'Robustness-Report.html', 'Excel RC3 실제 Windows 검증 보고서'),
 ]:
     source = tool / 'docs' / filename
     content = markdown.markdown(source.read_text(encoding='utf-8-sig'), extensions=['tables', 'fenced_code'])
@@ -32,6 +33,7 @@ for filename, target, title in [
     content = content.replace('href="WINDOWS_E2E_REPORT.md"', 'href="Windows-E2E-Report.html"')
     content = content.replace('href="QUICK_GUIDE.md"', 'href="QuickGuide.html"')
     content = content.replace('href="WINDOWS_TRUST_LOCATION_REPORT.md"', 'href="Trust-Location-Report.html"')
+    content = content.replace('href="WINDOWS_ROBUSTNESS_REPORT.md"', 'href="Robustness-Report.html"')
     # Source-only references remain precise public source links in offline output.
     def link(match):
         href = match.group(1)

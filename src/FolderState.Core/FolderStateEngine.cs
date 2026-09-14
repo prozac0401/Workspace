@@ -44,13 +44,18 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
             else
             {
                 var desktop = SafeFiles.Read(Path.Combine(target, DesktopFile));
-                var portable = SafeFiles.Read(Path.Combine(target, PortableFile));
                 var document = IniDocument.Read(desktop.Data);
                 bool folderReadOnly = File.GetAttributes(target).HasFlag(FileAttributes.ReadOnly);
                 var backup = metadata?.Backup ?? new Backup(desktop, folderReadOnly, [], null);
-                var changes = new List<Change>(); string? warning = null; bool afterReadOnly;
+                string previousIcon = backup.PortableName ?? PortableFile;
+                var portable = SafeFiles.Read(Path.Combine(target, previousIcon));
+                var changes = new List<Change>(); string? warning = null, refreshIcon = null; bool afterReadOnly;
                 if (action == "reset")
                 {
+                    if (backup.Extensions?.Count > 0 || IniDocument.Read(state.Data).HasOtherData(
+                        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase) {
+                            ["FolderState"] = ["Version", "Owner", "Status", "Updated", "Mode"], ["FolderStateBackup"] = ["Data"] }))
+                        throw new StateException("metadata_conflict", "상태 파일에 외부에서 추가한 정보가 있어 초기화를 중단했습니다. 원본을 보존하고 지원을 요청해 주세요.");
                     Snapshot restored;
                     if (desktop.Data is not null && desktop.Data.AsSpan().SequenceEqual(backup.ManagedDesktop)) restored = backup.Desktop;
                     else if (desktop.Data is null) { restored = desktop; warning = "desktop.ini가 외부에서 삭제되어 그대로 보존했습니다."; }
@@ -71,7 +76,7 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
                     if (backup.PortableHash is not null && portable.Data is not null)
                     {
                         EnsurePortableOwned(portable, backup.PortableHash);
-                        changes.Add(new(PortableFile, portable, Snapshot.Missing));
+                        changes.Add(new(previousIcon, portable, Snapshot.Missing));
                     }
                     changes.Add(new(StateFile, state, Snapshot.Missing));
                     afterReadOnly = SafeFiles.SameData(restored, backup.Desktop) ? backup.FolderReadOnly : folderReadOnly;
@@ -95,33 +100,45 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
                                 throw new StateException("icon_conflict", "다른 프로그램이 폴더 아이콘을 변경했습니다. 상태 초기화 후 다시 지정해 주세요.");
                     }
                     string? portableHash = backup.PortableHash;
+                    string? portableName = null;
                     if (mode == IconMode.Portable)
                     {
                         if (portable.Data is not null) EnsurePortableOwned(portable, portableHash);
-                        changes.Add(new(PortableFile, portable, new(icon.Data, HiddenSystem)));
                         portableHash = Hash(icon.Data);
+                        portableName = PortableName(portableHash);
+                        var nextIcon = previousIcon == portableName ? portable : SafeFiles.Read(Path.Combine(target, portableName));
+                        // Never adopt a coincidentally matching file that our metadata does not own.
+                        if (nextIcon.Data is not null && previousIcon != portableName)
+                            throw new StateException("portable_conflict", "새 아이콘 경로에 기존 파일이 있어 보존하고 작업을 중단했습니다.");
+                        changes.Add(new(portableName, nextIcon, new(icon.Data, HiddenSystem)));
+                        if (previousIcon != portableName && portable.Data is not null)
+                            changes.Add(new(previousIcon, portable, Snapshot.Missing));
                     }
                     else if (portableHash is not null)
                     {
                         if (portable.Data is not null)
-                        { EnsurePortableOwned(portable, portableHash); changes.Add(new(PortableFile, portable, Snapshot.Missing)); }
+                        { EnsurePortableOwned(portable, portableHash); changes.Add(new(previousIcon, portable, Snapshot.Missing)); }
                         portableHash = null;
                     }
-                    document.Set(".ShellClassInfo", "IconResource", mode == IconMode.Portable ? ".folderstate.ico,0" : $"\"{iconPath}\",0");
+                    refreshIcon = mode == IconMode.Portable ? portableName : iconPath;
+                    document.Set(".ShellClassInfo", "IconResource", refreshIcon + ",0");
                     document.Set(".ShellClassInfo", "IconFile", null);
                     document.Set(".ShellClassInfo", "IconIndex", null);
                     byte[] managedDesktop = document.Bytes();
-                    backup = backup with { ManagedDesktop = managedDesktop, PortableHash = portableHash };
-                    metadata = new(1, "FolderState", status.Value.Value(), mode.Value.ToString().ToLowerInvariant(),
+                    backup = backup with { ManagedDesktop = managedDesktop, PortableHash = portableHash, PortableName = portableName };
+                    metadata = new(2, "FolderState", status.Value.Value(), mode.Value.ToString().ToLowerInvariant(),
                         action == "repair" ? metadata!.Updated : DateTimeOffset.Now, backup);
-                    var encodedState = WriteMetadata(metadata);
+                    var encodedState = WriteMetadata(metadata, state.Data);
                     if (encodedState.Length > SafeFiles.MaxBytes) throw new StateException("metadata_too_large", "기존 폴더 설정이 너무 커서 안전한 복구 정보를 저장할 수 없습니다.");
                     changes.Add(new(DesktopFile, desktop, new(managedDesktop, desktop.Attributes | HiddenSystem)));
                     changes.Add(new(StateFile, state, new(encodedState, state.Attributes | HiddenSystem)));
                     afterReadOnly = true;
                 }
-                Commit(target, new(1, "FolderState", folderReadOnly, afterReadOnly, changes.ToArray()));
-                ShellRefresh.Notify(target);
+                var customizationWarning = Commit(target, new(2, "FolderState", folderReadOnly, afterReadOnly, changes.ToArray()), refreshIcon);
+                // State has committed. A Shell failure must never report that the state write failed.
+                var refreshWarning = ShellRefresh.Notify(target);
+                warning = string.Join(" ", new[] { warning, customizationWarning, refreshWarning }.Where(s => s is not null));
+                if (warning.Length == 0) warning = null;
                 result = new(true, action, target, previous, status?.Value(), action switch
                 { "reset" => "폴더 상태를 초기화했습니다.", "repair" => "저장된 상태의 아이콘을 복구했습니다.", _ => $"{status!.Value.Label()} 상태로 변경했습니다." }, Warning: warning);
             }
@@ -136,7 +153,7 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
         { result = result with { Warning = string.Join(" ", new[] { result.Warning, "로컬 로그를 기록하지 못했습니다." }.Where(s => s is not null)) }; }
         return result;
     }
-    private void Commit(string target, Transaction transaction)
+    private string? Commit(string target, Transaction transaction, string? refreshIcon)
     {
         string journal = Path.Combine(target, JournalFile);
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(transaction, StateNames.Json);
@@ -148,9 +165,22 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
             TransactionCheckpoint?.Invoke("journal");
             foreach (var change in transaction.Changes)
             { SafeFiles.Write(Path.Combine(target, change.Name), change.Before, change.After); TransactionCheckpoint?.Invoke(change.Name); }
+            string? warning = null;
+            if (refreshIcon is not null)
+            {
+                var desired = transaction.Changes.Single(c => c.Name == DesktopFile).After;
+                // Check immediately before asking Shell to re-assert the same owned field.
+                if (!SafeFiles.SameData(SafeFiles.Read(Path.Combine(target, DesktopFile)), desired))
+                    throw new StateException("concurrent_edit", "다른 프로그램이 폴더 설정을 변경했습니다.");
+                warning = ShellRefresh.UpdateIcon(target, refreshIcon);
+                if (!SafeFiles.SameData(SafeFiles.Read(Path.Combine(target, DesktopFile)), desired))
+                    throw new StateException("shell_metadata_changed", "Windows가 예상과 다르게 폴더 설정을 변경했습니다. 복원 정보를 보존했습니다.");
+                TransactionCheckpoint?.Invoke("shell");
+            }
             SetReadOnly(target, transaction.AfterReadOnly);
             TransactionCheckpoint?.Invoke("attributes");
             File.Delete(journal);
+            return warning;
         }
         catch (Exception operationError)
         {
@@ -169,9 +199,9 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
         try
         {
             transaction = JsonSerializer.Deserialize<Transaction>(file.Data, StateNames.Json) ?? throw new JsonException();
-            if (transaction.Version != 1 || transaction.Owner != "FolderState" || transaction.Changes is null || transaction.Changes.Length is < 1 or > 3 ||
+            if (transaction.Version is not (1 or 2) || transaction.Owner != "FolderState" || transaction.Changes is null || transaction.Changes.Length < 1 || transaction.Changes.Length > (transaction.Version == 1 ? 3 : 4) ||
                 transaction.Changes.Select(c => c.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count() != transaction.Changes.Length ||
-                transaction.Changes.Any(c => c.Name is not (StateFile or DesktopFile or PortableFile) || !ValidSnapshot(c.Before) || !ValidSnapshot(c.After)))
+                transaction.Changes.Any(c => !(c.Name is StateFile or DesktopFile or PortableFile || transaction.Version == 2 && ValidPortableName(c.Name)) || !ValidSnapshot(c.Before) || !ValidSnapshot(c.After)))
                 throw new JsonException();
         }
         catch (Exception ex) when (ex is JsonException or NullReferenceException)
@@ -184,15 +214,23 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
             SafeFiles.Write(Path.Combine(target, transaction.Changes[i].Name), current[i], transaction.Changes[i].Before);
         SetReadOnly(target, transaction.BeforeReadOnly); File.Delete(journal);
     }
-    private static bool ValidSnapshot(Snapshot? s) => s is not null && (s.Data?.Length ?? 0) <= SafeFiles.MaxBytes &&
+    private static bool ValidSnapshot(Snapshot? s) => s is not null && (s.Extensions?.Count ?? 0) == 0 && (s.Data?.Length ?? 0) <= SafeFiles.MaxBytes &&
         (s.Attributes & (FileAttributes.Directory | FileAttributes.ReparsePoint)) == 0;
     private static void SetReadOnly(string folder, bool enabled)
-    { var attributes = File.GetAttributes(folder); File.SetAttributes(folder, enabled ? attributes | FileAttributes.ReadOnly : attributes & ~FileAttributes.ReadOnly); }
+    {
+        var attributes = File.GetAttributes(folder);
+        var desired = enabled ? attributes | FileAttributes.ReadOnly : attributes & ~FileAttributes.ReadOnly;
+        if (attributes != desired) File.SetAttributes(folder, desired);
+    }
     private static string Hash(byte[] bytes) => Convert.ToHexString(SHA256.HashData(bytes));
+    private static string PortableName(string hash) => ".folderstate-" + hash.ToLowerInvariant() + ".ico";
+    private static bool ValidPortableName(string? name) => name is not null && name.Length == 81 &&
+        name.StartsWith(".folderstate-", StringComparison.Ordinal) && name.EndsWith(".ico", StringComparison.Ordinal) &&
+        name.AsSpan(13, 64).IndexOfAnyExcept("0123456789abcdef") < 0;
     private static void EnsurePortableOwned(Snapshot portable, string? hash)
     {
         if (hash is null || portable.Data is null || Hash(portable.Data) != hash)
-            throw new StateException("portable_conflict", "기존 .folderstate.ico가 본 도구의 아이콘과 다릅니다. 해당 파일을 보존하고 작업을 중단했습니다.");
+            throw new StateException("portable_conflict", "기존 Portable 아이콘이 본 도구의 아이콘과 다릅니다. 해당 파일을 보존하고 작업을 중단했습니다.");
     }
     private static IconMode ParseMode(string value) => value switch
     { "local" => IconMode.Local, "portable" => IconMode.Portable, _ => throw new StateException("invalid_metadata", "저장된 아이콘 모드를 읽을 수 없습니다.") };
@@ -202,20 +240,33 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
         try
         {
             var ini = IniDocument.Read(snapshot.Data);
-            if (ini.Get("FolderState", "Version") != "1" || ini.Get("FolderState", "Owner") != "FolderState") throw new FormatException();
+            var version = ini.Get("FolderState", "Version");
+            if (version is not ("1" or "2") || ini.Get("FolderState", "Owner") != "FolderState") throw new FormatException();
             var status = ini.Get("FolderState", "Status") ?? throw new FormatException(); _ = StateNames.Parse(status);
             var mode = ini.Get("FolderState", "Mode") ?? throw new FormatException(); _ = ParseMode(mode);
             var updated = DateTimeOffset.ParseExact(ini.Get("FolderState", "Updated")!, "O", System.Globalization.CultureInfo.InvariantCulture);
             var backup = JsonSerializer.Deserialize<Backup>(Convert.FromBase64String(ini.Get("FolderStateBackup", "Data")!), StateNames.Json) ?? throw new FormatException();
             if (!ValidSnapshot(backup.Desktop) || backup.ManagedDesktop is null || backup.ManagedDesktop.Length > SafeFiles.MaxBytes || backup.ManagedDesktop.Length == 0) throw new FormatException();
+            if (backup.PortableHash is not null && (backup.PortableHash.Length != 64 || backup.PortableHash.AsSpan().IndexOfAnyExcept("0123456789ABCDEF") >= 0)) throw new FormatException();
+            if (version == "1" && backup.PortableName is not null ||
+                version == "2" && (mode == "portable" ? backup.PortableHash is null || !ValidPortableName(backup.PortableName) || backup.PortableName != PortableName(backup.PortableHash) : backup.PortableName is not null || backup.PortableHash is not null)) throw new FormatException();
             _ = IniDocument.Read(backup.Desktop.Data); _ = IniDocument.Read(backup.ManagedDesktop);
-            return new(1, "FolderState", status, mode, updated, backup);
+            return new(version == "1" ? 1 : 2, "FolderState", status, mode, updated, backup);
         }
         catch (Exception ex) when (ex is FormatException or JsonException or ArgumentException or StateException)
         { throw new StateException("invalid_metadata", "상태 파일이 손상되었거나 지원하지 않는 형식입니다. 원본을 보존하고 작업을 중단했습니다."); }
     }
-    private static byte[] WriteMetadata(Metadata data) => Encoding.UTF8.GetBytes(
-        $"[FolderState]\r\nVersion=1\r\nOwner=FolderState\r\nStatus={data.Status}\r\nUpdated={data.Updated:O}\r\nMode={data.Mode}\r\n\r\n[FolderStateBackup]\r\nData={Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(data.Backup, StateNames.Json))}\r\n");
+    private static byte[] WriteMetadata(Metadata data, byte[]? original)
+    {
+        var ini = IniDocument.Read(original);
+        ini.Set("FolderState", "Version", data.Version.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        ini.Set("FolderState", "Owner", data.Owner);
+        ini.Set("FolderState", "Status", data.Status);
+        ini.Set("FolderState", "Updated", data.Updated.ToString("O", System.Globalization.CultureInfo.InvariantCulture));
+        ini.Set("FolderState", "Mode", data.Mode);
+        ini.Set("FolderStateBackup", "Data", Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(data.Backup, StateNames.Json)));
+        return ini.Bytes();
+    }
     private static IDisposable Acquire(string target)
     {
         var mutex = new Mutex(false, (OperatingSystem.IsWindows() ? @"Local\" : "") + "FolderState-" + Hash(Encoding.UTF8.GetBytes(target.ToUpperInvariant())));

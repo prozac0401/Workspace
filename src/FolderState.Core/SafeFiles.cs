@@ -43,6 +43,9 @@ internal static class SafeFiles
     {
         var current = Read(file);
         if (!SameData(current, expected)) throw new StateException("concurrent_edit", "다른 프로그램이 설정을 변경했습니다. 설정을 확인한 뒤 다시 시도해 주세요.");
+        // Recovery need not replace an unchanged file. In particular, an old icon
+        // can still be open by Explorer after a failed delete; leave its bytes intact.
+        if (SameData(current, desired) && (current.Data is null || current.Attributes == desired.Attributes)) return;
         var parent = Path.GetDirectoryName(file)!;
         _ = Folder(parent);
         string temporary = Path.Combine(parent, ".folderstate-" + Guid.NewGuid().ToString("N") + ".tmp");

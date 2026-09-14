@@ -1,5 +1,5 @@
 ﻿[CmdletBinding()]
-param([string]$Version = '0.1.0', [switch]$SkipTests)
+param([string]$Version = '0.1.1', [switch]$SkipTests)
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $repoRoot

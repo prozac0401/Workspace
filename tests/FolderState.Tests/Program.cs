@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Security.Cryptography;
 using FolderState.Core;
 
 if (!OperatingSystem.IsWindows()) { Console.Error.WriteLine("Windows integration tests require Windows."); return 1; }
@@ -24,6 +26,24 @@ byte[] Utf16(string text) => [.. Encoding.Unicode.GetPreamble(), .. Encoding.Uni
 void Overwrite(string file, byte[] bytes) { using var stream = new FileStream(file, FileMode.OpenOrCreate, FileAccess.Write); stream.SetLength(0); stream.Write(bytes); }
 void Desktop(string folder, byte[] bytes) => Overwrite(Path.Combine(folder, "desktop.ini"), bytes);
 byte[] ReadDesktop(string folder) => File.ReadAllBytes(Path.Combine(folder, "desktop.ini"));
+string IconName(WorkStatus status) => ".folderstate-" + Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(Path.Combine(icons,status.Value()+".ico")))).ToLowerInvariant() + ".ico";
+string PortablePath(string folder) => Path.Combine(folder, Encoding.Unicode.GetString(ReadDesktop(folder)).Split('\n').Single(s=>s.StartsWith("IconResource=",StringComparison.Ordinal))[13..].Trim().Split(',')[0]);
+void EditBackup(string folder, Action<JsonObject> edit, bool legacy = false)
+{
+    string file=Path.Combine(folder,FolderStateEngine.StateFile), text=File.ReadAllText(file);
+    var match=System.Text.RegularExpressions.Regex.Match(text,@"(?m)^Data=([^\r\n]+)");
+    var backup=JsonNode.Parse(Convert.FromBase64String(match.Groups[1].Value))!.AsObject(); edit(backup);
+    text=text.Replace(match.Value,"Data="+Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(backup)));
+    if(legacy) text=text.Replace("Version=2","Version=1");
+    Overwrite(file,Utf16(text));
+}
+void LegacyPortable(string folder)
+{
+    Ok(engine.Set(folder,WorkStatus.Doing,IconMode.Portable)); string old=PortablePath(folder);
+    File.Move(old,Path.Combine(folder,".folderstate.ico"));
+    Desktop(folder,Utf16(File.ReadAllText(Path.Combine(folder,"desktop.ini")).Replace(Path.GetFileName(old),".folderstate.ico")));
+    EditBackup(folder,b=>{b.Remove("PortableName");b["ManagedDesktop"]=Convert.ToBase64String(ReadDesktop(folder));},true);
+}
 
 Test("four states / Unicode / spaces / files unchanged", () => {
     string p = Folder(); string business = Path.Combine(p, "실제 업무.txt"); File.WriteAllText(business, "KEEP");
@@ -65,9 +85,9 @@ Test("repair local icon after folder copied", () => {
     Ok(engine.Repair(b)); Assert(engine.ReadState(b)!.Status==WorkStatus.Issue);
 });
 Test("portable / mode retained / local transition / reset", () => {
-    string p=Folder(); Ok(engine.Set(p,WorkStatus.Doing,IconMode.Portable)); Assert(File.Exists(Path.Combine(p,".folderstate.ico")));
+    string p=Folder(); Ok(engine.Set(p,WorkStatus.Doing,IconMode.Portable)); Assert(File.Exists(PortablePath(p)));
     Ok(engine.Set(p,WorkStatus.Done)); Assert(engine.ReadState(p)!.Mode==IconMode.Portable);
-    Ok(engine.Set(p,WorkStatus.Done,IconMode.Local)); Assert(!File.Exists(Path.Combine(p,".folderstate.ico")));
+    Ok(engine.Set(p,WorkStatus.Done,IconMode.Local)); Assert(Directory.GetFiles(p,"*.ico").Length==0);
     Ok(engine.Reset(p));
 });
 Test("unowned portable icon never overwritten", () => {
@@ -75,8 +95,8 @@ Test("unowned portable icon never overwritten", () => {
     Assert(!result.Success && result.ErrorCode=="portable_conflict"); Assert(File.ReadAllText(Path.Combine(p,".folderstate.ico"))=="mine"); Assert(engine.ReadState(p) is null);
 });
 Test("changed portable icon blocks reset without partial deletion", () => {
-    string p=Folder(); Ok(engine.Set(p,WorkStatus.Done,IconMode.Portable)); Overwrite(Path.Combine(p,".folderstate.ico"),Encoding.UTF8.GetBytes("external"));
-    Assert(!engine.Reset(p).Success); Assert(engine.ReadState(p)!.Status==WorkStatus.Done); Assert(File.ReadAllText(Path.Combine(p,".folderstate.ico"))=="external");
+    string p=Folder(); Ok(engine.Set(p,WorkStatus.Done,IconMode.Portable)); string icon=PortablePath(p); Overwrite(icon,Encoding.UTF8.GetBytes("external"));
+    Assert(!engine.Reset(p).Success); Assert(engine.ReadState(p)!.Status==WorkStatus.Done); Assert(File.ReadAllText(icon)=="external");
 });
 Test("malformed / foreign / future metadata preserved", () => {
     foreach (var text in new[]{"broken","[FolderState]\nVersion=99\nStatus=done","[FolderState]\nVersion=1\nStatus=todo\n"}) {
@@ -95,11 +115,11 @@ Test("missing icon causes no state change", () => {
     string p=Folder(); var result=new FolderStateEngine(suite).Set(p,WorkStatus.Done); Assert(!result.Success); Assert(engine.ReadState(p) is null);
 });
 Test("fault after each transaction stage restores exact original", () => {
-    foreach(var checkpoint in new[]{"journal",".folderstate.ico","desktop.ini",FolderStateEngine.StateFile,"attributes"}) {
+    foreach(var checkpoint in new[]{"journal",IconName(WorkStatus.Done),"desktop.ini",FolderStateEngine.StateFile,"shell","attributes"}) {
         string p=Folder(); var bytes=Utf16("[.ShellClassInfo]\nInfoTip=KEEP\n"); Desktop(p,bytes);
         var faulty=new FolderStateEngine(icons){TransactionCheckpoint=s=>{if(s==checkpoint)throw new IOException("injected");}};
         Assert(!faulty.Set(p,WorkStatus.Done,IconMode.Portable).Success); Assert(ReadDesktop(p).SequenceEqual(bytes));
-        Assert(engine.ReadState(p) is null); Assert(!File.Exists(Path.Combine(p,".folderstate.ico"))); Assert(!File.Exists(Path.Combine(p,FolderStateEngine.JournalFile)));
+        Assert(engine.ReadState(p) is null); Assert(Directory.GetFiles(p,"*.ico").Length==0); Assert(!File.Exists(Path.Combine(p,FolderStateEngine.JournalFile)));
     }
 });
 Test("failed reset restores previous state", () => {
@@ -142,7 +162,7 @@ Test("JSON audit log emitted outside business folder", () => {
     Assert(!File.Exists(Path.Combine(p,"operations.jsonl")));
 });
 Test("process interruption recovers persisted transaction", () => {
-    foreach (string checkpoint in new[]{"desktop.ini",FolderStateEngine.StateFile,"attributes"}) {
+    foreach (string checkpoint in new[]{"desktop.ini",FolderStateEngine.StateFile,"shell","attributes"}) {
         string p=Folder(); Ok(engine.Set(p,WorkStatus.Todo)); var before=engine.ReadState(p)!;
         var launch=new ProcessStartInfo(Environment.ProcessPath!){UseShellExecute=false,CreateNoWindow=true};
         if(string.Equals(Path.GetFileNameWithoutExtension(Environment.ProcessPath),"dotnet",StringComparison.OrdinalIgnoreCase)) launch.ArgumentList.Add(typeof(Program).Assembly.Location);
@@ -161,6 +181,94 @@ Test("damaged journal is retained without changing files", () => {
     string p=Folder(); Ok(engine.Set(p,WorkStatus.Todo)); byte[] before=ReadDesktop(p);
     string journal=Path.Combine(p,FolderStateEngine.JournalFile); File.WriteAllText(journal,"{broken");
     Assert(engine.Repair(p).ErrorCode=="invalid_journal"); Assert(ReadDesktop(p).SequenceEqual(before)); Assert(File.ReadAllText(journal)=="{broken");
+});
+
+Test("portable immutable resources / repeated states / no orphan icons", () => {
+    string p=Folder();
+    foreach(var status in Enumerable.Range(0,24).Select(i=>(WorkStatus)(i%4))) {
+        Ok(engine.Set(p,status,IconMode.Portable)); string icon=PortablePath(p);
+        Assert(Path.GetFileName(icon)==IconName(status)); Assert(Directory.GetFiles(p,"*.ico").Length==1);
+        Assert(File.ReadAllBytes(icon).SequenceEqual(File.ReadAllBytes(Path.Combine(icons,status.Value()+".ico"))));
+    }
+    Ok(engine.Reset(p)); Assert(Directory.GetFiles(p,"*.ico").Length==0);
+});
+Test("legacy portable upgrade / repair / exact reset", () => {
+    foreach(var action in new[]{"set","repair","reset"}) {
+        string p=Folder(); var original=Utf16("[.ShellClassInfo]\nIconResource=original.ico,0\nInfoTip=keep\n"); Desktop(p,original);
+        LegacyPortable(p); var updated=engine.ReadState(p)!.Updated;
+        if(action=="set") Ok(engine.Set(p,WorkStatus.Done)); else if(action=="repair") {Ok(engine.Repair(p));Assert(engine.ReadState(p)!.Updated==updated);}
+        else Ok(engine.Reset(p));
+        Assert(!File.Exists(Path.Combine(p,".folderstate.ico")));
+        if(action!="reset") {Assert(File.Exists(PortablePath(p)));Ok(engine.Reset(p));}
+        Assert(ReadDesktop(p).SequenceEqual(original)); Assert(Directory.GetFiles(p,"*.ico").Length==0);
+    }
+});
+Test("portable transition and legacy migration rollback at every stage", () => {
+    foreach(bool legacy in new[]{false,true})
+    foreach(string stage in new[]{"journal","new-icon","old-icon","desktop.ini",FolderStateEngine.StateFile,"shell","attributes"}) {
+        string p=Folder(); if(legacy) LegacyPortable(p); else Ok(engine.Set(p,WorkStatus.Doing,IconMode.Portable));
+        string old=Path.GetFileName(PortablePath(p)); var before=Directory.GetFiles(p).ToDictionary(f=>Path.GetFileName(f)!,f=>File.ReadAllBytes(f));
+        string checkpoint=stage=="new-icon"?IconName(WorkStatus.Done):stage=="old-icon"?old:stage;
+        var faulty=new FolderStateEngine(icons){TransactionCheckpoint=s=>{if(s==checkpoint)throw new IOException("injected");}};
+        Assert(!faulty.Set(p,WorkStatus.Done).Success);
+        Assert(Directory.GetFiles(p).Length==before.Count);
+        foreach(var file in before) Assert(File.ReadAllBytes(Path.Combine(p,file.Key!)).SequenceEqual(file.Value));
+        Ok(engine.Reset(p));
+    }
+});
+Test("portable process interruption recovers each persisted stage", () => {
+    foreach(bool legacy in new[]{false,true})
+    foreach(string stage in new[]{"journal","new-icon","old-icon","desktop.ini",FolderStateEngine.StateFile,"shell","attributes"}) {
+        string p=Folder(); if(legacy) LegacyPortable(p); else Ok(engine.Set(p,WorkStatus.Doing,IconMode.Portable));
+        string old=Path.GetFileName(PortablePath(p)); var before=engine.ReadState(p)!;
+        string checkpoint=stage=="new-icon"?IconName(WorkStatus.Done):stage=="old-icon"?old:stage;
+        var launch=new ProcessStartInfo(Environment.ProcessPath!){UseShellExecute=false,CreateNoWindow=true};
+        if(string.Equals(Path.GetFileNameWithoutExtension(Environment.ProcessPath),"dotnet",StringComparison.OrdinalIgnoreCase)) launch.ArgumentList.Add(typeof(Program).Assembly.Location);
+        launch.ArgumentList.Add("--interrupt");launch.ArgumentList.Add(p);launch.ArgumentList.Add(checkpoint);
+        using var child=Process.Start(launch)!;Assert(child.WaitForExit(15000));Assert(child.ExitCode==77);
+        Ok(engine.Repair(p));Assert(engine.ReadState(p)==before);Assert(Directory.GetFiles(p,"*.ico").Length==1);
+        Ok(engine.Reset(p));
+    }
+});
+Test("portable concurrent transitions leave one owned resource", () => {
+    string p=Folder();var jobs=Enumerable.Range(0,24).Select(i=>Task.Run(()=>engine.Set(p,(WorkStatus)(i%4),IconMode.Portable))).ToArray();
+    Task.WaitAll(jobs);foreach(var job in jobs)Ok(job.Result);
+    Assert(Directory.GetFiles(p,"*.ico").Length==1);Assert(Path.GetFileName(PortablePath(p))==IconName(engine.ReadState(p)!.Status));Ok(engine.Reset(p));
+});
+Test("unowned hash resource is never adopted / locked old icon rolls back", () => {
+    string p=Folder();string file=Path.Combine(p,IconName(WorkStatus.Done));File.Copy(Path.Combine(icons,"done.ico"),file);
+    Assert(engine.Set(p,WorkStatus.Done,IconMode.Portable).ErrorCode=="portable_conflict");Assert(File.Exists(file));Assert(engine.ReadState(p) is null);
+    p=Folder();Ok(engine.Set(p,WorkStatus.Doing,IconMode.Portable));
+    using(var locked=new FileStream(PortablePath(p),FileMode.Open,FileAccess.Read,FileShare.Read)) Assert(!engine.Set(p,WorkStatus.Done).Success);
+    Assert(engine.ReadState(p)!.Status==WorkStatus.Doing);Assert(Directory.GetFiles(p,"*.ico").Length==1);Ok(engine.Reset(p));
+});
+Test("unknown state fields and backup properties survive updates / reset is conservative", () => {
+    string p=Folder();Ok(engine.Set(p,WorkStatus.Doing,IconMode.Portable));
+    EditBackup(p,b=>b["External"]="preserve");File.AppendAllText(Path.Combine(p,FolderStateEngine.StateFile),"[External]\nNote=keep\n",Encoding.Unicode);
+    Ok(engine.Set(p,WorkStatus.Done));Ok(engine.Repair(p));string file=Path.Combine(p,FolderStateEngine.StateFile);byte[] before=File.ReadAllBytes(file);
+    Assert(File.ReadAllText(file).Contains("Note=keep"));
+    EditBackup(p,b=>Assert(b["External"]!.GetValue<string>()=="preserve"));
+    before=File.ReadAllBytes(file);Assert(engine.Reset(p).ErrorCode=="metadata_conflict");Assert(File.ReadAllBytes(file).SequenceEqual(before));
+});
+Test("portable metadata cannot address a business path", () => {
+    foreach(string name in new[]{"business.txt","../business.txt",".folderstate-"+new string('g',64)+".ico"}) {
+        string p=Folder();Ok(engine.Set(p,WorkStatus.Doing,IconMode.Portable));File.WriteAllText(Path.Combine(p,"business.txt"),"KEEP");EditBackup(p,b=>b["PortableName"]=name);
+        Assert(engine.Set(p,WorkStatus.Done).ErrorCode=="invalid_metadata");Assert(engine.Reset(p).ErrorCode=="invalid_metadata");Assert(File.ReadAllText(Path.Combine(p,"business.txt"))=="KEEP");
+    }
+});
+
+Test("Shell icon update preserves Unicode comma paths and unrelated settings", () => {
+    string customIcons=Folder("아이콘, 공백 [test]");
+    foreach(var file in Directory.GetFiles(icons,"*.ico"))File.Copy(file,Path.Combine(customIcons,Path.GetFileName(file)));
+    var custom=new FolderStateEngine(customIcons);string p=Folder();var before=Utf16(";keep\n[.ShellClassInfo]\nInfoTip=보존\n[Other]\nKey=value\n");Desktop(p,before);
+    foreach(var status in Enum.GetValues<WorkStatus>()) {var result=custom.Set(p,status);Ok(result);Assert(result.Warning is null,result.Warning??"");Assert(File.ReadAllText(Path.Combine(p,"desktop.ini")).Contains("InfoTip=보존"));}
+    Ok(custom.Reset(p));Assert(ReadDesktop(p).SequenceEqual(before));Assert(!File.GetAttributes(p).HasFlag(FileAttributes.ReadOnly));
+});
+
+Test("unknown snapshot format is rejected without losing fields", () => {
+    string p=Folder();Ok(engine.Set(p,WorkStatus.Doing));EditBackup(p,b=>b["Desktop"]!["ExternalSnapshotField"]="preserve");
+    string file=Path.Combine(p,FolderStateEngine.StateFile);byte[] before=File.ReadAllBytes(file);
+    Assert(engine.Set(p,WorkStatus.Done).ErrorCode=="invalid_metadata");Assert(engine.Reset(p).ErrorCode=="invalid_metadata");Assert(File.ReadAllBytes(file).SequenceEqual(before));
 });
 
 int failed=0; var evidence=new List<object>();
