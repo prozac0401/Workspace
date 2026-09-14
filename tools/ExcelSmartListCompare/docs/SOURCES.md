@@ -21,3 +21,5 @@
 | 제품 폴더 신뢰 위치 | https://learn.microsoft.com/en-us/microsoft-365-apps/security/trusted-locations | RC2는 명시적 후속 요구에 따라 전용 로컬 폴더만 등록하고 차단 정책을 보존 |
 | 신뢰 위치 정책 레지스트리 | https://github.com/microsoft/ActiveDirectoryTierModel/blob/main/config/admx/office16.admx | `allow user locations` 정책 값의 실제 이름 확인 |
 | Excel 신뢰 위치 정책 | https://github.com/microsoft/ActiveDirectoryTierModel/blob/main/config/admx/excel16.admx | `alllocationsdisabled`, LocationN의 Path와 AllowSubfolders 확인 |
+| RC4 실행 프로세스·인자 | https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_exe?view=powershell-5.1 | 2026-09-15 확인. 프로세스 한정 ExecutionPolicy와 `-File`의 인자·종료 코드 전달 |
+| RC4 실행 정책 우선순위·차단 해제 | https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies | 2026-09-15 확인. 그룹 정책 우선, RemoteSigned와 단일 파일 Unblock-File의 의미 |

@@ -3,6 +3,7 @@
 **/obj/
 artifacts/
 node_modules/
+__pycache__/
 site/
 .vs/
 *.user

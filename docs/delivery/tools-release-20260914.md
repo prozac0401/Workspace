@@ -30,6 +30,12 @@ MSI: FolderState-0.1.0-win-x64.msi. SHA-256: `b96eb391ce3bbb3fb8a1ea2d025690cc96
 
 [Excel RC2 평가용 릴리즈](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.2)에 설치 ZIP·수정 소스 ZIP·업데이트 캡처 퀵가이드·검증 보고서를 제공한다. XLAM은 RC1과 동일하며 설치기와 안내만 변경했다.
 
+## Excel RC4 · 설치 준비 통합
+
+2026-09-15 후속 요청으로 RC3에서 수동으로 수행하던 프로세스 한정 실행 허용과 Setup.ps1 한 파일의 다운로드 차단 해제를 설치·제거·진단 CMD에 포함했다. 그룹 정책과 유효 AllSigned 설정이 있으면 기존 정책과 파일 표식을 보존한다. 영구 실행 정책, 제품 확인창, XLAM, 설치 기록 형식과 복구 코드는 바꾸지 않았다. 설치기 버전은 0.2.0-rc.4다.
+
+[RC4 평가용 릴리즈](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.4)는 완성 XLAM과 스크립트가 포함된 설치 ZIP, 릴리즈 커밋의 수정 소스 ZIP, 해시, 오프라인 안내와 실행기 검증 보고서를 제공한다. RC3 자산은 보존한다. 실행기 20개 시나리오와 기존 Python 53개 참조 검사를 [RC4 검증 보고서](../../tools/ExcelSmartListCompare/docs/WINDOWS_LAUNCHER_REPORT.md)에 구분한다. RC4에서 실제 Excel 전체 수명주기를 다시 수행하지 않았으며 기존 Excel 실기는 같은 XLAM 해시의 RC3 보고서에 귀속된다.
+
 ## 최초 RC1 복원 기록
 
 21:22 KST 감사에서 두 도구 모두 미설치로 복원됐다. Excel 프로세스 0개, 제품 메뉴·등록 없음, 보안/정책/타 추가 기능 및 OPEN 값 14개 범주가 시작 전과 같았다. AccessVBOM 임시 허용은 원래 값 없음 상태로 원복했다. 원래 업무 파일·기존 Excel·다른 추가 기능을 변경하지 않았다.

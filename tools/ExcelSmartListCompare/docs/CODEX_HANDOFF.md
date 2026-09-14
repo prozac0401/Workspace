@@ -18,7 +18,7 @@
 1. 원래 E2E 지시, README, 추가 도구 개발 기준과 ADR-0002를 읽는다.
 2. VBA는 UTF-8 소스를 수정하고 `python tests/export_ascii.py`로 가져오기 파일을 동기화한다.
 3. Python 참조 검사와 실제 Excel 실행을 별도로 수행한다.
-4. 허용된 개발 환경에서 Build_Release.cmd를 실행한다. RC2의 명시적 후속 요구에 따른 제품 폴더 신뢰 위치만 예외이며, 범위를 [ADR-0003](ADR-0003-Product-trusted-location.md)보다 넓히지 않는다. 다른 보안 설정 변경을 설치기에 넣지 않는다.
+4. 허용된 개발 환경에서 Build_Release.cmd를 실행한다. 보안 설정 자동 변경의 후속 요청 예외는 RC2의 제품 폴더 신뢰 위치([ADR-0003](ADR-0003-Product-trusted-location.md))와 RC4 사용자 실행기의 프로세스 한정 준비·Setup.ps1 한 파일 차단 해제([ADR-0005](ADR-0005-Process-scoped-launchers.md))다. 제작자 빌드, 영구 실행 정책, 조직 정책, 다른 파일의 신뢰 범위로 넓히지 않는다.
 5. 바이너리가 바뀌면 같은 해시로 기능·취소·자동 로드·재설치·제거를 다시 검증한다.
 6. Setup이 바뀌면 .cmd 종료 코드, 기존 Excel 보호, 실패 복구, 추가 파일 보존을 재검증한다.
 7. 원시 계정·레지스트리·설치 로그는 로컬에 남기고 배포에는 식별자가 없는 요약과 실제 캡처만 넣는다.

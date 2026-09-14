@@ -1,19 +1,25 @@
-# Excel Smart List Compare 0.2.0 RC3
+# Excel Smart List Compare 0.2.0 RC4
 
 Windows 데스크톱 Excel용 명단 비교 추가 기능입니다. 코드 서명이 없는 평가용 배포 후보입니다.
 
 ## 설치와 사용
 
 1. ZIP을 모두 압축 해제합니다. Excel 업무를 저장하고 모든 Excel 창을 닫습니다.
-2. Release 폴더의 Install.cmd를 실행하고 이 제품 설치를 확인합니다.
+2. Release 폴더의 **Install.cmd를 더블클릭**하고 이 제품 설치를 확인합니다. PowerShell 명령을 따로 입력할 필요가 없습니다.
 3. Excel을 열고 첫 범위 선택 → 추가 기능 탭의 '명단 비교: 기준 담기' → 두 번째 범위 선택 → '명단 비교: 기준 n건과 비교'를 누릅니다.
 4. 필요한 결과는 새 통합문서로 저장합니다. 원본과 기존 결과를 덮어쓰지 않습니다.
 
-Release 폴더의 QuickGuide.html은 실제 화면 캡처를 포함한 오프라인 안내입니다. Robustness-Report.html과 Validation.json에 최신 실제 통과·실패·미실행 항목을 구분했습니다.
+Release 폴더의 QuickGuide.html은 실제 화면 캡처를 포함한 오프라인 안내입니다. Launcher-Report.html은 RC4 실행기 검증과 제한, Robustness-Report.html과 Validation.json은 동일한 Excel 파일로 수행한 RC3 실기 기록입니다. RC4에서 Excel 실기를 새로 수행했다는 의미는 아닙니다.
+
+## RC4의 간편 설치
+
+실제 PC에서 RC3가 `UnauthorizedAccess`로 막히던 `Restricted` 환경에 대응했습니다. 그룹 정책이 없고 유효 정책이 `AllSigned`가 아니면 실행기가 같은 폴더의 `Setup.ps1` 한 파일의 다운로드 차단 표시를 해제하고, 설치용 PowerShell 프로세스에만 `RemoteSigned`를 적용합니다. 관리자 권한이나 실행 정책 변경 질문은 필요하지 않으며 제품 설치 확인창은 유지합니다.
+
+사용자·컴퓨터의 영구 실행 정책은 바꾸지 않습니다. 프로세스가 끝나면 임시 실행 정책은 사라지고, `Setup.ps1` 한 파일의 차단 해제는 유지됩니다. 회사 그룹 정책이나 유효 `AllSigned` 설정이 있으면 파일 차단을 해제하지 않고 기존 정책으로 실행하므로 서명 요구·실행 차단이 그대로 적용됩니다. 다른 파일의 다운로드 차단을 일괄 해제하지 않습니다.
 
 ## 제거와 다시 설치
 
-Excel을 모두 닫고 이 폴더 또는 설치 폴더의 Uninstall.cmd를 실행합니다. 다시 설치하려면 새 Release의 Install.cmd를 실행합니다.
+Excel을 모두 닫고 이 폴더 또는 설치 폴더의 Uninstall.cmd를 실행합니다. 제거 실행기도 같은 준비를 처리합니다. 다시 설치하려면 새 Release의 Install.cmd를 실행합니다. 진단용 Test_Excel.cmd도 같은 방식이며 일반 사용에는 실행할 필요가 없습니다.
 
 설치 위치: %LOCALAPPDATA%\ExcelSmartListCompare
 
