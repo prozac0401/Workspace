@@ -17,6 +17,8 @@ GitHub Pages에는 업무 운영 정책과 FolderState 사용법만 게시합니
 
 도구는 설치 파일과 버전을 분리합니다. FolderState는 MSI, Excel Smart List Compare는 완성 XLAM을 포함하는 ZIP이 배포 단위입니다. 실제 검증과 현재 릴리즈 상태는 [2026-09-14 도구 릴리즈 기록](docs/delivery/tools-release-20260914.md)을 확인하세요. Excel 소스 후보를 설치 완료 제품으로 취급하지 않습니다.
 
+[FolderState 0.1.0 RC1 평가용 다운로드](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.0-rc.1) · [설치·사용 퀵가이드](docs/tools/folderstate/quick-guide.md). 퀵가이드의 실제 화면 캡처와 Excel 설치용 릴리즈는 아직 미완료입니다.
+
 Windows 11 x64, .NET SDK는 `global.json`의 버전을 사용합니다.
 
 ```powershell
