@@ -5,6 +5,11 @@ project access is not permitted in the current environment.
 No XLAM was produced. No installation success is claimed.
 The Windows desktop was also locked, blocking GUI validation.
 
+Approval retest: the user authorized temporary HKCU AccessVBOM access.
+Even with DWORD 1, Excel 16.0.20326.20144 x64 denied VBProject access
+with HRESULT 0x800A03EC. The approved setting was restored after each run.
+See ../docs/WINDOWS_APPROVAL_RETEST_REPORT.md for the actual follow-up.
+
 See ../docs/WINDOWS_E2E_REPORT.md for actual results and remaining work.
 Build in an approved environment, then verify the exact resulting XLAM
 through installation, normal startup, restart, reinstall and removal.

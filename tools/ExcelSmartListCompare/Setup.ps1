@@ -87,12 +87,17 @@ function Build-Addin {
     try {
         $book = $script:Excel.Workbooks.Add(-4167) # xlWBATWorksheet
         try {
-            $project = $book.VBProject
+            # PowerShell's COM property adapter can turn Excel's access-denied
+            # exception into null. Invoke explicitly to preserve the real cause.
+            $project = $book.GetType().InvokeMember('VBProject', [Reflection.BindingFlags]::GetProperty, $null, $book, $null)
             $null = $project.VBComponents.Count
         } catch {
+            $cause = $_.Exception
+            while ($null -ne $cause.InnerException) { $cause = $cause.InnerException }
+            $detail = $cause.Message.Trim() + (' (HRESULT 0x{0:X8})' -f $cause.HResult)
             throw (Setup-Failure ('Source build needs Excel VBA project access permitted by your organization. ' +
                 'Setup does not enable it or modify Trust Center. Ask an authorized developer to run Build_Release.cmd ' +
-                'and provide the Release folder containing the XLAM. End-user installation of that release does not need VBA project access.') 5)
+                'and provide the Release folder containing the XLAM. End-user installation of that release does not need VBA project access. Excel detail: ' + $detail) 5)
         }
         foreach ($file in @('CSLCList.cls','modSLCNormalize.bas','modSLCMain.bas')) {
             $component = $project.VBComponents.Import((Join-Path $src $file))

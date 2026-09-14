@@ -1,0 +1,275 @@
+{
+  "status": "BLOCKED_POLICY / BLOCKED_ENV",
+  "date": "2026-09-14",
+  "environment": {
+    "osCaption": "Microsoft Windows 11 Pro",
+    "osVersion": "10.0.22631",
+    "powershell": "5.1.22621.6133",
+    "sameDesktopAccount": true,
+    "elevated": false,
+    "excelPEMachine": "0x8664",
+    "excelFileVersion": "16.0.20326.20144"
+  },
+  "approvalScope": "Temporary AccessVBOM DWORD 1, restore original absence after each run; user approval received",
+  "temporaryAccessRuns": [
+    {
+      "started": "2026-09-14T15:20:00.8201574+09:00",
+      "finished": "2026-09-14T15:20:07.0983479+09:00",
+      "valuePresentBefore": false,
+      "valueBefore": null,
+      "kindBefore": "",
+      "buildExitCode": 5,
+      "restored": true,
+      "runId": "20260914-approved-build-01",
+      "scope": "HKCU Excel 16.0 Security AccessVBOM only"
+    },
+    {
+      "started": "2026-09-14T15:22:02.1280013+09:00",
+      "finished": "2026-09-14T15:22:08.9321182+09:00",
+      "valuePresentBefore": false,
+      "valueBefore": null,
+      "kindBefore": "",
+      "buildExitCode": 0,
+      "restored": true,
+      "runId": "20260914-approved-diagnostic-01",
+      "scope": "HKCU Excel 16.0 Security AccessVBOM only"
+    },
+    {
+      "started": "2026-09-14T15:23:33.5452363+09:00",
+      "finished": "2026-09-14T15:23:40.6246335+09:00",
+      "valuePresentBefore": false,
+      "valueBefore": null,
+      "kindBefore": "",
+      "buildExitCode": 0,
+      "restored": true,
+      "runId": "20260914-approved-diagnostic-02",
+      "scope": "HKCU Excel 16.0 Security AccessVBOM only"
+    },
+    {
+      "started": "2026-09-14T15:24:43.4058675+09:00",
+      "finished": "2026-09-14T15:25:15.1795417+09:00",
+      "valuePresentBefore": false,
+      "valueBefore": null,
+      "kindBefore": "",
+      "buildExitCode": 1,
+      "restored": true,
+      "runId": "20260914-approved-normal-diagnostic-01",
+      "scope": "HKCU Excel 16.0 Security AccessVBOM only"
+    },
+    {
+      "started": "2026-09-14T15:28:39.1565666+09:00",
+      "finished": "2026-09-14T15:28:45.7339061+09:00",
+      "valuePresentBefore": false,
+      "valueBefore": null,
+      "kindBefore": "",
+      "buildExitCode": 5,
+      "restored": true,
+      "runId": "20260914-approved-build-02",
+      "scope": "HKCU Excel 16.0 Security AccessVBOM only"
+    }
+  ],
+  "vbaProbe": {
+    "excelVersion": "16.0",
+    "excelBuild": "20326",
+    "automationSecurity": 2,
+    "vbaAccess": "BLOCKED_POLICY",
+    "vbaAccessError": "Visual Basic 프로젝트는 프로그래밍 방식으로 액세스할 수 없습니다.",
+    "vbaAccessHResult": "0x800A03EC"
+  },
+  "accountDiagnostic": {
+    "excelSameAccount": true,
+    "excelSessionMatchesCaller": true,
+    "accessVbomAfterExcelStart": 1,
+    "evidenceRun": "20260914-approved-diagnostic-02"
+  },
+  "normalStartDiagnostic": {
+    "status": "BLOCKED_ENV",
+    "rotDeadlineSeconds": 30,
+    "vbaAccessTestExecuted": false,
+    "autoloadTestExecuted": false
+  },
+  "gui": {
+    "status": "BLOCKED_ENV",
+    "intendedWindow": "Owned FolderState test window",
+    "accessibilityTreeAvailable": true,
+    "screenshotOutcome": "Windows lock screen; not saved or packaged as a product screenshot",
+    "inputAfterLockObservation": false
+  },
+  "registryComparison": [
+    {
+      "category": "HKCU:/Software/Microsoft/Office/16.0/Excel/Options",
+      "beforeCount": 23,
+      "afterCount": 23,
+      "unchanged": true
+    },
+    {
+      "category": "HKCU:/Software/Microsoft/Office/16.0/Excel/Add-in Manager",
+      "beforeCount": 0,
+      "afterCount": 0,
+      "unchanged": true
+    },
+    {
+      "category": "HKCU:/Software/Microsoft/Office/Excel/Addins",
+      "beforeCount": 5,
+      "afterCount": 5,
+      "unchanged": true
+    },
+    {
+      "category": "HKCU:/Software/Microsoft/Office/16.0/Excel/Security",
+      "beforeCount": 26,
+      "afterCount": 26,
+      "unchanged": true
+    },
+    {
+      "category": "HKCU:/Software/Policies/Microsoft/Office/16.0/Excel",
+      "beforeCount": 0,
+      "afterCount": 0,
+      "unchanged": true
+    },
+    {
+      "category": "HKCU:/Software/Microsoft/PowerShell/1/ShellIds/Microsoft.PowerShell",
+      "beforeCount": 1,
+      "afterCount": 1,
+      "unchanged": true
+    },
+    {
+      "category": "HKCU:/Software/Policies/Microsoft/Windows/PowerShell",
+      "beforeCount": 0,
+      "afterCount": 0,
+      "unchanged": true
+    },
+    {
+      "category": "HKLM:/Software/Microsoft/Office/16.0/Excel/Options",
+      "beforeCount": 0,
+      "afterCount": 0,
+      "unchanged": true
+    },
+    {
+      "category": "HKLM:/Software/Microsoft/Office/16.0/Excel/Add-in Manager",
+      "beforeCount": 0,
+      "afterCount": 0,
+      "unchanged": true
+    },
+    {
+      "category": "HKLM:/Software/Microsoft/Office/Excel/Addins",
+      "beforeCount": 1,
+      "afterCount": 1,
+      "unchanged": true
+    },
+    {
+      "category": "HKLM:/Software/Microsoft/Office/16.0/Excel/Security",
+      "beforeCount": 0,
+      "afterCount": 0,
+      "unchanged": true
+    },
+    {
+      "category": "HKLM:/Software/Policies/Microsoft/Office/16.0/Excel",
+      "beforeCount": 0,
+      "afterCount": 0,
+      "unchanged": true
+    },
+    {
+      "category": "HKLM:/Software/Microsoft/PowerShell/1/ShellIds/Microsoft.PowerShell",
+      "beforeCount": 1,
+      "afterCount": 1,
+      "unchanged": true
+    },
+    {
+      "category": "HKLM:/Software/Policies/Microsoft/Windows/PowerShell",
+      "beforeCount": 0,
+      "afterCount": 0,
+      "unchanged": true
+    }
+  ],
+  "processCleanup": [
+    {
+      "pid": 26308,
+      "product": "Excel",
+      "owned": true,
+      "reason": "Test-created empty /x process did not expose ROT or a closeable main window in 30 seconds",
+      "method": "Stopped exact verified test PID",
+      "userDocumentsOpened": false
+    },
+    {
+      "pid": 29920,
+      "product": "FolderState",
+      "owned": true,
+      "method": "CloseMainWindow",
+      "requested": true,
+      "closed": true
+    }
+  ],
+  "finalState": {
+    "timestamp": "2026-09-14T15:31:19.0161278+09:00",
+    "excelProcesses": 0,
+    "folderStateProcesses": 0,
+    "accessVbomPresent": false,
+    "excelProductInstalled": false,
+    "folderStateRelatedProducts": 0,
+    "folderStateMenuPresent": false
+  },
+  "xlamProduced": false,
+  "productFunctionalTestsExecuted": false,
+  "successfulInstallLifecycleExecuted": false,
+  "pythonReferenceTests": {
+    "passed": 53,
+    "total": 53,
+    "evidence": "Native command output; not Excel functional verification"
+  },
+  "powershellParserChecks": [
+    {
+      "file": "Invoke-WindowsE2E.ps1",
+      "parserVersion": "5.1.22621.6133",
+      "errors": [],
+      "status": "PASS"
+    },
+    {
+      "file": "windows-baseline.ps1",
+      "parserVersion": "5.1.22621.6133",
+      "errors": [],
+      "status": "PASS"
+    },
+    {
+      "file": "windows-close-owned.ps1",
+      "parserVersion": "5.1.22621.6133",
+      "errors": [],
+      "status": "PASS"
+    },
+    {
+      "file": "windows-excel-preflight.ps1",
+      "parserVersion": "5.1.22621.6133",
+      "errors": [],
+      "status": "PASS"
+    },
+    {
+      "file": "windows-functional.ps1",
+      "parserVersion": "5.1.22621.6133",
+      "errors": [],
+      "status": "PASS"
+    },
+    {
+      "file": "windows-setup-guards.ps1",
+      "parserVersion": "5.1.22621.6133",
+      "errors": [],
+      "status": "PASS"
+    },
+    {
+      "file": "windows-ui-fixture.ps1",
+      "parserVersion": "5.1.22621.6133",
+      "errors": [],
+      "status": "PASS"
+    },
+    {
+      "file": "windows-validate.ps1",
+      "parserVersion": "5.1.22621.6133",
+      "errors": [],
+      "status": "PASS"
+    },
+    {
+      "file": "Setup.ps1",
+      "parserVersion": "5.1.22621.6133",
+      "errors": [],
+      "status": "PASS"
+    }
+  ]
+}

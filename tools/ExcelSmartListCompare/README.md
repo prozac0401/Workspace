@@ -4,6 +4,8 @@
 
 > **2026-09-14 Windows 검증 상태: BLOCKED_POLICY.** 실제 Excel COM, 정상 시작, 합성 파일 생성과 설치 안전장치 10개를 실행했습니다. 한국어 Windows 테스트 오류 및 `.cmd` 실패 코드 유실을 수정했습니다. VBA 프로젝트 접근이 차단되어 XLAM 빌드·제품 기능·설치 수명주기는 완료하지 못했습니다. 데스크톱 잠금으로 GUI 클릭도 미검증입니다. Python 53개 통과를 Excel 기능 통과로 해석하지 마세요. [실제 Windows 보고서](docs/WINDOWS_E2E_REPORT.md)와 [재실행 안내](docs/WINDOWS_TEST_RUNNER.md)를 확인하세요. 현재 Release에는 차단 안내만 있으며 설치할 XLAM은 없습니다.
 
+승인 후 재검증에서도 VBA 프로젝트 접근은 차단됐다. 승인된 AccessVBOM 한 항목은 매 실행 직후 원복했다. [후속 실제 보고서](docs/WINDOWS_APPROVAL_RETEST_REPORT.md)에 적용 결과와 수정된 오류 진단을 기록했다.
+
 ## 1. 사용 흐름
 
 첫 범위 선택 → **명단 비교: 기준 담기** → 다른 범위 선택 → **명단 비교: 기준 n건과 비교**.

@@ -28,12 +28,16 @@ try {
     $result['addins'] = @($excel.AddIns | ForEach-Object { [ordered]@{name=$_.Name;fullName=$_.FullName;installed=$_.Installed} })
     $book = $excel.Workbooks.Add(-4167)
     try {
-        $project = $book.VBProject
+        # Preserve Excel's COM error; direct property access can silently return null.
+        $project = $book.GetType().InvokeMember('VBProject', [Reflection.BindingFlags]::GetProperty, $null, $book, $null)
         $result['vbaComponents'] = $project.VBComponents.Count
         $result['vbaAccess'] = 'PASS'
     } catch {
+        $cause = $_.Exception
+        while ($null -ne $cause.InnerException) { $cause = $cause.InnerException }
         $result['vbaAccess'] = 'BLOCKED_POLICY'
-        $result['vbaAccessError'] = $_.Exception.Message
+        $result['vbaAccessError'] = $cause.Message.Trim()
+        $result['vbaAccessHResult'] = ('0x{0:X8}' -f $cause.HResult)
     }
     $result.status = 'PASS'
 } catch {

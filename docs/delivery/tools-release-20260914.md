@@ -44,7 +44,11 @@ SHA-256: `b96eb391ce3bbb3fb8a1ea2d025690cc9617d299a87064e8c272f02529f8fc67`.
 
 설치→자동 로드→사용→재시작→재설치→제거 및 화면 캡처 퀵가이드는 **BLOCKED_POLICY / BLOCKED_ENV**다. 최종 XLAM이 없으므로 설치 가능한 제품의 공개 릴리즈로 게시하지 않았다. 별도 [Excel 릴리즈 draft](https://github.com/prozac0401/Workspace/releases/tag/untagged-9920a6f2bbe73f0fb8e1)에 검토용 소스 후보 ZIP과 해시만 업로드했다. 이 draft는 저장소 권한이 있는 사용자만 볼 수 있으며 공개 제품 릴리즈가 아니다.
 
-소스 후보 ZIP의 SHA-256은 `f6678ea66818252ea014e35be5b6f7deb33b5331dcf4dff15d8590beb8bb8bde`이며 GitHub 자산 digest와 일치한다. 유지보수 소스는 `main`의 `tools/ExcelSmartListCompare/`에서 확인할 수 있다. 보안 설정 한 항목의 임시 변경·복원 승인과 Windows 잠금 해제를 요청한 상태이며, 응답 없이 변경하지 않았다.
+최초 소스 후보 ZIP의 SHA-256은 `f6678ea66818252ea014e35be5b6f7deb33b5331dcf4dff15d8590beb8bb8bde`이며 업로드 당시 GitHub 자산 digest와 일치했다. 유지보수 소스는 `main`의 `tools/ExcelSmartListCompare/`에서 확인할 수 있다.
+
+사용자가 AccessVBOM 한 항목의 임시 변경·원복을 승인한 뒤 실제 재시도했다. Excel 시작 후에도 값이 1이고 실제 계정·세션이 일치했지만, Excel 16.0.20326.20144 x64는 `0x800A03EC`로 VBA 접근을 거부했다. 임시 적용한 값은 5회 모두 즉시 원복했다. 설치기와 사전 점검에서 원래 COM 오류가 누락되는 문제를 수정해 실제 Excel로 재검증했다. [승인 후 재검증 보고서](../../tools/ExcelSmartListCompare/docs/WINDOWS_APPROVAL_RETEST_REPORT.md)에 차단·원복·정리 내역을 구분했다. Windows 화면은 여전히 잠겨 있으며 잠금 해제를 요청한 상태다.
+
+후속 소스 후보는 `ExcelSmartListCompare_v0.2_SourceCandidate_BLOCKED_POLICY_20260914_r2.zip`이다. SHA-256은 `ad2ee868751e20340a851a7db18050cf433a2cfca9783525743281abf1f2107d`다. 78개 파일의 ZIP CRC 및 내부 해시 목록을 검증했고, XLAM과 원시 레지스트리·계정 로그는 포함하지 않았다. 이 후보 역시 설치 가능한 Release를 대신하지 않는다.
 
 ## 공개 자료와 로컬 자료
 
