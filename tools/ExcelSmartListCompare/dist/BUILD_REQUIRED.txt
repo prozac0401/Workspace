@@ -1,0 +1,6 @@
+No prebuilt XLAM is included in this source package.
+Run Build_Release.cmd in an authorized Windows desktop Excel environment.
+Build requires permitted VBA project access and runs Excel integration tests.
+A successful build creates ExcelSmartListCompare.xlam and a Release folder.
+The end-user Release installer does not need VBA project access.
+Do not report this source package as Windows-tested or production-ready.

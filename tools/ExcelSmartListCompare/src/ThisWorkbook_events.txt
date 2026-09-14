@@ -1,0 +1,13 @@
+Option Explicit
+Private Sub Workbook_Open()
+    SLC_AttachUI
+End Sub
+Private Sub Workbook_AddinInstall()
+    SLC_AttachUI
+End Sub
+Private Sub Workbook_AddinUninstall()
+    SLC_DetachUI
+End Sub
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    SLC_DetachUI
+End Sub

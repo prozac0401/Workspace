@@ -1,0 +1,10 @@
+BLOCKED_POLICY - NOT AN INSTALLABLE RELEASE
+
+2026-09-14: Actual Windows Excel build stopped because programmatic VBA
+project access is not permitted in the current environment.
+No XLAM was produced. No installation success is claimed.
+The Windows desktop was also locked, blocking GUI validation.
+
+See ../docs/WINDOWS_E2E_REPORT.md for actual results and remaining work.
+Build in an approved environment, then verify the exact resulting XLAM
+through installation, normal startup, restart, reinstall and removal.
