@@ -1,5 +1,7 @@
 # 승인 후 실제 Excel 재검증
 
+> 이 문서는 잠금 해제 전의 과거 실행 기록이다. 정상 시작 경로로 빌드를 완료한 후속 결과는 [현재 Windows E2E 보고서](WINDOWS_E2E_REPORT.md)에 있다. 아래 차단 상태를 최종 후보의 현재 상태로 해석하지 않는다.
+
 실행일: 2026-09-14 15:20~15:29 KST · 상태: **BLOCKED_POLICY / BLOCKED_ENV**
 
 사용자가 현재 계정의 `HKCU\Software\Microsoft\Office\16.0\Excel\Security\AccessVBOM` 한 항목의 임시 허용과 원복을 승인했다. 새 Excel을 시작하기 전에 DWORD 1을 기록하고 실제 빌드·진단을 실행한 뒤, 각 실행의 `finally`에서 원래의 **값 없음** 상태로 복원했다. 다른 매크로 보안, 신뢰 위치, PowerShell 실행 정책, 추가 기능 설정은 변경하지 않았다.

@@ -18,6 +18,9 @@ $Target = Join-Path $InstallDir 'ExcelSmartListCompare.xlam'
 $Manifest = Join-Path $InstallDir 'install.json'
 $script:Excel = $null
 $script:ExcelVersion = $null
+$script:ExcelProcess = $null
+$script:ExcelBootstrap = $null
+$script:ExcelSessionBook = $null
 $mutex = $null
 $acquired = $false
 $script:ExitCode = 0
@@ -33,26 +36,126 @@ function Release-Com([object]$Value) {
         [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($Value)
     }
 }
-function Start-OwnExcel {
+function New-SessionBootstrap {
+    # A new macro-free workbook gives a normal Excel process a document to open.
+    # No user workbook or template is read to create it.
+    Add-Type -AssemblyName System.IO.Compression
+    $path = Join-Path ([IO.Path]::GetTempPath()) ('slc-session-' + [Guid]::NewGuid().ToString('N') + '.xlsx')
+    $parts = [ordered]@{
+        '[Content_Types].xml' = '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'
+        '_rels/.rels' = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'
+        'xl/workbook.xml' = '<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="BuildSession" sheetId="1" r:id="rId1"/></sheets></workbook>'
+        'xl/_rels/workbook.xml.rels' = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'
+        'xl/worksheets/sheet1.xml' = '<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData/></worksheet>'
+    }
+    $stream = [IO.File]::Open($path, [IO.FileMode]::CreateNew)
+    $archive = $null
+    try {
+        $archive = [IO.Compression.ZipArchive]::new($stream, [IO.Compression.ZipArchiveMode]::Create, $false)
+        foreach ($name in $parts.Keys) {
+            $writer = [IO.StreamWriter]::new($archive.CreateEntry($name).Open(), [Text.UTF8Encoding]::new($false))
+            try { $writer.Write($parts[$name]) } finally { $writer.Dispose() }
+        }
+    } finally { if ($null -ne $archive) { $archive.Dispose() }; $stream.Dispose() }
+    return $path
+}
+function File-Sha256([string]$Path) {
+    $stream = [IO.File]::Open($Path, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::ReadWrite)
+    $hash = [Security.Cryptography.SHA256]::Create()
+    try { return ([BitConverter]::ToString($hash.ComputeHash($stream))).Replace('-', '') }
+    finally { $hash.Dispose(); $stream.Dispose() }
+}
+function Bytes-Sha256([byte[]]$Bytes) {
+    $hash = [Security.Cryptography.SHA256]::Create()
+    try { return ([BitConverter]::ToString($hash.ComputeHash($Bytes))).Replace('-', '') }
+    finally { $hash.Dispose() }
+}
+function Write-PackageMetadata([string]$Path) {
+    # Write product metadata without Office's default personal author identity.
+    Add-Type -AssemblyName System.IO.Compression
+    $stream = [IO.File]::Open($Path, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+    $archive = $null
+    try {
+        $archive = [IO.Compression.ZipArchive]::new($stream, [IO.Compression.ZipArchiveMode]::Update, $false)
+        $entry = $archive.GetEntry('docProps/core.xml')
+        if ($null -ne $entry) { $entry.Delete() }
+        $writer = [IO.StreamWriter]::new($archive.CreateEntry('docProps/core.xml').Open(), [Text.UTF8Encoding]::new($false))
+        try { $writer.Write('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>Excel Smart List Compare</dc:title><dc:creator>Excel Smart List Compare</dc:creator><cp:lastModifiedBy>Excel Smart List Compare</cp:lastModifiedBy><dc:description>Product SLC-68A45C44-2026; version 0.2.0</dc:description></cp:coreProperties>') }
+        finally { $writer.Dispose() }
+    } finally { if ($null -ne $archive) { $archive.Dispose() }; $stream.Dispose() }
+}
+function Start-OwnExcel([switch]$NormalStart) {
     # All Excel windows must already be closed by the user. Never close or kill their process.
     $active = @(Get-Process EXCEL -ErrorAction SilentlyContinue | Where-Object { $_.SessionId -eq (Get-Process -Id $PID).SessionId })
     if ($active.Count -gt 0) {
         throw (Setup-Failure '작업을 저장한 뒤 모든 Excel 창을 닫고 다시 실행해 주세요. 설치기가 Excel을 강제로 종료하지는 않습니다.' 3)
     }
-    $script:Excel = New-Object -ComObject Excel.Application
+    if ($NormalStart) {
+        # On the tested Office build, /automation -Embedding rejects VBProject
+        # even when developer access is allowed. Use normal startup and verify
+        # the newly created process before any build or registration operation.
+        if (-not ('SlcSetupWindowOwner' -as [type])) {
+            Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public static class SlcSetupWindowOwner {
+    [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint processId);
+}
+'@
+        }
+        $pathKey = Get-Item -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\excel.exe' -ErrorAction SilentlyContinue
+        if ($null -eq $pathKey) { $pathKey = Get-Item -LiteralPath 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\excel.exe' -ErrorAction SilentlyContinue }
+        if ($null -eq $pathKey) { throw 'Excel executable registration was not found.' }
+        $excelPath = [string]$pathKey.GetValue('')
+        if (-not (Test-Path -LiteralPath $excelPath -PathType Leaf)) { throw 'Registered Excel executable was not found.' }
+        $script:ExcelBootstrap = New-SessionBootstrap
+        $script:ExcelProcess = Start-Process -FilePath $excelPath -ArgumentList @('/x', ('"' + $script:ExcelBootstrap + '"')) -WindowStyle Hidden -PassThru
+        Write-Host ('Started dedicated Excel PID ' + $script:ExcelProcess.Id)
+        $timer = [Diagnostics.Stopwatch]::StartNew()
+        do {
+            try { $script:Excel = [Runtime.InteropServices.Marshal]::GetActiveObject('Excel.Application') }
+            catch { Start-Sleep -Milliseconds 200 }
+        } while ($null -eq $script:Excel -and $timer.Elapsed.TotalSeconds -lt 30 -and -not $script:ExcelProcess.HasExited)
+        if ($null -eq $script:Excel) { throw ('Could not attach to the new build Excel within 30 seconds. Inspect owned PID ' + $script:ExcelProcess.Id + '. No process was killed.') }
+        [uint32]$actualPid = 0
+        [void][SlcSetupWindowOwner]::GetWindowThreadProcessId([IntPtr]$script:Excel.Hwnd, [ref]$actualPid)
+        if ($actualPid -ne $script:ExcelProcess.Id) {
+            Release-Com $script:Excel
+            $script:Excel = $null
+            throw 'Excel automation resolved to another process. It was not changed or closed.'
+        }
+        $bootstrapBook = $script:Excel.Workbooks.Item([IO.Path]::GetFileName($script:ExcelBootstrap))
+        try { $bootstrapBook.Close($false) } finally { Release-Com $bootstrapBook }
+    } else { $script:Excel = New-Object -ComObject Excel.Application }
     $script:Excel.Visible = $false
+    $script:Excel.UserControl = $false
     # Explicitly respect the user's macro security; COM defaults must not weaken it.
     $script:Excel.AutomationSecurity = 2 # msoAutomationSecurityByUI
     $script:ExcelVersion = [string]$script:Excel.Version
 }
 function Stop-OwnExcel {
     if ($null -ne $script:Excel) {
+        if ($null -ne $script:ExcelSessionBook) {
+            try { $script:ExcelSessionBook.Close($false) } finally {
+                Release-Com $script:ExcelSessionBook
+                $script:ExcelSessionBook = $null
+            }
+        }
         try { $script:Excel.Quit() } finally {
             Release-Com $script:Excel
             $script:Excel = $null
             [GC]::Collect()
             [GC]::WaitForPendingFinalizers()
         }
+    }
+    if ($null -ne $script:ExcelProcess) {
+        if (-not $script:ExcelProcess.WaitForExit(5000)) { Write-Warning ('Owned build Excel PID ' + $script:ExcelProcess.Id + ' remains after normal Quit; no process was killed.') }
+        $script:ExcelProcess.Dispose()
+        $script:ExcelProcess = $null
+    }
+    if ($null -ne $script:ExcelBootstrap -and (Test-Path -LiteralPath $script:ExcelBootstrap)) {
+        Remove-Item -LiteralPath $script:ExcelBootstrap -Force
+        $script:ExcelBootstrap = $null
     }
 }
 function Read-OwnManifest {
@@ -115,11 +218,19 @@ function Build-Addin {
         $project.Name = 'SLC2026'
         Release-Com $project
         $project = $null
-        $book.BuiltinDocumentProperties.Item('Title').Value = 'Excel Smart List Compare'
-        $book.BuiltinDocumentProperties.Item('Comments').Value = 'Product SLC-68A45C44-2026; version 0.2.0'
+        # Ownership and version are verified through the manifest and VBA entry
+        # point. Optional Office document properties are not needed for either.
         $book.IsAddin = $true
         $book.SaveAs($temporary, 55) # xlOpenXMLAddIn
-        # Run entry points to make Excel compile the modules, then run integration tests.
+        # Saving as an add-in can leave the source workbook in its original
+        # format. Close it without another Save, then test the serialized XLAM.
+        $book.Close($false)
+        Release-Com $book
+        $book = $null
+        Write-PackageMetadata $temporary
+        $book = $script:Excel.Workbooks.Open($temporary, 0, $true)
+        Write-Host ('Testing saved XLAM: ' + $book.Name + '; format ' + $book.FileFormat)
+        # Run entry points to make Excel compile the saved modules and test them.
         $q = "'" + ([string]$book.Name).Replace("'", "''") + "'!"
         $reported = [string]$script:Excel.Run($q + 'SLC_Version')
         if ($reported -ne $Version) { throw 'The built add-in reported an unexpected version.' }
@@ -130,7 +241,6 @@ function Build-Addin {
         $null = $script:Excel.Run($q + 'SLC_AttachUI')
         if (-not [bool]$script:Excel.Run($q + 'SLC_UiReady')) { throw 'Excel could not register the comparison menu.' }
         $null = $script:Excel.Run($q + 'SLC_DetachUI')
-        $book.Save()
         $book.Close($false)
         Release-Com $book
         $book = $null
@@ -141,6 +251,8 @@ function Build-Addin {
         foreach ($file in @('Setup.ps1','Install.cmd','Uninstall.cmd','Test_Excel.cmd','README.md')) {
             Copy-Item -LiteralPath (Join-Path $Root $file) -Destination (Join-Path $release $file) -Force
         }
+        $userReadme = Join-Path $Root 'docs\RELEASE_README.md'
+        if (Test-Path -LiteralPath $userReadme) { Copy-Item -LiteralPath $userReadme -Destination (Join-Path $release 'README.md') -Force }
         ($testResult + "`r`nBuilt with Excel " + $script:ExcelVersion + "`r`n" + (Get-Date).ToString('o')) |
             Set-Content -LiteralPath (Join-Path $release 'EXCEL_TEST_RESULT.txt') -Encoding UTF8
         # This generated marker is obsolete only after the real build/tests succeeded.
@@ -165,116 +277,123 @@ function Find-OwnAddin {
     } finally { Release-Com $addins }
     return $null
 }
+function Excel-RegistrationVersion {
+    $key = Get-Item -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\excel.exe' -ErrorAction SilentlyContinue
+    if ($null -eq $key) { $key = Get-Item -LiteralPath 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\excel.exe' -ErrorAction SilentlyContinue }
+    if ($null -eq $key) { throw 'Windows desktop Excel was not found.' }
+    $path = [string]$key.GetValue('')
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw 'Registered Excel executable is missing.' }
+    return ([Diagnostics.FileVersionInfo]::GetVersionInfo($path).FileMajorPart.ToString() + '.0')
+}
+function Own-OpenEntries($Key) {
+    $entries = @{}
+    foreach ($name in $Key.GetValueNames()) {
+        if ($name -match '^OPEN\d*$') {
+            $value = [string]$Key.GetValue($name)
+            if ($value -ieq ('"' + $Target + '"') -or $value -ieq $Target) { $entries[$name] = $value }
+        }
+    }
+    return $entries
+}
 function Install-Addin {
     $oldManifest = Read-OwnManifest
-    if ((Test-Path -LiteralPath $Target) -and $null -eq $oldManifest) {
-        throw 'An unrecognized file already exists at the install path. It was not overwritten.'
+    $ownedFiles = @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md','install.json')
+    if ($null -eq $oldManifest) {
+        foreach ($name in $ownedFiles) {
+            if (Test-Path -LiteralPath (Join-Path $InstallDir $name)) { throw 'An unrecognized file already exists at the install path. It was not overwritten.' }
+        }
     }
     if (-not (Confirm-Action ('현재 Windows 사용자에게 명단 비교 기능을 설치할까요?' + "`r`n`r`n" +
-        'Excel을 모두 닫아 주세요. 관리자 권한 요청, 전역 단축키 등록, 보안 설정 변경은 하지 않습니다.' + "`r`n" +
-        '소스만 있는 패키지는 허용된 Excel 환경에서 최초 1회 빌드가 필요합니다.'))) { return }
+        'Excel을 모두 닫아 주세요. 이 제품의 파일과 자동 로드 항목을 등록합니다.'))) { return }
     $payload = Join-Path $Root 'ExcelSmartListCompare.xlam'
     if (-not (Test-Path -LiteralPath $payload)) { $payload = Join-Path $Root 'dist\ExcelSmartListCompare.xlam' }
-    if (-not (Test-Path -LiteralPath $payload)) {
-        Start-OwnExcel
-        try { $payload = Build-Addin } finally { Stop-OwnExcel }
+    if (-not (Test-Path -LiteralPath $payload)) { throw 'Install requires the built Release folder. Build_Release.cmd is for authorized developers.' }
+    $payloadHash = File-Sha256 $payload
+    $version = Excel-RegistrationVersion
+    $optionPath = 'Software\Microsoft\Office\' + $version + '\Excel\Options'
+    $options = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey($optionPath)
+    $before = Own-OpenEntries $options
+    $backup = @{}
+    $written = @{}
+    foreach ($name in $ownedFiles) {
+        $file = Join-Path $InstallDir $name
+        if (Test-Path -LiteralPath $file -PathType Leaf) { $backup[$name] = [IO.File]::ReadAllBytes($file) }
     }
-    [void](New-Item -ItemType Directory -Path $InstallDir -Force)
-    $backup = $null
-    if (Test-Path -LiteralPath $Target) {
-        $backup = Join-Path $InstallDir ('slc-backup-' + [Guid]::NewGuid().ToString('N') + '.xlam')
-        Copy-Item -LiteralPath $Target -Destination $backup
-    }
-    $ai = $null
-    $installed = $false
+    $temporary = $null
     try {
+        [void](New-Item -ItemType Directory -Path $InstallDir -Force)
         Copy-Item -LiteralPath $payload -Destination $Target -Force
-        Start-OwnExcel
-        $ai = Find-OwnAddin
-        if ($null -eq $ai) { $ai = $script:Excel.AddIns.Add($Target, $false) }
-        $ai.Installed = $true
-        $q = "'ExcelSmartListCompare.xlam'!"
-        $reported = [string]$script:Excel.Run($q + 'SLC_Version')
-        if ($reported -ne $Version) { throw 'The registered add-in failed its version check.' }
-        $null = $script:Excel.Run($q + 'SLC_AttachUI')
-        if (-not [bool]$script:Excel.Run($q + 'SLC_UiReady')) { throw 'Excel could not register the comparison menu.' }
-        Release-Com $ai
-        $ai = $null
-        Stop-OwnExcel
-        foreach ($file in @('Setup.ps1','Uninstall.cmd','README.md')) {
-            $source = Join-Path $Root $file
-            $destination = Join-Path $InstallDir $file
-            if ([IO.Path]::GetFullPath($source) -ine [IO.Path]::GetFullPath($destination)) {
-                Copy-Item -LiteralPath $source -Destination $destination -Force
-            }
+        $written['ExcelSmartListCompare.xlam'] = $payloadHash
+        foreach ($name in @('Setup.ps1','Uninstall.cmd','README.md')) {
+            $source = Join-Path $Root $name
+            $destination = Join-Path $InstallDir $name
+            if ([IO.Path]::GetFullPath($source) -ine [IO.Path]::GetFullPath($destination)) { Copy-Item -LiteralPath $source -Destination $destination -Force; $written[$name] = File-Sha256 $destination }
         }
-        [ordered]@{
-            productId = $ProductId; version = $Version; installDirectory = $InstallDir
-            installedAt = (Get-Date).ToString('o'); excelVersion = $script:ExcelVersion
-            sha256 = (Get-FileHash -LiteralPath $Target -Algorithm SHA256).Hash
-            ownedFiles = @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md','install.json')
-        } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $Manifest -Encoding UTF8
-        $installed = $true
-        Write-Host '설치했습니다. Excel에서 추가 기능 탭의 명단 비교 버튼 또는 셀 우클릭 메뉴를 사용하세요.'
+        if ((File-Sha256 $Target) -ne $payloadHash) { throw 'Copied XLAM hash mismatch.' }
+        $names = @($before.Keys | Sort-Object)
+        if ($names.Count) { $openName = $names[0] }
+        else {
+            $index = 0
+            do { $openName = if ($index -eq 0) { 'OPEN' } else { 'OPEN' + $index }; $index++ } while ($options.GetValueNames() -contains $openName)
+        }
+        # Commit ownership before registration so an interrupted install is removable.
+        $data = [ordered]@{productId=$ProductId;version=$Version;installDirectory=$InstallDir;installedAt=(Get-Date).ToString('o');excelVersion=$version;sha256=$payloadHash;openValueName=$openName;ownedFiles=$ownedFiles}
+        $temporary = Join-Path $InstallDir ('slc-install-' + [Guid]::NewGuid().ToString('N') + '.json')
+        [IO.File]::WriteAllText($temporary, ($data | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($true))
+        if (Test-Path -LiteralPath $Manifest) { [IO.File]::Replace($temporary,$Manifest,[NullString]::Value) } else { [IO.File]::Move($temporary,$Manifest) }
+        $temporary = $null
+        $written['install.json'] = File-Sha256 $Manifest
+        $current = $options.GetValue($openName,$null)
+        if ($null -ne $current -and [string]$current -ine ('"'+$Target+'"') -and [string]$current -ine $Target) { throw 'Excel registration changed concurrently; the external value was preserved.' }
+        $options.SetValue($openName,('"'+$Target+'"'),[Microsoft.Win32.RegistryValueKind]::String)
+        foreach ($duplicate in $names) { if ($duplicate -ne $openName -and (Own-OpenEntries $options).ContainsKey($duplicate)) { $options.DeleteValue($duplicate,$false) } }
+        $options.Flush()
+        if ([string]$options.GetValue($openName) -cne ('"'+$Target+'"')) { throw 'Excel registration verification failed.' }
+        Write-Host '설치했습니다. Excel을 열어 추가 기능 탭 또는 셀 우클릭의 명단 비교를 사용하세요.'
         Write-Host ('Uninstall: ' + (Join-Path $InstallDir 'Uninstall.cmd'))
     } catch {
-        # Best effort registration rollback, with truthful reporting on upgrades.
-        if ($null -ne $script:Excel) {
-            if ($null -eq $ai) { $ai = Find-OwnAddin }
-            if ($null -ne $ai) { try { $ai.Installed = $false } catch {} }
+        # Roll back only this exact product path; preserve unrelated OPEN values.
+        foreach ($name in @((Own-OpenEntries $options).Keys)) { $options.DeleteValue($name,$false) }
+        foreach ($name in $before.Keys) {
+            if ($null -eq $options.GetValue($name,$null)) { $options.SetValue($name,$before[$name],[Microsoft.Win32.RegistryValueKind]::String) }
         }
-        Release-Com $ai
-        $ai = $null
-        Stop-OwnExcel
-        if ($null -ne $backup -and (Test-Path -LiteralPath $backup)) {
-            Copy-Item -LiteralPath $backup -Destination $Target -Force
-            Write-Warning 'Previous XLAM restored. If needed, re-enable it in Excel Add-ins after resolving the installation error.'
-        } elseif (Test-Path -LiteralPath $Target) { Remove-Item -LiteralPath $Target -Force }
+        foreach ($name in $ownedFiles) {
+            $file = Join-Path $InstallDir $name
+            $currentHash = if (Test-Path -LiteralPath $file -PathType Leaf) { File-Sha256 $file } else { $null }
+            if ($backup.ContainsKey($name)) {
+                if ($currentHash -eq (Bytes-Sha256 $backup[$name])) { continue }
+                if ($null -ne $currentHash -and (-not $written.ContainsKey($name) -or $currentHash -ne $written[$name])) { Write-Warning ('Externally changed file preserved during rollback: '+$name); continue }
+                [IO.File]::WriteAllBytes($file,$backup[$name])
+            } elseif ($null -ne $currentHash -and $written.ContainsKey($name) -and $currentHash -eq $written[$name]) { Remove-Item -LiteralPath $file -Force }
+        }
         throw
     } finally {
-        Release-Com $ai
-        Stop-OwnExcel
-        if ($null -ne $backup -and (Test-Path -LiteralPath $backup)) { Remove-Item -LiteralPath $backup -Force }
+        $options.Close()
+        if ($null -ne $temporary -and (Test-Path -LiteralPath $temporary)) { Remove-Item -LiteralPath $temporary -Force }
     }
 }
 function Uninstall-Addin {
     $data = Read-OwnManifest
-    if ($null -eq $data) {
-        Write-Host 'No owned installation found. No files or other add-ins were changed.'
-        return
+    if ($null -eq $data) { Write-Host 'No owned installation found. No files or other add-ins were changed.'; return }
+    if (-not (Confirm-Action ('Excel 명단 비교 기능만 삭제할까요?' + "`r`n`r`n" + '기존 통합문서와 다른 추가 기능은 삭제하지 않습니다.'))) { return }
+    $version = [string]$data.excelVersion
+    if ($version -notmatch '^\d+\.0$') { throw 'Invalid owned Excel registration version.' }
+    $options = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(('Software\Microsoft\Office\'+$version+'\Excel\Options'),$true)
+    if ($null -ne $options) {
+        try { foreach ($name in @((Own-OpenEntries $options).Keys)) { $options.DeleteValue($name,$false) }; $options.Flush() }
+        finally { $options.Close() }
     }
-    if (-not (Confirm-Action ('Excel 명단 비교 기능만 삭제할까요?' + "`r`n`r`n" +
-        '기존 통합문서와 다른 추가 기능은 삭제하지 않습니다.'))) { return }
-    $ai = $null
-    try {
-        Start-OwnExcel
-        $ai = Find-OwnAddin
-        if ($null -ne $ai) { $ai.Installed = $false }
-        Release-Com $ai
-        $ai = $null
-    } finally { Release-Com $ai; Stop-OwnExcel }
-    # Excel owns OPEN registration. Remove only our exact, disabled list entry, not the key or other values.
-    if ($null -ne $script:ExcelVersion) {
-        $reg = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(
-            ('Software\Microsoft\Office\' + $script:ExcelVersion + '\Excel\Add-in Manager'), $true)
-        if ($null -ne $reg) {
-            try {
-                foreach ($name in $reg.GetValueNames()) {
-                    if ($name -ieq $Target) { $reg.DeleteValue($name, $false) }
-                }
-            } finally { $reg.Close() }
-        }
+    $manager = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(('Software\Microsoft\Office\'+$version+'\Excel\Add-in Manager'),$true)
+    if ($null -ne $manager) { try { foreach ($name in $manager.GetValueNames()) { if ($name -ieq $Target) { $manager.DeleteValue($name,$false) } } } finally { $manager.Close() } }
+    foreach ($name in @('ExcelSmartListCompare.xlam','README.md','Uninstall.cmd','Setup.ps1','install.json')) {
+        $file = Join-Path $InstallDir $name
+        if (Test-Path -LiteralPath $file -PathType Leaf) { Remove-Item -LiteralPath $file -Force }
     }
-    # Fixed allow-list: never recursively delete the installation directory.
-    foreach ($file in @('ExcelSmartListCompare.xlam','README.md','Uninstall.cmd','Setup.ps1','install.json')) {
-        $path = Join-Path $InstallDir $file
-        if (Test-Path -LiteralPath $path -PathType Leaf) { Remove-Item -LiteralPath $path -Force }
-    }
-    if ((Get-ChildItem -LiteralPath $InstallDir -Force | Measure-Object).Count -eq 0) {
-        Remove-Item -LiteralPath $InstallDir -Force
-    } else { Write-Host 'Additional files were left untouched in the installation directory.' }
+    if ((Get-ChildItem -LiteralPath $InstallDir -Force | Measure-Object).Count -eq 0) { Remove-Item -LiteralPath $InstallDir -Force }
+    else { Write-Host 'Additional files were left untouched in the installation directory.' }
     Write-Host '삭제했습니다. 통합문서와 다른 추가 기능은 변경하지 않았습니다.'
 }
+
 function Test-Addin {
     $file = $Target
     if (-not (Test-Path -LiteralPath $file)) { $file = Join-Path $Root 'dist\ExcelSmartListCompare.xlam' }
@@ -282,11 +401,11 @@ function Test-Addin {
     if (-not (Test-Path -LiteralPath $file)) { throw 'Build or install the add-in before running Excel tests.' }
     $book = $null
     try {
-        Start-OwnExcel
-        foreach ($b in $script:Excel.Workbooks) {
-            if ([string]$b.FullName -ieq $file) { $book = $b; break }
-            Release-Com $b
-        }
+        Start-OwnExcel -NormalStart
+        # Loaded add-ins need not appear in Workbooks enumeration.
+        # Resolve the exact name and verify its path before opening it again.
+        try { $book = $script:Excel.Workbooks.Item([IO.Path]::GetFileName($file)) } catch {}
+        if ($null -ne $book -and [string]$book.FullName -ine $file) { Release-Com $book; $book = $null }
         if ($null -eq $book) { $book = $script:Excel.Workbooks.Open($file, 0, $true) }
         $q = "'" + ([string]$book.Name).Replace("'", "''") + "'!"
         $result = [string]$script:Excel.Run($q + 'SLC_TestAll')
@@ -304,7 +423,7 @@ try {
     if ($active.Count -gt 0) { throw (Setup-Failure '작업을 저장한 뒤 모든 Excel 창을 닫고 다시 실행해 주세요. 다른 프로그램은 종료하지 않습니다.' 3) }
     switch ($Action) {
         'Build' {
-            Start-OwnExcel
+            Start-OwnExcel -NormalStart
             $built = Build-Addin
             Write-Host ('Built: ' + $built)
             Write-Host 'Distribute the Release folder; end users run Install.cmd once.'
@@ -314,6 +433,7 @@ try {
         'Test' { Test-Addin }
     }
 } catch {
+    Write-Host ('Setup failure location: ' + $_.ScriptStackTrace)
     Write-Error $_ -ErrorAction Continue
     Write-Host 'No security policy was bypassed. If macros or PowerShell are blocked, use your approved IT distribution process.'
     $script:ExitCode = 1

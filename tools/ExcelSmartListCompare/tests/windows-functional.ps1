@@ -20,9 +20,18 @@ function Get-SharedHash([string]$path){
 }
 function Check([string]$id,[bool]$condition,$actual,$expected){
     $results.Add([pscustomobject]@{id=$id;layer='Actual Excel COM';status=if($condition){'PASS'}else{'FAIL'};expected=$expected;actual=$actual})
+    $results | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $output 'functional.json') -Encoding UTF8
+    Write-Host ($id + ': ' + $condition)
     if(-not $condition){throw "Assertion failed: $id"}
 }
-function Run-Macro([string]$name){$excel.Run("'"+([IO.Path]::GetFileName($addin)).Replace("'","''")+"'!"+$name)}
+function Run-Macro([string]$name){
+    Write-Host ('Running '+$name)
+    $qualified="'"+([IO.Path]::GetFileName($addin)).Replace("'","''")+"'!"+$name
+    if($name -in @('SLC_Run','SLC_Clear','SLC_Replace')){$null=$excel.Run($qualified);Write-Host ('Finished '+$name);return}
+    $value=[string]$excel.Run($qualified)
+    Write-Host ('Finished '+$name)
+    return $value
+}
 function Make-Book([string]$name,[object[]]$values,[bool]$horizontal){
     $book=$excel.Workbooks.Add(-4167)
     $sheet=$book.Worksheets.Item(1)
@@ -31,7 +40,7 @@ function Make-Book([string]$name,[object[]]$values,[bool]$horizontal){
         $row=if($horizontal){2}else{$i+2};$column=if($horizontal){$i+2}else{2}
         $cell=$sheet.Cells.Item($row,$column)
         if($values[$i] -is [string]){$cell.NumberFormat='@'}
-        $cell.Value2=$values[$i]
+        $null=$cell.GetType().InvokeMember('Value2',[Reflection.BindingFlags]::SetProperty,$null,$cell,@($values[$i]))
         Release-Com $cell
     }
     # An adjacent sentinel must never leak into the selected list.
@@ -77,13 +86,16 @@ try{
         $actual[$key]=@([int]$sheet.Cells.Item($r,4).Value2,[int]$sheet.Cells.Item($r,6).Value2)
     }
     Check 'PUBLIC-DUPLICATE-COUNTS' (($actual['alice'] -join ',') -eq '2,1') ($actual['alice'] -join ',') '2,1'
-    $result.SaveAs((Join-Path $output 'actual-comparison.xlsx'),51)
+    Write-Host 'Saving comparison workbook'
+    $resultPath=Join-Path $output 'actual-comparison.xlsx'
+    $null=$result.GetType().InvokeMember('SaveAs',[Reflection.BindingFlags]::InvokeMethod,$null,$result,@([string]$resultPath,[int]51))
+    Write-Host 'Saved comparison workbook'
     $after=@($paths | ForEach-Object {Get-SharedHash $_})
     Check 'PUBLIC-SOURCE-FILE-HASHES' (($before -join ',') -eq ($after -join ',')) $after $before
     [ordered]@{captureTotalMs=$captureMs;readCompareOutputTotalMs=$compareMs;phaseBreakdown='NOT_RUN';cellsPerList=5} | ConvertTo-Json | Set-Content (Join-Path $output 'performance.json') -Encoding UTF8
     Release-Com $sheet;Release-Com $result
 }catch{
-    $results.Add([pscustomobject]@{id='COM-EXECUTION';status='FAIL';actual=$_.Exception.Message})
+    $results.Add([pscustomobject]@{id='COM-EXECUTION';status='FAIL';actual=$_.Exception.Message;location=$_.ScriptStackTrace})
 }finally{
     if($excel){
         # Every workbook in this uniquely owned instance was opened by this script.

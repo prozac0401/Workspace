@@ -200,7 +200,8 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     Set parts = PrepareParts(selected, True, combining)
     If parts Is Nothing Then GoTo Finished
     mStarted = Timer
-    Application.Interactive = False
+    ' Keep keyboard input available so EnableCancelKey can handle Esc.
+    ' The selected Range is already captured and mBusy rejects re-entry.
     Set exclusions = MetadataRects(selected.Worksheet)
     Set current = ReadParts(selected, parts, exclusions)
     If current.Total = 0 Then

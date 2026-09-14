@@ -1,114 +1,104 @@
-# Excel Smart List Compare · Windows E2E 실제 실행 보고서
+# Excel Smart List Compare · 실제 Windows E2E 보고서
 
-작성일: 2026-09-14 · 제품 소스 버전: 0.2.0 · 상태: **BLOCKED_POLICY / 배포 승인 불가**
+실행일: 2026-09-14 · 최종 확인: 21:22 KST · 판정: **설치 가능한 평가용 배포 후보**
 
-**후속 실행:** 사용자의 AccessVBOM 임시 허용·원복 승인을 받고 재시도했지만 Excel은 여전히 접근을 거부했다. 실제 COM 오류 수집을 수정하고 원복을 검증했다. [승인 후 재검증 보고서](WINDOWS_APPROVAL_RETEST_REPORT.md)를 먼저 확인한다. 아래 최초 실행 결과는 당시의 설정·Excel 버전·증거를 보존한 기록이다.
+실제 Windows Excel에서 빌드 → 설치 → 실행 → 재시작 → 재설치 → 제거 → 제거 후 재시작을 수행했다. 발견한 빌드·설치·Esc·진단 명령 오류를 수정하고 재검증했다. 아래 범위에서 통과했으며 전체 인수·코드 서명·상용 배포 승인을 뜻하지 않는다.
 
-실제 Windows Excel을 실행해 환경, 설치 안전장치, 합성 파일 생성과 종료를 검증했다. **VBA 프로젝트 접근 차단으로 XLAM 빌드에 실패했다. 따라서 설치 가능한 Release, 제품 기능 검증, 설치→재시작→재설치→제거 완료를 달성하지 못했다.** Windows 데스크톱도 잠겨 있어 GUI 클릭 검증은 차단됐다. Python 통과는 Excel 제품 기능 통과가 아니다.
+## 환경과 최종 파일
 
-## 입력과 작업 경계
-
-- 원격: `https://github.com/prozac0401/Workspace`, 커밋 `e9e20e3efc15c042949721bdee8db8e835d70749`.
-- 원격의 `CODEX_EXCEL_E2E_TEST_PROMPT.md` 및 `ExcelSmartListCompare_v0.2_Source.zip`을 별도 clone으로 받았다.
-- 원본 ZIP SHA-256: `1096DFFF947442501F8ED9C906710A7DB146271055F47BB30F6528E317013319`.
-- 작업 위치: `WORKSPACE/ExcelE2E-20260914/project/ExcelSmartListCompare_v0.2/`. 기존 Workspace 소스는 수정하지 않았다.
-- 원본 지시/README/인수 기준/설치 스크립트/VBA/테스트와 Workspace 도구·문서 정책 및 양식을 읽었다.
-- 원본 보고서는 역사적 기록으로 보존한다. 새 Windows 결과의 근거로 원본 Linux 로그를 재사용하지 않았다.
-
-## 실제 환경
-
-| 항목 | 확인값 |
+| 항목 | 실제 확인 |
 |---|---|
-| OS | Windows 11 Pro, 10.0.22631 |
-| Windows 실행기 | Windows PowerShell 5.1.22621.6133, `powershell.exe -NoProfile -STA -File` |
-| 명령 환경 | Windows 네이티브, WSL 아님 |
-| 계정/세션 | 실행 SID와 같은 세션 Explorer SID 일치, 일반 사용자, 비관리자 |
-| HKCU/LocalAppData | 해당 데스크톱 계정과 일치; 공개 보고서의 SID·계정·프로필은 마스킹 |
-| Excel 파일 버전 | 16.0.20326.20132 |
-| 실제 Excel COM | Version 16.0, Build 20326, Windows (64-bit) NT 10.00 |
-| Excel 자체 비트수 | EXCEL.EXE PE Machine `0x8664` = x64. PowerShell 비트수에서 추정하지 않음 |
-| VBA 프로젝트 접근 | 새 Workbook의 VBProject/VBComponents 접근 실패. 실제 빌더도 해당 제한에서 중단 |
-| 매크로 실행 | XLAM을 만들지 못해 미실행. 허용 여부도 입증하지 못함 |
-| AutomationSecurity | 테스트·설치용 새 인스턴스에서 `2`(ByUI). 보안 설정 완화 없음 |
-| 화면 | 접근성 트리는 읽혔으나 캡처는 Windows 잠금 화면. 클릭/시각 검증 증거로 사용하지 않음 |
+| 운영체제 | Windows 11 Pro 10.0.22631 |
+| Excel | 16.0.20326.20144, x64 |
+| 실행 계정 | 데스크톱과 같은 계정·세션, 비관리자 |
+| PowerShell | Windows PowerShell 5.1.22621.6133 |
+| 제품/형식 | SLC_Version 0.2.0, XLAM FileFormat 55 |
+| 최종 XLAM SHA-256 | `c6f55886c368294c4e21396366d0cf3c368605e965f3ca2bd153f2e75bc8ae86` |
+| 최종 Setup SHA-256 | `ea77f5c6c0b167b6c1de4d4e7009406327a4c5b7449382a44634d294a0334516` |
+| 작업 위치 | 별도 ExcelE2E-20260914 폴더의 격리 checkout |
 
-## 실제 결과 표
+XLAM을 저장·닫고 제품 메타데이터를 기록한 뒤 다시 열어 실제 검사를 실행했다. 검사 후 바이너리를 다시 저장하지 않았다. 설치·제거·진단 스크립트 후속 수정은 VBA 바이너리 해시를 바꾸지 않았다. 일반 사용자는 완성 Release를 설치하며 VBA 프로젝트 접근 권한은 필요하지 않다.
 
-증거 기준 폴더는 `artifacts/windows-e2e/20260914-1346/`이다. 원시 로그/계정 정보는 로컬 전용이다. 배포 후보에는 식별자를 가린 `evidence/windows-e2e/` 요약 및 로그만 포함한다.
+## 실제 통과 범위
 
-| ID | 검증 계층 / 환경 | 기대값 | 실제값 | 상태 | 증거 |
-|---|---|---|---|---|---|
-| ENV-01 | 네이티브 Windows/계정 | 실제 데스크톱 계정과 일치 | SID/세션 일치, 비관리자 | PASS | `baseline-before.json` |
-| ENV-02 | Excel 실행 파일 | Excel 자체 비트수 확인 | PE x64, 파일 버전 확인 | PASS | `baseline-before.json` |
-| ENV-03 | 실제 COM | 새 인스턴스 생성/종료 | PID 3440에서 생성·Workbook 생성·Quit; 최종 잔존 없음 | PASS | `excel-preflight.json`, `restoration.json` |
-| ENV-04 | VBA 빌드 권한 | VBA 컴포넌트 가져오기 가능 | 접근 차단 | BLOCKED_POLICY | `build-policy.log` |
-| ENV-05 | 정상 Excel 시작 | 합성 파일 열림 | `/x` 시작 PID 15472에서 Synthetic-B 열림, 접근성 트리 확인 | PASS | `normal-start.json`, `evidence/windows-e2e/ui-observation.json` |
-| ENV-06 | 실제 화면/입력 | Excel 화면과 버튼 조작 | 초기 activation/geometry 오류, 이후 잠금 화면 확인. GUI 검증 중단 | BLOCKED_ENV | `evidence/windows-e2e/ui-observation.json` |
-| FIX-01 | Python/한국어 Windows | UTF-8 파일 정상 읽기 | 원본 53개 중 오류 4개 → 수정 후 53개 통과 | PASS | `python-original.log`, `python-fixed.log` |
-| FIX-02 | 실제 `.cmd` | 내부 실패 코드 보존 | 원본 내부 실패에도 0 → 수정 후 VBA 차단 5 | PASS | `cmd-original.log`, `cmd-original.exitcode.txt`, `cmd-fixed-build.exitcode.txt` |
-| SRC-01 | 가져오기 파일 | UTF-8와 ASCII 동기화 | exporter 실행, 동기화 검사 통과. VBA 비교 로직 변경 없음 | PASS | `ascii-export.log`, `python-fixed.log` |
-| SRC-02 | PowerShell 문법 | 파서 오류 없음 | 최종 스크립트 파서 검사 | PASS | `parser-final.json` |
-| I01 | 실제 Excel Build | 테스트 후 XLAM 생성 | VBA 접근 단계에서 종료 5, XLAM 없음 | BLOCKED_POLICY | `cmd-fixed-build.log` |
-| I04-a | `.cmd` + 실제 열린 Excel | 설치 중단, Excel 보존 | Install 종료 3, 소유 PID 유지 | PASS | `guards/GUARD-OPEN-INSTALL.log`, `guards/guards.json` |
-| I04-b | `.cmd` + 실제 열린 Excel | 제거 중단, Excel 보존 | Uninstall 종료 3, 소유 PID 유지 | PASS | `guards/GUARD-OPEN-UNINSTALL.log`, `guards/guards.json` |
-| I04-c | `.cmd` + 실제 열린 Excel | Build/Test도 중단 | 각각 종료 3 | PASS | `guards/guards.json` |
-| I05 | 실제 빌더 | 정책 우회 없이 실패 | VBA 접근 차단 안내, 정책 변경 없음 | PASS | `cmd-fixed-build.log`, `restoration.json` |
-| I09-a | 이름 있는 제품 mutex | 경쟁 요청 거절 | 시험 프로세스가 mutex 보유 중 Install/Uninstall 각각 종료 4 | PASS | `guards/GUARD-LOCK-INSTALL.log`, `guards/GUARD-LOCK-UNINSTALL.log` |
-| I09-b | 설치와 제거의 실제 동시 실행 | 파일/등록 충돌 없음 | 두 실제 설치 트랜잭션의 동시 실행은 미실행 | NOT_RUN | XLAM 빌드 차단 |
-| I07-absent | 미설치 제거/재제거 | 안전하게 종료 | 두 번 모두 종료 0, 제품 폴더 생성 없음 | PASS | `guards/GUARD-ABSENT-UNINSTALL.log`, `guards/GUARD-ABSENT-REUNINSTALL.log` |
-| TEST-missing | 실제 Test_Excel.cmd | 없는 바이너리 실패 | 종료 1 | PASS | `guards/GUARD-MISSING-XLAM-TEST.log` |
-| DATA-01 | 실제 Excel 합성 파일 | A/B 실제 xlsx 생성 | 두 파일 생성·정상 닫기, SHA-256 기록 | PASS | `synthetic-data/fixture.json`, `synthetic-data-create.exitcode.txt` |
-| RUNNER-01 | 재실행기 | 차단 상태/종료 코드 전파 | Preflight 종료 5, 전후 snapshot 기록 | PASS | `../20260914-runner-preflight-fixed/commands.json` |
-| RESTORE-01 | 제품 파일/등록 | 초기 미설치 상태 | 제품 폴더/파일 없음 | PASS | `restoration.json` |
-| RESTORE-02 | 보안/타 추가 기능 등록 | 관련 값 보존 | 보안, 정책, OPEN 등록, Add-in Manager, COM Addins 비교 일치 | PASS | `restoration.json` |
-| RESTORE-03 | 프로세스 | 시험용 Excel 잔존 없음 | 최종 Excel PID 없음 | PASS | `baseline-after.json`, `normal-start-cleanup.log` |
+각 행은 다른 실행 층이다. 내장 검사에 포함된 항목과 일반 명령 검사는 겹칠 수 있으므로 합산해 고유 테스트 개수로 표시하지 않는다.
 
-`GUARD-OWNED-PID-PRESERVED`를 포함한 설치 안전장치 실행은 10개 PASS이다. 이는 성공 설치 10건을 의미하지 않는다. 원본 빌드 시 기존 PID 24632를 감지한 중단도 실제로 확인했다.
+| 실행 | 결과·독립적으로 확인한 내용 |
+|---|---|
+| 실제 빌드 | PASS, 종료 0. 저장된 XLAM의 정규화와 Excel 통합 19개 |
+| 최종 Test_Excel.cmd | PASS, 종료 0. 설치된 XLAM의 19개 검사 |
+| COM 기능 7개 | 모두 PASS. 버전·내장 검사·SLC_Run·별도 결과·닫힌 A 스냅샷·중복 개수·수식 방지·합성 원본 해시 |
+| 일반 명령 SLC_Run 14개 | 모두 PASS. 가로↔세로·사각형·단일·다중/겹침·전체 행/열·숨김 행/열·AutoFilter·Table 필터/합계·수동 계산·같은 범위 수정 후 이전 기준 |
+| 경고·오류 복구 5개 | 모두 PASS. 20,000셀 경고에서 아니요, 빈 B, 병합 셀, 4,097자 거절, 보존된 A로 재비교 |
+| 최종 실제 도구 모음 클릭 | PASS. A 3 / B 3 / 일치 3, 중복 2회, 새 결과 HasFormula=False |
+| 실제 Esc 입력 | PASS. 100,000셀 작업에서 68,096셀 진행을 관찰한 뒤 Esc. 취소 메시지·기준 3건·설정 복원 확인 |
+| 설치 안전장치 11개 | 모두 PASS. .cmd의 Excel 열림 차단 4개, 소유 시험 PID 보존, mutex 충돌 2개, 반복 제거 2개, 누락 XLAM 진단·설치 거절 |
+| 설치 실패 주입 | PASS. 매니페스트 교체를 파일 공유 잠금으로 실패시킴. 종료 1, 기존 5개 파일 해시·OPEN 등록 복원, 임시 파일 0 |
+| PowerShell 파서 | 14/14 PASS |
+| Python 참조/정적 검사 | 53/53 PASS. Excel 검증과 별도 |
 
-## 실행하지 못한 제품 검증
+내장 19개에는 숨긴 단일 셀, 오류/수식 빈문자 제외, 필터 제목 옆 일반 데이터, Table 제목/합계, 100,001 가시 셀 거절과 큰 스캔 상한 거절도 포함된다. 모든 경계값의 앞뒤를 검사했다는 뜻은 아니다.
 
-| ID / 범위 | 미실행 항목 | 상태 / 이유 |
-|---|---|---|
-| API-01 | 실제 XLAM의 SLC_Version, SLC_TestAll, SLC_AttachUI, SLC_UiReady | BLOCKED_POLICY — XLAM 빌드 불가 |
-| S01~S09 | SLC_Run 가로/세로/사각형/단일/다중/겹침, 두 실제 파일 비교, 원본 종료 후 snapshot, 독립 프로세스 경계 | BLOCKED_POLICY |
-| F01~F08 | AutoFilter/Table, 숨김 행·열, 제목/합계 제외, 빈칸/오류/병합, 계산 상태 | BLOCKED_POLICY |
-| C03~C08 | 성공/오류/취소 설정 복원, 이전 결과, HasFormula=False, 실제 정규화·개수 비교, Undo | BLOCKED_POLICY |
-| P01~P10 | 19,999/20,000/100,000/100,001, 조각·스캔·문자 상한 전후, 경고 아니요, Esc, 성능 단계별 실측 | BLOCKED_POLICY — 참조 테스트 통과로 대체하지 않음 |
-| I02/I03/I06/I07/I08 | Release 설치, 정상 시작 자동 로드, 재시작, 재설치, rollback, 실제 제거 후 재시작, 설치 폴더의 사용자 파일 보존 | BLOCKED_POLICY |
-| I10 | 한국어/공백 경로의 성공 설치 및 x86 Excel | NOT_RUN — 현재 빌드 불가, x86 Excel 환경 없음 |
-| C01/C02/I11 | 타 추가 기능/메뉴/PERSONAL.XLSB/단축키의 제품 설치 전후 실제 공존 | NOT_RUN — 제품 미설치. 레지스트리 보존 관찰과 구분 |
-| GUI-01 | 셀/행/열 우클릭, 추가 기능 탭, 두 파일 선택→기준→비교, 경고 기본 버튼/거절/취소 | BLOCKED_ENV 및 BLOCKED_POLICY |
-| SETUP-CANCEL | 기본 설치/제거 확인창의 아니요 및 종료 2 | NOT_RUN — 잠긴 데스크톱. 기본 확인 코드는 유지 |
-| SIGN-01 | 조직 서명/승인 배포 및 모든 Office 버전 | NOT_RUN — 조직 결정/다른 환경 없음 |
+일반 명령 14개는 합성 원본으로 Selection을 만든 뒤 실제 SLC_Run을 호출했다. 각 결과의 기대 요약은 독립 리터럴이며 제품 정규화 함수로 기대값을 재계산하지 않았다. 모든 결과는 HasFormula=False였고 Excel 설정과 앞서 편집한 결과의 시험 표식이 유지됐다. 이 14개는 COM을 통한 실제 사용자 명령 검사이며 마우스로 14개 시나리오를 입력한 것은 아니다.
 
-## 수정 사항과 확인된 오류
+![최종 XLAM의 도구 모음 클릭으로 만든 실제 결과](images/09-final-ui-result.jpg)
 
-1. `tests/test_reference.py`: UTF-8 인코딩 지정으로 실제 한국어 Windows CP949 오류 4개 해결.
-2. 네 `.cmd`: `pause` 전에 종료 코드 저장, 마지막에 그대로 반환. 기본 사용자 대기는 유지. `%*`로 제품 한정 확인 인자를 전달.
-3. `Setup.ps1`: 제품 한정 명시적 확인 옵션과 종료 코드 2/3/4/5 추가. VBA·매크로·신뢰 위치·PowerShell 정책을 변경하는 코드는 추가하지 않음.
-4. Windows 실행기, 계정/등록 snapshot, 소유 PID 정리, 합성 파일 작성, 설치 guard 및 COM 기능 실행기 추가. [설계 결정](ADR-0001-Windows-test-entrypoints.md) 참조.
+## 설치 → 재시작 → 재설치 → 제거
 
-VBA 본체를 실행할 수 없어 비교 엔진 오류가 없다고 결론내리지 않는다. 새 `windows-functional.ps1`은 SLC_Run/닫힌 A snapshot/독립 기대값/출력/원본 해시 검사용 코드지만, XLAM 실행 경로는 **NOT_RUN**이다. 파서 검사만으로 기능 성공을 주장하지 않는다.
+| 단계 | 실제 결과 |
+|---|---|
+| 시작 전 | 제품 미설치, 기존 Excel 0개 |
+| 한국어·공백 경로의 Install.cmd | 종료 0, 최종 XLAM 해시 일치, Excel 프로세스를 만들지 않음 |
+| 정상 시작 | 자동 로드 PASS, Cell/Row/Column 메뉴 각각 1개, 도구 모음 4개 |
+| 정상 종료 뒤 재시작 | 같은 등록과 메뉴 개수 PASS |
+| 재설치 및 후속 Setup 재설치 | 각각 종료 0 |
+| 재설치 후 정상 시작 | 자동 로드와 메뉴 한 세트 PASS |
+| Uninstall.cmd | 종료 0, 소유 5개 파일과 정확한 제품 OPEN 등록 제거 |
+| 설치 폴더의 추가 파일 | 시험 파일 해시 유지 PASS. 시험 후 그 파일만 정리 |
+| 제거 후 정상 Excel 시작 | 자동 로드 없음, 제품 메뉴·도구 모음 0, 실제 화면에 누락 파일 경고 없음 |
+| 반복 제거 | 2회 종료 0, 다른 파일·등록 변경 없음 |
 
-시험 도구의 개발 중 오류도 보존했다. 최초 guard 실행은 Windows PowerShell의 stderr 처리가 조기 중단시켜 cmd 내부 stderr 결합으로 수정했다. 열린 xlsx의 배타적 해시 읽기 실패는 파일을 정상 닫고 해시하도록 수정 후 두 파일 생성 성공을 재확인했다. 정상 시작의 ROT 연결 첫 시도는 `MK_E_UNAVAILABLE`로 실패했다. 최종 합성 파일 세션의 PID 확인/정상 Quit은 성공했다. 재실행기 첫 preflight의 C# heredoc 편집 오류도 수정 후 실제 종료 5를 확인했다.
+자동 로드 검사 전에 XLAM을 열거나 SLC_AttachUI를 호출하지 않았다. EXCEL.EXE 정상 시작과 일반 XLSX만 사용했고 이후 로드 상태를 읽었다.
 
-## 사용자 데이터 보호와 복구
+빌드/진단 및 일부 정상 종료는 창 없는 시험용 Excel을 남겼다. 최종 제거 후 시험 PID도 Quit 이후 남아 소유 PID·시작 시각·실행 파일·창 없음이 일치하는 것을 확인한 뒤 그 PID만 정리했다. 사용자 프로세스는 종료하지 않았다. 최종 감사에서 Excel 프로세스 0개를 확인했다. 설치·제거 코드에는 프로세스 강제 종료가 없다.
 
-초기 제품은 미설치였다. 시작 전부터 존재한 PID 24632는 임의 종료하지 않았으며, 사용자가 해당 PID 중지를 명시 승인한 뒤 COM으로 PID와 열린 통합문서 0개를 확인했다. 정상 `Quit` 후에도 남아 있어 **승인된 그 PID만** 중지했다. 이 명시적 사용자 요청은 초기 프로세스 복구 대상에서 제외한다.
+## 발견한 오류와 재검증
 
-테스트가 만든 Excel만 정상 종료했다. 업무 파일을 열거나 저장하지 않았다. 합성 자료와 로그는 별도 작업 폴더에만 남긴다. 최종 제품은 미설치이며 제품 등록, 보안/정책, 타 추가 기능 등록은 보존됐다. Excel이 정상 실행 중 갱신한 일반 옵션 전체를 덮어써 복원하지 않았다. 원시 계정/경로/로컬 진단은 ZIP 공개본에서 제외한다. 화면 캡처가 잠금 화면이었으므로 Excel 스크린샷으로 첨부하지 않는다.
+| 실제 실패 | 수정 및 확인 |
+|---|---|
+| COM 자동화 모드에서 VBA 프로젝트 접근 거부 | 새 정상 Excel 시작과 소유 PID 확인으로 빌드 성공. 승인한 AccessVBOM 한 항목은 즉시 원복 |
+| COM 속성 접근이 원래 오류를 누락 | 명시적인 COM 속성 호출로 진단 보완 |
+| XLAM 저장 뒤 매크로 없는 원본 Save가 보안/형식 대화상자를 유발 | 저장·닫기·최종 XLAM 재열기 검사로 변경 |
+| AddIns.Add 설치 실패와 불완전 소유 기록 | Excel을 시작하지 않는 제품 전용 HKCU OPEN 등록과 원자적 매니페스트로 변경. 설치·실패 복구·제거 통과 |
+| 매니페스트 교체의 빈 backup 경로 오류 | PowerShell 5.1 NullString 처리. 실제 재설치 통과 |
+| Interactive=False로 실제 Esc가 먹지 않음 | 입력 차단 제거, 재진입 보호 유지. 최종 바이너리에서 실제 Esc 취소 통과 |
+| Test_Excel.cmd가 존재하는 설치 XLAM 재열기 실패 | 정상 Excel 시작·정확한 이름/경로 확인. 최종 명령 종료 0 |
+| .cmd 종료 코드 유실·한글 소스·테스트 COM SaveAs 형식 오류 | 종료 코드 보존, UTF-8 BOM, 명시한 COM 인자 타입. 최종 파서·실제 명령·기능 재실행 |
 
-## 산출물과 재개 조건
+초기 후보의 Esc 두 번은 **실패**였고 30초 지연 보호가 대신 실행됐다. 이를 Esc 통과로 재분류하지 않았다. [설계 결정](ADR-0002-Excel-native-lifecycle.md)과 [과거 차단 기록](WINDOWS_INITIAL_E2E_REPORT.md)을 보존했다.
 
-- 수정 소스와 Windows 테스트: 이 프로젝트 및 `tests/`.
-- 합성 xlsx 두 개 및 원시 실행 증거: `artifacts/windows-e2e/20260914-1346/`.
-- 공유 가능한 결과: `evidence/windows-e2e/`.
-- `Release/BUILD_BLOCKED.txt`: 설치 가능한 배포물이 아님을 명시. `.xlam` 및 성공을 암시하는 가짜 테스트 결과는 만들지 않았다.
-- `ExcelSmartListCompare_v0.2_SourceCandidate_BLOCKED_POLICY_20260914.zip`: **소스 배포 후보**이며 최종 사용자 설치용 ZIP이 아니다. 설치 가능한 Release/ZIP 요청은 미완료다.
-- 원본/수정 비교: `CHANGES.patch`. 해시: 프로젝트 `SHA256SUMS.txt`, 작업 폴더 `DELIVERABLES_SHA256.txt`.
+## 성능과 남은 검증
 
-승인된 VBA 빌드 환경(또는 사용자가 준비한 해당 접근)과 잠금 해제가 필요하다. 준비 후 [Windows 실행 안내](WINDOWS_TEST_RUNNER.md)에 따라 실제 빌드부터 재개한다. 마지막 빌드 XLAM의 해시를 실제 설치본 및 최종 배포본과 대조하기 전에는 배포 완료로 표시하지 않는다.
+최종 후보의 5셀 A 읽기 전체는 517.84ms, B 읽기·비교·출력 전체는 1561.21ms였다. 이 PC·합성 자료 한 번의 총시간이며 단계별 시간, 일반 처리량이나 최악 시간 보장이 아니다. 성능 상수는 변경하지 않았다.
 
-## 기술 근거
+| 상태 | 항목·한계 |
+|---|---|
+| 이전 후보에서만 실제 PASS | 독립 Excel 프로세스의 기준 비공유, 마우스 기준 담기→원본 A 닫기→셀 우클릭 비교, 30초 체크포인트 보호. 이전 해시 86b0ba7b…의 결과이며 최종 C6 해시 검사와 구분 |
+| NOT_RUN | 19,999/20,000 및 모든 합산·영역 조각·스캔·전체 문자열 상한의 직전/직후 전체 조합 |
+| NOT_RUN | A/B 각각 100,000개가 모두 다른 결과의 끝까지 출력·메모리 측정, 단계별 성능 측정 |
+| NOT_RUN | 모든 타사 추가 기능·단축키 매핑의 기능 공존, Undo 기록 보존 실측, v0.1/PERSONAL 코드 마이그레이션 |
+| NOT_RUN | 설치 프로세스 강제 중단·전원 단절의 모든 시점, 복구 도중 외부 프로그램이 파일/등록을 동시에 변경하는 경합 |
+| NOT_RUN | 설치/제거 기본 확인창의 아니요 버튼과 설치창 자체 캡처. 실제 .cmd 설치·제거·자동 로드는 수행 |
+| 환경 없음 | x86 Excel, 다른 Office/Windows 빌드, 다른 계정·조직 GPO·서명된 배포 |
+| BLOCKED_TOOL | 오프라인 HTML의 브라우저 배치 확인: 브라우저 도구가 file URL 접근을 거절했다. 실제 앱 캡처 이미지는 확인했고 HTML 링크·내장 이미지·ZIP 무결성은 파일 검사로 확인 |
+| 승인 대상 아님 | 코드 서명과 조직의 상용 배포 승인 |
 
-COM 기본 보안값을 신뢰하지 않고 기존 ByUI 의도를 유지한다. [Microsoft: AutomationSecurity](https://learn.microsoft.com/en-us/office/vba/api/excel.application.automationsecurity). VBA 프로젝트의 프로그래밍 접근 신뢰는 별도 접근 설정이다. [Microsoft: Office solution security](https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/security-notes-for-microsoft-office-solution-developers). 이 문서는 동작 근거이며 본 제품의 테스트 성공 증거가 아니다.
+일부 경계·환경 검증은 남았으므로 완전한 인수 통과나 모든 PC의 정상 동작을 선언하지 않는다. 일반 사용 안내는 [실제 캡처 퀵가이드](QUICK_GUIDE.md)를 따른다.
+
+## 원상복구와 증거
+
+21:22 KST 최종 감사 **PASS**. Excel 제품 디렉터리 없음, 제품 자동 로드/메뉴 없음, Excel 프로세스 0개. HKCU/HKLM의 보안·정책·타 추가 기능·Excel OPEN 값 14개 범주는 시작 전과 같았다. Excel이 기록한 일반 창/사용 옵션은 통째로 덮어쓰지 않았다. AccessVBOM은 원래의 값 없음 상태다.
+
+FolderState도 MSI 미설치 상태(-1), 제품 Explorer 메뉴·설정·시험 설치 실행 파일 없음으로 복원했다. FolderState의 합성 업무 파일은 원래 해시를 유지했다. 업무 파일은 열거나 편집하지 않았고 기존 Excel 프로세스도 변경하지 않았다.
+
+로컬 원시 증거는 도구의 artifacts/windows-e2e 아래 `20260914-final-build-cancel-fix`, `final-functional`, `final-public-matrix`, `final-warning-cases`, `final-lifecycle`, `final-setup-rollback`, `final-removal`, `final-guards-02` 및 최종 restoration JSON에 있다(각 디렉터리 접두어는 20260914-). 계정·경로·원시 레지스트리·설치 로그는 공개 자산에서 제외했다. Release/Validation.json은 위 실행에서 필요한 값만 추린 요약이다.

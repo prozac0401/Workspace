@@ -1,13 +1,19 @@
-"""Build an offline quick guide; identify rendered previews honestly."""
+"""Build an offline quick guide with the reviewed native application captures."""
 from pathlib import Path
 import base64
 import markdown
+import mimetypes
+import re
 
 root = Path(__file__).resolve().parents[1]
 source = root / 'docs/tools/folderstate/quick-guide.md'
 content = markdown.markdown(source.read_text(encoding='utf-8'), extensions=['tables', 'fenced_code'])
-picture = base64.b64encode((root / 'docs/assets/folderstate.png').read_bytes()).decode('ascii')
-content = content.replace('../../assets/folderstate.png', 'data:image/png;base64,' + picture)
+for relative in set(re.findall(r'<img[^>]+src="([^"]+)"', content)):
+    path = (source.parent / relative).resolve()
+    if not path.is_relative_to(root / 'docs/assets'):
+        raise ValueError('Unexpected image path: ' + relative)
+    picture = base64.b64encode(path.read_bytes()).decode('ascii')
+    content = content.replace(relative, 'data:' + (mimetypes.guess_type(path)[0] or 'image/jpeg') + ';base64,' + picture)
 for name, route in [('installation.md', 'installation/'), ('index.md', ''), ('troubleshooting.md', 'troubleshooting/')]:
     content = content.replace('href="' + name + '"', 'href="https://prozac0401.github.io/Workspace/tools/folderstate/' + route + '"')
 page = '''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

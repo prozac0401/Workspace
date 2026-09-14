@@ -48,7 +48,16 @@ try {
     $mutex.ReleaseMutex();$held=$false
     Run-Case 'GUARD-ABSENT-UNINSTALL' 'Uninstall.cmd -ConfirmProduct SLC-68A45C44-2026' 0
     Run-Case 'GUARD-ABSENT-REUNINSTALL' 'Uninstall.cmd -ConfirmProduct SLC-68A45C44-2026' 0
-    Run-Case 'GUARD-MISSING-XLAM-TEST' 'Test_Excel.cmd' 1
+    $missing = Join-Path $output 'script-only-package'
+    [void](New-Item -ItemType Directory -Path $missing -Force)
+    foreach($name in @('Setup.ps1','Test_Excel.cmd','Install.cmd')) {
+        Copy-Item -LiteralPath (Join-Path $root $name) -Destination (Join-Path $missing $name)
+    }
+    Push-Location $missing
+    try {
+        Run-Case 'GUARD-MISSING-XLAM-TEST' 'Test_Excel.cmd' 1
+        Run-Case 'GUARD-MISSING-XLAM-INSTALL' 'Install.cmd -ConfirmProduct SLC-68A45C44-2026' 1
+    } finally { Pop-Location }
 } finally {
     if($excel){$excel.Quit();[void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($excel)}
     if($held){$mutex.ReleaseMutex()}
