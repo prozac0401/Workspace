@@ -24,7 +24,10 @@ function Snapshot {
     $options=Get-Item -LiteralPath ('HKCU:/Software/Microsoft/Office/'+$owner.excelVersion+'/Excel/Options')
     $entries=[ordered]@{}
     foreach($name in @($options.GetValueNames() | Where-Object {$_ -match '^OPEN\d*$'} | Sort-Object)){$entries[$name]=[string]$options.GetValue($name)}
-    return [ordered]@{files=$files;openValues=$entries}
+    $trustPath='HKCU:/Software/Microsoft/Office/'+$owner.excelVersion+'/Excel/Security/Trusted Locations'
+    $trust=@()
+    if(Test-Path -LiteralPath $trustPath){foreach($key in @((Get-Item -LiteralPath $trustPath))+@(Get-ChildItem -LiteralPath $trustPath -Recurse | Sort-Object Name)){foreach($name in @($key.GetValueNames() | Sort-Object)){$trust+=($key.Name+'|'+$name+'|'+$key.GetValueKind($name)+'|'+$key.GetValue($name))}}}
+    return [ordered]@{files=$files;openValues=$entries;trustedLocations=$trust}
 }
 $before=Snapshot
 $stream=[IO.File]::Open($manifest,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)

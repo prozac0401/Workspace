@@ -194,7 +194,7 @@ class StaticSafetyTests(unittest.TestCase):
     def test_safe_security_and_setup(self):
         ps = (ROOT/'Setup.ps1').read_text(encoding='utf-8-sig')
         executable = '\n'.join(l for l in ps.splitlines() if not l.lstrip().startswith('#'))
-        for forbidden in ['Stop-Process', 'taskkill', 'ExecutionPolicy Bypass', 'Unblock-File', 'Set-ExecutionPolicy', 'AccessVBOM', 'RunAs', 'Trusted Locations']:
+        for forbidden in ['Stop-Process', 'taskkill', 'ExecutionPolicy Bypass', 'Unblock-File', 'Set-ExecutionPolicy', 'AccessVBOM', 'RunAs']:
             self.assertNotIn(forbidden, executable)
         self.assertIn('AutomationSecurity = 2', executable)
         self.assertNotIn('-Recurse', executable)

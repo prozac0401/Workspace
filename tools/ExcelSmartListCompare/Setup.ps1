@@ -1,10 +1,11 @@
 ﻿# Windows PowerShell 5.1 / Windows desktop Excel.
-# No policy bypass, elevation, trust-location changes, network calls, or process killing.
+# Trusts only this product's local install directory, without subfolders.
+# No policy bypass, elevation, network calls, or process killing.
 [CmdletBinding()]
 param(
     [ValidateSet('Install','Build','Uninstall','Test')]
     [string]$Action = 'Install',
-    # Explicit approval of this product only; never suppresses an Office security prompt.
+    # Approval includes this product directory's narrowly scoped Trusted Location.
     [ValidateSet('SLC-68A45C44-2026')]
     [string]$ConfirmProduct
 )
@@ -12,6 +13,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProductId = 'SLC-68A45C44-2026'
 $Version = '0.2.0'
+$InstallerVersion = '0.2.0-rc.2'
 $Root = $PSScriptRoot
 $InstallDir = Join-Path $env:LOCALAPPDATA 'ExcelSmartListCompare'
 $Target = Join-Path $InstallDir 'ExcelSmartListCompare.xlam'
@@ -295,6 +297,163 @@ function Own-OpenEntries($Key) {
     }
     return $entries
 }
+function Excel-UserPath([string]$OfficeVersion) {
+    return ('Software\Microsoft\Office\' + $OfficeVersion + '\Excel')
+}
+function Trust-RootPath([string]$OfficeVersion) {
+    return ((Excel-UserPath $OfficeVersion) + '\Security\Trusted Locations')
+}
+function Test-TrustPolicyBlocked($Key) {
+    return ($Key.GetValue('alllocationsdisabled',0) -eq 1 -or $Key.GetValue('allow user locations',1) -eq 0)
+}
+function Assert-TrustPolicy([string]$OfficeVersion) {
+    # Office ADMX: alllocationsdisabled (Excel), allow user locations (Common).
+    # Read preferences, Group Policy and Cloud Policy; never write policy values.
+    foreach ($hive in @([Microsoft.Win32.Registry]::CurrentUser,[Microsoft.Win32.Registry]::LocalMachine)) {
+        foreach ($prefix in @('Software\Microsoft\Office\','Software\Policies\Microsoft\Office\','Software\Policies\Microsoft\Cloud\Office\')) {
+            foreach ($app in @('Excel','Common')) {
+                $key = $hive.OpenSubKey(($prefix+$OfficeVersion+'\'+$app+'\Security\Trusted Locations'))
+                if ($null -eq $key) { continue }
+                try {
+                    if (Test-TrustPolicyBlocked $key) {
+                        throw (Setup-Failure 'Excel 설정 또는 조직 정책에서 사용자 신뢰 위치를 차단했습니다. 정책은 변경하지 않았습니다. IT 담당자에게 이 제품 폴더의 승인된 배포를 요청하세요.' 6)
+                    }
+                } finally { $key.Close() }
+            }
+        }
+    }
+}
+function Trust-Values($Record) {
+    return [ordered]@{SLCProductId=$ProductId;SLCOwnerToken=[string]$Record.token;Description='Excel Smart List Compare';AllowSubfolders=0;Path=($InstallDir.TrimEnd('\')+'\')}
+}
+function Test-OwnTrustKey($Key, $Record, [switch]$Partial) {
+    if ($null -eq $Key -or $Key.SubKeyCount -ne 0) { return $false }
+    $values = Trust-Values $Record
+    $names = @($Key.GetValueNames())
+    if (-not $Partial -and $names.Count -ne $values.Count) { return $false }
+    # The owner token is written before Path, including interrupted activation.
+    if ([string]$Key.GetValue('SLCOwnerToken','') -cne [string]$Record.token) { return $false }
+    foreach ($name in $names) {
+        if (-not $values.Contains($name)) { return $false }
+        $kind = if ($name -eq 'AllowSubfolders') { 'DWord' } else { 'String' }
+        if ([string]$Key.GetValueKind($name) -ne $kind -or [string]$Key.GetValue($name) -cne [string]$values[$name]) { return $false }
+    }
+    return $true
+}
+function Plan-TrustedLocation([string]$OfficeVersion, $OldManifest) {
+    Assert-TrustPolicy $OfficeVersion
+    if ($InstallDir.StartsWith('\\') -or ([IO.DriveInfo]::new([IO.Path]::GetPathRoot($InstallDir))).DriveType -ne 'Fixed') { throw 'Automatic trust requires a local fixed disk.' }
+    if ((Test-Path -LiteralPath $InstallDir) -and ((Get-Item -LiteralPath $InstallDir -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'A redirected product directory cannot be automatically trusted.' }
+    $path = Trust-RootPath $OfficeVersion
+    $parent = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($path)
+    try {
+        if ($null -ne $OldManifest -and $null -ne $OldManifest.PSObject.Properties['trustedLocation'] -and $null -ne $OldManifest.trustedLocation -and $OldManifest.trustedLocation.owned) {
+            $record = $OldManifest.trustedLocation
+            if ($OldManifest.excelVersion -ne $OfficeVersion -or [string]$record.keyName -notmatch '^Location\d+$' -or [string]$record.token -notmatch '^[a-f0-9]{32}$') { throw 'Invalid or different Office Trusted Location ownership record; remove the previous installation first.' }
+            $key = if ($null -ne $parent) { $parent.OpenSubKey([string]$record.keyName) } else { $null }
+            if ($null -ne $key) {
+                try { if (-not (Test-OwnTrustKey $key $record)) { throw 'The product Trusted Location was externally changed. It was preserved. Remove the product and review that location before reinstalling.' } }
+                finally { $key.Close() }
+                return [pscustomobject]@{record=$record;create=$false}
+            }
+        }
+        if ($null -ne $parent) {
+            foreach ($name in $parent.GetSubKeyNames()) {
+                $key = $parent.OpenSubKey($name)
+                try {
+                    $existing = [Environment]::ExpandEnvironmentVariables([string]$key.GetValue('Path','')).TrimEnd('\')
+                    if ($existing -ieq $InstallDir.TrimEnd('\')) {
+                        return [pscustomobject]@{record=[pscustomobject]@{owned=$false;keyName=$name};create=$false}
+                    }
+                } finally { $key.Close() }
+            }
+        }
+        # New trust must not silently enable unrelated files already in this folder.
+        if (Test-Path -LiteralPath $InstallDir) {
+            $other = @(Get-ChildItem -LiteralPath $InstallDir -Force | Where-Object { $_.PSIsContainer -or $_.Name -notin @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md','install.json') })
+            if ($other.Count) { throw 'The product directory contains additional files. Move those files yourself before automatically trusting this directory.' }
+        }
+        $index = 0
+        $names = if ($null -ne $parent) { @($parent.GetSubKeyNames()) } else { @() }
+        do { $name = 'Location'+$index; $index++ } while ($names -contains $name)
+        $security = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(((Excel-UserPath $OfficeVersion)+'\Security'))
+        $securityCreated = $null -eq $security
+        if ($null -ne $security) { $security.Close() }
+        return [pscustomobject]@{record=[pscustomobject]@{owned=$true;keyName=$name;token=[Guid]::NewGuid().ToString('N');rootCreated=($null -eq $parent);securityCreated=$securityCreated};create=$true}
+    } finally { if ($null -ne $parent) { $parent.Close() } }
+}
+function New-ExclusiveRegistryKey($Parent, [string]$Name) {
+    # RegCreateKeyEx disposition prevents taking ownership of a concurrently added key.
+    if (-not ('SlcRegistryCreate' -as [type])) {
+        Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+public static class SlcRegistryCreate {
+    [DllImport("advapi32.dll", CharSet=CharSet.Unicode)]
+    public static extern int RegCreateKeyEx(SafeRegistryHandle parent, string name, int reserved,
+        string cls, int options, int access, IntPtr security, out SafeRegistryHandle key, out int disposition);
+}
+'@
+    }
+    $handle = $null; [int]$disposition = 0
+    $errorCode = [SlcRegistryCreate]::RegCreateKeyEx($Parent.Handle,$Name,0,$null,0,0x2001f,[IntPtr]::Zero,[ref]$handle,[ref]$disposition)
+    if ($errorCode -ne 0) { throw ([ComponentModel.Win32Exception]::new($errorCode)) }
+    if ($disposition -ne 1) { $handle.Dispose(); throw 'Trusted Location key appeared concurrently. The external key was preserved; retry installation.' }
+    return [Microsoft.Win32.RegistryKey]::FromHandle($handle,$Parent.View)
+}
+function Enable-TrustedLocation([string]$OfficeVersion, $Plan) {
+    Assert-TrustPolicy $OfficeVersion
+    if (-not $Plan.create) {
+        $existing = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(((Trust-RootPath $OfficeVersion)+'\'+$Plan.record.keyName))
+        try {
+            if ($null -eq $existing) { throw 'Trusted Location disappeared during installation.' }
+            if ($Plan.record.owned) { if (-not (Test-OwnTrustKey $existing $Plan.record)) { throw 'Trusted Location changed during installation; the external change was preserved.' } }
+            elseif ([Environment]::ExpandEnvironmentVariables([string]$existing.GetValue('Path','')).TrimEnd('\') -ine $InstallDir.TrimEnd('\')) { throw 'Existing Trusted Location changed during installation.' }
+        } finally { if ($null -ne $existing) { $existing.Close() } }
+        return
+    }
+    $parent = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey((Trust-RootPath $OfficeVersion))
+    $key = $null
+    try {
+        $key = New-ExclusiveRegistryKey $parent ([string]$Plan.record.keyName)
+        $Plan | Add-Member -NotePropertyName created -NotePropertyValue $true -Force
+        # Manifest is already committed. Write the identity first and Path last.
+        $key.SetValue('SLCOwnerToken',[string]$Plan.record.token,[Microsoft.Win32.RegistryValueKind]::String)
+        $values = Trust-Values $Plan.record
+        foreach ($name in $values.Keys) {
+            $kind = if ($name -eq 'AllowSubfolders') { [Microsoft.Win32.RegistryValueKind]::DWord } else { [Microsoft.Win32.RegistryValueKind]::String }
+            $key.SetValue($name,$values[$name],$kind)
+        }
+        $key.Flush()
+        if (-not (Test-OwnTrustKey $key $Plan.record)) { throw 'Trusted Location verification failed.' }
+    } finally { if ($null -ne $key) { $key.Close() }; $parent.Close() }
+}
+function Remove-OwnedTrustedLocation([string]$OfficeVersion, $Record) {
+    if ($null -eq $Record -or -not $Record.owned) { return }
+    if ([string]$Record.keyName -notmatch '^Location\d+$' -or [string]$Record.token -notmatch '^[a-f0-9]{32}$') { throw 'Invalid Trusted Location ownership record.' }
+    $path = Trust-RootPath $OfficeVersion
+    $parent = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($path,$true)
+    if ($null -eq $parent) { return }
+    try {
+        $key = $parent.OpenSubKey([string]$Record.keyName)
+        if ($null -ne $key) {
+            try { $owned = Test-OwnTrustKey $key $Record -Partial } finally { $key.Close() }
+            if ($owned) { $parent.DeleteSubKey([string]$Record.keyName,$false) }
+            else { Write-Warning 'Externally changed Trusted Location preserved; review it in Excel Trust Center.' }
+        }
+        $empty = $parent.ValueCount -eq 0 -and $parent.SubKeyCount -eq 0
+    } finally { $parent.Close() }
+    if ($Record.rootCreated -and $empty) { [Microsoft.Win32.Registry]::CurrentUser.DeleteSubKey($path,$false) }
+    if ($Record.securityCreated) {
+        $securityPath = (Excel-UserPath $OfficeVersion)+'\Security'
+        $security = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($securityPath)
+        if ($null -ne $security) {
+            try { $empty = $security.ValueCount -eq 0 -and $security.SubKeyCount -eq 0 } finally { $security.Close() }
+            if ($empty) { [Microsoft.Win32.Registry]::CurrentUser.DeleteSubKey($securityPath,$false) }
+        }
+    }
+}
 function Install-Addin {
     $oldManifest = Read-OwnManifest
     $ownedFiles = @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md','install.json')
@@ -304,13 +463,15 @@ function Install-Addin {
         }
     }
     if (-not (Confirm-Action ('현재 Windows 사용자에게 명단 비교 기능을 설치할까요?' + "`r`n`r`n" +
-        'Excel을 모두 닫아 주세요. 이 제품의 파일과 자동 로드 항목을 등록합니다.'))) { return }
+        '제품 파일과 자동 로드를 등록하고 아래 폴더만 Excel 신뢰 위치로 추가합니다(하위 폴더 제외).' + "`r`n" + $InstallDir + "`r`n" +
+        '이 폴더 안의 파일은 매크로 알림 없이 실행될 수 있습니다. 제품 파일만 보관하세요.'))) { return }
     $payload = Join-Path $Root 'ExcelSmartListCompare.xlam'
     if (-not (Test-Path -LiteralPath $payload)) { $payload = Join-Path $Root 'dist\ExcelSmartListCompare.xlam' }
     if (-not (Test-Path -LiteralPath $payload)) { throw 'Install requires the built Release folder. Build_Release.cmd is for authorized developers.' }
     $payloadHash = File-Sha256 $payload
-    $version = Excel-RegistrationVersion
-    $optionPath = 'Software\Microsoft\Office\' + $version + '\Excel\Options'
+    $officeVersion = Excel-RegistrationVersion
+    $trustPlan = Plan-TrustedLocation $officeVersion $oldManifest
+    $optionPath = (Excel-UserPath $officeVersion) + '\Options'
     $options = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey($optionPath)
     $before = Own-OpenEntries $options
     $backup = @{}
@@ -337,12 +498,13 @@ function Install-Addin {
             do { $openName = if ($index -eq 0) { 'OPEN' } else { 'OPEN' + $index }; $index++ } while ($options.GetValueNames() -contains $openName)
         }
         # Commit ownership before registration so an interrupted install is removable.
-        $data = [ordered]@{productId=$ProductId;version=$Version;installDirectory=$InstallDir;installedAt=(Get-Date).ToString('o');excelVersion=$version;sha256=$payloadHash;openValueName=$openName;ownedFiles=$ownedFiles}
+        $data = [ordered]@{productId=$ProductId;version=$Version;installerVersion=$InstallerVersion;installDirectory=$InstallDir;installedAt=(Get-Date).ToString('o');excelVersion=$officeVersion;sha256=$payloadHash;openValueName=$openName;ownedFiles=$ownedFiles;trustedLocation=$trustPlan.record}
         $temporary = Join-Path $InstallDir ('slc-install-' + [Guid]::NewGuid().ToString('N') + '.json')
         [IO.File]::WriteAllText($temporary, ($data | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($true))
         if (Test-Path -LiteralPath $Manifest) { [IO.File]::Replace($temporary,$Manifest,[NullString]::Value) } else { [IO.File]::Move($temporary,$Manifest) }
         $temporary = $null
         $written['install.json'] = File-Sha256 $Manifest
+        Enable-TrustedLocation $officeVersion $trustPlan
         $current = $options.GetValue($openName,$null)
         if ($null -ne $current -and [string]$current -ine ('"'+$Target+'"') -and [string]$current -ine $Target) { throw 'Excel registration changed concurrently; the external value was preserved.' }
         $options.SetValue($openName,('"'+$Target+'"'),[Microsoft.Win32.RegistryValueKind]::String)
@@ -350,8 +512,10 @@ function Install-Addin {
         $options.Flush()
         if ([string]$options.GetValue($openName) -cne ('"'+$Target+'"')) { throw 'Excel registration verification failed.' }
         Write-Host '설치했습니다. Excel을 열어 추가 기능 탭 또는 셀 우클릭의 명단 비교를 사용하세요.'
+        Write-Host ('Excel 신뢰 위치: ' + $InstallDir + ' (기존 항목은 보존합니다.)')
         Write-Host ('Uninstall: ' + (Join-Path $InstallDir 'Uninstall.cmd'))
     } catch {
+        if ($null -ne $trustPlan.PSObject.Properties['created'] -and $trustPlan.created) { Remove-OwnedTrustedLocation $officeVersion $trustPlan.record }
         # Roll back only this exact product path; preserve unrelated OPEN values.
         foreach ($name in @((Own-OpenEntries $options).Keys)) { $options.DeleteValue($name,$false) }
         foreach ($name in $before.Keys) {
@@ -378,12 +542,13 @@ function Uninstall-Addin {
     if (-not (Confirm-Action ('Excel 명단 비교 기능만 삭제할까요?' + "`r`n`r`n" + '기존 통합문서와 다른 추가 기능은 삭제하지 않습니다.'))) { return }
     $version = [string]$data.excelVersion
     if ($version -notmatch '^\d+\.0$') { throw 'Invalid owned Excel registration version.' }
-    $options = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(('Software\Microsoft\Office\'+$version+'\Excel\Options'),$true)
+    if ($null -ne $data.PSObject.Properties['trustedLocation']) { Remove-OwnedTrustedLocation $version $data.trustedLocation }
+    $options = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(((Excel-UserPath $version)+'\Options'),$true)
     if ($null -ne $options) {
         try { foreach ($name in @((Own-OpenEntries $options).Keys)) { $options.DeleteValue($name,$false) }; $options.Flush() }
         finally { $options.Close() }
     }
-    $manager = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(('Software\Microsoft\Office\'+$version+'\Excel\Add-in Manager'),$true)
+    $manager = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(((Excel-UserPath $version)+'\Add-in Manager'),$true)
     if ($null -ne $manager) { try { foreach ($name in $manager.GetValueNames()) { if ($name -ieq $Target) { $manager.DeleteValue($name,$false) } } } finally { $manager.Close() } }
     foreach ($name in @('ExcelSmartListCompare.xlam','README.md','Uninstall.cmd','Setup.ps1','install.json')) {
         $file = Join-Path $InstallDir $name

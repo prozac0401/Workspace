@@ -1,4 +1,4 @@
-# Excel Smart List Compare 0.2.0 RC1
+# Excel Smart List Compare 0.2.0 RC2
 
 Windows 데스크톱 Excel용 명단 비교 추가 기능입니다. 코드 서명이 없는 평가용 배포 후보입니다.
 
@@ -16,6 +16,10 @@ Release 폴더의 QuickGuide.html은 실제 화면 캡처를 포함한 오프라
 Excel을 모두 닫고 이 폴더 또는 설치 폴더의 Uninstall.cmd를 실행합니다. 다시 설치하려면 새 Release의 Install.cmd를 실행합니다.
 
 설치 위치: %LOCALAPPDATA%\ExcelSmartListCompare
+
+Install.cmd가 이 제품 폴더만 Excel 신뢰 위치로 자동 등록합니다(하위 폴더 제외). 이 폴더의 파일은 매크로 알림 없이 실행될 수 있으므로 제품 파일만 보관하세요. 기존 신뢰 위치는 보존하며 제거할 때는 설치기가 만든 변경되지 않은 항목만 삭제합니다. 회사 정책에서 사용자 신뢰 위치를 막으면 종료 코드 6으로 중단합니다. 전역 매크로 설정과 회사 정책은 변경하지 않습니다.
+
+Trust-Location-Report.html에는 RC2의 실제 Excel 재검증과 PC 원복 결과를 기록합니다. Windows-E2E-Report.html은 변경하지 않은 RC1 VBA 엔진의 기존 실행 기록입니다.
 
 일반 사용자 설치이며 별도 Python이나 VBA 프로젝트 접근 권한이 필요하지 않습니다. 설치·제거는 Windows PowerShell을 사용합니다. 조직의 매크로/설치 정책이 차단하면 승인된 배포 절차를 이용하세요.
 

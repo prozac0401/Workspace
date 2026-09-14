@@ -22,7 +22,15 @@ MSI: FolderState-0.1.0-win-x64.msi. SHA-256: `b96eb391ce3bbb3fb8a1ea2d025690cc96
 
 [Excel 평가용 릴리즈](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.1)는 FolderState와 별도 태그·자산으로 제공한다. 사용자용 Release ZIP과 수정 소스 ZIP을 분리한다. 예전의 BLOCKED_POLICY 소스만 있던 draft를 최종 설치 가능 후보로 갱신한다. x86·다른 Office·모든 상한 경계·대규모 최악 출력·Undo·조직 서명은 미검증/미승인이다.
 
-## 복원과 공개 범위
+## Excel RC2 후속 변경
+
+사용자가 설치 명령의 제품 폴더 신뢰 위치 자동 등록을 요청해 Excel 0.2.0 RC2를 추가했다. FolderState RC1과 Excel RC1은 기존 별도 릴리즈로 보존한다. RC2 설치기는 제품의 로컬 폴더만 하위 폴더 없이 신뢰 위치로 등록한다. 기존 사용자 위치와 외부 수정 항목은 보존하고, 정책에서 사용자 위치를 차단하면 종료 코드 6으로 중단한다.
+
+실제 Excel에서 설치 → 정상 시작 → 재시작 → 재설치 → 내장 19개 검사 → 제거 → 제거 후 재시작을 수행했다. 매크로 승인 클릭 없이 기준 담기 버튼도 실행했다. 격리 HKCU의 소유권·동시 생성·중단 단계·롤백 23개가 통과했다. 기존 6개 신뢰 위치가 보존됐고 시험 종료 후 14개 설정 범주와 미설치 상태가 복구됐다. Excel이 갱신한 시험 창 위치 한 값도 복원했다. 상세 실행·한계는 [RC2 보고서](../../tools/ExcelSmartListCompare/docs/WINDOWS_TRUST_LOCATION_REPORT.md)를 따른다.
+
+[Excel RC2 평가용 릴리즈](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.2)에 설치 ZIP·수정 소스 ZIP·업데이트 캡처 퀵가이드·검증 보고서를 제공한다. XLAM은 RC1과 동일하며 설치기와 안내만 변경했다.
+
+## 최초 RC1 복원 기록
 
 21:22 KST 감사에서 두 도구 모두 미설치로 복원됐다. Excel 프로세스 0개, 제품 메뉴·등록 없음, 보안/정책/타 추가 기능 및 OPEN 값 14개 범주가 시작 전과 같았다. AccessVBOM 임시 허용은 원래 값 없음 상태로 원복했다. 원래 업무 파일·기존 Excel·다른 추가 기능을 변경하지 않았다.
 

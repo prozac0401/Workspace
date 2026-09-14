@@ -23,7 +23,7 @@ cmd.exe /d /c 'Release\Install.cmd -ConfirmProduct SLC-68A45C44-2026'
 powershell.exe -NoLogo -NoProfile -STA -File tests/windows-normal-start.ps1 -FixturePath artifacts/Guide-A.xlsx -OutputPath artifacts/start-01.json -ExpectInstalled
 ```
 
-제품 ID는 이미 승인받은 제품 설치 확인만 생략한다. Office 보안 경고는 생략하지 않는다. 기본 사용자는 옵션 없이 실행해 확인창과 마지막 대기를 본다.
+제품 ID는 이미 승인받은 제품 설치 확인을 생략한다. RC2에서는 제품 설치 폴더 한 곳의 신뢰 위치 등록도 설치 범위에 포함한다. 하위 폴더와 다른 위치, 전체 매크로 설정은 변경하지 않는다. 기본 사용자는 옵션 없이 실행해 등록 범위가 표시된 확인창과 마지막 대기를 본다.
 
 Normal-start는 시험용 일반 XLSX만 정상 Excel로 연 뒤 소유 PID·자동 로드·Cell/Row/Column 메뉴 1개씩·도구 모음 4개를 읽는다. 먼저 XLAM을 열거나 AttachUI를 호출하지 않는다. 관찰 후 시험 파일을 화면에 남긴다.
 
@@ -43,4 +43,6 @@ Normal-start는 시험용 일반 XLSX만 정상 Excel로 연 뒤 소유 PID·자
 - windows-remove-owned.ps1: 시험용 추가 파일을 만든 뒤 Uninstall.cmd가 보존하는지 검사한다. 시험이 만든 해당 파일만 확인 후 정리한다.
 - Invoke-WindowsE2E.ps1 -Phase Guards: **제품 미설치 상태 전용**. 기존 Excel 보호, mutex, 반복 제거, XLAM이 없는 격리 패키지의 설치·진단 거절을 검사한다.
 
-종료 코드: 0 성공, 1 일반 실패, 2 제품 확인 거절, 3 Excel 실행 중, 4 잠금 충돌, 5 VBA 빌드 접근 차단. 마지막에 초기 보안·타 추가 기능·설치·프로세스 상태를 비교하고 복원 결과를 기록한다. 전체 경계값·다른 Office 버전은 별도 인수 범위다.
+- windows-trusted-location.ps1 -OutputDirectory artifacts/trust-isolated-01: 실제 Office 설정과 분리한 HKCU 시험 브랜치에서 신뢰 위치 소유권·외부 수정·동시 생성·중단 단계·롤백·RC1 업그레이드를 검사한다. 실제 Excel 시작 검증은 별도로 수행한다.
+
+종료 코드: 0 성공, 1 일반 실패, 2 제품 확인 거절, 3 Excel 실행 중, 4 잠금 충돌, 5 VBA 빌드 접근 차단, 6 사용자 신뢰 위치 차단 정책. 마지막에 초기 보안·타 추가 기능·설치·프로세스 상태를 비교하고 복원 결과를 기록한다. 전체 경계값·다른 Office 버전은 별도 인수 범위다.

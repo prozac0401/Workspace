@@ -18,3 +18,6 @@
 | 자동화 보안 | https://learn.microsoft.com/en-us/office/vba/api/excel.application.automationsecurity | 설치용 COM Excel에도 사용자 보안 정책 적용 |
 | VBA 프로젝트 접근 | https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/security-notes-for-microsoft-office-solution-developers | 승인된 개발 환경에서만 소스 빌드, 설치기의 보안 옵션 변경 금지 |
 | 인터넷 매크로 차단 | https://learn.microsoft.com/en-us/microsoft-365-apps/security/internet-macros-blocked | 매크로 차단/조직 배포 정책을 우회하지 않음 |
+| 제품 폴더 신뢰 위치 | https://learn.microsoft.com/en-us/microsoft-365-apps/security/trusted-locations | RC2는 명시적 후속 요구에 따라 전용 로컬 폴더만 등록하고 차단 정책을 보존 |
+| 신뢰 위치 정책 레지스트리 | https://github.com/microsoft/ActiveDirectoryTierModel/blob/main/config/admx/office16.admx | `allow user locations` 정책 값의 실제 이름 확인 |
+| Excel 신뢰 위치 정책 | https://github.com/microsoft/ActiveDirectoryTierModel/blob/main/config/admx/excel16.admx | `alllocationsdisabled`, LocationN의 Path와 AllowSubfolders 확인 |
