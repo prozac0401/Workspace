@@ -19,7 +19,7 @@ GitHub Pages에는 업무 운영 정책과 FolderState 사용법만 게시합니
 
 [FolderState 0.1.0 RC1 다운로드](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.0-rc.1) · [FolderState 캡처 퀵가이드](docs/tools/folderstate/quick-guide.md)
 
-[Excel 0.2.0 RC5 다운로드](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.5) · [Excel 퀵가이드](tools/ExcelSmartListCompare/docs/QUICK_GUIDE.md) · [RC5 검증과 제한](tools/ExcelSmartListCompare/docs/WORDING_UPDATE.md)
+[Excel 0.2.0 RC6 다운로드](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.6) · [Excel 퀵가이드](tools/ExcelSmartListCompare/docs/QUICK_GUIDE.md) · [RC6 검증과 제한](tools/ExcelSmartListCompare/docs/WINDOW_STATE_REPORT.md)
 
 Windows 11 x64, .NET SDK는 `global.json`의 버전을 사용합니다.
 

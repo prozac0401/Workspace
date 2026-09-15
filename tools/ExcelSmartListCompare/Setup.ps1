@@ -13,7 +13,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProductId = 'SLC-68A45C44-2026'
 $Version = '0.2.0'
-$InstallerVersion = '0.2.0-rc.5'
+$InstallerVersion = '0.2.0-rc.6'
 $Root = $PSScriptRoot
 $InstallDir = Join-Path $env:LOCALAPPDATA 'ExcelSmartListCompare'
 $Target = Join-Path $InstallDir 'ExcelSmartListCompare.xlam'
@@ -232,7 +232,7 @@ function Build-Addin {
                 'Setup does not enable it or modify Trust Center. Ask an authorized developer to run Build_Release.cmd ' +
                 'and provide the Release folder containing the XLAM. End-user installation of that release does not need VBA project access. Excel detail: ' + $detail) 5)
         }
-        foreach ($file in @('CSLCList.cls','modSLCNormalize.bas','modSLCMain.bas')) {
+        foreach ($file in @('CSLCList.cls','CSLCAppEvents.cls','modSLCNormalize.bas','modSLCMain.bas')) {
             $component = $project.VBComponents.Import((Join-Path $src $file))
             Release-Com $component
             $component = $null
@@ -482,43 +482,115 @@ function Remove-OwnedTrustedLocation([string]$OfficeVersion, $Record) {
         }
     }
 }
+function Release-Order([string]$Text) {
+    if ($Text -notmatch '^(\d+\.\d+\.\d+)(?:-rc\.(\d+))?$') { throw 'Unknown installation version; the existing installation was preserved.' }
+    $base = [Version]$Matches[1]
+    $candidate = if ($Matches.ContainsKey(2)) { [long]$Matches[2] } else { [long]::MaxValue }
+    return [pscustomobject]@{base=$base;candidate=$candidate}
+}
+function Plan-Install($OldManifest) {
+    if ($null -eq $OldManifest) { return [pscustomobject]@{mode='Install';previous=$null} }
+    if ($null -ne $OldManifest.PSObject.Properties['installerVersion']) { $previous = [string]$OldManifest.installerVersion }
+    elseif ([string]$OldManifest.version -eq '0.2.0') { $previous = '0.2.0-rc.1' } # Known RC1 marker.
+    else { throw 'Unknown legacy installation version; the existing installation was preserved.' }
+    $old = Release-Order $previous
+    $next = Release-Order $InstallerVersion
+    $comparison = $old.base.CompareTo($next.base)
+    if ($comparison -eq 0) { $comparison = $old.candidate.CompareTo($next.candidate) }
+    if ($comparison -gt 0) { throw ('더 최신 버전('+ $previous +')이 이미 설치되어 있습니다. 기존 설치를 유지합니다.') }
+    return [pscustomobject]@{mode=$(if ($comparison -lt 0) { 'Upgrade' } else { 'Repair' });previous=$previous}
+}
+function Write-InstallFile([string]$Path, [byte[]]$Bytes, [string]$ExpectedHash) {
+    # Commit complete files only. A failed write cannot leave a partial payload.
+    $temporary = Join-Path $InstallDir ('slc-install-' + [Guid]::NewGuid().ToString('N') + '.tmp')
+    try {
+        $stream = [IO.File]::Open($temporary,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+        try { $stream.Write($Bytes,0,$Bytes.Length); $stream.Flush($true) } finally { $stream.Dispose() }
+        Assert-UnredirectedInstallPath $temporary
+        if (Test-Path -LiteralPath $Path) {
+            if (-not $ExpectedHash -or (File-Sha256 $Path) -ne $ExpectedHash) { throw ('Installation file changed concurrently; it was preserved: '+[IO.Path]::GetFileName($Path)) }
+            [IO.File]::Replace($temporary,$Path,[NullString]::Value)
+        } else { [IO.File]::Move($temporary,$Path) }
+    } finally { if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -Force } }
+}
+function Remove-PreviousVersion($Options, $OpenEntries, $Manager, $ManagerEntry, $Backup) {
+    # The directory trust and marker describe this product, not one release.
+    # Retain both until the new marker is committed, including interrupted upgrades.
+    foreach ($name in $OpenEntries.Keys) {
+        if ([string]$Options.GetValue($name,$null) -cne [string]$OpenEntries[$name]) { throw 'Excel registration changed before upgrade; the external value was preserved.' }
+        $Options.DeleteValue($name,$false)
+    }
+    $Options.Flush()
+    if ($null -ne $ManagerEntry) {
+        if ($Manager.GetValueKind($Target) -ne $ManagerEntry.kind -or $Manager.GetValue($Target,$null,[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames) -cne $ManagerEntry.value) { throw 'Add-in Manager registration changed before upgrade; it was preserved.' }
+        $Manager.DeleteValue($Target,$false)
+        $Manager.Flush()
+    }
+    foreach ($name in @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md')) {
+        $file = Join-Path $InstallDir $name
+        if (Test-Path -LiteralPath $file) {
+            if (-not $Backup.ContainsKey($name) -or (File-Sha256 $file) -ne (Bytes-Sha256 $Backup[$name])) { throw ('Previous version file changed; it was preserved: '+$name) }
+            Assert-UnredirectedInstallPath $file
+            Remove-Item -LiteralPath $file -Force
+        }
+    }
+}
 function Install-Addin {
     $oldManifest = Read-OwnManifest
+    $plan = Plan-Install $oldManifest
     $ownedFiles = @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md','install.json')
     if ($null -eq $oldManifest) {
         foreach ($name in $ownedFiles) {
             if (Test-Path -LiteralPath (Join-Path $InstallDir $name)) { throw 'An unrecognized file already exists at the install path. It was not overwritten.' }
         }
     }
-    if (-not (Confirm-Action ('현재 Windows 사용자에게 명단 비교 기능을 설치할까요?' + "`r`n`r`n" +
-        '제품 파일과 자동 로드를 등록하고 아래 폴더만 Excel 신뢰 위치로 추가합니다(하위 폴더 제외).' + "`r`n" + $InstallDir + "`r`n" +
-        '이 폴더 안의 파일은 매크로 알림 없이 실행될 수 있습니다. 제품 파일만 보관하세요.'))) { return }
     $payload = Join-Path $Root 'ExcelSmartListCompare.xlam'
     if (-not (Test-Path -LiteralPath $payload)) { $payload = Join-Path $Root 'dist\ExcelSmartListCompare.xlam' }
     if (-not (Test-Path -LiteralPath $payload)) { throw 'Install requires the built Release folder. Build_Release.cmd is for authorized developers.' }
-    $payloadHash = File-Sha256 $payload
+    # Read every required package file before removing anything, including when
+    # the source is inside the installed directory.
+    $package = [ordered]@{'ExcelSmartListCompare.xlam'=[IO.File]::ReadAllBytes($payload)}
+    foreach ($name in @('Setup.ps1','Uninstall.cmd','README.md')) { $package[$name] = [IO.File]::ReadAllBytes((Join-Path $Root $name)) }
+    $payloadHash = Bytes-Sha256 $package['ExcelSmartListCompare.xlam']
     $officeVersion = Excel-RegistrationVersion
+    if ($null -ne $oldManifest -and [string]$oldManifest.excelVersion -ne $officeVersion) { throw 'The installed Office version differs. Remove the previous installation with its Uninstall.cmd before installing for this Office version.' }
     $trustPlan = Plan-TrustedLocation $officeVersion $oldManifest
+    $question = switch ($plan.mode) {
+        'Upgrade' { '이전 버전 '+$plan.previous+'을 제거하고 '+$InstallerVersion+'을 설치할까요?' }
+        'Repair' { '같은 버전 '+$InstallerVersion+'이 설치되어 있습니다. 다시 설치할까요?' }
+        default { '현재 Windows 사용자에게 명단 비교 기능을 설치할까요?' }
+    }
+    if (-not (Confirm-Action ($question + "`r`n`r`n" +
+        '제품 파일과 자동 로드를 등록하고 아래 폴더만 Excel 신뢰 위치로 사용합니다(새 항목은 하위 폴더 제외).' + "`r`n" + $InstallDir + "`r`n" +
+        '이 폴더 안의 파일은 매크로 알림 없이 실행될 수 있습니다. 제품 파일만 보관하세요.'))) { return }
     $optionPath = (Excel-UserPath $officeVersion) + '\Options'
-    $options = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey($optionPath)
-    $before = Own-OpenEntries $options
     $backup = @{}
     $written = @{}
     foreach ($name in $ownedFiles) {
         $file = Join-Path $InstallDir $name
         if (Test-Path -LiteralPath $file -PathType Leaf) { $backup[$name] = [IO.File]::ReadAllBytes($file) }
     }
-    $temporary = $null
+    $options = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey($optionPath)
+    $before = Own-OpenEntries $options
+    $manager = $null
+    $managerBefore = $null
     $directoryExisted = Test-Path -LiteralPath $InstallDir
     $installFailed = $false
     try {
+        if ($plan.mode -eq 'Upgrade') {
+            $manager = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(((Excel-UserPath $officeVersion)+'\Add-in Manager'),$true)
+            if ($null -ne $manager -and $manager.GetValueNames() -contains $Target) {
+                $managerBefore = [pscustomobject]@{value=$manager.GetValue($Target,$null,[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames);kind=$manager.GetValueKind($Target)}
+            }
+            Write-Host ('이전 버전 '+$plan.previous+'을 감지했습니다. 이전 제품 파일과 자동 실행 등록을 제거합니다.')
+            Remove-PreviousVersion $options $before $manager $managerBefore $backup
+            Write-Host ('이전 버전 제거를 완료했습니다. '+$InstallerVersion+'을 설치합니다.')
+        } elseif ($plan.mode -eq 'Repair') { Write-Host ('같은 버전 '+$InstallerVersion+'을 다시 설치합니다.') }
         [void](New-Item -ItemType Directory -Path $InstallDir -Force)
-        Copy-Item -LiteralPath $payload -Destination $Target -Force
-        $written['ExcelSmartListCompare.xlam'] = $payloadHash
-        foreach ($name in @('Setup.ps1','Uninstall.cmd','README.md')) {
-            $source = Join-Path $Root $name
-            $destination = Join-Path $InstallDir $name
-            if ([IO.Path]::GetFullPath($source) -ine [IO.Path]::GetFullPath($destination)) { Copy-Item -LiteralPath $source -Destination $destination -Force; $written[$name] = File-Sha256 $destination }
+        foreach ($name in $package.Keys) {
+            $written[$name] = Bytes-Sha256 $package[$name]
+            $expected = if ($plan.mode -ne 'Upgrade' -and $backup.ContainsKey($name)) { Bytes-Sha256 $backup[$name] } else { $null }
+            Write-InstallFile (Join-Path $InstallDir $name) $package[$name] $expected
         }
         if ((File-Sha256 $Target) -ne $payloadHash) { throw 'Copied XLAM hash mismatch.' }
         Assert-UnredirectedInstallPath $Target
@@ -530,12 +602,10 @@ function Install-Addin {
         }
         # Commit ownership before registration so an interrupted install is removable.
         $data = [ordered]@{productId=$ProductId;version=$Version;installerVersion=$InstallerVersion;installDirectory=$InstallDir;installedAt=(Get-Date).ToString('o');excelVersion=$officeVersion;sha256=$payloadHash;openValueName=$openName;ownedFiles=$ownedFiles;trustedLocation=$trustPlan.record}
-        $temporary = Join-Path $InstallDir ('slc-install-' + [Guid]::NewGuid().ToString('N') + '.json')
-        [IO.File]::WriteAllText($temporary, ($data | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($true))
-        Assert-UnredirectedInstallPath $temporary
-        if (Test-Path -LiteralPath $Manifest) { [IO.File]::Replace($temporary,$Manifest,[NullString]::Value) } else { [IO.File]::Move($temporary,$Manifest) }
-        $temporary = $null
-        $written['install.json'] = File-Sha256 $Manifest
+        $manifestBytes = [Text.UTF8Encoding]::new($false).GetBytes(($data | ConvertTo-Json -Depth 4))
+        $written['install.json'] = Bytes-Sha256 $manifestBytes
+        $expected = if ($backup.ContainsKey('install.json')) { Bytes-Sha256 $backup['install.json'] } else { $null }
+        Write-InstallFile $Manifest $manifestBytes $expected
         Enable-TrustedLocation $officeVersion $trustPlan
         $current = $options.GetValue($openName,$null)
         if ($null -ne $current -and [string]$current -ine ('"'+$Target+'"') -and [string]$current -ine $Target) { throw 'Excel registration changed concurrently; the external value was preserved.' }
@@ -549,11 +619,8 @@ function Install-Addin {
     } catch {
         $installFailed = $true
         if ($null -ne $trustPlan.PSObject.Properties['created'] -and $trustPlan.created) { Remove-OwnedTrustedLocation $officeVersion $trustPlan.record }
-        # Roll back only this exact product path; preserve unrelated OPEN values.
+        # Stop loading the product while restoring its files.
         foreach ($name in @((Own-OpenEntries $options).Keys)) { $options.DeleteValue($name,$false) }
-        foreach ($name in $before.Keys) {
-            if ($null -eq $options.GetValue($name,$null)) { $options.SetValue($name,$before[$name],[Microsoft.Win32.RegistryValueKind]::String) }
-        }
         foreach ($name in $ownedFiles) {
             $file = Join-Path $InstallDir $name
             $currentHash = if (Test-Path -LiteralPath $file -PathType Leaf) { File-Sha256 $file } else { $null }
@@ -563,10 +630,17 @@ function Install-Addin {
                 [IO.File]::WriteAllBytes($file,$backup[$name])
             } elseif ($null -ne $currentHash -and $written.ContainsKey($name) -and $currentHash -eq $written[$name]) { Remove-Item -LiteralPath $file -Force }
         }
+        foreach ($name in $before.Keys) {
+            if ($null -eq $options.GetValue($name,$null)) { $options.SetValue($name,$before[$name],[Microsoft.Win32.RegistryValueKind]::String) }
+            else { Write-Warning ('Externally changed registration preserved during rollback: '+$name) }
+        }
+        $options.Flush()
+        if ($null -ne $managerBefore -and $manager.GetValueNames() -notcontains $Target) { $manager.SetValue($Target,$managerBefore.value,$managerBefore.kind); $manager.Flush() }
+        if ($plan.mode -eq 'Upgrade') { Write-Host '업데이트 설치에 실패하여 이전 버전 복구를 처리했습니다. 외부 변경을 보존한 항목은 위 경고를 확인하세요.' }
         throw
     } finally {
         $options.Close()
-        if ($null -ne $temporary -and (Test-Path -LiteralPath $temporary)) { Remove-Item -LiteralPath $temporary -Force }
+        if ($null -ne $manager) { $manager.Close() }
         if ($installFailed -and -not $directoryExisted -and (Test-Path -LiteralPath $InstallDir)) {
             # Nonrecursive deletion refuses any file added by another process.
             try { [IO.Directory]::Delete($InstallDir,$false) } catch { Write-Warning '설치 폴더의 추가 파일은 보존했습니다.' }

@@ -23,3 +23,6 @@
 | Excel 신뢰 위치 정책 | https://github.com/microsoft/ActiveDirectoryTierModel/blob/main/config/admx/excel16.admx | `alllocationsdisabled`, LocationN의 Path와 AllowSubfolders 확인 |
 | RC4 실행 프로세스·인자 | https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_exe?view=powershell-5.1 | 2026-09-15 확인. 프로세스 한정 ExecutionPolicy와 `-File`의 인자·종료 코드 전달 |
 | RC4 실행 정책 우선순위·차단 해제 | https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies | 2026-09-15 확인. 그룹 정책 우선, RemoteSigned와 단일 파일 Unblock-File의 의미 |
+| 창별 메뉴 상태 | https://learn.microsoft.com/en-us/office/vba/excel/concepts/programming-for-the-single-document-interface-in-excel | 2026-09-15 확인. 창 전환 시 캐시된 작업 상태를 각 창의 컨트롤에 반영 |
+| 창 활성화 이벤트 | https://learn.microsoft.com/en-us/office/vba/api/excel.application.windowactivate | 모든 통합문서 창의 활성화 감지 |
+| 우클릭 직전 이벤트 | https://learn.microsoft.com/en-us/office/vba/api/excel.application.sheetbeforerightclick | 선택값을 읽거나 Cancel을 바꾸지 않고 메뉴 표시만 갱신 |

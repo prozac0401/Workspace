@@ -24,6 +24,7 @@ Private mBusy As Boolean
 Private mStarted As Double
 Private mCancelled As Boolean
 Private mUiAttached As Boolean
+Private mAppEvents As CSLCAppEvents
 Private mOwnStatus As Boolean
 Private mPreviousStatus As Variant
 Private mLastStatus As String
@@ -78,10 +79,13 @@ Public Sub SLC_AttachUI()
             AddButton pop.Controls, "사용 안내", "SLC_About", "about"
         End If
     Next menuName
+    Set mAppEvents = New CSLCAppEvents
+    Set mAppEvents.ExcelApp = Application
     mUiAttached = True
     RefreshUI
     Exit Sub
 Failed:
+    Set mAppEvents = Nothing
     RemoveOwnUI
     mUiAttached = False
 End Sub
@@ -119,6 +123,7 @@ Private Sub RemoveOwnUI()
 End Sub
 
 Public Sub SLC_DetachUI()
+    Set mAppEvents = Nothing
     If mBusy Then mCancelled = True
     Set mPending = Nothing
     ReleaseStatus
@@ -126,21 +131,27 @@ Public Sub SLC_DetachUI()
     mUiAttached = False
 End Sub
 
+Public Sub SLC_RefreshActiveUI()
+    ' Excel SDI windows keep their own copies of legacy menu controls.
+    ' Refresh presentation only; never select a cell or replace the snapshot.
+    If Not mUiAttached Or mBusy Then Exit Sub
+    RefreshUI
+End Sub
+
 Private Sub RefreshUI()
-    Dim bar As CommandBar, n As Variant, ctl As CommandBarControl, child As CommandBarControl
+    Dim bar As CommandBar, ctl As CommandBarControl, child As CommandBarControl
     Dim popup As CommandBarPopup
     Dim title As String, pendingTitle As String
     If mPending Is Nothing Then
         title = "첫 번째 목록 담기"
     Else
-        title = "두 번째 목록과 비교"
+        title = "두 번째 목록 담아 비교"
         pendingTitle = "첫 번째 목록: " & Format$(mPending.Total, "#,##0") & "개 항목"
     End If
     On Error Resume Next
-    For Each n In Array(BAR_NAME, "Cell", "Row", "Column")
-        Set bar = Nothing
-        Set bar = Application.CommandBars(CStr(n))
-        If Not bar Is Nothing Then
+    ' Resolve controls afresh in the active window, not a cached first-window bar.
+    For Each bar In Application.CommandBars
+        If bar.Name = BAR_NAME Or bar.Name = "Cell" Or bar.Name = "Row" Or bar.Name = "Column" Then
             For Each ctl In bar.Controls
                 If ctl.Tag = UI_TAG & ".run" Then ctl.Caption = title
                 If ctl.Tag = UI_TAG & ".pending" Then
@@ -159,7 +170,7 @@ Private Sub RefreshUI()
                 End If
             Next ctl
         End If
-    Next n
+    Next bar
     On Error GoTo 0
 End Sub
 
@@ -757,7 +768,7 @@ End Sub
 Public Sub SLC_About()
     MsgBox "Excel Smart List Compare " & VERSION_TEXT & vbCrLf & vbCrLf & _
         "첫 번째 목록을 선택하고 [첫 번째 목록 담기]를 누르세요." & vbCrLf & _
-        "이어서 두 번째 목록을 선택하고 [두 번째 목록과 비교]를 누르세요." & vbCrLf & vbCrLf & _
+        "이어서 두 번째 목록을 선택하고 [두 번째 목록 담아 비교]를 누르세요." & vbCrLf & vbCrLf & _
         "목록은 선택한 셀 전체, 항목은 그 안의 값 하나입니다." & vbCrLf & _
         "가로·세로·사각 범위·다중 선택은 모두 하나의 목록입니다." & vbCrLf & _
         "다른 파일도 같은 Excel 실행 세션이면 가능합니다." & vbCrLf & _

@@ -24,6 +24,7 @@ Private mBusy As Boolean
 Private mStarted As Double
 Private mCancelled As Boolean
 Private mUiAttached As Boolean
+Private mAppEvents As CSLCAppEvents
 Private mOwnStatus As Boolean
 Private mPreviousStatus As Variant
 Private mLastStatus As String
@@ -78,10 +79,13 @@ Public Sub SLC_AttachUI()
             AddButton pop.Controls, SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_About", "about"
         End If
     Next menuName
+    Set mAppEvents = New CSLCAppEvents
+    Set mAppEvents.ExcelApp = Application
     mUiAttached = True
     RefreshUI
     Exit Sub
 Failed:
+    Set mAppEvents = Nothing
     RemoveOwnUI
     mUiAttached = False
 End Sub
@@ -119,6 +123,7 @@ Private Sub RemoveOwnUI()
 End Sub
 
 Public Sub SLC_DetachUI()
+    Set mAppEvents = Nothing
     If mBusy Then mCancelled = True
     Set mPending = Nothing
     ReleaseStatus
@@ -126,21 +131,27 @@ Public Sub SLC_DetachUI()
     mUiAttached = False
 End Sub
 
+Public Sub SLC_RefreshActiveUI()
+    ' Excel SDI windows keep their own copies of legacy menu controls.
+    ' Refresh presentation only; never select a cell or replace the snapshot.
+    If Not mUiAttached Or mBusy Then Exit Sub
+    RefreshUI
+End Sub
+
 Private Sub RefreshUI()
-    Dim bar As CommandBar, n As Variant, ctl As CommandBarControl, child As CommandBarControl
+    Dim bar As CommandBar, ctl As CommandBarControl, child As CommandBarControl
     Dim popup As CommandBarPopup
     Dim title As String, pendingTitle As String
     If mPending Is Nothing Then
         title = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30")
     Else
-        title = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D ACFC 0020 BE44 AD50")
+        title = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50")
         pendingTitle = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(mPending.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9")
     End If
     On Error Resume Next
-    For Each n In Array(BAR_NAME, "Cell", "Row", "Column")
-        Set bar = Nothing
-        Set bar = Application.CommandBars(CStr(n))
-        If Not bar Is Nothing Then
+    ' Resolve controls afresh in the active window, not a cached first-window bar.
+    For Each bar In Application.CommandBars
+        If bar.Name = BAR_NAME Or bar.Name = "Cell" Or bar.Name = "Row" Or bar.Name = "Column" Then
             For Each ctl In bar.Controls
                 If ctl.Tag = UI_TAG & ".run" Then ctl.Caption = title
                 If ctl.Tag = UI_TAG & ".pending" Then
@@ -159,7 +170,7 @@ Private Sub RefreshUI()
                 End If
             Next ctl
         End If
-    Next n
+    Next bar
     On Error GoTo 0
 End Sub
 
@@ -757,7 +768,7 @@ End Sub
 Public Sub SLC_About()
     MsgBox "Excel Smart List Compare " & VERSION_TEXT & vbCrLf & vbCrLf & _
         SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & _
-        SLC_U("C774 C5B4 C11C 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B B450 0020 BC88 C9F8 0020 BAA9 B85D ACFC 0020 BE44 AD50 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & vbCrLf & _
+        SLC_U("C774 C5B4 C11C 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & vbCrLf & _
         SLC_U("BAA9 B85D C740 0020 C120 D0DD D55C 0020 C140 0020 C804 CCB4 002C 0020 D56D BAA9 C740 0020 ADF8 0020 C548 C758 0020 AC12 0020 D558 B098 C785 B2C8 B2E4 002E") & vbCrLf & _
         SLC_U("AC00 B85C 00B7 C138 B85C 00B7 C0AC AC01 0020 BC94 C704 00B7 B2E4 C911 0020 C120 D0DD C740 0020 BAA8 B450 0020 D558 B098 C758 0020 BAA9 B85D C785 B2C8 B2E4 002E") & vbCrLf & _
         SLC_U("B2E4 B978 0020 D30C C77C B3C4 0020 AC19 C740 0020 0045 0078 0063 0065 006C 0020 C2E4 D589 0020 C138 C158 C774 BA74 0020 AC00 B2A5 D569 B2C8 B2E4 002E") & vbCrLf & _
