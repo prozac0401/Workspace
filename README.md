@@ -5,7 +5,7 @@
 [빠른 판단 기준](docs/quick-reference.md)에서 지금 할 행동을 찾고, 처음이라면 [도입 순서](docs/getting-started.md)로 시작하세요. 공통 철학은 [10대 기본원칙](docs/principles.md)에 정리했습니다. 회신 누락·인수인계 같은 반복 문제가 생기면 [선택 운영 개선안](docs/policies/folder-workflow.md)을 참고합니다.
 
 - **FolderState**: Windows Explorer 폴더 상태표시 도구. C# / .NET 10 / WPF, 사용자별 MSI 설치.
-- **Excel Smart List Compare**: 선택한 두 명단을 비교하는 Excel 추가 기능. [별도 도구 폴더](tools/ExcelSmartListCompare/README.md)에 소스·실제 Windows 검증·캡처 안내가 있습니다. 설치 가능한 XLAM 평가용 후보를 별도 ZIP으로 제공합니다.
+- **Excel Smart List Compare**: 선택한 두 목록을 비교하는 Excel 추가 기능. [별도 도구 폴더](tools/ExcelSmartListCompare/README.md)에 소스·실제 Windows 검증·캡처 안내가 있습니다. 설치 가능한 XLAM 평가용 후보를 별도 ZIP으로 제공합니다.
 - **운영 정책**: 파일·폴더·이메일, 원본 시스템, MASTER 키트, 진행·인수인계 기준. [업무효율화의 확장 순서](docs/policies/work-efficiency.md)는 Work Inbox·업무 지식·자동화·Agent로 이어지는 선택 적용 지도입니다.
 - **공통 기반**: 향후 도구가 공유할 문서 양식, ADR, 명세 대응표, 테스트·배포 기준.
 
@@ -19,7 +19,7 @@ GitHub Pages에는 업무 운영 정책과 FolderState 사용법만 게시합니
 
 [FolderState 0.1.0 RC1 다운로드](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.0-rc.1) · [FolderState 캡처 퀵가이드](docs/tools/folderstate/quick-guide.md)
 
-[Excel 0.2.0 RC4 다운로드](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.4) · [Excel 캡처 퀵가이드](tools/ExcelSmartListCompare/docs/QUICK_GUIDE.md)
+[Excel 0.2.0 RC5 다운로드](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.5) · [Excel 퀵가이드](tools/ExcelSmartListCompare/docs/QUICK_GUIDE.md) · [RC5 검증과 제한](tools/ExcelSmartListCompare/docs/WORDING_UPDATE.md)
 
 Windows 11 x64, .NET SDK는 `global.json`의 버전을 사용합니다.
 

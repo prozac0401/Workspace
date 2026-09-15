@@ -36,6 +36,14 @@ MSI: FolderState-0.1.0-win-x64.msi. SHA-256: `b96eb391ce3bbb3fb8a1ea2d025690cc96
 
 [RC4 평가용 릴리즈](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.4)는 완성 XLAM과 스크립트가 포함된 설치 ZIP, 릴리즈 커밋의 수정 소스 ZIP, 해시, 오프라인 안내와 실행기 검증 보고서를 제공한다. RC3 자산은 보존한다. 실행기 20개 시나리오와 기존 Python 53개 참조 검사를 [RC4 검증 보고서](../../tools/ExcelSmartListCompare/docs/WINDOWS_LAUNCHER_REPORT.md)에 구분한다. RC4에서 실제 Excel 전체 수명주기를 다시 수행하지 않았으며 기존 Excel 실기는 같은 XLAM 해시의 RC3 보고서에 귀속된다.
 
+## Excel RC5 · 목록 용어 정리
+
+2026-09-15 사용자 피드백에 따라 메뉴·개수 표시·결과의 용어를 첫 번째 목록 / 두 번째 목록으로 정리하고 새 XLAM을 제작했다. [RC5 평가용 릴리즈](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.5)에 설치 ZIP·소스 ZIP·SHA-256 파일을 게시했다. 공개 다운로드 파일이 검증한 패키지와 일치하는 것을 확인했다.
+
+실제 Excel에서 정규화·통합 검사 19개, 문구·상태 단언 31개, 선택 시나리오 14개, 자동 로드·재설치·실패 복구·제거를 확인했다. Python 59개와 문서 strict 빌드도 통과했다. 승인받아 임시 허용한 VBA 접근 설정과 시험 설치·관련 설정을 원복했다. 제작 경로와 시험 도구의 한계는 [RC5 검증 기록](../../tools/ExcelSmartListCompare/docs/WORDING_UPDATE.md)에 구분했다.
+
+잠긴 데스크톱에서 진행했으므로 새 화면의 육안 확인·클릭, 대화상자·경고 거절, 실제 Esc 취소 입력은 RC5에서 미실행이다. 이전 캡처는 당시 기록으로 보존하며, 서명 없는 평가용 후보의 전체 인수나 상용 배포 승인을 뜻하지 않는다.
+
 ## 최초 RC1 복원 기록
 
 21:22 KST 감사에서 두 도구 모두 미설치로 복원됐다. Excel 프로세스 0개, 제품 메뉴·등록 없음, 보안/정책/타 추가 기능 및 OPEN 값 14개 범주가 시작 전과 같았다. AccessVBOM 임시 허용은 원래 값 없음 상태로 원복했다. 원래 업무 파일·기존 Excel·다른 추가 기능을 변경하지 않았다.
