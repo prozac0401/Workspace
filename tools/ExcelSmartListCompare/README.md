@@ -105,6 +105,10 @@ RC3의 실제 대용량·일반 Windows 설치 검증은 [검증 보고서](docs
 
 ## 6. 설치/삭제 — 사용자와 제작자를 분리
 
+### 단일 EXE 설치 프로그램
+
+[RC7 단일 EXE 설치기](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7-setup.1)는 아래 ZIP의 설치 엔진과 XLAM을 그대로 내장합니다. EXE를 실행하고 설치 버튼을 누르면 설치·업데이트하며, Windows 설정의 설치된 앱에서 제거할 수 있습니다. [설치 안내](docs/ONEFILE_INSTALLATION.md)와 [검증 범위](docs/ONEFILE_REPORT.md)를 확인하세요.
+
 ### 완성된 Release 폴더를 받은 사용자
 
 1. 업무를 저장하고 Excel 창을 모두 닫습니다.

@@ -52,6 +52,12 @@ MSI: FolderState-0.1.0-win-x64.msi. SHA-256: `b96eb391ce3bbb3fb8a1ea2d025690cc96
 
 [RC6 평가용 릴리즈](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.6)는 새 이벤트 클래스를 포함한 XLAM과 설치·소스 ZIP을 제공한다. 실제 창 전환·명령 실행 70개 단언, 내장 정규화·통합 검사 19개, 선택 시나리오 14개, 재설치·실패 복구·제거를 검증했다. 임시 VBA 접근, 시험 설치와 관련 설정은 시작 전으로 복원했다. 원복·검증 대상 해시·시험 준비의 한계·잠금으로 미실행한 실제 우클릭·Esc·육안 확인은 [RC6 검증 기록](../../tools/ExcelSmartListCompare/docs/WINDOW_STATE_REPORT.md)에 구분한다.
 
+## Excel RC7 · 단일 EXE 설치기
+
+2026-09-15 동일한 로직의 단일 설치 프로그램 요청에 따라 공개 RC7의 XLAM과 설치 파일 5개를 그대로 내장한 EXE를 추가했다. [EXE 설치·제거 안내](../../tools/ExcelSmartListCompare/docs/ONEFILE_INSTALLATION.md)와 [검증 기록](../../tools/ExcelSmartListCompare/docs/ONEFILE_REPORT.md)을 제공한다. 기존 ZIP 릴리즈는 보존하며 엔진 버전은 RC7, 포장 버전은 1로 구분한다.
+
+실제 EXE의 설치 수명주기 49개와 설치된 Excel 기능 단언 164개, 원래 엔진의 격리 검사 46개, Python 기존 59개와 새 패키징 보호 3개를 확인했다. 시험 설치와 14개 설정 그룹을 복원하고 시험용 예약 작업을 제거했다. 최종 배포 EXE의 소스·해시·실행 검증은 릴리즈의 공개 요약을 따른다. 화면 잠금으로 설치 화면의 육안 확인·마우스 클릭은 미검증이고 코드 서명이 없는 평가용 배포다.
+
 ## 최초 RC1 복원 기록
 
 21:22 KST 감사에서 두 도구 모두 미설치로 복원됐다. Excel 프로세스 0개, 제품 메뉴·등록 없음, 보안/정책/타 추가 기능 및 OPEN 값 14개 범주가 시작 전과 같았다. AccessVBOM 임시 허용은 원래 값 없음 상태로 원복했다. 원래 업무 파일·기존 Excel·다른 추가 기능을 변경하지 않았다.
