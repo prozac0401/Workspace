@@ -48,7 +48,7 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def render(source, output, commit):
+def render(source, output, commit, *, title="Excel Smart List Compare RC4", html_names=HTML_NAMES):
     content = markdown.markdown(source.read_text(encoding="utf-8-sig"), extensions=["tables", "fenced_code"])
     for relative in set(re.findall(r'<img[^>]+src="([^"]+)"', content)):
         path = (source.parent / relative).resolve()
@@ -59,8 +59,8 @@ def render(source, output, commit):
 
     def link(match):
         href = match[1]
-        if href in HTML_NAMES:
-            return 'href="' + HTML_NAMES[href] + '"'
+        if href in html_names:
+            return 'href="' + html_names[href] + '"'
         parsed = urlsplit(href)
         if not parsed.scheme and parsed.path.endswith(".md"):
             target = (source.parent / unquote(parsed.path)).resolve()
@@ -73,7 +73,6 @@ def render(source, output, commit):
         return match[0]
 
     content = re.sub(r'href="([^"]+)"', link, content)
-    title = "Excel Smart List Compare RC4"
     output.write_text('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + title + '</title><style>' + CSS + '</style></head><body><main>' + content + '</main></body></html>', encoding="utf-8")
 
 

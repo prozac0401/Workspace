@@ -34,11 +34,11 @@ try {
         for($i=1;$i -le $bar.Controls.Count;$i++){$control=$bar.Controls.Item($i);if([string]$control.Tag -eq 'SLC_68A45C44_2026'){$count++};Release-Com $control}
         $counts[$name]=$count;Release-Com $bar
     }
-    $buttons=0
-    try{$bar=$excel.CommandBars.Item('SLC_68A45C44_Toolbar');$buttons=$bar.Controls.Count;Release-Com $bar}catch{}
-    $record['popupCounts']=$counts;$record['toolbarButtons']=$buttons
+    $controls=0
+    try{$bar=$excel.CommandBars.Item('SLC_68A45C44_Toolbar');$controls=$bar.Controls.Count;Release-Com $bar}catch{}
+    $record['popupCounts']=$counts;$record['toolbarControls']=$controls
     $expected=if($ExpectInstalled){1}else{0}
-    if($loaded -ne [bool]$ExpectInstalled -or @($counts.Values | Where-Object {$_ -ne $expected}).Count -or $buttons -ne (4*$expected)){throw 'Normal startup load/menu assertions failed.'}
+    if($loaded -ne [bool]$ExpectInstalled -or @($counts.Values | Where-Object {$_ -ne $expected}).Count -or $controls -ne (5*$expected)){throw 'Normal startup load/menu assertions failed.'}
     $record['status']='PASS'
 }catch{$record['status']='FAIL';$record['error']=$_.Exception.Message;throw}
 finally{

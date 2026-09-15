@@ -18,14 +18,14 @@ $path=Join-Path $output 'Warning-Fixture.xlsx'
 if(Test-Path -LiteralPath $path){throw 'Existing fixture preserved.'}
 $null=$book.GetType().InvokeMember('SaveAs',[Reflection.BindingFlags]::InvokeMethod,$null,$book,@([string]$path,[int]51))
 $sheet.Range('H1:H3').Select();$null=$e.Run($q+'SLC_Run')
-$caption=[string]$e.CommandBars.Item('SLC_68A45C44_Toolbar').Controls.Item(1).Caption
+$caption=[string]$e.CommandBars.Item('SLC_68A45C44_Toolbar').Controls.Item(2).Caption
 $settings=@($e.ScreenUpdating,$e.EnableEvents,$e.Interactive,$e.EnableCancelKey)
 $results=[Collections.Generic.List[object]]::new()
 foreach($case in @(@('WARN-20000-NO','A1:A20000'),@('EMPTY-B-PRESERVED','F1:F3'),@('MERGED-B-PRESERVED','J1:K1'),@('TEXT-4097-PRESERVED','G1'))){
     $sheet.Range($case[1]).Select()
     Write-Host ('WAITING_FOR_NATIVE_DIALOG '+$case[0])
     $null=$e.Run($q+'SLC_Run')
-    $after=[string]$e.CommandBars.Item('SLC_68A45C44_Toolbar').Controls.Item(1).Caption
+    $after=[string]$e.CommandBars.Item('SLC_68A45C44_Toolbar').Controls.Item(2).Caption
     $actualSettings=@($e.ScreenUpdating,$e.EnableEvents,$e.Interactive,$e.EnableCancelKey)
     $passed=($after -eq $caption -and ($settings -join ',') -eq ($actualSettings -join ','))
     $results.Add([ordered]@{id=$case[0];status=if($passed){'PASS'}else{'FAIL'};pendingCaption=$after;settingsRestored=(($settings -join ',') -eq ($actualSettings -join ','))})
@@ -35,7 +35,7 @@ foreach($case in @(@('WARN-20000-NO','A1:A20000'),@('EMPTY-B-PRESERVED','F1:F3')
 $sheet.Range('H1:H3').Select();$null=$e.Run($q+'SLC_Run')
 $result=$e.ActiveWorkbook;$rs=$result.Worksheets.Item(1)
 $summary=[string]$rs.Range('B4').Value2
-$passed=($summary -eq 'A 3 / B 3 / 일치 3 / A 잔여 0 / B 잔여 0')
+$passed=($summary -eq '첫 번째 목록: 3개 항목 / 두 번째 목록: 3개 항목 / 일치 3개 / 첫 번째 목록 잔여 0개 / 두 번째 목록 잔여 0개')
 $resultPath=Join-Path $output 'preserved-snapshot-result.xlsx'
 $null=$result.GetType().InvokeMember('SaveAs',[Reflection.BindingFlags]::InvokeMethod,$null,$result,@([string]$resultPath,[int]51))
 $results.Add([ordered]@{id='PRESERVED-SNAPSHOT-COMPARE';status=if($passed){'PASS'}else{'FAIL'};summary=$summary})

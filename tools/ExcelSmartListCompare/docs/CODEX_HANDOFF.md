@@ -1,17 +1,17 @@
 # Windows 빌드·실기 검증 인계
 
-상태: 설치 가능한 0.2.0 RC1 평가용 후보 · 2026-09-14
+상태: 설치 가능한 0.2.0 RC5 평가용 후보 · 2026-09-15
 
-[현재 Windows 보고서](WINDOWS_E2E_REPORT.md)에 최종 XLAM 해시, 실제 테스트, 실패 수정과 원상복구 결과를 기록했다. TEST_REPORT.md는 최초 Linux 기록이다. WINDOWS_INITIAL_E2E_REPORT.md와 WINDOWS_APPROVAL_RETEST_REPORT.md는 잠금 해제 전 기록이며 최종 상태를 뜻하지 않는다.
+[RC5 검증 기록](WORDING_UPDATE.md)에 새 XLAM 해시, 실제 Excel 검사, 설치 수명주기와 원상복구 결과를 기록했다. RC5는 잠긴 데스크톱에서 가능한 작업을 진행해 달라는 사용자 요청에 따라 제작했다. 새 화면의 육안 확인·클릭과 실제 Esc 취소 입력은 미실행이며, 서명되지 않은 평가용 후보로만 배포한다. WINDOWS_E2E_REPORT.md와 RC1~RC4 보고서·캡처는 이전 실행 기록이고 TEST_REPORT.md는 최초 Linux 기록이다.
 
 ## 현재 구현
 
-- 첫 Selection 전체를 기준으로 담고 다음 Selection과 비교한다. 방향·모드 선택과 두 열 자동 분할을 추가하지 않는다.
+- 첫 Selection 전체를 첫 번째 목록으로 담고 다음 Selection을 두 번째 목록으로 비교한다. 화면 용어와 검증 상태는 [목록 용어 변경 기록](WORDING_UPDATE.md)을 따른다. 방향·모드 선택과 두 열 자동 분할을 추가하지 않는다.
 - 가시 셀의 값과 개수를 비교하며 텍스트 앞자리 0을 보존한다.
-- 저장한 XLAM을 다시 열어 실제 VBA 검사를 실행한 뒤 Release를 만든다.
+- 기본 빌드는 저장한 XLAM을 다시 열어 실제 VBA 검사 후 Release를 만든다. RC5에서는 단독 재열기가 정체되어 저장된 파일을 승인된 제품 설치 경로에서 검증했다. 소스와 바이너리 대조, 실제 실행 결과를 확인한 뒤 `scripts/package-excel-wording-release.py`로 포장했으며 기본 빌드의 정상 종료로 기록하지 않는다.
 - 빌드·진단은 소유 PID를 확인한 정상 Excel 시작을 사용한다. 시험 Office의 COM 자동화 모드는 VBProject 접근과 설치본 재열기에서 실패했다.
-- 설치·제거는 Excel을 시작하지 않고 자기 LocalAppData 파일과 HKCU의 정확한 제품 OPEN 경로만 관리한다.
-- Esc 입력을 받을 수 있도록 Interactive=False를 설정하지 않는다. mBusy로 재진입을 막고 기존 기준과 설정을 복원한다.
+- 설치·제거는 Excel을 시작하지 않고 자기 LocalAppData 파일, HKCU의 정확한 제품 OPEN 경로와 제품 폴더 신뢰 위치를 관리한다.
+- Esc 입력을 받을 수 있도록 Interactive=False를 설정하지 않는다. mBusy로 재진입을 막고 담아 둔 첫 번째 목록과 설정을 복원한다.
 
 ## 후속 변경
 
@@ -19,7 +19,7 @@
 2. VBA는 UTF-8 소스를 수정하고 `python tests/export_ascii.py`로 가져오기 파일을 동기화한다.
 3. Python 참조 검사와 실제 Excel 실행을 별도로 수행한다.
 4. 허용된 개발 환경에서 Build_Release.cmd를 실행한다. 보안 설정 자동 변경의 후속 요청 예외는 RC2의 제품 폴더 신뢰 위치([ADR-0003](ADR-0003-Product-trusted-location.md))와 RC4 사용자 실행기의 프로세스 한정 준비·Setup.ps1 한 파일 차단 해제([ADR-0005](ADR-0005-Process-scoped-launchers.md))다. 제작자 빌드, 영구 실행 정책, 조직 정책, 다른 파일의 신뢰 범위로 넓히지 않는다.
-5. 바이너리가 바뀌면 같은 해시로 기능·취소·자동 로드·재설치·제거를 다시 검증한다.
+5. 바이너리가 바뀌면 같은 해시로 기능·취소·자동 로드·재설치·제거를 다시 검증한다. RC5의 실제 Esc·새 화면 확인은 잠금 상태 때문에 남아 있다. 이후 잠금이 해제된 검증 환경에서 진행하며, 이전 버전 결과로 통과 처리하지 않는다.
 6. Setup이 바뀌면 .cmd 종료 코드, 기존 Excel 보호, 실패 복구, 추가 파일 보존을 재검증한다.
 7. 원시 계정·레지스트리·설치 로그는 로컬에 남기고 배포에는 식별자가 없는 요약과 실제 캡처만 넣는다.
 

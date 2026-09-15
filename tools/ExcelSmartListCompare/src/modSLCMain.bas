@@ -57,8 +57,9 @@ Public Sub SLC_AttachUI()
     RemoveOwnUI
     Set bar = Application.CommandBars.Add(Name:=BAR_NAME, Position:=msoBarTop, Temporary:=True)
     AddButton bar.Controls, SLC_U("BA85 B2E8 0020 BE44 AD50"), "SLC_Run", "run"
-    AddButton bar.Controls, SLC_U("AE30 C900 0020 BE44 C6B0 AE30"), "SLC_Clear", "clear"
-    AddButton bar.Controls, SLC_U("C120 D0DD 0020 BC94 C704 B85C 0020 AE30 C900 0020 AD50 CCB4"), "SLC_Replace", "replace"
+    AddButton bar.Controls, "", "", "pending"
+    AddButton bar.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BE44 C6B0 AE30"), "SLC_Clear", "clear"
+    AddButton bar.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BC14 AFB8 AE30"), "SLC_Replace", "replace"
     AddButton bar.Controls, SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_About", "about"
     bar.Visible = True
     For Each menuName In Array("Cell", "Row", "Column")
@@ -71,8 +72,9 @@ Public Sub SLC_AttachUI()
             pop.Tag = UI_TAG
             pop.Caption = SLC_U("BA85 B2E8 0020 BE44 AD50")
             AddButton pop.Controls, SLC_U("BA85 B2E8 0020 BE44 AD50"), "SLC_Run", "run"
-            AddButton pop.Controls, SLC_U("AE30 C900 0020 BE44 C6B0 AE30"), "SLC_Clear", "clear"
-            AddButton pop.Controls, SLC_U("C120 D0DD 0020 BC94 C704 B85C 0020 AE30 C900 0020 AD50 CCB4"), "SLC_Replace", "replace"
+            AddButton pop.Controls, "", "", "pending"
+            AddButton pop.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BE44 C6B0 AE30"), "SLC_Clear", "clear"
+            AddButton pop.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BC14 AFB8 AE30"), "SLC_Replace", "replace"
             AddButton pop.Controls, SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_About", "about"
         End If
     Next menuName
@@ -91,7 +93,13 @@ Private Sub AddButton(ByVal controls As CommandBarControls, ByVal caption As Str
     button.Caption = caption
     button.Tag = UI_TAG & "." & suffix
     button.Style = msoButtonCaption
-    button.OnAction = "'" & Replace(ThisWorkbook.Name, "'", "''") & "'!" & procedureName
+    If Len(procedureName) > 0 Then
+        button.OnAction = "'" & Replace(ThisWorkbook.Name, "'", "''") & "'!" & procedureName
+    Else
+        ' A read-only count beside the action, visible only while a list is stored.
+        button.Enabled = False
+        button.Visible = False
+    End If
 End Sub
 
 Private Sub RemoveOwnUI()
@@ -121,11 +129,12 @@ End Sub
 Private Sub RefreshUI()
     Dim bar As CommandBar, n As Variant, ctl As CommandBarControl, child As CommandBarControl
     Dim popup As CommandBarPopup
-    Dim title As String
+    Dim title As String, pendingTitle As String
     If mPending Is Nothing Then
-        title = SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020 AE30 C900 0020 B2F4 AE30")
+        title = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30")
     Else
-        title = SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020 AE30 C900 0020") & Format$(mPending.Total, "#,##0") & SLC_U("AC74 ACFC 0020 BE44 AD50")
+        title = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D ACFC 0020 BE44 AD50")
+        pendingTitle = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(mPending.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9")
     End If
     On Error Resume Next
     For Each n In Array(BAR_NAME, "Cell", "Row", "Column")
@@ -134,10 +143,18 @@ Private Sub RefreshUI()
         If Not bar Is Nothing Then
             For Each ctl In bar.Controls
                 If ctl.Tag = UI_TAG & ".run" Then ctl.Caption = title
+                If ctl.Tag = UI_TAG & ".pending" Then
+                    ctl.Caption = pendingTitle
+                    ctl.Visible = (Len(pendingTitle) > 0)
+                End If
                 If ctl.Tag = UI_TAG Then
                     Set popup = ctl
                     For Each child In popup.Controls
                         If child.Tag = UI_TAG & ".run" Then child.Caption = title
+                        If child.Tag = UI_TAG & ".pending" Then
+                            child.Caption = pendingTitle
+                            child.Visible = (Len(pendingTitle) > 0)
+                        End If
                     Next child
                 End If
             Next ctl
@@ -207,14 +224,13 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     If current.Total = 0 Then
         ReleaseStatus
         MsgBox SLC_U("D654 BA74 C5D0 0020 B0A8 C740 0020 C120 D0DD 0020 C140 C5D0 C11C 0020 BE44 AD50 D560 0020 AC12 C744 0020 CC3E C9C0 0020 BABB D588 C2B5 B2C8 B2E4 002E") & vbCrLf & _
-               SLC_U("BE48 CE78 00B7 C624 B958 AC12 00B7 D45C 0020 C81C BAA9 002F D569 ACC4 0020 C140 C740 0020 C81C C678 B429 B2C8 B2E4 002E 0020 AE30 C874 0020 AE30 C900 C740 0020 C720 C9C0 B429 B2C8 B2E4 002E"), _
+               SLC_U("BE48 CE78 00B7 C624 B958 AC12 00B7 D45C 0020 C81C BAA9 002F D569 ACC4 0020 C140 C740 0020 C81C C678 B429 B2C8 B2E4 002E 0020 B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C740 0020 C720 C9C0 B429 B2C8 B2E4 002E"), _
                vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
         GoTo Finished
     End If
     If Not combining Then
         Set mPending = current
-        SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020 AE30 C900 0020") & Format$(current.Total, "#,##0") & _
-                  SLC_U("AC74 0020 C800 C7A5 B428 002E 0020 B2E4 B978 0020 BC94 C704 B97C 0020 C120 D0DD D55C 0020 B4A4 0020 B2E4 C2DC 0020 C2E4 D589 D558 C138 C694 002E")
+        SetStatus SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(current.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9")
     Else
         ShowComparison mPending, current
         Set mPending = Nothing
@@ -241,9 +257,9 @@ Failed:
     RefreshUI
     On Error GoTo 0
     If errNo = 18 Or errNo = ERR_CANCEL Then
-        MsgBox SLC_U("C791 C5C5 C744 0020 CDE8 C18C D588 C2B5 B2C8 B2E4 002E 0020 AE30 C874 0020 AE30 C900 C740 0020 C720 C9C0 B429 B2C8 B2E4 002E"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
+        MsgBox SLC_U("C791 C5C5 C744 0020 CDE8 C18C D588 C2B5 B2C8 B2E4 002E 0020 B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C740 0020 C720 C9C0 B429 B2C8 B2E4 002E"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
     Else
-        MsgBox errText & vbCrLf & vbCrLf & SLC_U("AE30 C874 0020 AE30 C900 ACFC 0020 C6D0 BCF8 0020 B370 C774 D130 B294 0020 BCC0 ACBD D558 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E") & _
+        MsgBox errText & vbCrLf & vbCrLf & SLC_U("B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D ACFC 0020 C6D0 BCF8 0020 B370 C774 D130 B294 0020 BCC0 ACBD D558 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E") & _
                vbCrLf & SLC_U("C624 B958 0020 CF54 B4DC 003A 0020") & CStr(errNo), vbExclamation, SLC_U("BA85 B2E8 0020 BE44 AD50")
     End If
 End Sub
@@ -319,7 +335,7 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
             End If
             visibleCount = visibleCount + CDbl(vis.CountLarge)
             If visibleCount > MAX_VISIBLE Then
-                Err.Raise ERR_LIMIT, , SLC_U("D55C 0020 BA85 B2E8 C740 0020 BCF4 C774 B294 0020 C120 D0DD 0020 C140 0020 0031 0030 0030 002C 0030 0030 0030 AC1C AE4C C9C0 0020 CC98 B9AC D569 B2C8 B2E4 002E") & vbCrLf & _
+                Err.Raise ERR_LIMIT, , SLC_U("D55C 0020 BAA9 B85D C740 0020 BCF4 C774 B294 0020 C120 D0DD 0020 C140 0020 0031 0030 0030 002C 0030 0030 0030 AC1C AE4C C9C0 0020 CC98 B9AC D569 B2C8 B2E4 002E") & vbCrLf & _
                     SLC_U("BE48 CE78 C744 0020 D3EC D568 D55C 0020 C548 C804 0020 C0C1 D55C C785 B2C8 B2E4 002E 0020 C228 ACA8 C9C4 0020 C140 C740 0020 C774 0020 C218 C5D0 0020 B123 C9C0 0020 C54A C2B5 B2C8 B2E4 002E")
             End If
             For Each part In vis.Areas
@@ -334,7 +350,7 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
             text = SLC_U("C77D AE30 00B7 BE44 AD50 00B7 ACB0 ACFC 0020 CD9C B825 C5D0 0020 C2DC AC04 C774 0020 AC78 B9B4 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E") & vbCrLf & _
                    SLC_U("C774 BC88 0020 C120 D0DD 003A 0020 BCF4 C774 B294 0020") & Format$(visibleCount, "#,##0") & SLC_U("C140 0020 002F 0020") & _
                    Format$(parts.Count, "#,##0") & SLC_U("AC1C 0020 C601 C5ED") & vbCrLf & _
-                   SLC_U("AE30 C900 0020 D3EC D568 0020 CC98 B9AC 0020 ADDC BAA8 003A 0020") & Format$(combinedCount, "#,##0") & SLC_U("C140") & vbCrLf & _
+                   SLC_U("C804 CCB4 0020 CC98 B9AC 0020 ADDC BAA8 003A 0020") & Format$(combinedCount, "#,##0") & SLC_U("C140") & vbCrLf & _
                    SLC_U("ACC4 C18D D560 AE4C C694 003F 0020 C2E4 D589 0020 C911 0020 0045 0073 0063 B85C 0020 CDE8 C18C D560 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E")
             If ask Then
                 If MsgBox(text, vbYesNo + vbExclamation + vbDefaultButton2, SLC_U("BA85 B2E8 0020 BE44 AD50 0020 002D 0020 B300 B7C9 0020 C791 C5C5")) <> vbYes Then Exit Function
@@ -454,11 +470,11 @@ Private Sub AddValue(ByVal list As CSLCList, ByVal v As Variant, ByVal address A
     End If
     raw = CStr(v)
     If Len(raw) > MAX_ITEM_CHARS Then
-        Err.Raise ERR_LIMIT, , address & SLC_U("003A 0020 C140 0020 D558 B098 C758 0020 AC12 C774 0020 0034 002C 0030 0039 0036 C790 B97C 0020 CD08 ACFC D569 B2C8 B2E4 002E 0020 BA85 B2E8 0020 BC94 C704 B97C 0020 B2E4 C2DC 0020 D655 C778 D574 0020 C8FC C138 C694 002E")
+        Err.Raise ERR_LIMIT, , address & SLC_U("003A 0020 C140 0020 D558 B098 C758 0020 AC12 C774 0020 0034 002C 0030 0039 0036 C790 B97C 0020 CD08 ACFC D569 B2C8 B2E4 002E 0020 BAA9 B85D 0020 BC94 C704 B97C 0020 B2E4 C2DC 0020 D655 C778 D574 0020 C8FC C138 C694 002E")
     End If
     list.RawCharCount = list.RawCharCount + Len(raw)
     If list.RawCharCount > MAX_RAW_CHARS Then
-        Err.Raise ERR_LIMIT, , SLC_U("D55C 0020 BA85 B2E8 C758 0020 C804 CCB4 0020 D14D C2A4 D2B8 AC00 0020 0035 002C 0030 0030 0030 002C 0030 0030 0030 C790 B97C 0020 CD08 ACFC D569 B2C8 B2E4 002E 0020 BC94 C704 B97C 0020 C904 C5EC 0020 C8FC C138 C694 002E")
+        Err.Raise ERR_LIMIT, , SLC_U("D55C 0020 BAA9 B85D C758 0020 C804 CCB4 0020 D14D C2A4 D2B8 AC00 0020 0035 002C 0030 0030 0030 002C 0030 0030 0030 C790 B97C 0020 CD08 ACFC D569 B2C8 B2E4 002E 0020 BC94 C704 B97C 0020 C904 C5EC 0020 C8FC C138 C694 002E")
     End If
     key = SLC_Normalize(v)
     If Len(key) = 0 Then
@@ -564,9 +580,10 @@ Private Sub ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList)
     If excessA = 0 And excessB = 0 And a.DuplicateExcess = 0 And b.DuplicateExcess = 0 _
         And a.ErrorCount = 0 And b.ErrorCount = 0 Then
         ReleaseStatus
-        MsgBox SLC_U("B450 0020 BA85 B2E8 C758 0020 AC12 ACFC 0020 AC1C C218 AC00 0020 AC19 C2B5 B2C8 B2E4 002E") & vbCrLf & _
-            "A " & Format$(a.Total, "#,##0") & SLC_U("AC74 0020 002F 0020 0042 0020") & Format$(b.Total, "#,##0") & SLC_U("AC74") & vbCrLf & _
-            SLC_U("BE44 AD50 0020 AE30 C900 003A 0020 C774 BA54 C77C 0020 0049 0044 00B7 C22B C790 0020 D45C AE30 00B7 B300 C18C BB38 C790 00B7 ACF5 BC31 0020 C790 B3D9 0020 C815 B9AC"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
+        MsgBox SLC_U("B450 0020 BAA9 B85D C758 0020 AC12 ACFC 0020 AC1C C218 AC00 0020 AC19 C2B5 B2C8 B2E4 002E") & vbCrLf & _
+            SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(a.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9") & vbCrLf & _
+            SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(b.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9") & vbCrLf & _
+            SLC_U("BE44 AD50 0020 ADDC CE59 003A 0020 C774 BA54 C77C 0020 0049 0044 00B7 C22B C790 0020 D45C AE30 00B7 B300 C18C BB38 C790 00B7 ACF5 BC31 0020 C790 B3D9 0020 C815 B9AC"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
     Else
         WriteResults a, b, keys, matched, excessA, excessB
     End If
@@ -604,22 +621,22 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
     ws.Range("A1:J8").NumberFormat = "@"
     ws.Range("A1:J1").Merge
     ws.Range("A1").Value2 = SLC_U("BA85 B2E8 0020 BE44 AD50 0020 ACB0 ACFC")
-    ws.Range("A2").Value2 = SLC_U("0041 0020 CD9C CC98 0020 002F 0020 C2DC C810")
+    ws.Range("A2").Value2 = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 CD9C CC98 0020 002F 0020 C2DC C810")
     ws.Range("B2:J2").Merge
     ws.Range("B2").Value2 = OutputText(a.Source & " / " & Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    ws.Range("A3").Value2 = SLC_U("0042 0020 CD9C CC98 0020 002F 0020 C2DC C810")
+    ws.Range("A3").Value2 = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 CD9C CC98 0020 002F 0020 C2DC C810")
     ws.Range("B3:J3").Merge
     ws.Range("B3").Value2 = OutputText(b.Source & " / " & Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    ws.Range("A4").Value2 = SLC_U("AC74 C218")
+    ws.Range("A4").Value2 = SLC_U("D56D BAA9 0020 C218")
     ws.Range("B4:J4").Merge
-    ws.Range("B4").Value2 = "A " & a.Total & " / B " & b.Total & SLC_U("0020 002F 0020 C77C CE58 0020") & matched & _
-                            SLC_U("0020 002F 0020 0041 0020 C794 C5EC 0020") & excessA & SLC_U("0020 002F 0020 0042 0020 C794 C5EC 0020") & excessB
+    ws.Range("B4").Value2 = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & a.Total & SLC_U("AC1C 0020 D56D BAA9 0020 002F 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & b.Total & _
+        SLC_U("AC1C 0020 D56D BAA9 0020 002F 0020 C77C CE58 0020") & matched & SLC_U("AC1C 0020 002F 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C794 C5EC 0020") & excessA & SLC_U("AC1C 0020 002F 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 C794 C5EC 0020") & excessB & SLC_U("AC1C")
     ws.Range("A5").Value2 = SLC_U("C911 BCF5 0020 002F 0020 C81C C678")
     ws.Range("B5:J5").Merge
-    ws.Range("B5").Value2 = SLC_U("C911 BCF5 CD08 ACFC 0020 0041 0020") & a.DuplicateExcess & " / B " & b.DuplicateExcess & _
-        SLC_U("0020 007C 0020 BE48 CE78 0020 0041 0020") & a.BlankCount & " / B " & b.BlankCount & _
-        SLC_U("0020 007C 0020 C624 B958 0020 0041 0020") & a.ErrorCount & " / B " & b.ErrorCount & _
-        SLC_U("0020 007C 0020 D45C 0020 C81C BAA9 00B7 D569 ACC4 0020 0041 0020") & a.MetadataCount & " / B " & b.MetadataCount
+    ws.Range("B5").Value2 = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020 C911 BCF5 0020 CD08 ACFC 0020") & a.DuplicateExcess & SLC_U("AC1C 0020 002F 0020 BE48 CE78 0020") & a.BlankCount & _
+        SLC_U("AC1C 0020 002F 0020 C624 B958 0020") & a.ErrorCount & SLC_U("AC1C 0020 002F 0020 D45C 0020 C81C BAA9 00B7 D569 ACC4 0020") & a.MetadataCount & SLC_U("AC1C") & vbLf & _
+        SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020 C911 BCF5 0020 CD08 ACFC 0020") & b.DuplicateExcess & SLC_U("AC1C 0020 002F 0020 BE48 CE78 0020") & b.BlankCount & _
+        SLC_U("AC1C 0020 002F 0020 C624 B958 0020") & b.ErrorCount & SLC_U("AC1C 0020 002F 0020 D45C 0020 C81C BAA9 00B7 D569 ACC4 0020") & b.MetadataCount & SLC_U("AC1C")
     ws.Range("A6").Value2 = SLC_U("BE44 AD50 0020 ADDC CE59")
     ws.Range("B6:J6").Merge
     ws.Range("B6").Value2 = SLC_U("C774 BA54 C77C 0020 0040 0020 C55E BD80 BD84 0020 002F 0020 C22B C790 002D BB38 C790 C22B C790 0020 D1B5 C77C 0020 002F 0020 C55E C790 B9AC 0020 0030 0020 BCF4 C874 0020 002F 0020 ACF5 BC31 00B7 B300 C18C BB38 C790 0020 C815 B9AC 0020 002F 0020 AC12 BCC4 0020 AC1C C218 0020 BE44 AD50")
@@ -629,7 +646,9 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
     Else
         ws.Range("A7").Value2 = SLC_U("D45C C5D0 B294 0020 CC28 C774 00B7 C911 BCF5 B9CC 0020 D45C C2DC D569 B2C8 B2E4 002E 0020 C8FC C18C C640 0020 C6D0 BCF8 0020 C608 B294 0020 D574 B2F9 0020 D0A4 C758 0020 CCAB 0020 BC88 C9F8 0020 C140 C785 B2C8 B2E4 002E")
     End If
-    labels = Array(SLC_U("C0C1 D0DC"), SLC_U("BE44 AD50 D0A4"), SLC_U("0041 0020 C6D0 BCF8 0020 C608"), SLC_U("0041 0020 AC1C C218"), SLC_U("0042 0020 C6D0 BCF8 0020 C608"), SLC_U("0042 0020 AC1C C218"), SLC_U("0041 0020 C794 C5EC"), SLC_U("0042 0020 C794 C5EC"), SLC_U("0041 0020 C8FC C18C"), SLC_U("0042 0020 C8FC C18C"))
+    labels = Array(SLC_U("C0C1 D0DC"), SLC_U("BE44 AD50 D0A4"), SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C6D0 BCF8 0020 C608"), SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 AC1C C218"), _
+        SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 C6D0 BCF8 0020 C608"), SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 AC1C C218"), SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C794 C5EC"), SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 C794 C5EC"), _
+        SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C8FC C18C"), SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 C8FC C18C"))
     For i = 0 To 9
         headers(1, i + 1) = labels(i)
     Next i
@@ -640,9 +659,9 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
         cb = CountOf(b, CStr(k))
         If ca <> cb Or ca > 1 Or cb > 1 Then
             If ca = 0 Then
-                status = SLC_U("0042 C5D0 B9CC 0020 C788 C74C")
+                status = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D C5D0 B9CC 0020 C788 C74C")
             ElseIf cb = 0 Then
-                status = SLC_U("0041 C5D0 B9CC 0020 C788 C74C")
+                status = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D C5D0 B9CC 0020 C788 C74C")
             ElseIf ca <> cb Then
                 status = SLC_U("AC1C C218 0020 CC28 C774")
             Else
@@ -670,13 +689,13 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
         outRow = 10
     End If
     With ws
-        .Columns("A").ColumnWidth = 18
+        .Columns("A").ColumnWidth = 26
         .Columns("B").ColumnWidth = 25
         .Columns("C").ColumnWidth = 32
-        .Columns("D").ColumnWidth = 10
+        .Columns("D").ColumnWidth = 16
         .Columns("E").ColumnWidth = 32
-        .Columns("F:H").ColumnWidth = 10
-        .Columns("I:J").ColumnWidth = 13
+        .Columns("F:H").ColumnWidth = 16
+        .Columns("I:J").ColumnWidth = 16
         .Range("A1:J1").Font.Size = 17
         .Range("A1:J1").Font.Bold = True
         .Range("A1:J1").RowHeight = 32
@@ -685,9 +704,10 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
         .Range("A2:A6").Font.Bold = True
         .Range("A8:J8").Font.Bold = True
         .Range("A8:J8").Interior.Color = RGB(225, 234, 242)
-        .Range("A2:J7").WrapText = True
-        .Range("A2:J3").RowHeight = 32
-        .Range("A5:J7").RowHeight = 32
+        .Range("A2:J8").WrapText = True
+        .Range("A2:J7").RowHeight = 36
+        .Range("A5:J5").RowHeight = 48
+        .Range("A8:J8").RowHeight = 48
         .Range("A8:J" & CStr(outRow - 1)).AutoFilter
     End With
     wb.Activate
@@ -736,12 +756,13 @@ End Sub
 
 Public Sub SLC_About()
     MsgBox "Excel Smart List Compare " & VERSION_TEXT & vbCrLf & vbCrLf & _
-        SLC_U("0031 002E 0020 CCAB 0020 BC94 C704 0020 C120 D0DD 0020 2192 0020 BA85 B2E8 0020 BE44 AD50 003A 0020 AE30 C900 0020 B2F4 AE30") & vbCrLf & _
-        SLC_U("0032 002E 0020 B2E4 B978 0020 BC94 C704 0020 C120 D0DD 0020 2192 0020 BA85 B2E8 0020 BE44 AD50 003A 0020 AE30 C900 ACFC 0020 BE44 AD50") & vbCrLf & vbCrLf & _
-        SLC_U("AC00 B85C 00B7 C138 B85C 00B7 C0AC AC01 0020 BC94 C704 00B7 B2E4 C911 0020 C120 D0DD C740 0020 BAA8 B450 0020 D558 B098 C758 0020 BA85 B2E8 C785 B2C8 B2E4 002E") & vbCrLf & _
+        SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & _
+        SLC_U("C774 C5B4 C11C 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B B450 0020 BC88 C9F8 0020 BAA9 B85D ACFC 0020 BE44 AD50 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & vbCrLf & _
+        SLC_U("BAA9 B85D C740 0020 C120 D0DD D55C 0020 C140 0020 C804 CCB4 002C 0020 D56D BAA9 C740 0020 ADF8 0020 C548 C758 0020 AC12 0020 D558 B098 C785 B2C8 B2E4 002E") & vbCrLf & _
+        SLC_U("AC00 B85C 00B7 C138 B85C 00B7 C0AC AC01 0020 BC94 C704 00B7 B2E4 C911 0020 C120 D0DD C740 0020 BAA8 B450 0020 D558 B098 C758 0020 BAA9 B85D C785 B2C8 B2E4 002E") & vbCrLf & _
         SLC_U("B2E4 B978 0020 D30C C77C B3C4 0020 AC19 C740 0020 0045 0078 0063 0065 006C 0020 C2E4 D589 0020 C138 C158 C774 BA74 0020 AC00 B2A5 D569 B2C8 B2E4 002E") & vbCrLf & _
         SLC_U("D544 D130 002F C228 AE40 0020 C140 C740 0020 C81C C678 D569 B2C8 B2E4 002E 0020 AC12 BCC4 0020 AC1C C218 AE4C C9C0 0020 BE44 AD50 D569 B2C8 B2E4 002E") & vbCrLf & _
-        SLC_U("0031 0030 0030 002C 0030 0030 0030 C140 002F BA85 B2E8 0020 C0C1 D55C 002E 0020 0032 0030 002C 0030 0030 0030 C140 BD80 D130 0020 C9C0 C5F0 0020 ACBD ACE0 002E") & vbCrLf & _
+        SLC_U("0031 0030 0030 002C 0030 0030 0030 C140 002F BAA9 B85D 0020 C0C1 D55C 002E 0020 0032 0030 002C 0030 0030 0030 C140 BD80 D130 0020 C9C0 C5F0 0020 ACBD ACE0 002E") & vbCrLf & _
         SLC_U("C804 C5ED 0020 B2E8 CD95 D0A4 00B7 D074 B9BD BCF4 B4DC 00B7 C6D0 BCF8 0020 AC12 00B7 ACC4 C0B0 0020 BAA8 B4DC B97C 0020 BCC0 ACBD D558 C9C0 0020 C54A C2B5 B2C8 B2E4 002E") & vbCrLf & _
         SLC_U("C218 B3D9 0020 ACC4 C0B0 0020 C0C1 D0DC C758 0020 C624 B798 B41C 0020 C218 C2DD 0020 ACB0 ACFC B098 0020 0045 0078 0063 0065 006C C774 0020 C774 BBF8 0020 C783 C740 0020 C22B C790 0020 C815 BC00 B3C4 B294 0020 BCF5 AD6C D558 C9C0 0020 C54A C2B5 B2C8 B2E4 002E"), _
         vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50 0020 002D 0020 C0AC C6A9 0020 C548 B0B4")

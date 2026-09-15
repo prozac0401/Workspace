@@ -57,8 +57,9 @@ Public Sub SLC_AttachUI()
     RemoveOwnUI
     Set bar = Application.CommandBars.Add(Name:=BAR_NAME, Position:=msoBarTop, Temporary:=True)
     AddButton bar.Controls, "명단 비교", "SLC_Run", "run"
-    AddButton bar.Controls, "기준 비우기", "SLC_Clear", "clear"
-    AddButton bar.Controls, "선택 범위로 기준 교체", "SLC_Replace", "replace"
+    AddButton bar.Controls, "", "", "pending"
+    AddButton bar.Controls, "첫 번째 목록 비우기", "SLC_Clear", "clear"
+    AddButton bar.Controls, "첫 번째 목록 바꾸기", "SLC_Replace", "replace"
     AddButton bar.Controls, "사용 안내", "SLC_About", "about"
     bar.Visible = True
     For Each menuName In Array("Cell", "Row", "Column")
@@ -71,8 +72,9 @@ Public Sub SLC_AttachUI()
             pop.Tag = UI_TAG
             pop.Caption = "명단 비교"
             AddButton pop.Controls, "명단 비교", "SLC_Run", "run"
-            AddButton pop.Controls, "기준 비우기", "SLC_Clear", "clear"
-            AddButton pop.Controls, "선택 범위로 기준 교체", "SLC_Replace", "replace"
+            AddButton pop.Controls, "", "", "pending"
+            AddButton pop.Controls, "첫 번째 목록 비우기", "SLC_Clear", "clear"
+            AddButton pop.Controls, "첫 번째 목록 바꾸기", "SLC_Replace", "replace"
             AddButton pop.Controls, "사용 안내", "SLC_About", "about"
         End If
     Next menuName
@@ -91,7 +93,13 @@ Private Sub AddButton(ByVal controls As CommandBarControls, ByVal caption As Str
     button.Caption = caption
     button.Tag = UI_TAG & "." & suffix
     button.Style = msoButtonCaption
-    button.OnAction = "'" & Replace(ThisWorkbook.Name, "'", "''") & "'!" & procedureName
+    If Len(procedureName) > 0 Then
+        button.OnAction = "'" & Replace(ThisWorkbook.Name, "'", "''") & "'!" & procedureName
+    Else
+        ' A read-only count beside the action, visible only while a list is stored.
+        button.Enabled = False
+        button.Visible = False
+    End If
 End Sub
 
 Private Sub RemoveOwnUI()
@@ -121,11 +129,12 @@ End Sub
 Private Sub RefreshUI()
     Dim bar As CommandBar, n As Variant, ctl As CommandBarControl, child As CommandBarControl
     Dim popup As CommandBarPopup
-    Dim title As String
+    Dim title As String, pendingTitle As String
     If mPending Is Nothing Then
-        title = "명단 비교: 기준 담기"
+        title = "첫 번째 목록 담기"
     Else
-        title = "명단 비교: 기준 " & Format$(mPending.Total, "#,##0") & "건과 비교"
+        title = "두 번째 목록과 비교"
+        pendingTitle = "첫 번째 목록: " & Format$(mPending.Total, "#,##0") & "개 항목"
     End If
     On Error Resume Next
     For Each n In Array(BAR_NAME, "Cell", "Row", "Column")
@@ -134,10 +143,18 @@ Private Sub RefreshUI()
         If Not bar Is Nothing Then
             For Each ctl In bar.Controls
                 If ctl.Tag = UI_TAG & ".run" Then ctl.Caption = title
+                If ctl.Tag = UI_TAG & ".pending" Then
+                    ctl.Caption = pendingTitle
+                    ctl.Visible = (Len(pendingTitle) > 0)
+                End If
                 If ctl.Tag = UI_TAG Then
                     Set popup = ctl
                     For Each child In popup.Controls
                         If child.Tag = UI_TAG & ".run" Then child.Caption = title
+                        If child.Tag = UI_TAG & ".pending" Then
+                            child.Caption = pendingTitle
+                            child.Visible = (Len(pendingTitle) > 0)
+                        End If
                     Next child
                 End If
             Next ctl
@@ -207,14 +224,13 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     If current.Total = 0 Then
         ReleaseStatus
         MsgBox "화면에 남은 선택 셀에서 비교할 값을 찾지 못했습니다." & vbCrLf & _
-               "빈칸·오류값·표 제목/합계 셀은 제외됩니다. 기존 기준은 유지됩니다.", _
+               "빈칸·오류값·표 제목/합계 셀은 제외됩니다. 담아 둔 첫 번째 목록은 유지됩니다.", _
                vbInformation, "명단 비교"
         GoTo Finished
     End If
     If Not combining Then
         Set mPending = current
-        SetStatus "명단 비교: 기준 " & Format$(current.Total, "#,##0") & _
-                  "건 저장됨. 다른 범위를 선택한 뒤 다시 실행하세요."
+        SetStatus "첫 번째 목록: " & Format$(current.Total, "#,##0") & "개 항목"
     Else
         ShowComparison mPending, current
         Set mPending = Nothing
@@ -241,9 +257,9 @@ Failed:
     RefreshUI
     On Error GoTo 0
     If errNo = 18 Or errNo = ERR_CANCEL Then
-        MsgBox "작업을 취소했습니다. 기존 기준은 유지됩니다.", vbInformation, "명단 비교"
+        MsgBox "작업을 취소했습니다. 담아 둔 첫 번째 목록은 유지됩니다.", vbInformation, "명단 비교"
     Else
-        MsgBox errText & vbCrLf & vbCrLf & "기존 기준과 원본 데이터는 변경하지 않았습니다." & _
+        MsgBox errText & vbCrLf & vbCrLf & "담아 둔 첫 번째 목록과 원본 데이터는 변경하지 않았습니다." & _
                vbCrLf & "오류 코드: " & CStr(errNo), vbExclamation, "명단 비교"
     End If
 End Sub
@@ -319,7 +335,7 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
             End If
             visibleCount = visibleCount + CDbl(vis.CountLarge)
             If visibleCount > MAX_VISIBLE Then
-                Err.Raise ERR_LIMIT, , "한 명단은 보이는 선택 셀 100,000개까지 처리합니다." & vbCrLf & _
+                Err.Raise ERR_LIMIT, , "한 목록은 보이는 선택 셀 100,000개까지 처리합니다." & vbCrLf & _
                     "빈칸을 포함한 안전 상한입니다. 숨겨진 셀은 이 수에 넣지 않습니다."
             End If
             For Each part In vis.Areas
@@ -334,7 +350,7 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
             text = "읽기·비교·결과 출력에 시간이 걸릴 수 있습니다." & vbCrLf & _
                    "이번 선택: 보이는 " & Format$(visibleCount, "#,##0") & "셀 / " & _
                    Format$(parts.Count, "#,##0") & "개 영역" & vbCrLf & _
-                   "기준 포함 처리 규모: " & Format$(combinedCount, "#,##0") & "셀" & vbCrLf & _
+                   "전체 처리 규모: " & Format$(combinedCount, "#,##0") & "셀" & vbCrLf & _
                    "계속할까요? 실행 중 Esc로 취소할 수 있습니다."
             If ask Then
                 If MsgBox(text, vbYesNo + vbExclamation + vbDefaultButton2, "명단 비교 - 대량 작업") <> vbYes Then Exit Function
@@ -454,11 +470,11 @@ Private Sub AddValue(ByVal list As CSLCList, ByVal v As Variant, ByVal address A
     End If
     raw = CStr(v)
     If Len(raw) > MAX_ITEM_CHARS Then
-        Err.Raise ERR_LIMIT, , address & ": 셀 하나의 값이 4,096자를 초과합니다. 명단 범위를 다시 확인해 주세요."
+        Err.Raise ERR_LIMIT, , address & ": 셀 하나의 값이 4,096자를 초과합니다. 목록 범위를 다시 확인해 주세요."
     End If
     list.RawCharCount = list.RawCharCount + Len(raw)
     If list.RawCharCount > MAX_RAW_CHARS Then
-        Err.Raise ERR_LIMIT, , "한 명단의 전체 텍스트가 5,000,000자를 초과합니다. 범위를 줄여 주세요."
+        Err.Raise ERR_LIMIT, , "한 목록의 전체 텍스트가 5,000,000자를 초과합니다. 범위를 줄여 주세요."
     End If
     key = SLC_Normalize(v)
     If Len(key) = 0 Then
@@ -564,9 +580,10 @@ Private Sub ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList)
     If excessA = 0 And excessB = 0 And a.DuplicateExcess = 0 And b.DuplicateExcess = 0 _
         And a.ErrorCount = 0 And b.ErrorCount = 0 Then
         ReleaseStatus
-        MsgBox "두 명단의 값과 개수가 같습니다." & vbCrLf & _
-            "A " & Format$(a.Total, "#,##0") & "건 / B " & Format$(b.Total, "#,##0") & "건" & vbCrLf & _
-            "비교 기준: 이메일 ID·숫자 표기·대소문자·공백 자동 정리", vbInformation, "명단 비교"
+        MsgBox "두 목록의 값과 개수가 같습니다." & vbCrLf & _
+            "첫 번째 목록: " & Format$(a.Total, "#,##0") & "개 항목" & vbCrLf & _
+            "두 번째 목록: " & Format$(b.Total, "#,##0") & "개 항목" & vbCrLf & _
+            "비교 규칙: 이메일 ID·숫자 표기·대소문자·공백 자동 정리", vbInformation, "명단 비교"
     Else
         WriteResults a, b, keys, matched, excessA, excessB
     End If
@@ -604,22 +621,22 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
     ws.Range("A1:J8").NumberFormat = "@"
     ws.Range("A1:J1").Merge
     ws.Range("A1").Value2 = "명단 비교 결과"
-    ws.Range("A2").Value2 = "A 출처 / 시점"
+    ws.Range("A2").Value2 = "첫 번째 목록 출처 / 시점"
     ws.Range("B2:J2").Merge
     ws.Range("B2").Value2 = OutputText(a.Source & " / " & Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    ws.Range("A3").Value2 = "B 출처 / 시점"
+    ws.Range("A3").Value2 = "두 번째 목록 출처 / 시점"
     ws.Range("B3:J3").Merge
     ws.Range("B3").Value2 = OutputText(b.Source & " / " & Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    ws.Range("A4").Value2 = "건수"
+    ws.Range("A4").Value2 = "항목 수"
     ws.Range("B4:J4").Merge
-    ws.Range("B4").Value2 = "A " & a.Total & " / B " & b.Total & " / 일치 " & matched & _
-                            " / A 잔여 " & excessA & " / B 잔여 " & excessB
+    ws.Range("B4").Value2 = "첫 번째 목록: " & a.Total & "개 항목 / 두 번째 목록: " & b.Total & _
+        "개 항목 / 일치 " & matched & "개 / 첫 번째 목록 잔여 " & excessA & "개 / 두 번째 목록 잔여 " & excessB & "개"
     ws.Range("A5").Value2 = "중복 / 제외"
     ws.Range("B5:J5").Merge
-    ws.Range("B5").Value2 = "중복초과 A " & a.DuplicateExcess & " / B " & b.DuplicateExcess & _
-        " | 빈칸 A " & a.BlankCount & " / B " & b.BlankCount & _
-        " | 오류 A " & a.ErrorCount & " / B " & b.ErrorCount & _
-        " | 표 제목·합계 A " & a.MetadataCount & " / B " & b.MetadataCount
+    ws.Range("B5").Value2 = "첫 번째 목록: 중복 초과 " & a.DuplicateExcess & "개 / 빈칸 " & a.BlankCount & _
+        "개 / 오류 " & a.ErrorCount & "개 / 표 제목·합계 " & a.MetadataCount & "개" & vbLf & _
+        "두 번째 목록: 중복 초과 " & b.DuplicateExcess & "개 / 빈칸 " & b.BlankCount & _
+        "개 / 오류 " & b.ErrorCount & "개 / 표 제목·합계 " & b.MetadataCount & "개"
     ws.Range("A6").Value2 = "비교 규칙"
     ws.Range("B6:J6").Merge
     ws.Range("B6").Value2 = "이메일 @ 앞부분 / 숫자-문자숫자 통일 / 앞자리 0 보존 / 공백·대소문자 정리 / 값별 개수 비교"
@@ -629,7 +646,9 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
     Else
         ws.Range("A7").Value2 = "표에는 차이·중복만 표시합니다. 주소와 원본 예는 해당 키의 첫 번째 셀입니다."
     End If
-    labels = Array("상태", "비교키", "A 원본 예", "A 개수", "B 원본 예", "B 개수", "A 잔여", "B 잔여", "A 주소", "B 주소")
+    labels = Array("상태", "비교키", "첫 번째 목록 원본 예", "첫 번째 목록 개수", _
+        "두 번째 목록 원본 예", "두 번째 목록 개수", "첫 번째 목록 잔여", "두 번째 목록 잔여", _
+        "첫 번째 목록 주소", "두 번째 목록 주소")
     For i = 0 To 9
         headers(1, i + 1) = labels(i)
     Next i
@@ -640,9 +659,9 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
         cb = CountOf(b, CStr(k))
         If ca <> cb Or ca > 1 Or cb > 1 Then
             If ca = 0 Then
-                status = "B에만 있음"
+                status = "두 번째 목록에만 있음"
             ElseIf cb = 0 Then
-                status = "A에만 있음"
+                status = "첫 번째 목록에만 있음"
             ElseIf ca <> cb Then
                 status = "개수 차이"
             Else
@@ -670,13 +689,13 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
         outRow = 10
     End If
     With ws
-        .Columns("A").ColumnWidth = 18
+        .Columns("A").ColumnWidth = 26
         .Columns("B").ColumnWidth = 25
         .Columns("C").ColumnWidth = 32
-        .Columns("D").ColumnWidth = 10
+        .Columns("D").ColumnWidth = 16
         .Columns("E").ColumnWidth = 32
-        .Columns("F:H").ColumnWidth = 10
-        .Columns("I:J").ColumnWidth = 13
+        .Columns("F:H").ColumnWidth = 16
+        .Columns("I:J").ColumnWidth = 16
         .Range("A1:J1").Font.Size = 17
         .Range("A1:J1").Font.Bold = True
         .Range("A1:J1").RowHeight = 32
@@ -685,9 +704,10 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
         .Range("A2:A6").Font.Bold = True
         .Range("A8:J8").Font.Bold = True
         .Range("A8:J8").Interior.Color = RGB(225, 234, 242)
-        .Range("A2:J7").WrapText = True
-        .Range("A2:J3").RowHeight = 32
-        .Range("A5:J7").RowHeight = 32
+        .Range("A2:J8").WrapText = True
+        .Range("A2:J7").RowHeight = 36
+        .Range("A5:J5").RowHeight = 48
+        .Range("A8:J8").RowHeight = 48
         .Range("A8:J" & CStr(outRow - 1)).AutoFilter
     End With
     wb.Activate
@@ -736,12 +756,13 @@ End Sub
 
 Public Sub SLC_About()
     MsgBox "Excel Smart List Compare " & VERSION_TEXT & vbCrLf & vbCrLf & _
-        "1. 첫 범위 선택 → 명단 비교: 기준 담기" & vbCrLf & _
-        "2. 다른 범위 선택 → 명단 비교: 기준과 비교" & vbCrLf & vbCrLf & _
-        "가로·세로·사각 범위·다중 선택은 모두 하나의 명단입니다." & vbCrLf & _
+        "첫 번째 목록을 선택하고 [첫 번째 목록 담기]를 누르세요." & vbCrLf & _
+        "이어서 두 번째 목록을 선택하고 [두 번째 목록과 비교]를 누르세요." & vbCrLf & vbCrLf & _
+        "목록은 선택한 셀 전체, 항목은 그 안의 값 하나입니다." & vbCrLf & _
+        "가로·세로·사각 범위·다중 선택은 모두 하나의 목록입니다." & vbCrLf & _
         "다른 파일도 같은 Excel 실행 세션이면 가능합니다." & vbCrLf & _
         "필터/숨김 셀은 제외합니다. 값별 개수까지 비교합니다." & vbCrLf & _
-        "100,000셀/명단 상한. 20,000셀부터 지연 경고." & vbCrLf & _
+        "100,000셀/목록 상한. 20,000셀부터 지연 경고." & vbCrLf & _
         "전역 단축키·클립보드·원본 값·계산 모드를 변경하지 않습니다." & vbCrLf & _
         "수동 계산 상태의 오래된 수식 결과나 Excel이 이미 잃은 숫자 정밀도는 복구하지 않습니다.", _
         vbInformation, "명단 비교 - 사용 안내"
