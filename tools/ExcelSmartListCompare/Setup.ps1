@@ -13,7 +13,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProductId = 'SLC-68A45C44-2026'
 $Version = '0.2.0'
-$InstallerVersion = '0.2.0-rc.6'
+$InstallerVersion = '0.2.0-rc.7'
 $Root = $PSScriptRoot
 $InstallDir = Join-Path $env:LOCALAPPDATA 'ExcelSmartListCompare'
 $Target = Join-Path $InstallDir 'ExcelSmartListCompare.xlam'
@@ -100,8 +100,21 @@ public static class SlcSetupPhysicalPath {
         }
     } finally { $stream.Dispose() }
 }
-function Write-PackageMetadata([string]$Path) {
+function Read-ZipText($Archive, [string]$Name) {
+    $reader = [IO.StreamReader]::new($Archive.GetEntry($Name).Open(),[Text.Encoding]::UTF8)
+    try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
+}
+function Write-ZipText($Archive, [string]$Name, [string]$Text) {
+    $entry = $Archive.GetEntry($Name)
+    if ($null -ne $entry) { $entry.Delete() }
+    $writer = [IO.StreamWriter]::new($Archive.CreateEntry($Name).Open(),[Text.UTF8Encoding]::new($false))
+    try { $writer.Write($Text) } finally { $writer.Dispose() }
+}
+function Write-PackageMetadata([string]$Path, [string]$RibbonPath = (Join-Path $Root 'src\customUI14.xml')) {
     # Write product metadata without Office's default personal author identity.
+    $ribbonXml = [IO.File]::ReadAllText($RibbonPath,[Text.Encoding]::UTF8)
+    $ribbonDocument = [xml]$ribbonXml
+    if ($ribbonDocument.DocumentElement.LocalName -ne 'customUI' -or $ribbonDocument.DocumentElement.NamespaceURI -ne 'http://schemas.microsoft.com/office/2009/07/customui') { throw 'Invalid product RibbonX source.' }
     Add-Type -AssemblyName System.IO.Compression
     $stream = [IO.File]::Open($Path, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
     $archive = $null
@@ -112,6 +125,28 @@ function Write-PackageMetadata([string]$Path) {
         $writer = [IO.StreamWriter]::new($archive.CreateEntry('docProps/core.xml').Open(), [Text.UTF8Encoding]::new($false))
         try { $writer.Write('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>Excel Smart List Compare</dc:title><dc:creator>Excel Smart List Compare</dc:creator><cp:lastModifiedBy>Excel Smart List Compare</cp:lastModifiedBy><dc:description>Product SLC-68A45C44-2026; version 0.2.0</dc:description></cp:coreProperties>') }
         finally { $writer.Dispose() }
+        Write-ZipText $archive 'customUI/customUI14.xml' $ribbonXml
+        $relationships = [xml](Read-ZipText $archive '_rels/.rels')
+        $relationshipNamespace = 'http://schemas.openxmlformats.org/package/2006/relationships'
+        $relationshipType = 'http://schemas.microsoft.com/office/2007/relationships/ui/extensibility'
+        foreach ($relationship in @($relationships.DocumentElement.ChildNodes)) {
+            if ($relationship.LocalName -eq 'Relationship' -and $relationship.GetAttribute('Type') -eq $relationshipType) { [void]$relationships.DocumentElement.RemoveChild($relationship) }
+        }
+        $relationship = $relationships.CreateElement('Relationship',$relationshipNamespace)
+        $relationship.SetAttribute('Id','rIdSLC68CustomUI')
+        $relationship.SetAttribute('Type',$relationshipType)
+        $relationship.SetAttribute('Target','customUI/customUI14.xml')
+        [void]$relationships.DocumentElement.AppendChild($relationship)
+        Write-ZipText $archive '_rels/.rels' $relationships.OuterXml
+        $types = [xml](Read-ZipText $archive '[Content_Types].xml')
+        foreach ($type in @($types.DocumentElement.ChildNodes)) {
+            if ($type.LocalName -eq 'Override' -and $type.GetAttribute('PartName') -eq '/customUI/customUI14.xml') { [void]$types.DocumentElement.RemoveChild($type) }
+        }
+        $type = $types.CreateElement('Override','http://schemas.openxmlformats.org/package/2006/content-types')
+        $type.SetAttribute('PartName','/customUI/customUI14.xml')
+        $type.SetAttribute('ContentType','application/xml')
+        [void]$types.DocumentElement.AppendChild($type)
+        Write-ZipText $archive '[Content_Types].xml' $types.OuterXml
     } finally { if ($null -ne $archive) { $archive.Dispose() }; $stream.Dispose() }
 }
 function Start-OwnExcel([switch]$NormalStart) {

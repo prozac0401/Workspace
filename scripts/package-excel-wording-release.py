@@ -1,4 +1,4 @@
-"""Package a rebuilt Excel wording/window-state XLAM after exact-file validation.
+"""Package a rebuilt Excel menu/wording XLAM after exact-file validation.
 
 Uses a fresh repository-local artifacts directory. Does not install software,
 change security settings, run Excel, or reuse the RC3/RC4 binary as a new build.
@@ -12,6 +12,7 @@ import shutil
 import subprocess
 from urllib.parse import unquote, urlsplit
 import zipfile
+import xml.etree.ElementTree as ET
 
 REPO = Path(__file__).resolve().parents[1]
 TOOL = REPO / "tools/ExcelSmartListCompare"
@@ -43,23 +44,74 @@ def git(*args):
     return subprocess.check_output(["git", *args], cwd=REPO, text=True, encoding="utf-8").strip()
 
 
+def validate_ribbon_package(path):
+    """Check the actual Office package wiring, separately from VBA source audit."""
+    ui_ns = "http://schemas.microsoft.com/office/2009/07/customui"
+    rel_ns = "http://schemas.openxmlformats.org/package/2006/relationships"
+    rel_type = "http://schemas.microsoft.com/office/2007/relationships/ui/extensibility"
+    type_ns = "http://schemas.openxmlformats.org/package/2006/content-types"
+    expected = {
+        "ContextMenuCell": "Cell", "ContextMenuRow": "Row", "ContextMenuColumn": "Column",
+        "ContextMenuListRange": "Table", "ContextMenuCellLayout": "CellLayout",
+        "ContextMenuRowLayout": "RowLayout", "ContextMenuColumnLayout": "ColumnLayout",
+        "ContextMenuListRangeLayout": "TableLayout",
+    }
+    with zipfile.ZipFile(path) as archive:
+        if len(archive.namelist()) != len(set(archive.namelist())):
+            raise SystemExit("Duplicate XLAM package entries.")
+        data = archive.read("customUI/customUI14.xml")
+        if text_hash(data) != text_hash((TOOL / "src/customUI14.xml").read_bytes()):
+            raise SystemExit("Packaged RibbonX does not match source.")
+        root = ET.fromstring(data)
+        menus = root.findall(f"{{{ui_ns}}}contextMenus/{{{ui_ns}}}contextMenu")
+        if root.tag != f"{{{ui_ns}}}customUI" or root.get("onLoad") != "SLC_RibbonLoad" or len(menus) != len(expected):
+            raise SystemExit("Incomplete RibbonX registration.")
+        actual = {}
+        ids = set()
+        for menu in menus:
+            children = list(menu)
+            if len(children) != 1 or children[0].tag != f"{{{ui_ns}}}dynamicMenu":
+                raise SystemExit("Context menu must contain one dynamic menu.")
+            dynamic = children[0]
+            actual[menu.get("idMso")] = dynamic.get("tag")
+            ids.add(dynamic.get("id"))
+            if dynamic.get("invalidateContentOnDrop") != "true" or dynamic.get("getContent") != "SLC_GetContextMenu":
+                raise SystemExit("Context menu content must refresh on every drop.")
+        if actual != expected or len(ids) != len(expected) or None in ids:
+            raise SystemExit("Unexpected or duplicate context menu identifiers.")
+        relationships = ET.fromstring(archive.read("_rels/.rels"))
+        ui = [r for r in relationships.findall(f"{{{rel_ns}}}Relationship") if r.get("Type") == rel_type]
+        if len(ui) != 1 or ui[0].get("Target") != "customUI/customUI14.xml":
+            raise SystemExit("Missing or duplicate Office RibbonX relationship.")
+        types = ET.fromstring(archive.read("[Content_Types].xml"))
+        ui_types = [t for t in types.findall(f"{{{type_ns}}}Override") if t.get("PartName") == "/customUI/customUI14.xml"]
+        if len(ui_types) != 1 or ui_types[0].get("ContentType") != "application/xml":
+            raise SystemExit("Missing or duplicate RibbonX content type.")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--xlam", type=Path, required=True)
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
-    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6"), default=VERSION)
+    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7"), default=VERSION)
     args = parser.parse_args()
     version = args.installer_version
-    rc = 6 if version == "0.2.0-rc.6" else 5
-    sources = SOURCES + (("src/CSLCAppEvents.cls",) if rc == 6 else ())
-    checks = CHECKS + (("windowState", "upgrade") if rc == 6 else ())
+    rc = int(version.rsplit(".", 1)[1])
+    sources = SOURCES + (("src/CSLCAppEvents.cls",) if rc >= 6 else ())
+    checks = CHECKS + (("windowState", "upgrade") if rc >= 6 else ())
+    if rc >= 7:
+        sources += ("src/customUI14.xml",)
+        checks += ("contextMenuContent", "nativeContextMenu")
     html_names = dict(HTML_NAMES)
     report = "Wording-Report.html"
-    if rc == 6:
+    if rc >= 6:
         html_names["WINDOW_STATE_REPORT.md"] = "Window-State-Report.html"
         html_names["UPGRADE_REPORT.md"] = "Upgrade-Report.html"
         report = "Window-State-Report.html"
+    if rc >= 7:
+        html_names["CONTEXT_MENU_REPORT.md"] = "Context-Menu-Report.html"
+        report = "Context-Menu-Report.html"
     output = args.output_directory.resolve()
     if not output.is_relative_to(REPO / "artifacts") or output == REPO / "artifacts" or output.exists():
         raise SystemExit("Choose a fresh directory under this repository's artifacts.")
@@ -68,25 +120,31 @@ def main():
     commit = git("rev-parse", "HEAD")
     digest = sha256(args.xlam)
     retired = {OLD_XLAM}
-    if rc == 6:
+    if rc >= 6:
         retired.add("e6eff07df465933f7159ab073b3cb656c23691d74f522733ca450f19a3f077de")
+    if rc >= 7:
+        retired.add("81d8b3e58aee1c352fbf19a1447581297a2e64d11edce9102523ebbbf7e07322")
     if digest in retired:
         raise SystemExit("This release requires a newly built XLAM.")
     validation = json.loads(args.validation.read_text(encoding="utf-8-sig"))
     if validation["installerVersion"] != version or validation["xlamSha256"] != digest:
         raise SystemExit("Validation does not describe this version and exact XLAM.")
-    if rc == 6 and validation.get("installerSha256") != sha256(TOOL / "Setup.ps1"):
+    if rc >= 6 and validation.get("installerSha256") != sha256(TOOL / "Setup.ps1"):
         raise SystemExit("Installer changed after upgrade validation.")
-    required = tuple(c for c in checks if c != "cancellation")
+    native_checks = {"cancellation", "nativeContextMenu"}
+    required = tuple(c for c in checks if c not in native_checks)
     if set(validation["checks"]) != set(checks) or any(not str(validation["checks"][c]).startswith("PASS") for c in required):
         raise SystemExit("Required validation is incomplete or failed.")
-    # A locked desktop prevents native Esc input. This explicit limitation is
+    # A locked desktop prevents native menu/Esc input. This explicit limitation is
     # allowed only for the unsigned evaluation prerelease and is shipped intact.
-    if not str(validation["checks"]["cancellation"]).startswith(("PASS", "NOT_RUN: desktop locked")):
-        raise SystemExit("Cancellation needs a result or the explicit locked-desktop limitation.")
+    for name in native_checks.intersection(checks):
+        if not str(validation["checks"][name]).startswith(("PASS", "NOT_RUN: desktop locked")):
+            raise SystemExit(name + " needs a result or the explicit locked-desktop limitation.")
     source_hashes = {name: text_hash((TOOL / name).read_bytes()) for name in sources}
     if validation["sourceTextSha256"] != source_hashes:
         raise SystemExit("Sources have changed since binary validation.")
+    if rc >= 7:
+        validate_ribbon_package(args.xlam)
     if "$InstallerVersion = '" + version + "'" not in (TOOL / "Setup.ps1").read_text(encoding="utf-8-sig"):
         raise SystemExit("Installer version mismatch.")
     release = output / "Release"

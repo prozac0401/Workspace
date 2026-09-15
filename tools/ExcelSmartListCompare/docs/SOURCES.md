@@ -26,3 +26,12 @@
 | 창별 메뉴 상태 | https://learn.microsoft.com/en-us/office/vba/excel/concepts/programming-for-the-single-document-interface-in-excel | 2026-09-15 확인. 창 전환 시 캐시된 작업 상태를 각 창의 컨트롤에 반영 |
 | 창 활성화 이벤트 | https://learn.microsoft.com/en-us/office/vba/api/excel.application.windowactivate | 모든 통합문서 창의 활성화 감지 |
 | 우클릭 직전 이벤트 | https://learn.microsoft.com/en-us/office/vba/api/excel.application.sheetbeforerightclick | 선택값을 읽거나 Cancel을 바꾸지 않고 메뉴 표시만 갱신 |
+
+## RC7 메뉴 구성 근거 · 2026-09-15 확인
+
+- [Microsoft SDI 안내](https://learn.microsoft.com/en-us/office/vba/excel/concepts/programming-for-the-single-document-interface-in-excel): 창별 UI 사본과 기존 CommandBar 제한. RC7은 컨텍스트 메뉴를 RibbonX로 등록한다.
+- [DynamicMenu 규격](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.office2010.customui.dynamicmenu): `getContent`, `invalidateContentOnDrop`으로 메뉴를 열 때 내용을 요청한다.
+- [Office contextMenus XML 규격](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-customui2/db5b22ab-d58e-459b-81a2-b9e51c23e9cc): 컨텍스트 메뉴의 XML 등록 구조.
+- [Office 공식 컨트롤 ID](https://github.com/OfficeDev/office-fluent-ui-command-identifiers): Excel의 일반 셀·행·열·표 및 페이지 레이아웃 메뉴 ID 8개를 원본 Excel 목록과 대조했다.
+
+규격과 ID 확인은 실제 우클릭 표시 검증을 대신하지 않는다. 실제 결과는 [RC7 검증 기록](CONTEXT_MENU_REPORT.md)을 따른다.

@@ -4,7 +4,13 @@ param(
     [Parameter(Mandatory=$true)][string]$ReleaseDirectory,
     [Parameter(Mandatory=$true)][string]$PreviousXlamSha256,
     [Parameter(Mandatory=$true)][string]$ExpectedXlamSha256,
-    [Parameter(Mandatory=$true)][string]$OutputDirectory
+    [Parameter(Mandatory=$true)][string]$OutputDirectory,
+    [string]$PreviousInstallerVersion='0.2.0-rc.5',
+    [string]$ExpectedInstallerVersion='0.2.0-rc.6',
+    [string]$WindowTestScript=(Join-Path $PSScriptRoot 'windows-window-state.ps1'),
+    [string]$WindowResultName='window-state.json',
+    [int]$WindowCheckCount=70,
+    [switch]$IncludeSelectionMatrix
 )
 # Run as the ordinary desktop user. Requires an initially absent product and no Excel.
 Set-StrictMode -Version Latest
@@ -41,11 +47,11 @@ try {
     $created=$true
     Run-Setup $PreviousReleaseDirectory 'Install' 'previous-install'
     $previous=Get-Content (Join-Path $installed 'install.json') -Raw|ConvertFrom-Json
-    Check 'Previous release installed with expected hash' ($previous.installerVersion -eq '0.2.0-rc.5' -and (Get-FileHash (Join-Path $installed 'ExcelSmartListCompare.xlam')).Hash -ieq $PreviousXlamSha256)
+    Check 'Previous release installed with expected hash' ($previous.installerVersion -eq $PreviousInstallerVersion -and (Get-FileHash (Join-Path $installed 'ExcelSmartListCompare.xlam')).Hash -ieq $PreviousXlamSha256)
     [IO.File]::WriteAllText($extra,$extraText)
     & (Join-Path $PSScriptRoot 'windows-install-rollback.ps1') -ReleaseDirectory $ReleaseDirectory -OutputDirectory (Join-Path $output 'failed-upgrade')
     $rollback=Get-Content (Join-Path $output 'failed-upgrade/rollback.json') -Raw|ConvertFrom-Json
-    Check 'Failed RC5 to RC6 upgrade restores files and registrations' ($rollback.status -eq 'PASS' -and (Get-Content (Join-Path $installed 'install.json') -Raw|ConvertFrom-Json).installerVersion -eq '0.2.0-rc.5')
+    Check 'Failed upgrade restores files and registrations' ($rollback.status -eq 'PASS' -and (Get-Content (Join-Path $installed 'install.json') -Raw|ConvertFrom-Json).installerVersion -eq $PreviousInstallerVersion)
     $mutex=New-Object Threading.Mutex($false,'Local\ExcelSmartListCompare-Setup')
     $held=$mutex.WaitOne(0)
     try{
@@ -58,16 +64,28 @@ try {
     }finally{if($held){$mutex.ReleaseMutex()};$mutex.Dispose()}
     Run-Setup $ReleaseDirectory 'Install' 'upgrade-install'
     $next=Get-Content (Join-Path $installed 'install.json') -Raw|ConvertFrom-Json
-    Check 'RC6 version and exact XLAM installed' ($next.installerVersion -eq '0.2.0-rc.6' -and $next.sha256 -ieq $ExpectedXlamSha256 -and (Get-FileHash (Join-Path $installed 'ExcelSmartListCompare.xlam')).Hash -ieq $ExpectedXlamSha256)
+    Check 'New version and exact XLAM installed' ($next.installerVersion -eq $ExpectedInstallerVersion -and $next.sha256 -ieq $ExpectedXlamSha256 -and (Get-FileHash (Join-Path $installed 'ExcelSmartListCompare.xlam')).Hash -ieq $ExpectedXlamSha256)
     Check 'Final installer script installed exactly' ((Get-FileHash (Join-Path $installed 'Setup.ps1')).Hash -ceq (Get-FileHash (Join-Path $ReleaseDirectory 'Setup.ps1')).Hash)
     Check 'Upgrade retains product trust token' ($next.trustedLocation.token -ceq $previous.trustedLocation.token)
     Check 'Upgrade preserves additional file' ([IO.File]::ReadAllText($extra) -ceq $extraText)
     Run-Setup $ReleaseDirectory 'Install' 'same-version-reinstall'
     Check 'Same version repair retains exact XLAM' ((Get-FileHash (Join-Path $installed 'ExcelSmartListCompare.xlam')).Hash -ieq $ExpectedXlamSha256)
-    & $psExe -NoProfile -STA -File (Join-Path $PSScriptRoot 'windows-window-state.ps1') -SetupPath (Join-Path $ReleaseDirectory 'Setup.ps1') -ExpectedXlamSha256 $ExpectedXlamSha256 -OutputDirectory (Join-Path $output 'window-state') *> (Join-Path $output 'window-state.log')
+    & $psExe -NoProfile -STA -File $WindowTestScript -SetupPath (Join-Path $ReleaseDirectory 'Setup.ps1') -ExpectedXlamSha256 $ExpectedXlamSha256 -OutputDirectory (Join-Path $output 'window-state') *> (Join-Path $output 'window-state.log')
     Check 'Upgraded normal startup and window-state test exit code' ($LASTEXITCODE -eq 0)
-    $window=Get-Content (Join-Path $output 'window-state/window-state.json') -Raw|ConvertFrom-Json
-    Check 'Upgraded binary passes all 70 window-state checks' ($window.Count -eq 70 -and @($window|Where-Object status -ne 'PASS').Count -eq 0)
+    $window=Get-Content (Join-Path (Join-Path $output 'window-state') $WindowResultName) -Raw|ConvertFrom-Json
+    Check ('Upgraded binary passes all '+$WindowCheckCount+' window/content checks') ($window.Count -eq $WindowCheckCount -and @($window|Where-Object status -ne 'PASS').Count -eq 0)
+    if($IncludeSelectionMatrix){
+        $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $ReleaseDirectory 'Setup.ps1'),[ref]$null,[ref]$null)
+        foreach($f in $ast.FindAll({param($n)$n -is [Management.Automation.Language.FunctionDefinitionAst]},$false)){. ([scriptblock]::Create($f.Extent.Text))}
+        $script:Excel=$null;$script:ExcelVersion=$null;$script:ExcelProcess=$null;$script:ExcelBootstrap=$null;$script:ExcelSessionBook=$null
+        try{
+            Start-OwnExcel -NormalStart
+            & $psExe -NoProfile -STA -File (Join-Path $PSScriptRoot 'windows-public-matrix.ps1') -OwnedPid $script:ExcelProcess.Id -OutputDirectory (Join-Path $output 'matrix') *> (Join-Path $output 'matrix.log')
+            Check 'Selection matrix exit code' ($LASTEXITCODE -eq 0)
+            $matrix=Get-Content (Join-Path $output 'matrix/public-matrix.json') -Raw|ConvertFrom-Json
+            Check 'All 14 selection scenarios passed' ($matrix.Count -eq 14 -and @($matrix|Where-Object status -ne 'PASS').Count -eq 0)
+        }finally{Stop-OwnExcel}
+    }
     Run-Setup $ReleaseDirectory 'Uninstall' 'upgraded-uninstall'
     Check 'Uninstall preserves additional file' ((Test-Path -LiteralPath $extra) -and [IO.File]::ReadAllText($extra) -ceq $extraText)
     Check 'Uninstall removes product payload and ownership marker' (-not(Test-Path -LiteralPath (Join-Path $installed 'ExcelSmartListCompare.xlam')) -and -not(Test-Path -LiteralPath (Join-Path $installed 'install.json')))

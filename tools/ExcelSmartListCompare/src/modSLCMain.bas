@@ -25,6 +25,7 @@ Private mStarted As Double
 Private mCancelled As Boolean
 Private mUiAttached As Boolean
 Private mAppEvents As CSLCAppEvents
+Private mRibbonLoaded As Boolean
 Private mOwnStatus As Boolean
 Private mPreviousStatus As Variant
 Private mLastStatus As String
@@ -36,6 +37,79 @@ End Function
 Public Function SLC_UiReady() As Boolean
     SLC_UiReady = mUiAttached
 End Function
+
+Public Sub SLC_RibbonLoad(ByVal ribbon As Office.IRibbonUI)
+    mRibbonLoaded = True
+End Sub
+
+Public Function SLC_RibbonReady() As Boolean
+    SLC_RibbonReady = mRibbonLoaded
+End Function
+
+Public Function SLC_ReleaseVersion() As String
+    SLC_ReleaseVersion = "0.2.0-rc.7"
+End Function
+
+Public Sub SLC_GetContextMenu(ByVal control As Office.IRibbonControl, ByRef content)
+    content = SLC_MenuXml(control.Tag)
+End Sub
+
+Public Function SLC_MenuXml(Optional ByVal menuKind As String = "Cell") As String
+    Dim prefix As String, xml As String
+    Select Case menuKind
+        Case "Cell", "Row", "Column", "Table", "CellLayout", "RowLayout", "ColumnLayout", "TableLayout"
+            prefix = "slc68" & menuKind
+        Case Else
+            Err.Raise 5, "SLC_MenuXml", "Unknown product menu."
+    End Select
+    ' Called on every drop, independent of workbook/window event delivery.
+    ' Only read the process snapshot; never inspect or change a selection here.
+    xml = "<menu xmlns=""http://schemas.microsoft.com/office/2009/07/customui"">"
+    If mPending Is Nothing Then
+        xml = xml & MenuButton(prefix & "Capture", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30"), "SLC_CaptureClick")
+    Else
+        xml = xml & MenuButton(prefix & "Compare", SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50"), "SLC_CompareClick")
+        xml = xml & "<button id=""" & prefix & "Count"" enabled=""false"" label=""" & _
+              SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(mPending.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9") & """/>"
+        xml = xml & MenuButton(prefix & "Clear", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BE44 C6B0 AE30"), "SLC_ClearClick")
+        xml = xml & MenuButton(prefix & "Replace", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BC14 AFB8 AE30"), "SLC_ReplaceClick")
+    End If
+    xml = xml & MenuButton(prefix & "About", SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_AboutClick")
+    SLC_MenuXml = xml & "</menu>"
+End Function
+
+Private Function MenuButton(ByVal id As String, ByVal label As String, ByVal action As String) As String
+    ' All attributes are product constants or the allow-listed menu prefix.
+    MenuButton = "<button id=""" & id & """ label=""" & label & """ onAction=""" & action & """/>"
+End Function
+
+Public Sub SLC_CaptureClick(ByVal control As Office.IRibbonControl)
+    SLC_Capture
+End Sub
+Public Sub SLC_CompareClick(ByVal control As Office.IRibbonControl)
+    SLC_Compare
+End Sub
+Public Sub SLC_ClearClick(ByVal control As Office.IRibbonControl)
+    SLC_Clear
+End Sub
+Public Sub SLC_ReplaceClick(ByVal control As Office.IRibbonControl)
+    SLC_Replace
+End Sub
+Public Sub SLC_AboutClick(ByVal control As Office.IRibbonControl)
+    SLC_About
+End Sub
+
+Public Sub SLC_Capture()
+    RunSelection True
+End Sub
+Public Sub SLC_Compare()
+    If mBusy Then Exit Sub
+    If mPending Is Nothing Then
+        MsgBox SLC_U("BA3C C800 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30 005D B97C 0020 B204 B974 C138 C694 002E"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
+        Exit Sub
+    End If
+    RunSelection False
+End Sub
 
 Public Sub Auto_Open()
     SLC_AttachUI
@@ -52,7 +126,7 @@ End Sub
 
 ' Never calls OnKey, CommandBars.Reset, SendKeys, or changes the clipboard.
 Public Sub SLC_AttachUI()
-    Dim bar As CommandBar, menuName As Variant, pop As CommandBarPopup
+    Dim bar As CommandBar
     On Error GoTo Failed
     If mUiAttached Then Exit Sub
     RemoveOwnUI
@@ -63,22 +137,7 @@ Public Sub SLC_AttachUI()
     AddButton bar.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BC14 AFB8 AE30"), "SLC_Replace", "replace"
     AddButton bar.Controls, SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_About", "about"
     bar.Visible = True
-    For Each menuName In Array("Cell", "Row", "Column")
-        Set bar = Nothing
-        On Error Resume Next
-        Set bar = Application.CommandBars(CStr(menuName))
-        On Error GoTo Failed
-        If Not bar Is Nothing Then
-            Set pop = bar.Controls.Add(Type:=msoControlPopup, Temporary:=True)
-            pop.Tag = UI_TAG
-            pop.Caption = SLC_U("BA85 B2E8 0020 BE44 AD50")
-            AddButton pop.Controls, SLC_U("BA85 B2E8 0020 BE44 AD50"), "SLC_Run", "run"
-            AddButton pop.Controls, "", "", "pending"
-            AddButton pop.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BE44 C6B0 AE30"), "SLC_Clear", "clear"
-            AddButton pop.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BC14 AFB8 AE30"), "SLC_Replace", "replace"
-            AddButton pop.Controls, SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_About", "about"
-        End If
-    Next menuName
+    ' Context menus are registered by customUI14.xml, never by legacy controls.
     Set mAppEvents = New CSLCAppEvents
     Set mAppEvents.ExcelApp = Application
     mUiAttached = True
@@ -766,7 +825,7 @@ Private Sub FlushOutput(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef 
 End Sub
 
 Public Sub SLC_About()
-    MsgBox "Excel Smart List Compare " & VERSION_TEXT & vbCrLf & vbCrLf & _
+    MsgBox "Excel Smart List Compare " & SLC_ReleaseVersion() & vbCrLf & vbCrLf & _
         SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & _
         SLC_U("C774 C5B4 C11C 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & vbCrLf & _
         SLC_U("BAA9 B85D C740 0020 C120 D0DD D55C 0020 C140 0020 C804 CCB4 002C 0020 D56D BAA9 C740 0020 ADF8 0020 C548 C758 0020 AC12 0020 D558 B098 C785 B2C8 B2E4 002E") & vbCrLf & _

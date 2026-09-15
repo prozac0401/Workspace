@@ -57,3 +57,9 @@ MSI: FolderState-0.1.0-win-x64.msi. SHA-256: `b96eb391ce3bbb3fb8a1ea2d025690cc96
 21:22 KST 감사에서 두 도구 모두 미설치로 복원됐다. Excel 프로세스 0개, 제품 메뉴·등록 없음, 보안/정책/타 추가 기능 및 OPEN 값 14개 범주가 시작 전과 같았다. AccessVBOM 임시 허용은 원래 값 없음 상태로 원복했다. 원래 업무 파일·기존 Excel·다른 추가 기능을 변경하지 않았다.
 
 패키지·해시·실제 캡처 안내·식별자 없는 검증만 공개한다. 원시 계정 SID·레지스트리·MSI 진단·사용자 자료는 로컬 artifacts에 둔다. Python, CI, 정적 검사를 실제 Excel 또는 화면 클릭 통과로 대체하지 않는다.
+
+## Excel RC7 · 메뉴를 여는 시점에 내용 구성
+
+RC6에서도 두 파일의 메뉴가 다르다는 후속 보고를 반영했다. 파일을 각각 열거나 첫 파일에서 두 번째 파일을 열어도 같다는 사용자 확인에 따라 열기 방식을 원인으로 단정하지 않는다. RibbonX 메뉴가 열릴 때마다 현재 목록 상태로 내용을 구성하고 담기·비교 명령을 분리했다.
+
+[RC7 평가용 릴리즈](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7)는 새 XLAM, 설치·소스 ZIP, 검증 요약을 제공한다. Office 메뉴 정의 로드, 164개 내용·창 단언, 내장 19개와 선택 14개, RC6 → RC7 설치 수명주기 21개를 확인했다. 임시 VBA 접근·시험 설치·관련 설정은 원복했다. 실제 우클릭 표시·클릭·Esc는 잠금으로 미실행이며 사용자 재보고의 해결을 확정하지 않는다. [검증과 제한](../../tools/ExcelSmartListCompare/docs/CONTEXT_MENU_REPORT.md)을 확인한다.

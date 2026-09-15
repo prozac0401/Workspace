@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="SLC_RibbonLoad">
+  <contextMenus>
+    <contextMenu idMso="ContextMenuCell">
+      <dynamicMenu id="slc68CellMenu" tag="Cell" label="명단 비교" getContent="SLC_GetContextMenu" invalidateContentOnDrop="true"/>
+    </contextMenu>
+    <contextMenu idMso="ContextMenuRow">
+      <dynamicMenu id="slc68RowMenu" tag="Row" label="명단 비교" getContent="SLC_GetContextMenu" invalidateContentOnDrop="true"/>
+    </contextMenu>
+    <contextMenu idMso="ContextMenuColumn">
+      <dynamicMenu id="slc68ColumnMenu" tag="Column" label="명단 비교" getContent="SLC_GetContextMenu" invalidateContentOnDrop="true"/>
+    </contextMenu>
+    <contextMenu idMso="ContextMenuListRange">
+      <dynamicMenu id="slc68TableMenu" tag="Table" label="명단 비교" getContent="SLC_GetContextMenu" invalidateContentOnDrop="true"/>
+    </contextMenu>
+    <contextMenu idMso="ContextMenuCellLayout">
+      <dynamicMenu id="slc68CellLayoutMenu" tag="CellLayout" label="명단 비교" getContent="SLC_GetContextMenu" invalidateContentOnDrop="true"/>
+    </contextMenu>
+    <contextMenu idMso="ContextMenuRowLayout">
+      <dynamicMenu id="slc68RowLayoutMenu" tag="RowLayout" label="명단 비교" getContent="SLC_GetContextMenu" invalidateContentOnDrop="true"/>
+    </contextMenu>
+    <contextMenu idMso="ContextMenuColumnLayout">
+      <dynamicMenu id="slc68ColumnLayoutMenu" tag="ColumnLayout" label="명단 비교" getContent="SLC_GetContextMenu" invalidateContentOnDrop="true"/>
+    </contextMenu>
+    <contextMenu idMso="ContextMenuListRangeLayout">
+      <dynamicMenu id="slc68TableLayoutMenu" tag="TableLayout" label="명단 비교" getContent="SLC_GetContextMenu" invalidateContentOnDrop="true"/>
+    </contextMenu>
+  </contextMenus>
+</customUI>
