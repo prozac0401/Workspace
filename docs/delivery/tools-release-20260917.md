@@ -31,3 +31,20 @@ Excel 화면·결과표·설치·제거 문구와 안내 문서의 수정 소스
 ## 게시 상태
 
 이 기록을 작성할 때는 로컬 제작과 검증을 마쳤으며 원격 게시 전입니다. Git 반영, Release 파일 업로드와 실제 Pages 응답을 확인한 뒤 후속 기록을 추가합니다. 기존 릴리스의 실행 파일·태그·검증 자료는 덮어쓰지 않습니다.
+
+
+## 실제 게시 확인
+
+2026-09-17에 아래 게시와 공개 주소 검증을 마쳤습니다. 위 게시 전 기록은 제작 시점의 상태로 남깁니다.
+
+- 통합 소스 커밋: `221d8dfaed40ee93d97db744e168732aae8869a3`, GitHub `main` 반영.
+- [문서 배포 실행](https://github.com/prozac0401/Workspace/actions/runs/35115199256): strict 빌드·공개 범위 검사·Pages 배포 성공.
+- [Windows 빌드 실행](https://github.com/prozac0401/Workspace/actions/runs/35115199123): 성공. 로컬에서 검사한 MSI를 Release에 게시했으며 CI에서 다시 만든 파일로 바꿔 올리지 않았습니다.
+- [FolderState 0.1.2 RC1](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.2-rc.1): 공개 사전 릴리스. MSI·SHA-256 파일·검증 요약 3개를 올렸고, 업로드한 3개 자산의 크기와 SHA-256이 로컬 파일과 일치합니다.
+- MSI를 인증 없이 공개 다운로드 주소에서 받아 50,461,317바이트와 위 SHA-256이 일치함을 확인했습니다. 내려받은 파일을 설치하지는 않았습니다.
+- [Excel RC7 단일 설치 파일 Release](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7-setup.1): 본문 맨 위에 새 안내 페이지, 후속 취소·제거 실패, 새 한국어 소스와 기존 파일의 구분을 추가했습니다. 기존 자산 7개의 식별자·크기·해시와 소스 커밋은 바꾸지 않았습니다.
+- Excel EXE를 인증 없이 공개 주소에서 받아 2,182,377바이트, SHA-256 `dbac4ab9920e093b1ec5d8c1b29727f6d5c853585cd8f29019d7e75b6a1e69be`가 기존 Release와 일치함을 확인했습니다.
+- 실제 Pages의 공개 15페이지 모두 HTTP 200입니다. 홈페이지의 프로그램 받기 링크, [Excel 설치·사용 페이지](https://prozac0401.github.io/Workspace/tools/excel-list-compare/), [FolderState 설치 페이지](https://prozac0401.github.io/Workspace/tools/folderstate/installation/)에서 정확한 버전의 다운로드 주소를 확인했습니다.
+- 공개 검색 경로는 허용한 15개와 일치합니다. 개발 검증 문서·진단 자산 등 제외 주소 4개는 HTTP 404입니다. 공개 CSS와 프로그램 화면은 Git에 기록된 원본 바이트의 SHA-256과 일치합니다. 첫 CSS 대조는 Windows 작업본의 CRLF와 Git의 LF 차이로 실패했으며, 커밋 원본을 기준으로 다시 대조해 일치함을 확인했습니다.
+
+실행 파일에 반영된 것은 FolderState 0.1.2입니다. Excel의 새 문구는 소스에 반영했으며 새 XLAM·배포용 EXE 제작은 아직 하지 않았습니다. 제작용 VBA 접근 설정은 변경하지 않았습니다. 기존 RC8의 취소 실패와 배포 보류를 유지합니다.

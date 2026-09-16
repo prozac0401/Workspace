@@ -1,5 +1,11 @@
 # 검증 기록
 
+## 다운로드 페이지·Release 게시 완료 · 2026-09-17
+
+통합 커밋 `221d8df`를 GitHub main에 반영했습니다. [Pages 배포](https://github.com/prozac0401/Workspace/actions/runs/35115199256)와 [Windows 빌드](https://github.com/prozac0401/Workspace/actions/runs/35115199123)가 성공했습니다. [실제 게시 검증](tools-release-20260917.md#실제-게시-확인)에 Release·공개 다운로드·15페이지 응답·검색 범위·제외 주소 확인을 기록했습니다.
+
+FolderState 0.1.2 RC1은 새 MSI·해시·검증 요약으로 게시했습니다. Excel RC7은 기존 배포 자산 7개를 보존하고 Release 본문에 후속 실패와 새 문구 미반영을 안내했습니다. Excel 새 XLAM을 만들었다고 표시하지 않습니다.
+
 ## 다운로드 페이지·통합 0.1.2 제작 · 2026-09-17
 
 [통합 검증 기록](tools-release-20260917.md)에 FolderState 37개 엔진 시험·WPF·새 0.1.2 MSI, Excel 소스 검사 63개와 공개 15페이지·30화면 검사를 기록했습니다. 이전 0.1.0 패키지 기록과 구분합니다. 새 Excel XLAM은 제작하지 않았으며 공개 다운로드는 알려진 제한을 적은 기존 RC7입니다. 원격 게시 결과는 후속 기록으로 확인합니다.
