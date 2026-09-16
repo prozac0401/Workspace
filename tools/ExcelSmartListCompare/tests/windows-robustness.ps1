@@ -53,14 +53,14 @@ try {
   'Areas5001' {$selected=Areas $b 5001}
   'Scan200000No' {$b.Range('A1').Value2='first';$b.Range('T10000').Value2='last';$selected=$b.Range('A1:T10000')}
   'Scan2000001' {$b.Range('A1').Value2='first';$b.Range('C666667').Value2='last';$selected=$b.Range('A1:C666667')}
-  'Item4096' {$mode='result';$b.Range('A1').Value2=('x'*4096);$selected=$b.Range('A1');$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 1개 항목 / 일치 0개 / 첫 번째 목록 잔여 3개 / 두 번째 목록 잔여 1개'}
+  'Item4096' {$mode='result';$b.Range('A1').Value2=('x'*4096);$selected=$b.Range('A1');$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 1개 항목 / 일치 0개 / 첫 번째 목록 남은 항목 3개 / 두 번째 목록 남은 항목 1개'}
   'Item4097' {$b.Range('A1').Value2=('x'*4097);$selected=$b.Range('A1')}
-  'Chars5000000' {$mode='result';$b.Range('A1:A1220').Value2=('x'*4096);$b.Range('A1221').Value2=('y'*2880);$selected=$b.Range('A1:A1221');$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 1221개 항목 / 일치 0개 / 첫 번째 목록 잔여 3개 / 두 번째 목록 잔여 1221개'}
+  'Chars5000000' {$mode='result';$b.Range('A1:A1220').Value2=('x'*4096);$b.Range('A1221').Value2=('y'*2880);$selected=$b.Range('A1:A1221');$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 1221개 항목 / 일치 0개 / 첫 번째 목록 남은 항목 3개 / 두 번째 목록 남은 항목 1221개'}
   'Chars5000001' {$b.Range('A1:A1220').Value2=('x'*4096);$b.Range('A1221').Value2=('y'*2881);$selected=$b.Range('A1:A1221')}
-  'Worst100k' {$mode='worst';FillUnique $a 'A_' 100000;FillUnique $b 'B_' 100000;$base=$a.Range('A1:A100000');$selected=$b.Range('A1:A100000');$expected='첫 번째 목록: 100000개 항목 / 두 번째 목록: 100000개 항목 / 일치 0개 / 첫 번째 목록 잔여 100000개 / 두 번째 목록 잔여 100000개'}
+  'Worst100k' {$mode='worst';FillUnique $a 'A_' 100000;FillUnique $b 'B_' 100000;$base=$a.Range('A1:A100000');$selected=$b.Range('A1:A100000');$expected='첫 번째 목록: 100000개 항목 / 두 번째 목록: 100000개 항목 / 일치 0개 / 첫 번째 목록 남은 항목 100000개 / 두 번째 목록 남은 항목 100000개'}
   'Worst100kTimeout' {$mode='timeout';FillUnique $a 'A_' 100000;FillUnique $b 'B_' 100000;$base=$a.Range('A1:A100000');$selected=$b.Range('A1:A100000')}
   'LargeCancel' {FillUnique $b 'C_' 100000;$selected=$b.Range('A1:A100000')}
-  'Repeated50' {$mode='repeat';$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 3개 항목 / 일치 2개 / 첫 번째 목록 잔여 1개 / 두 번째 목록 잔여 1개'}
+  'Repeated50' {$mode='repeat';$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 3개 항목 / 일치 2개 / 첫 번째 목록 남은 항목 1개 / 두 번째 목록 남은 항목 1개'}
  }
  $source=Join-Path $output 'Synthetic-Source.xlsx'
  $null=$book.GetType().InvokeMember('SaveAs',[Reflection.BindingFlags]::InvokeMethod,$null,$book,@([string]$source,[int]51))
@@ -89,7 +89,7 @@ try {
    $record['captionBefore']=$before;$record['captionAfter']=Caption
    Check 'baseline preserved' ((Caption) -ceq $before);Check 'no partial result workbook' ($e.Workbooks.Count -eq $bookCount)
    # Demonstrate that the next ordinary comparison still works after rejection.
-   if($mode -ne 'timeout' -and $Case -ne 'Combined20000No'){$a.Activate();$base.Select();Run 'compare-preserved-baseline';$result=$e.ActiveWorkbook;$books.Add($result);Check 'preserved baseline compares correctly' ([string]$result.Worksheets.Item(1).Range('B4').Value2 -ceq '첫 번째 목록: 3개 항목 / 두 번째 목록: 3개 항목 / 일치 3개 / 첫 번째 목록 잔여 0개 / 두 번째 목록 잔여 0개')}
+   if($mode -ne 'timeout' -and $Case -ne 'Combined20000No'){$a.Activate();$base.Select();Run 'compare-preserved-baseline';$result=$e.ActiveWorkbook;$books.Add($result);Check 'preserved baseline compares correctly' ([string]$result.Worksheets.Item(1).Range('B4').Value2 -ceq '첫 번째 목록: 3개 항목 / 두 번째 목록: 3개 항목 / 일치 3개 / 첫 번째 목록 남은 항목 0개 / 두 번째 목록 남은 항목 0개')}
   }else{
    $result=$e.ActiveWorkbook;Check 'new result workbook' ([string]$result.Name -ne [string]$book.Name);$books.Add($result);$rs=$result.Worksheets.Item(1)
    $record['summary']=[string]$rs.Range('B4').Value2;Check 'literal summary' ($record.summary -ceq $expected);Check 'result has no formulas' ($rs.UsedRange.HasFormula -eq $false)

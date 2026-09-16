@@ -42,12 +42,12 @@ try{
  Check 'second process owns its two-item snapshot' ($after.Contains('2개 항목'))
  $sheet.Range('B1:B3').Select();$null=$e.Run($q+'SLC_Run');$result=$e.ActiveWorkbook
  $summary=[string]$result.Worksheets.Item(1).Range('B4').Value2;$record['summary']=$summary
- Check 'second process comparison uses only its own snapshot' ($summary -ceq '첫 번째 목록: 2개 항목 / 두 번째 목록: 3개 항목 / 일치 0개 / 첫 번째 목록 잔여 2개 / 두 번째 목록 잔여 3개')
+ Check 'second process comparison uses only its own snapshot' ($summary -ceq '첫 번째 목록: 2개 항목 / 두 번째 목록: 3개 항목 / 일치 0개 / 첫 번째 목록 남은 항목 2개 / 두 번째 목록 남은 항목 3개')
  $file=Join-Path $output 'Second-Process-Result.xlsx';$null=$result.GetType().InvokeMember('SaveAs',[Reflection.BindingFlags]::InvokeMethod,$null,$result,@([string]$file,[int]51))
  Check 'first process remains running with same identity' ((Get-Process -Id $FirstPid).StartTime -eq $firstStarted)
  Check 'first process snapshot caption unchanged' ([string]$firstExcel.CommandBars.Item('SLC_68A45C44_Toolbar').Controls.Item(2).Caption -ceq $firstCaption)
  $firstBook.Activate();$firstSheet.Range('B1:B4').Select();$null=$firstExcel.Run($q+'SLC_Run');$firstResult=$firstExcel.ActiveWorkbook
- Check 'first process still compares its own snapshot' ([string]$firstResult.Worksheets.Item(1).Range('B4').Value2 -ceq '첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 0개 / 첫 번째 목록 잔여 3개 / 두 번째 목록 잔여 4개')
+ Check 'first process still compares its own snapshot' ([string]$firstResult.Worksheets.Item(1).Range('B4').Value2 -ceq '첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 0개 / 첫 번째 목록 남은 항목 3개 / 두 번째 목록 남은 항목 4개')
  $record.status='PASS'
 }catch{$record.status='FAIL';$record['error']=$_.Exception.Message;throw}
 finally{

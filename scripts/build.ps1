@@ -1,5 +1,5 @@
 ﻿[CmdletBinding()]
-param([string]$Version = '0.1.1', [switch]$SkipTests)
+param([string]$Version = '0.1.2', [switch]$SkipTests)
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $repoRoot
@@ -84,7 +84,7 @@ foreach ($file in (Get-ChildItem -LiteralPath $publish -File -Recurse | Sort-Obj
     [void]$dirNodes[$parent].AppendChild($component)
     [void]$xml.Wix.Fragment.ComponentGroup[0].AppendChild((Element 'ComponentRef' @{Id=$id}))
 }
-$menu = @(@('01Todo','미착수','set todo','todo'),@('02Doing','진행 중','set doing','doing'),@('03Done','완료','set done','done'),@('04Issue','이슈','set issue','issue'),@('05Reset','상태 초기화','reset','app'),@('06Repair','상태 아이콘 복구','repair','app'))
+$menu = @(@('01Todo','시작 전','set todo','todo'),@('02Doing','진행 중','set doing','doing'),@('03Done','완료','set done','done'),@('04Issue','확인 필요','set issue','issue'),@('05Reset','상태 표시 지우기','reset','app'),@('06Repair','아이콘 다시 표시','repair','app'))
 foreach ($item in $menu) {
     $component = Element 'Component' @{Id="Menu$($item[0])";Guid='*';Directory='INSTALLFOLDER'}
     $key = "Software\Classes\Directory\shell\Workspace.FolderState\shell\$($item[0])"

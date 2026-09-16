@@ -11,7 +11,7 @@ internal static class ShellRefresh
     {
         if (!OperatingSystem.IsWindows()) return null;
         if (folder.Length >= 260)
-            return "상태는 저장했습니다. 긴 경로는 Windows 폴더 설정 갱신 API의 범위를 넘어 화면 반영이 지연될 수 있습니다.";
+            return "상태는 저장했습니다. 폴더 경로가 길어 아이콘이 늦게 바뀔 수 있습니다. 탐색기에서 F5를 누르거나 폴더 창을 다시 열어 주세요.";
         int initialized = CoInitializeEx(IntPtr.Zero, 0);
         try
         {
@@ -22,7 +22,7 @@ internal static class ShellRefresh
             return null;
         }
         catch (Exception ex) when (ex is ExternalException)
-        { return "상태는 저장했지만 Windows 폴더 설정 캐시를 갱신하지 못했습니다. 해당 창을 새로고침해 주세요."; }
+        { return "상태는 저장했지만 Windows에 아이콘 변경을 적용하지 못했습니다. 탐색기에서 F5를 누르거나 폴더 창을 다시 열어 주세요."; }
         finally { if (initialized >= 0) CoUninitialize(); }
     }
     private sealed class UnicodeString(string value) : IDisposable
@@ -45,7 +45,7 @@ internal static class ShellRefresh
             return null;
         }
         catch (Exception ex) when (ex is COMException or ExternalException)
-        { return "상태는 저장했지만 탐색기에 갱신 알림을 전달하지 못했습니다. 해당 창을 새로고침해 주세요."; }
+        { return "상태는 저장했지만 탐색기에 변경 내용을 알리지 못했습니다. 탐색기에서 F5를 누르거나 폴더 창을 다시 열어 주세요."; }
         finally
         {
             if (pidl != IntPtr.Zero) Marshal.FreeCoTaskMem(pidl);

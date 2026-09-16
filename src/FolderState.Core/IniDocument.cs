@@ -10,7 +10,7 @@ internal sealed class IniDocument
     private readonly string newline;
     private IniDocument(string text)
     {
-        if (text.Contains('\0')) throw new StateException("invalid_ini", "INI 파일에 잘못된 문자가 있습니다.");
+        if (text.Contains('\0')) throw new StateException("invalid_ini", "설정 파일에 읽을 수 없는 문자가 있습니다. 파일을 지우지 말고 지원을 요청해 주세요.");
         newline = text.Contains("\r\n", StringComparison.Ordinal) ? "\r\n" : "\n";
         lines = text.Replace("\r\n", "\n", StringComparison.Ordinal).Split('\n').ToList();
         var sections = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -20,11 +20,11 @@ internal sealed class IniDocument
             string trimmed = line.Trim();
             if (trimmed.StartsWith('[') && trimmed.EndsWith(']'))
             {
-                if (!sections.Add(trimmed)) throw new StateException("ambiguous_ini", "중복된 INI 섹션이 있어 기존 설정을 안전하게 변경할 수 없습니다.");
+                if (!sections.Add(trimmed)) throw new StateException("ambiguous_ini", "설정 파일에 같은 이름의 묶음이 둘 이상 있어 어느 것을 바꿀지 정할 수 없습니다. 파일을 그대로 두고 지원을 요청해 주세요.");
                 keys.Clear();
             }
             else if (TryKey(line, out string key) && !keys.Add(key))
-                throw new StateException("ambiguous_ini", "중복된 INI 항목이 있어 기존 설정을 안전하게 변경할 수 없습니다.");
+                throw new StateException("ambiguous_ini", "설정 파일에 같은 항목이 둘 이상 있어 어느 것을 바꿀지 정할 수 없습니다. 파일을 그대로 두고 지원을 요청해 주세요.");
         }
     }
     public static IniDocument Read(byte[]? bytes)
@@ -47,7 +47,7 @@ internal sealed class IniDocument
                 }
             }
         }
-        catch (DecoderFallbackException) { throw new StateException("invalid_encoding", "INI 파일의 문자 인코딩을 읽을 수 없습니다."); }
+        catch (DecoderFallbackException) { throw new StateException("invalid_encoding", "설정 파일의 문자를 읽을 수 없습니다. 파일을 지우지 말고 지원을 요청해 주세요."); }
         return new IniDocument(text);
     }
     public string? Get(string section, string key)

@@ -35,7 +35,7 @@ foreach($case in @(@('WARN-20000-NO','A1:A20000'),@('EMPTY-B-PRESERVED','F1:F3')
 $sheet.Range('H1:H3').Select();$null=$e.Run($q+'SLC_Run')
 $result=$e.ActiveWorkbook;$rs=$result.Worksheets.Item(1)
 $summary=[string]$rs.Range('B4').Value2
-$passed=($summary -eq '첫 번째 목록: 3개 항목 / 두 번째 목록: 3개 항목 / 일치 3개 / 첫 번째 목록 잔여 0개 / 두 번째 목록 잔여 0개')
+$passed=($summary -eq '첫 번째 목록: 3개 항목 / 두 번째 목록: 3개 항목 / 일치 3개 / 첫 번째 목록 남은 항목 0개 / 두 번째 목록 남은 항목 0개')
 $resultPath=Join-Path $output 'preserved-snapshot-result.xlsx'
 $null=$result.GetType().InvokeMember('SaveAs',[Reflection.BindingFlags]::InvokeMethod,$null,$result,@([string]$resultPath,[int]51))
 $results.Add([ordered]@{id='PRESERVED-SNAPSHOT-COMPARE';status=if($passed){'PASS'}else{'FAIL'};summary=$summary})

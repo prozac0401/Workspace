@@ -13,7 +13,7 @@ public partial class App : Application
         {
             var command = Commands.Parse(e.Args);
             if (command.Action == "status")
-            { var state = await Task.Run(() => Commands.CreateEngine().ReadState(command.Folders[0])); MessageBox.Show(state?.Status.Label() ?? "상태 미지정", "FolderState"); Shutdown(0); return; }
+            { var state = await Task.Run(() => Commands.CreateEngine().ReadState(command.Folders[0])); MessageBox.Show(state?.Status.Label() ?? "아직 상태를 표시하지 않은 폴더입니다.", "FolderState"); Shutdown(0); return; }
             var results = await Task.Run(() => Commands.Run(Commands.CreateEngine(), command));
             var failures = results.Where(r => !r.Success || r.Warning is not null).ToArray();
             if (failures.Length > 0) MessageBox.Show(string.Join("\n\n", failures.Select(r => $"{r.TargetPath}\n{r.Message}\n{r.Warning}")), "FolderState · 작업 결과", MessageBoxButton.OK, MessageBoxImage.Warning);

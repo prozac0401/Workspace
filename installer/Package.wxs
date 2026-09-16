@@ -1,10 +1,10 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package Name="FolderState" Manufacturer="Workspace" Version="$(var.Version)" UpgradeCode="71B69B50-56F6-4FDC-A225-26B88FA22D50" Language="1042" Codepage="65001" Scope="perUser" InstallerVersion="500">
-    <SummaryInformation Description="FolderState user installation" Manufacturer="Workspace" Codepage="1252"/>
-    <MajorUpgrade DowngradeErrorMessage="더 최신 버전의 FolderState가 설치되어 있습니다." Schedule="afterInstallInitialize"/>
+    <SummaryInformation Description="FolderState 설치 파일" Keywords="FolderState, 설치, 폴더 상태" Manufacturer="Workspace" Codepage="949"/>
+    <MajorUpgrade DowngradeErrorMessage="더 새로운 버전의 FolderState가 이미 설치되어 있습니다. 설치된 프로그램을 사용해 주세요." Schedule="afterInstallInitialize"/>
     <MediaTemplate EmbedCab="yes" CompressionLevel="high"/>
     <Property Id="WINDOWSBUILD"><RegistrySearch Id="WindowsCurrentBuild" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Name="CurrentBuildNumber" Type="raw" Bitness="always64"/></Property>
-    <Launch Condition="Installed OR (VersionNT64 AND WINDOWSBUILD &gt;= 22000)" Message="FolderState는 Windows 11 x64 이상에서 사용할 수 있습니다."/>
+    <Launch Condition="Installed OR (VersionNT64 AND WINDOWSBUILD &gt;= 22000)" Message="FolderState를 설치하려면 Windows 11 이상을 사용하는 x64 PC가 필요합니다."/>
     <Property Id="ARPPRODUCTICON" Value="FolderStateIcon"/>
     <Property Id="SAVEDINSTALLFOLDER"><RegistrySearch Id="RememberedInstallFolder" Root="HKCU" Key="Software\Workspace\FolderState" Name="InstallFolder" Type="raw"/></Property>
     <SetProperty Id="INSTALLFOLDER" Value="[SAVEDINSTALLFOLDER]" After="AppSearch" Sequence="both" Condition="SAVEDINSTALLFOLDER AND NOT INSTALLFOLDER"/>
@@ -48,26 +48,26 @@
       <Property Id="DefaultUIFont" Value="DefaultFont"/>
       <Dialog Id="Welcome" Width="420" Height="280" Title="FolderState 설치">
         <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" Text="{\TitleFont}FolderState 설치"/>
-        <Control Id="Body" Type="Text" X="24" Y="78" Width="370" Height="90" Text="탐색기에서 폴더의 업무 상태를 표시합니다.&#13;&#10;현재 사용자에게 설치하며 관리자 권한이 필요하지 않습니다.&#13;&#10;&#13;&#10;설치 후: 폴더 우클릭 → 더 많은 옵션 표시 → 업무 상태"/>
+        <Control Id="Body" Type="Text" X="24" Y="78" Width="370" Height="90" Text="폴더 아이콘으로 진행 상황을 표시합니다.&#13;&#10;지금 로그인한 Windows 계정에 설치합니다.&#13;&#10;관리자 권한은 필요하지 않습니다.&#13;&#10;&#13;&#10;설치 후에는 폴더를 오른쪽 클릭하고&#13;&#10;더 많은 옵션 표시 → 업무 상태를 선택하세요."/>
         <Control Id="Folder" Type="Text" X="24" Y="180" Width="370" Height="38" Text="설치 위치: [INSTALLFOLDER]"/>
         <Control Id="Install" Type="PushButton" X="230" Y="238" Width="76" Height="24" Default="yes" Text="설치"><Publish Event="EndDialog" Value="Return"/></Control>
         <Control Id="Cancel" Type="PushButton" X="316" Y="238" Width="76" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit"/></Control>
       </Dialog>
-      <Dialog Id="Progress" Width="420" Height="220" Title="FolderState 설치 중" Modeless="yes">
-        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" TabSkip="no" Text="{\TitleFont}FolderState 설치 중"/>
+      <Dialog Id="Progress" Width="420" Height="220" Title="FolderState 작업 중" Modeless="yes">
+        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" TabSkip="no" Text="{\TitleFont}잠시 기다려 주세요"/>
         <Control Id="Action" Type="Text" X="24" Y="82" Width="370" Height="40"><Subscribe Event="ActionText" Attribute="Text"/></Control>
         <Control Id="ProgressBar" Type="ProgressBar" X="24" Y="133" Width="370" Height="18" ProgressBlocks="yes"><Subscribe Event="SetProgress" Attribute="Progress"/></Control>
       </Dialog>
-      <Dialog Id="Maintenance" Width="420" Height="250" Title="FolderState 유지 관리">
-        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" Text="{\TitleFont}FolderState 유지 관리"/>
-        <Control Id="Body" Type="Text" X="24" Y="82" Width="370" Height="85" Text="누락되거나 손상된 프로그램 파일과 메뉴를 복구할 수 있습니다.&#13;&#10;&#13;&#10;제거 시 프로그램과 메뉴가 삭제됩니다.&#13;&#10;업무 폴더의 파일과 상태정보는 보존됩니다."/>
-        <Control Id="Repair" Type="PushButton" X="144" Y="202" Width="76" Height="24" Default="yes" Text="복구"><Publish Property="REINSTALL" Value="ALL"/><Publish Property="REINSTALLMODE" Value="amus"/><Publish Event="EndDialog" Value="Return"/></Control>
-        <Control Id="Remove" Type="PushButton" X="230" Y="202" Width="76" Height="24" Text="제거"><Publish Property="REMOVE" Value="ALL"/><Publish Event="EndDialog" Value="Return"/></Control>
+      <Dialog Id="Maintenance" Width="420" Height="250" Title="FolderState 복구 또는 제거">
+        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" Text="{\TitleFont}복구 또는 제거를 선택하세요"/>
+        <Control Id="Body" Type="Text" X="24" Y="82" Width="370" Height="85" Text="프로그램 복구: 프로그램 파일과 탐색기 메뉴를 다시 설치합니다.&#13;&#10;&#13;&#10;프로그램 제거: 프로그램과 탐색기 메뉴, 작업 기록을 지웁니다.&#13;&#10;업무 폴더와 파일, 저장된 상태는 그대로 둡니다."/>
+        <Control Id="Repair" Type="PushButton" X="104" Y="202" Width="96" Height="24" Default="yes" Text="프로그램 복구"><Publish Property="REINSTALL" Value="ALL"/><Publish Property="REINSTALLMODE" Value="amus"/><Publish Event="EndDialog" Value="Return"/></Control>
+        <Control Id="Remove" Type="PushButton" X="210" Y="202" Width="96" Height="24" Text="프로그램 제거"><Publish Property="REMOVE" Value="ALL"/><Publish Event="EndDialog" Value="Return"/></Control>
         <Control Id="Cancel" Type="PushButton" X="316" Y="202" Width="76" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit"/></Control>
       </Dialog>
       <Dialog Id="Complete" Width="420" Height="240" Title="FolderState">
-        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" Text="{\TitleFont}작업이 완료되었습니다"/>
-        <Control Id="Body" Type="Text" X="24" Y="80" Width="370" Height="88" Text="최초 실행 없이 폴더 우클릭 → 더 많은 옵션 표시 → 업무 상태를 사용할 수 있습니다. 재부팅 후에도 사용할 수 있습니다.&#13;&#10;탐색기 메뉴가 보이지 않으면 탐색기 창을 다시 열어 주세요.&#13;&#10;&#13;&#10;업무 폴더의 상태정보는 프로그램 제거 후에도 보존됩니다."/>
+        <Control Id="Title" Type="Text" X="24" Y="24" Width="370" Height="35" Text="{\TitleFont}작업을 마쳤습니다"/>
+        <Control Id="Body" Type="Text" X="24" Y="80" Width="370" Height="88" Text="설치나 복구 후에는 시작 메뉴에서 FolderState를 열 수 있습니다.&#13;&#10;프로그램을 열지 않고 탐색기 메뉴에서 바로 사용해도 됩니다.&#13;&#10;PC를 다시 시작해도 탐색기 메뉴는 남아 있습니다.&#13;&#10;탐색기 메뉴가 안 보이면 탐색기 창을 다시 열어 주세요.&#13;&#10;&#13;&#10;프로그램을 제거해도 업무 파일과 저장된 상태는 남아 있습니다."/>
         <Control Id="Close" Type="PushButton" X="316" Y="195" Width="76" Height="24" Default="yes" Cancel="yes" Text="닫기"><Publish Event="EndDialog" Value="Return"/></Control>
       </Dialog>
       <InstallUISequence><Show Dialog="Welcome" Before="Maintenance" Condition="NOT Installed"/><Show Dialog="Maintenance" Before="Progress" Condition="Installed AND NOT REMOVE AND NOT REINSTALL"/><Show Dialog="Progress" Before="ExecuteAction"/><Show Dialog="Complete" OnExit="success"/></InstallUISequence>

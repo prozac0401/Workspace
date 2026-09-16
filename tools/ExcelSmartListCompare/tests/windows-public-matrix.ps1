@@ -23,20 +23,20 @@ try {
         $a=$book.Worksheets.Item(1);$a.Name='A';$b=$book.Worksheets.Add();$b.Name='B'
         Fill $a @('A1','A2','A3','A4') @('one','one','two','three')
         Fill $b @('H1','H2','H3','H4') @('one','two','three','four')
-        $ra=$a.Range('A1:A4');$rb=$b.Range('H1:H4');$expected='첫 번째 목록: 4개 항목 / 두 번째 목록: 4개 항목 / 일치 3개 / 첫 번째 목록 잔여 1개 / 두 번째 목록 잔여 1개'
+        $ra=$a.Range('A1:A4');$rb=$b.Range('H1:H4');$expected='첫 번째 목록: 4개 항목 / 두 번째 목록: 4개 항목 / 일치 3개 / 첫 번째 목록 남은 항목 1개 / 두 번째 목록 남은 항목 1개'
         switch($id){
             'HORIZONTAL-VERTICAL' {$a.Cells.Clear();Fill $a @('A1','B1','C1','D1') @('one','one','two','three');$ra=$a.Range('A1:D1')}
             'VERTICAL-HORIZONTAL' {$b.Cells.Clear();Fill $b @('H1','I1','J1','K1') @('one','two','three','four');$rb=$b.Range('H1:K1')}
             'RECTANGLE-LINE' {$a.Cells.Clear();Fill $a @('A1','B1','A2','B2') @('one','one','two','three');$ra=$a.Range('A1:B2')}
-            'SINGLE-ONLY' {$ra=$a.Range('A1');$rb=$b.Range('H2');$expected='첫 번째 목록: 1개 항목 / 두 번째 목록: 1개 항목 / 일치 0개 / 첫 번째 목록 잔여 1개 / 두 번째 목록 잔여 1개'}
+            'SINGLE-ONLY' {$ra=$a.Range('A1');$rb=$b.Range('H2');$expected='첫 번째 목록: 1개 항목 / 두 번째 목록: 1개 항목 / 일치 0개 / 첫 번째 목록 남은 항목 1개 / 두 번째 목록 남은 항목 1개'}
             'MULTI-AREA' {$a.Cells.Clear();Fill $a @('A1','A2','C1','C2') @('one','one','two','three');$ra=$e.Union($a.Range('A1:A2'),$a.Range('C1:C2'))}
             'OVERLAP' {$ra=$e.Union($a.Range('A1:A3'),$a.Range('A2:A4'))}
             'WHOLE-ROW' {$a.Cells.Clear();Fill $a @('A1','B1','C1','D1') @('one','one','two','three');$ra=$a.Rows.Item(1)}
             'WHOLE-COLUMN' {$ra=$a.Columns.Item(1)}
-            'HIDDEN-ROW' {$a.Rows.Item(3).Hidden=$true;$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 2개 / 첫 번째 목록 잔여 1개 / 두 번째 목록 잔여 2개'}
-            'HIDDEN-COLUMN' {$a.Cells.Clear();Fill $a @('A1','B1','C1','D1') @('one','one','two','three');$a.Columns.Item(3).Hidden=$true;$ra=$a.Range('A1:D1');$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 2개 / 첫 번째 목록 잔여 1개 / 두 번째 목록 잔여 2개'}
-            'AUTOFILTER-HEADER' {$a.Cells.Clear();Fill $a @('A1','A2','A3','A4','A5') @('heading','one','one','two','three');$null=$a.Range('A1:A5').AutoFilter(1,'<>two');$ra=$a.Range('A1:A5');$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 2개 / 첫 번째 목록 잔여 1개 / 두 번째 목록 잔여 2개'}
-            'TABLE-FILTER-TOTALS' {$a.Cells.Clear();Fill $a @('A1','A2','A3','A4','A5') @('heading','one','one','two','three');$lo=$a.ListObjects.Add(1,$a.Range('A1:A5'),[Type]::Missing,1);$lo.ShowTotals=$true;$null=$lo.Range.AutoFilter(1,'<>two');$ra=$lo.Range;$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 2개 / 첫 번째 목록 잔여 1개 / 두 번째 목록 잔여 2개';Release-Com $lo}
+            'HIDDEN-ROW' {$a.Rows.Item(3).Hidden=$true;$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 2개 / 첫 번째 목록 남은 항목 1개 / 두 번째 목록 남은 항목 2개'}
+            'HIDDEN-COLUMN' {$a.Cells.Clear();Fill $a @('A1','B1','C1','D1') @('one','one','two','three');$a.Columns.Item(3).Hidden=$true;$ra=$a.Range('A1:D1');$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 2개 / 첫 번째 목록 남은 항목 1개 / 두 번째 목록 남은 항목 2개'}
+            'AUTOFILTER-HEADER' {$a.Cells.Clear();Fill $a @('A1','A2','A3','A4','A5') @('heading','one','one','two','three');$null=$a.Range('A1:A5').AutoFilter(1,'<>two');$ra=$a.Range('A1:A5');$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 2개 / 첫 번째 목록 남은 항목 1개 / 두 번째 목록 남은 항목 2개'}
+            'TABLE-FILTER-TOTALS' {$a.Cells.Clear();Fill $a @('A1','A2','A3','A4','A5') @('heading','one','one','two','three');$lo=$a.ListObjects.Add(1,$a.Range('A1:A5'),[Type]::Missing,1);$lo.ShowTotals=$true;$null=$lo.Range.AutoFilter(1,'<>two');$ra=$lo.Range;$expected='첫 번째 목록: 3개 항목 / 두 번째 목록: 4개 항목 / 일치 2개 / 첫 번째 목록 남은 항목 1개 / 두 번째 목록 남은 항목 2개';Release-Com $lo}
         }
         $file=Join-Path $output ($id+'.xlsx')
         $null=$book.GetType().InvokeMember('SaveAs',[Reflection.BindingFlags]::InvokeMethod,$null,$book,@([string]$file,[int]51))
@@ -44,7 +44,7 @@ try {
         if($id -eq 'MANUAL-CALCULATION'){$e.Calculation=-4135}
         $settings=@($e.ScreenUpdating,$e.EnableEvents,$e.Interactive,$e.EnableCancelKey,$e.Calculation)
         $a.Activate();$ra.Select();$null=$e.Run($q+'SLC_Run')
-        if($id -eq 'SAME-RANGE-SNAPSHOT'){$a.Range('A4').Value2='changed';$rb=$ra;$b=$a;$expected='첫 번째 목록: 4개 항목 / 두 번째 목록: 4개 항목 / 일치 3개 / 첫 번째 목록 잔여 1개 / 두 번째 목록 잔여 1개'}
+        if($id -eq 'SAME-RANGE-SNAPSHOT'){$a.Range('A4').Value2='changed';$rb=$ra;$b=$a;$expected='첫 번째 목록: 4개 항목 / 두 번째 목록: 4개 항목 / 일치 3개 / 첫 번째 목록 남은 항목 1개 / 두 번째 목록 남은 항목 1개'}
         $b.Activate();$rb.Select();$null=$e.Run($q+'SLC_Run')
         $result=$e.ActiveWorkbook
         if([string]$result.Name -eq [string]$book.Name){throw 'Expected a new result workbook.'}

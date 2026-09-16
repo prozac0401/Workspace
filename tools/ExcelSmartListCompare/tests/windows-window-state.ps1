@@ -133,7 +133,7 @@ try{
     $a.Activate();Check-Window 'source file closed snapshot retained' 4
     $a.Worksheets.Item(1).Range('A1:A3').Select();Invoke-Menu 1
     $result=$e.ActiveWorkbook
-    Check 'comparison uses replacement snapshot' ($result.Worksheets.Item(1).Range('B4').Value2 -ceq '첫 번째 목록: 4개 항목 / 두 번째 목록: 3개 항목 / 일치 0개 / 첫 번째 목록 잔여 4개 / 두 번째 목록 잔여 3개')
+    Check 'comparison uses replacement snapshot' ($result.Worksheets.Item(1).Range('B4').Value2 -ceq '첫 번째 목록: 4개 항목 / 두 번째 목록: 3개 항목 / 일치 0개 / 첫 번째 목록 남은 항목 4개 / 두 번째 목록 남은 항목 3개')
     Check 'result contains no formulas' ($result.Worksheets.Item(1).UsedRange.HasFormula -eq $false)
     Check-Window 'result window after comparison' 0
     $a.Activate();Check-Window 'first file after comparison' 0

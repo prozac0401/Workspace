@@ -13,12 +13,12 @@ try
     {
         var info = engine.ReadState(command.Folders[0]);
         if (command.Json) Console.WriteLine(JsonSerializer.Serialize(new { success = true, target_path = command.Folders[0], status = info?.Status.Value(), mode = info?.Mode.ToString().ToLowerInvariant(), updated = info?.Updated }));
-        else Console.WriteLine(info is null ? "상태 미지정" : $"{info.Status.Label()} ({info.Mode}) · {info.Updated:O}");
+        else Console.WriteLine(info is null ? "아직 상태를 표시하지 않은 폴더입니다." : $"현재 상태: {info.Status.Label()}\n아이콘 저장 위치: {(info.Mode == IconMode.Local ? "이 PC" : "선택한 폴더 안")}\n마지막으로 바꾼 때: {info.Updated:O}");
         return 0;
     }
     var results = Commands.Run(engine, command);
     if (command.Json) Console.WriteLine(JsonSerializer.Serialize(results));
-    else foreach (var result in results) Console.WriteLine($"{(result.Success ? "OK" : "ERROR")} {result.TargetPath}: {result.Message} {result.Warning}");
+    else foreach (var result in results) Console.WriteLine($"{(result.Success ? "성공" : "실패")} · {result.TargetPath}\n{result.Message}{(result.Warning is null ? "" : "\n안내: " + result.Warning)}");
     return results.All(r => r.Success) ? 0 : 1;
 }
 catch (Exception ex)

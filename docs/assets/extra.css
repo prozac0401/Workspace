@@ -119,6 +119,7 @@ body {
 .handbook-closing p { margin: .6em 0; }
 .page-lead { color: var(--handbook-muted); font-size: .9rem; }
 .md-typeset .section-jumps { display: flex; flex-wrap: wrap; gap: .5rem 1rem; border-block: 1px solid var(--handbook-line); padding: .8rem 0; margin: 1.5rem 0; }
+.md-typeset .section-jumps > p { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin: 0; }
 .section-jumps a { font-size: .75rem; font-weight: 650; }
 .principles-intro { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.6rem; align-items: center; padding: 1rem 0; }
 .principles-intro img { width: 100%; height: auto; max-height: 16rem; object-fit: cover; border-radius: 4px; }

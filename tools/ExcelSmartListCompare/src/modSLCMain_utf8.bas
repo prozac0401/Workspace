@@ -267,7 +267,7 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     End If
     Set selected = Application.Selection
     If Application.ActiveWindow.SelectedSheets.Count > 1 Then
-        MsgBox "그룹 선택된 시트를 해제하고 한 시트의 범위를 선택해 주세요.", vbInformation, "명단 비교"
+        MsgBox "여러 시트가 함께 선택되어 있습니다. 시트 하나만 선택한 뒤 비교할 셀을 선택해 주세요.", vbInformation, "명단 비교"
         Exit Sub
     End If
     If Application.CalculationState <> xlDone Then
@@ -293,8 +293,9 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     Set current = ReadParts(selected, parts, exclusions)
     If current.Total = 0 Then
         ReleaseStatus
-        MsgBox "화면에 남은 선택 셀에서 비교할 값을 찾지 못했습니다." & vbCrLf & _
-               "빈칸·오류값·표 제목/합계 셀은 제외됩니다. 담아 둔 첫 번째 목록은 유지됩니다.", _
+        MsgBox "선택한 셀에 비교할 값이 없습니다." & vbCrLf & _
+               "숨긴 셀, 필터로 가려진 셀, 빈칸, 오류 셀, 표의 제목·합계 셀은 비교에서 뺍니다." & vbCrLf & _
+               "담아 둔 첫 번째 목록이 있다면 그대로 남아 있습니다.", _
                vbInformation, "명단 비교"
         GoTo Finished
     End If
@@ -327,9 +328,9 @@ Failed:
     RefreshUI
     On Error GoTo 0
     If errNo = 18 Or errNo = ERR_CANCEL Then
-        MsgBox "작업을 취소했습니다. 담아 둔 첫 번째 목록은 유지됩니다.", vbInformation, "명단 비교"
+        MsgBox "작업을 취소했습니다. 담아 둔 첫 번째 목록이 있다면 그대로 남아 있습니다.", vbInformation, "명단 비교"
     Else
-        MsgBox errText & vbCrLf & vbCrLf & "담아 둔 첫 번째 목록과 원본 데이터는 변경하지 않았습니다." & _
+        MsgBox errText & vbCrLf & vbCrLf & "담아 둔 첫 번째 목록과 원본 내용은 바뀌지 않았습니다." & _
                vbCrLf & "오류 코드: " & CStr(errNo), vbExclamation, "명단 비교"
     End If
 End Sub
@@ -344,7 +345,7 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
     Dim specialErr As Long
 
     If sel.Areas.Count > MAX_AREAS Then
-        Err.Raise ERR_LIMIT, , "선택 영역 조각이 5,000개를 초과합니다. 범위를 줄여 주세요."
+        Err.Raise ERR_LIMIT, , "따로 선택한 영역이 5,000개를 넘습니다. 선택 범위를 줄여 주세요."
     End If
     ' Intersect, not Find: never changes the user's Find/Replace settings.
     Set bounded = Application.Intersect(sel, sel.Worksheet.UsedRange)
@@ -354,19 +355,20 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
     End If
     scanCount = CDbl(bounded.CountLarge)
     If scanCount > MAX_SCAN Then
-        Err.Raise ERR_LIMIT, , "가시성 확인 대상이 2,000,000셀을 초과합니다." & vbCrLf & _
-            "전체 행/열 대신 실제 값이 있는 작은 범위를 선택해 주세요."
+        Err.Raise ERR_LIMIT, , "숨김 여부를 확인할 셀이 2,000,000개를 넘습니다." & vbCrLf & _
+            "행이나 열 전체를 선택했다면 값이 있는 부분만 다시 선택해 주세요."
     End If
     If bounded.Areas.Count > MAX_AREAS Then
-        Err.Raise ERR_LIMIT, , "선택 영역 조각이 5,000개를 초과합니다."
+        Err.Raise ERR_LIMIT, , "선택한 범위가 5,000개가 넘는 영역으로 나뉘어 있습니다. 선택 범위를 줄여 주세요."
     End If
     If scanCount >= WARN_SCAN Or bounded.Areas.Count >= WARN_AREAS Then
-        text = "선택 범위의 가시성을 확인하는 데 시간이 걸릴 수 있습니다." & vbCrLf & _
-            "확인 대상: " & Format$(scanCount, "#,##0") & "셀" & vbCrLf & _
-            "필터/숨김 확인 후 보이는 셀만 읽습니다." & vbCrLf & _
-            "값 읽기·비교를 계속할까요? [아니요]가 기본입니다."
+        text = "선택한 셀이 많아 숨김 여부를 확인하는 데 시간이 걸릴 수 있습니다." & vbCrLf & _
+            "확인할 셀: " & Format$(scanCount, "#,##0") & "개" & vbCrLf & _
+            "숨긴 셀과 필터로 가려진 셀은 비교에서 뺍니다." & vbCrLf & _
+            "이 시험 버전에서는 Esc를 눌러도 작업이 취소되지 않을 수 있습니다." & vbCrLf & _
+            "계속할까요? 범위를 줄이려면 [아니요]를 누르세요."
         If ask Then
-            If MsgBox(text, vbYesNo + vbExclamation + vbDefaultButton2, "명단 비교 - 대량 작업") <> vbYes Then Exit Function
+            If MsgBox(text, vbYesNo + vbExclamation + vbDefaultButton2, "명단 비교 - 선택 범위 확인") <> vbYes Then Exit Function
         End If
         warned = True
         mStarted = Timer
@@ -375,9 +377,9 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
         Checkpoint
         mergeState = ar.MergeCells
         If IsNull(mergeState) Then
-            Err.Raise ERR_DATA, , "병합 셀이 섞여 있습니다. 병합 셀을 제외한 값 범위를 선택해 주세요."
+            Err.Raise ERR_DATA, , "선택한 범위에 병합된 셀이 있습니다. 병합된 셀을 빼고 다시 선택해 주세요."
         ElseIf CBool(mergeState) Then
-            Err.Raise ERR_DATA, , "병합 셀은 비교하지 않습니다. 병합되지 않은 값 범위를 선택해 주세요."
+            Err.Raise ERR_DATA, , "병합된 셀은 비교할 수 없습니다. 병합되지 않은 셀을 선택해 주세요."
         End If
         Set vis = Nothing
         If ar.CountLarge = 1 Then
@@ -391,22 +393,22 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
             On Error GoTo 0
             If specialErr <> 0 Then
                 If specialErr <> 1004 Then
-                    Err.Raise specialErr, , "보이는 셀을 확인하지 못했습니다."
+                    Err.Raise specialErr, , "어떤 셀이 숨겨져 있는지 확인하지 못했습니다. 다시 실행해 주세요."
                 ElseIf Not EntirelyHidden(ar) Then
                     ' 1004 is ambiguous: do not silently turn a visibility failure into an empty list.
-                    Err.Raise ERR_DATA, , "보이는 셀을 안전하게 확인하지 못했습니다. 선택 범위를 줄여 주세요."
+                    Err.Raise ERR_DATA, , "어떤 셀이 숨겨져 있는지 확인하지 못했습니다. 선택 범위를 줄여 다시 실행해 주세요."
                 End If
             End If
             If Not vis Is Nothing Then Set vis = Application.Intersect(ar, vis)
         End If
         If Not vis Is Nothing Then
             If parts.Count + vis.Areas.Count > MAX_AREAS Then
-                Err.Raise ERR_LIMIT, , "필터로 나뉜 가시 영역이 5,000개를 초과합니다. 선택 범위를 줄여 주세요."
+                Err.Raise ERR_LIMIT, , "비교할 셀이 5,000개가 넘는 영역에 나뉘어 있습니다. 선택 범위를 줄여 주세요."
             End If
             visibleCount = visibleCount + CDbl(vis.CountLarge)
             If visibleCount > MAX_VISIBLE Then
-                Err.Raise ERR_LIMIT, , "한 목록은 보이는 선택 셀 100,000개까지 처리합니다." & vbCrLf & _
-                    "빈칸을 포함한 안전 상한입니다. 숨겨진 셀은 이 수에 넣지 않습니다."
+                Err.Raise ERR_LIMIT, , "한 목록에 담을 수 있는 셀은 100,000개까지입니다. 선택 범위를 줄여 주세요." & vbCrLf & _
+                    "빈칸도 이 개수에 포함합니다. 숨긴 셀과 필터로 가려진 셀은 세지 않습니다."
             End If
             For Each part In vis.Areas
                 parts.Add part
@@ -417,13 +419,14 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
     If combining Then combinedCount = combinedCount + mPending.VisibleCellCount
     If Not warned Then
         If combinedCount >= WARN_VISIBLE Or parts.Count >= WARN_AREAS Then
-            text = "읽기·비교·결과 출력에 시간이 걸릴 수 있습니다." & vbCrLf & _
-                   "이번 선택: 보이는 " & Format$(visibleCount, "#,##0") & "셀 / " & _
+            text = "선택한 값을 읽고 결과를 만드는 데 시간이 걸릴 수 있습니다." & vbCrLf & _
+                   "이번에 선택한 범위: 숨기지 않은 셀 " & Format$(visibleCount, "#,##0") & "개 / " & _
                    Format$(parts.Count, "#,##0") & "개 영역" & vbCrLf & _
-                   "전체 처리 규모: " & Format$(combinedCount, "#,##0") & "셀" & vbCrLf & _
-                   "계속할까요? 실행 중 Esc로 취소할 수 있습니다."
+                   "이번 작업에서 다룰 셀: " & Format$(combinedCount, "#,##0") & "개" & vbCrLf & _
+                   "이 시험 버전에서는 Esc를 눌러도 작업이 취소되지 않을 수 있습니다." & vbCrLf & _
+                   "계속할까요? 범위를 줄이려면 [아니요]를 누르세요."
             If ask Then
-                If MsgBox(text, vbYesNo + vbExclamation + vbDefaultButton2, "명단 비교 - 대량 작업") <> vbYes Then Exit Function
+                If MsgBox(text, vbYesNo + vbExclamation + vbDefaultButton2, "명단 비교 - 선택 범위 확인") <> vbYes Then Exit Function
             End If
         End If
     End If
@@ -528,7 +531,7 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
                     End If
                     tick = tick + 1
                     If tick Mod 512 = 0 Then
-                        SetStatus "명단 비교: " & Format$(result.VisibleCellCount, "#,##0") & "셀 처리 중 / Esc 취소"
+                        SetStatus "명단 비교: 셀 " & Format$(result.VisibleCellCount, "#,##0") & "개 확인 중"
                         Checkpoint
                     End If
                 Next c
@@ -550,11 +553,11 @@ Private Sub AddValue(ByVal list As CSLCList, ByVal v As Variant, ByVal address A
     End If
     raw = CStr(v)
     If Len(raw) > MAX_ITEM_CHARS Then
-        Err.Raise ERR_LIMIT, , address & ": 셀 하나의 값이 4,096자를 초과합니다. 목록 범위를 다시 확인해 주세요."
+        Err.Raise ERR_LIMIT, , address & " 셀의 내용이 4,096자를 넘습니다. 이 셀을 빼고 다시 선택해 주세요."
     End If
     list.RawCharCount = list.RawCharCount + Len(raw)
     If list.RawCharCount > MAX_RAW_CHARS Then
-        Err.Raise ERR_LIMIT, , "한 목록의 전체 텍스트가 5,000,000자를 초과합니다. 범위를 줄여 주세요."
+        Err.Raise ERR_LIMIT, , "선택한 셀의 내용을 모두 합치면 5,000,000자를 넘습니다. 선택 범위를 줄여 주세요."
     End If
     key = SLC_Normalize(v)
     If Len(key) = 0 Then
@@ -590,7 +593,7 @@ Private Function SourceLabel(ByVal rng As Range) As String
         If Len(s) > 0 Then s = s & ", "
         s = s & ar.Address(False, False)
     Next ar
-    If rng.Areas.Count > 6 Then s = s & " ... (" & CStr(rng.Areas.Count) & " areas)"
+    If rng.Areas.Count > 6 Then s = s & " ... (총 " & CStr(rng.Areas.Count) & "개 영역)"
     SourceLabel = rng.Worksheet.Parent.FullName & " / " & rng.Worksheet.Name & "!" & s
 End Function
 
@@ -605,7 +608,7 @@ Private Sub Checkpoint()
     elapsed = Timer - mStarted
     If elapsed < 0 Then elapsed = elapsed + 86400#
     If elapsed > MAX_ACTIVE_SECONDS Then
-        Err.Raise ERR_TIME, , "지연 보호 한도(활성 처리 약 30초)에 도달해 중단했습니다. 범위를 줄여 주세요."
+        Err.Raise ERR_TIME, , "작업 시간이 길어져 중단했습니다. 선택 범위를 줄여 다시 실행해 주세요."
     End If
 End Sub
 
@@ -682,10 +685,10 @@ Private Sub ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList)
     If excessA = 0 And excessB = 0 And a.DuplicateExcess = 0 And b.DuplicateExcess = 0 _
         And a.ErrorCount = 0 And b.ErrorCount = 0 Then
         ReleaseStatus
-        MsgBox "두 목록의 값과 개수가 같습니다." & vbCrLf & _
+        MsgBox "비교 규칙을 적용한 결과, 두 목록의 값과 개수가 같습니다." & vbCrLf & _
             "첫 번째 목록: " & Format$(a.Total, "#,##0") & "개 항목" & vbCrLf & _
             "두 번째 목록: " & Format$(b.Total, "#,##0") & "개 항목" & vbCrLf & _
-            "비교 규칙: 이메일 ID·숫자 표기·대소문자·공백 자동 정리", vbInformation, "명단 비교"
+            "이메일은 @ 앞부분만 비교합니다. 숫자 표기, 영문 대소문자, 일부 공백 차이는 무시합니다.", vbInformation, "명단 비교"
     Else
         WriteResults a, b, keys, matched, excessA, excessB
     End If
@@ -723,34 +726,36 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
     ws.Range("A1:J8").NumberFormat = "@"
     ws.Range("A1:J1").Merge
     ws.Range("A1").Value2 = "명단 비교 결과"
-    ws.Range("A2").Value2 = "첫 번째 목록 출처 / 시점"
+    ws.Range("A2").Value2 = "첫 번째 목록 위치 / 담은 시각"
     ws.Range("B2:J2").Merge
     ws.Range("B2").Value2 = OutputText(a.Source & " / " & Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    ws.Range("A3").Value2 = "두 번째 목록 출처 / 시점"
+    ws.Range("A3").Value2 = "두 번째 목록 위치 / 담은 시각"
     ws.Range("B3:J3").Merge
     ws.Range("B3").Value2 = OutputText(b.Source & " / " & Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
     ws.Range("A4").Value2 = "항목 수"
     ws.Range("B4:J4").Merge
     ws.Range("B4").Value2 = "첫 번째 목록: " & a.Total & "개 항목 / 두 번째 목록: " & b.Total & _
-        "개 항목 / 일치 " & matched & "개 / 첫 번째 목록 잔여 " & excessA & "개 / 두 번째 목록 잔여 " & excessB & "개"
-    ws.Range("A5").Value2 = "중복 / 제외"
+        "개 항목 / 일치 " & matched & "개 / 첫 번째 목록 남은 항목 " & excessA & "개 / 두 번째 목록 남은 항목 " & excessB & "개"
+    ws.Range("A5").Value2 = "중복된 값 / 비교에서 뺀 셀"
     ws.Range("B5:J5").Merge
-    ws.Range("B5").Value2 = "첫 번째 목록: 중복 초과 " & a.DuplicateExcess & "개 / 빈칸 " & a.BlankCount & _
-        "개 / 오류 " & a.ErrorCount & "개 / 표 제목·합계 " & a.MetadataCount & "개" & vbLf & _
-        "두 번째 목록: 중복 초과 " & b.DuplicateExcess & "개 / 빈칸 " & b.BlankCount & _
-        "개 / 오류 " & b.ErrorCount & "개 / 표 제목·합계 " & b.MetadataCount & "개"
+    ws.Range("B5").Value2 = "첫 번째 목록: 중복 " & a.DuplicateExcess & "개 / 비교에서 뺀 셀: 빈칸 " & a.BlankCount & _
+        "개, 오류 " & a.ErrorCount & "개, 표 제목·합계 " & a.MetadataCount & "개" & vbLf & _
+        "두 번째 목록: 중복 " & b.DuplicateExcess & "개 / 비교에서 뺀 셀: 빈칸 " & b.BlankCount & _
+        "개, 오류 " & b.ErrorCount & "개, 표 제목·합계 " & b.MetadataCount & "개" & vbLf & _
+        "중복은 같은 값이 두 번째로 나온 것부터 셉니다. 같은 값이 3개 있으면 중복은 2개입니다."
     ws.Range("A6").Value2 = "비교 규칙"
     ws.Range("B6:J6").Merge
-    ws.Range("B6").Value2 = "이메일 @ 앞부분 / 숫자-문자숫자 통일 / 앞자리 0 보존 / 공백·대소문자 정리 / 값별 개수 비교"
+    ws.Range("B6").Value2 = "이메일은 @ 앞부분만 비교합니다. 숫자 표기·영문 대소문자·일부 공백 차이는 무시합니다. 문자로 입력한 00123과 숫자 123은 다르게 봅니다." & vbLf & _
+        "남은 개수: 같은 값이 첫 번째에 2개, 두 번째에 1개면 첫 번째에 1개가 남습니다."
     ws.Range("A7:J7").Merge
     If a.ErrorCount + b.ErrorCount > 0 Then
-        ws.Range("A7").Value2 = "주의: 오류 셀을 제외한 결과입니다. 두 원본 전체가 동일하다는 의미가 아닙니다."
+        ws.Range("A7").Value2 = "오류 셀을 뺀 결과이므로 원본 전체가 같다고 볼 수는 없습니다. 원래 값 (예)와 셀 주소는 해당 항목이 각 목록에서 처음 나온 셀을 보여줍니다."
     Else
-        ws.Range("A7").Value2 = "표에는 차이·중복만 표시합니다. 주소와 원본 예는 해당 키의 첫 번째 셀입니다."
+        ws.Range("A7").Value2 = "표에는 차이·중복만 보여줍니다. 원래 값 (예)와 셀 주소는 해당 항목이 각 목록에서 처음 나온 셀을 보여줍니다."
     End If
-    labels = Array("상태", "비교키", "첫 번째 목록 원본 예", "첫 번째 목록 개수", _
-        "두 번째 목록 원본 예", "두 번째 목록 개수", "첫 번째 목록 잔여", "두 번째 목록 잔여", _
-        "첫 번째 목록 주소", "두 번째 목록 주소")
+    labels = Array("상태", "비교에 쓴 값", "첫 번째 목록 원래 값 (예)", "첫 번째 목록 개수", _
+        "두 번째 목록 원래 값 (예)", "두 번째 목록 개수", "첫 번째 목록 남은 개수", "두 번째 목록 남은 개수", _
+        "첫 번째 목록 셀 주소", "두 번째 목록 셀 주소")
     For i = 0 To 9
         headers(1, i + 1) = labels(i)
     Next i
@@ -765,7 +770,7 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
             ElseIf cb = 0 Then
                 status = "첫 번째 목록에만 있음"
             ElseIf ca <> cb Then
-                status = "개수 차이"
+                status = "개수가 다름"
             Else
                 status = "중복"
             End If
@@ -787,7 +792,7 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
     Next k
     If fill > 0 Then FlushOutput ws, buffer, fill, outRow
     If outRow = 9 Then
-        ws.Range("A9").Value2 = "비교 가능한 값의 차이는 없습니다. 제외된 오류 셀을 확인해 주세요."
+        ws.Range("A9").Value2 = "비교한 값과 개수는 같습니다. 비교에서 뺀 오류 셀은 원본에서 확인해 주세요."
         outRow = 10
     End If
     With ws
@@ -808,7 +813,8 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
         .Range("A8:J8").Interior.Color = RGB(225, 234, 242)
         .Range("A2:J8").WrapText = True
         .Range("A2:J7").RowHeight = 36
-        .Range("A5:J5").RowHeight = 48
+        .Range("A5:J5").RowHeight = 60
+        .Range("A6:J6").RowHeight = 48
         .Range("A8:J8").RowHeight = 48
         .Range("A8:J" & CStr(outRow - 1)).AutoFilter
     End With
@@ -858,15 +864,18 @@ End Sub
 
 Public Sub SLC_About()
     MsgBox "Excel Smart List Compare " & SLC_ReleaseVersion() & vbCrLf & vbCrLf & _
-        "첫 번째 목록을 선택하고 [첫 번째 목록 담기]를 누르세요." & vbCrLf & _
-        "이어서 두 번째 목록을 선택하고 [두 번째 목록 담아 비교]를 누르세요." & vbCrLf & vbCrLf & _
-        "목록은 선택한 셀 전체, 항목은 그 안의 값 하나입니다." & vbCrLf & _
-        "가로·세로·사각 범위·다중 선택은 모두 하나의 목록입니다." & vbCrLf & _
-        "다른 파일도 같은 Excel 실행 세션이면 가능합니다." & vbCrLf & _
-        "필터/숨김 셀은 제외합니다. 값별 개수까지 비교합니다." & vbCrLf & _
-        "100,000셀/목록 상한. 20,000셀부터 지연 경고." & vbCrLf & _
-        "전역 단축키·클립보드·원본 값·계산 모드를 변경하지 않습니다." & vbCrLf & _
-        "수동 계산 상태의 오래된 수식 결과나 Excel이 이미 잃은 숫자 정밀도는 복구하지 않습니다.", _
+        "1. 첫 번째 목록을 선택하고 [첫 번째 목록 담기]를 누르세요." & vbCrLf & _
+        "2. 두 번째 목록을 선택하고 [두 번째 목록 담아 비교]를 누르세요." & vbCrLf & vbCrLf & _
+        "선택한 셀 전체가 목록 하나이며, 셀의 값 하나를 항목이라고 합니다." & vbCrLf & _
+        "가로, 세로, 여러 영역을 선택해도 목록 하나로 비교합니다." & vbCrLf & _
+        "다른 파일로 이동한 뒤에도 첫 번째 목록의 개수 표시가 보이면 이어서 비교할 수 있습니다." & vbCrLf & _
+        "숨긴 셀, 필터로 가려진 셀, 빈칸, 오류 셀, 표의 제목·합계 셀은 비교에서 뺍니다." & vbCrLf & _
+        "같은 값이 몇 번 나오는지도 비교합니다. 이메일은 @ 앞부분만 비교합니다." & vbCrLf & _
+        "원본은 바꾸지 않습니다. 차이·중복·오류는 새 파일에 표시하며, 필요하면 직접 저장해 주세요." & vbCrLf & _
+        "한 목록은 숨기지 않은 셀을 빈칸까지 합쳐 100,000개로 제한합니다." & vbCrLf & _
+        "수동 계산을 쓰고 있다면 먼저 수식을 계산해 주세요." & vbCrLf & _
+        "긴 사번이나 ID는 처음 입력할 때부터 텍스트 형식으로 저장해 주세요." & vbCrLf & _
+        "이 시험 버전에서는 Esc를 눌러도 작업이 취소되지 않을 수 있습니다.", _
         vbInformation, "명단 비교 - 사용 안내"
 End Sub
 

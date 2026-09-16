@@ -78,7 +78,7 @@ try{
     $result=$excel.ActiveWorkbook
     Check 'PUBLIC-NEW-RESULT' ($result.FullName -ne $sourceB.FullName) $result.Name 'new result workbook'
     $sheet=$result.Worksheets.Item(1)
-    Check 'PUBLIC-SNAPSHOT-A-CLOSED' ($sheet.Range('B4').Value2 -eq '첫 번째 목록: 5개 항목 / 두 번째 목록: 5개 항목 / 일치 3개 / 첫 번째 목록 잔여 2개 / 두 번째 목록 잔여 2개') $sheet.Range('B4').Value2 '첫 번째 목록: 5개 항목 / 두 번째 목록: 5개 항목 / 일치 3개 / 첫 번째 목록 잔여 2개 / 두 번째 목록 잔여 2개'
+    Check 'PUBLIC-SNAPSHOT-A-CLOSED' ($sheet.Range('B4').Value2 -eq '첫 번째 목록: 5개 항목 / 두 번째 목록: 5개 항목 / 일치 3개 / 첫 번째 목록 남은 항목 2개 / 두 번째 목록 남은 항목 2개') $sheet.Range('B4').Value2 '첫 번째 목록: 5개 항목 / 두 번째 목록: 5개 항목 / 일치 3개 / 첫 번째 목록 남은 항목 2개 / 두 번째 목록 남은 항목 2개'
     Check 'PUBLIC-OUTPUT-NO-FORMULA' ($sheet.UsedRange.HasFormula -eq $false) $sheet.UsedRange.HasFormula $false
     $actual=@{}
     for($r=9;$r -le $sheet.UsedRange.Rows.Count;$r++){

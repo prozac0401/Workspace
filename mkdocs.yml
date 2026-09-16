@@ -1,5 +1,5 @@
-site_name: Workspace · 업무 운영 기준
-site_description: 정리가 일이 되지 않는 업무 기준 — 폴더·이메일 운영에서 Work Inbox, 업무 지식, 자동화와 Agent까지
+site_name: Workspace · 자료 정리와 업무 안내
+site_description: 파일과 메일을 찾기 쉽게 정리하고, 폴더에 진행 상태를 표시하고, 다음 할 일을 확인하는 방법
 site_url: https://prozac0401.github.io/Workspace/
 exclude_docs: |
   **
@@ -17,6 +17,7 @@ exclude_docs: |
   !/tools/folderstate/index.md
   !/tools/folderstate/installation.md
   !/tools/folderstate/troubleshooting.md
+  !/tools/excel-list-compare/index.md
   !/assets/extra.css
   !/assets/folderstate.png
   !/assets/handbook/workspace-flow.webp
@@ -75,23 +76,24 @@ extra_css:
   - assets/extra.css
 nav:
   - 시작:
-      - 운영 기준 안내: index.md
-      - 빠른 판단 기준: quick-reference.md
-      - 10대 기본원칙: principles.md
-      - 도입 순서: getting-started.md
-      - 결정이 필요한 항목: policies/decisions.md
-  - 기본 운영:
-      - 기본 구조와 원본: policies/workspace.md
-      - 업무 키트와 일정: policies/kits.md
-      - 파일과 이메일: policies/files-email.md
-      - 보관·보안·백업: policies/archive-security.md
-  - FolderState:
-      - 사용 안내: tools/folderstate/index.md
-      - 설치·제거·업그레이드: tools/folderstate/installation.md
-      - 명령줄과 오류 해결: tools/folderstate/troubleshooting.md
-  - 운영 개선 (선택):
-      - 업무효율화의 확장 순서: policies/work-efficiency.md
-      - 진행·인수인계 개선안: policies/folder-workflow.md
+      - 안내 첫 화면: index.md
+      - 지금 할 일 찾기: quick-reference.md
+      - 자료 정리의 10가지 습관: principles.md
+      - 업무 하나로 시작하기: getting-started.md
+      - 회사에서 정할 항목: policies/decisions.md
+  - 자료와 업무 정리:
+      - 자료를 둘 곳 정하기: policies/workspace.md
+      - 반복 업무 시작과 일정 관리: policies/kits.md
+      - 파일 이름과 메일 정리: policies/files-email.md
+      - 끝난 업무 보관과 자료 보호: policies/archive-security.md
+  - 프로그램 받기:
+      - FolderState 설치·업데이트·제거: tools/folderstate/installation.md
+      - FolderState 사용하기: tools/folderstate/index.md
+      - FolderState 문제 해결: tools/folderstate/troubleshooting.md
+      - Excel 명단 비교 설치·사용: tools/excel-list-compare/index.md
+  - 불편할 때 더 살펴보기:
+      - 반복되는 불편 줄이기: policies/work-efficiency.md
+      - 일을 이어서 하고 다른 사람에게 넘기기: policies/folder-workflow.md
 validation:
   nav:
     omitted_files: info

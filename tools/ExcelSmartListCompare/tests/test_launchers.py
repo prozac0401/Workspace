@@ -141,7 +141,7 @@ class WindowsLaunchers(unittest.TestCase):
         (folder / "Setup.ps1").unlink()  # One known fixture file, never a directory.
         result = self.run_ps(folder, INVOKE)
         self.assertEqual(result.returncode, 1)
-        self.assertIn("Setup.ps1 is missing", result.stdout + result.stderr)
+        self.assertIn("설치에 필요한 Setup.ps1 파일이 없습니다", result.stdout + result.stderr)
         self.assertFalse((folder / "result.json").exists())
         self.assert_parent_preserved(folder)
 
@@ -162,7 +162,7 @@ class WindowsLaunchers(unittest.TestCase):
         folder = self.fixture()
         result = self.run_ps(folder, INVOKE, policy="AllSigned")
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Using the configured PowerShell policy", result.stdout + result.stderr)
+        self.assertIn("기존 PowerShell 보안 정책에 따라 실행합니다", result.stdout + result.stderr)
         self.assertFalse((folder / "result.json").exists())
         self.assertTrue(has_zone(folder / "Setup.ps1"))
         self.assert_parent_preserved(folder)
@@ -206,7 +206,7 @@ exit $code
                 if result.returncode == 99:
                     self.skipTest("Another setup owns the product mutex")
                 self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
-                self.assertIn("Another setup or removal is already running", result.stdout + result.stderr)
+                self.assertIn("Excel 명단 비교를 설치하거나 제거하는 작업이 진행 중입니다", result.stdout + result.stderr)
                 self.assert_parent_preserved(folder)
 
 

@@ -1,36 +1,43 @@
 # Workspace
 
-**정리가 일이 되지 않아야 합니다.** 필요한 자료를 다시 찾고 업무를 이어갈 수 있도록, 반복 업무는 미착수 상태의 MASTER를 복사해 시작하고 끝난 회차는 통째로 보관합니다. 정리는 새 업무·착수·문제·완료·종료라는 업무 사건에 붙입니다.
+**필요한 자료를 찾고, 다음에 할 일을 알 수 있도록 돕습니다.** 파일과 메일을 정리하는 방법, 폴더에 진행 상태를 표시하는 FolderState, 두 목록을 비교하는 Excel 명단 비교를 제공합니다.
 
-[빠른 판단 기준](docs/quick-reference.md)에서 지금 할 행동을 찾고, 처음이라면 [도입 순서](docs/getting-started.md)로 시작하세요. 공통 철학은 [10대 기본원칙](docs/principles.md)에 정리했습니다. 회신 누락·인수인계 같은 반복 문제가 생기면 [선택 운영 개선안](docs/policies/folder-workflow.md)을 참고합니다.
+[지금 할 일 찾기](docs/quick-reference.md)에서 자신의 상황을 골라 보세요. 처음 사용한다면 [업무 하나로 시작하기](docs/getting-started.md)를 따라 하면 됩니다. 반복하는 업무는 복사용 기본 폴더를 만들어 두고 새 업무를 시작할 때 복사해 씁니다. 업무가 끝나면 그 폴더를 통째로 보관합니다.
 
-- **FolderState**: Windows Explorer 폴더 상태표시 도구. C# / .NET 10 / WPF, 사용자별 MSI 설치.
-- **Excel Smart List Compare**: 선택한 두 목록을 비교하는 Excel 추가 기능. [별도 도구 폴더](tools/ExcelSmartListCompare/README.md)에 소스·실제 Windows 검증·캡처 안내가 있습니다. RC7의 같은 설치 엔진과 XLAM을 담은 단일 EXE와 기존 ZIP을 제공합니다.
-- **운영 정책**: 파일·폴더·이메일, 원본 시스템, MASTER 키트, 진행·인수인계 기준. [업무효율화의 확장 순서](docs/policies/work-efficiency.md)는 Work Inbox·업무 지식·자동화·Agent로 이어지는 선택 적용 지도입니다.
-- **공통 기반**: 향후 도구가 공유할 문서 양식, ADR, 명세 대응표, 테스트·배포 기준.
+- **[FolderState 설치·사용](docs/tools/folderstate/installation.md)**: Windows 폴더 아이콘으로 업무 진행 상태를 표시합니다.
+- **[Excel 명단 비교 설치·사용](docs/tools/excel-list-compare/index.md)**: 두 목록에서 다른 값과 중복된 값을 찾습니다.
+- **[파일과 메일 정리하기](docs/policies/workspace.md)**: 현재 업무, 복사용 기본 폴더, 끝난 업무를 어디에 둘지 안내합니다.
+- **[놓치는 일과 반복 작업 줄이기](docs/policies/work-efficiency.md)**: 요청을 모으거나 이전 해결 방법을 찾기 어려울 때 필요한 방법만 골라 씁니다.
 
-[문서 사이트](https://prozac0401.github.io/Workspace/) · [원문 01](01_Windows_Explorer_폴더상태도구_명세.md) · [원문 02](02_사무실PC_파일폴더이메일_정리설계안.md)
+[안내 사이트](https://prozac0401.github.io/Workspace/) · [폴더 상태 도구의 최초 명세](01_Windows_Explorer_폴더상태도구_명세.md) · [파일·폴더·메일 정리의 최초 설계안](02_사무실PC_파일폴더이메일_정리설계안.md)
 
-GitHub Pages에는 업무 운영 정책과 FolderState 사용법만 게시합니다. 개발 명세·설계·양식·배포·검증 기록은 저장소에서 계속 관리하고 사이트 빌드·검색·사이트맵에서는 제외합니다.
+업무 안내는 **제안 단계**입니다. 저장 위치와 자료 보관 기간 등은 회사에서 정한 기준을 따릅니다. 안내 사이트에는 업무 안내와 두 프로그램의 설치·사용법을 공개합니다. 개발 명세·설계·양식·배포·검증 기록은 이 저장소에서 관리하며 사이트에는 공개하지 않습니다.
 
-## 빌드
+## 프로그램 받기
 
-도구는 설치 파일과 버전을 분리합니다. FolderState는 MSI, Excel Smart List Compare는 완성 XLAM을 포함하는 단일 EXE와 ZIP을 제공합니다. [실제 검증·원상복구·지원 제한](docs/delivery/tools-release-20260914.md)을 확인하세요. 두 후보 모두 코드 서명과 조직의 상용 배포 승인 대상입니다.
+| 프로그램 | 설치 파일 | 확인할 내용 |
+|---|---|---|
+| FolderState 0.1.2 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.2-rc.1/FolderState-0.1.2-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.2-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
+| Excel 명단 비교 0.2.0 RC7 | [이전 공개 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.7-setup.1/ExcelSmartListCompare-0.2.0-rc.7-Setup.exe) · [기존 ZIP 배포](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7) | [사용법과 알려진 문제](docs/tools/excel-list-compare/index.md) |
 
-[FolderState 0.1.0 RC1 다운로드](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.0-rc.1) · [FolderState 캡처 퀵가이드](docs/tools/folderstate/quick-guide.md)
+두 프로그램 모두 코드 서명이 없는 시험용 버전입니다. Excel 다운로드는 **이전에 공개한 RC7 파일**이며, 이번 한국어 문구 교정은 아직 포함되지 않았습니다. RC7에서는 Esc 취소와 첫 제거 실패를 확인했습니다. 후속 RC8도 취소·첫 설치 문제로 배포를 보류했습니다. 새 Excel 소스를 고쳤다는 사실만으로 이 문제가 해결된 것은 아닙니다.
 
-[Excel 0.2.0 RC7 다운로드](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7) · [Excel 퀵가이드](tools/ExcelSmartListCompare/docs/QUICK_GUIDE.md) · [RC7 검증과 제한](tools/ExcelSmartListCompare/docs/CONTEXT_MENU_REPORT.md)
+이전 배포와 확인 자료: [FolderState 0.1.0 RC1](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.0-rc.1) · [FolderState 캡처 퀵가이드](docs/tools/folderstate/quick-guide.md) · [Excel RC7 단일 EXE 배포](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7-setup.1) · [Excel 퀵가이드](tools/ExcelSmartListCompare/docs/QUICK_GUIDE.md) · [RC7 검증과 제한](tools/ExcelSmartListCompare/docs/CONTEXT_MENU_REPORT.md) · [EXE 검증 기록](tools/ExcelSmartListCompare/docs/ONEFILE_REPORT.md)
 
-[Excel RC7 단일 EXE 다운로드](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7-setup.1) · [EXE 설치·제거 안내](tools/ExcelSmartListCompare/docs/ONEFILE_INSTALLATION.md) · [EXE 검증 기록](tools/ExcelSmartListCompare/docs/ONEFILE_REPORT.md)
+## 개발자가 프로그램을 만드는 방법
 
-Windows 11 x64, .NET SDK는 `global.json`의 버전을 사용합니다.
+FolderState는 C# / .NET 10 / WPF로 만들었습니다. 아래 명령은 Windows 11 x64에서 실행합니다. .NET SDK 버전은 `global.json`을 따릅니다. 두 도구의 확인 범위는 [실제 검증·복구·지원 제한](docs/delivery/tools-release-20260914.md)을 참고하세요.
 
 ```powershell
 dotnet run --project tests/FolderState.Tests -c Release
 powershell -NoProfile -File scripts/build.ps1
 ```
 
-결과: `artifacts/release/FolderState-0.1.0-win-x64.msi` 및 SHA-256 파일. 자체 포함 배포이므로 사용자 PC에 .NET을 따로 설치하지 않습니다.
+설치 파일은 `artifacts/release/FolderState-0.1.2-win-x64.msi`에 만들어집니다. 파일이 바뀌었는지 확인하는 SHA-256 파일도 함께 생성합니다. 설치 파일에 실행에 필요한 .NET이 포함되어 있어 사용자 PC에 따로 설치할 필요가 없습니다. 현재 Windows 사용자 계정에 설치됩니다.
+
+Excel 추가 기능과 설치 프로그램의 제작 방법은 [별도 도구 안내](tools/ExcelSmartListCompare/README.md)와 [EXE 설치·제거 안내](tools/ExcelSmartListCompare/docs/ONEFILE_INSTALLATION.md)에 있습니다. 새 소스, 실제 검증한 XLAM, 공개된 설치 파일을 구분합니다.
+
+문서 사이트를 확인하려면 다음 명령을 실행하세요.
 
 ```powershell
 python -m pip install -r requirements-docs.txt
@@ -39,15 +46,16 @@ python scripts/check-site.py site
 python -m mkdocs serve
 ```
 
-## 구조
+## 개발 파일의 위치
 
 ```text
-src/          상태 엔진, WPF 관리 화면, CLI
+src/          폴더 상태 엔진, WPF 관리 화면, CLI
 tests/        실제 Windows 파일시스템 통합 테스트
 installer/    사용자별 MSI 정의
-scripts/      재현 가능한 빌드·검증 스크립트
+tools/        Excel 명단 비교 등 별도 도구
+scripts/      빌드·검증 스크립트
 docs/         GitHub Pages 문서 원본
 assets/       다중 해상도 상태 아이콘
 ```
 
-현 배포 단계와 실제 검증 결과는 [품질 기준](docs/delivery/quality.md), [검증 기록](docs/delivery/verification.md)을 확인하세요. 코드 서명과 깨끗한 PC의 설치 수명주기 검증이 완료되기 전에는 상용 정식판으로 분류하지 않습니다.
+현재 버전은 검증용입니다. 배포 단계와 확인 결과는 [품질 기준](docs/delivery/quality.md), [검증 기록](docs/delivery/verification.md)에서 확인하세요. 제작자를 확인하는 코드 서명과 새 PC에서의 설치·업데이트·제거 검증이 끝나기 전에는 상용 정식판으로 분류하지 않습니다.

@@ -14,6 +14,7 @@ public_routes = {
     'policies/work-efficiency/',
     'tools/folderstate/', 'tools/folderstate/installation/',
     'tools/folderstate/troubleshooting/',
+    'tools/excel-list-compare/',
 }
 public_assets = {
     'assets/extra.css', 'assets/folderstate.png',
