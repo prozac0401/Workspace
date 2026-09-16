@@ -1,14 +1,16 @@
 # Excel RC7 · 단일 EXE 검증 기록
 
+후속 수정과 현재 파일의 검증 결과는 [RC8 검증 기록](RC8_COMPLETION_REPORT.md)을 따른다. 아래는 해당 버전 당시의 기록이다.
+
 도구 ID: ExcelSmartListCompare · 엔진: 0.2.0-rc.7 · 포장: 1 · 날짜: 2026-09-15
 
-상태: 설치 수명주기와 실제 Excel 실행을 검증한 **코드 서명이 없는 평가용 설치기**. 실제 설치 화면의 육안 확인·클릭은 데스크톱 잠금으로 미실행입니다.
+상태: **코드 서명이 없는 평가용 설치기**. 아래는 최초 자동 검증 기록입니다. 후속 [잠금 해제 화면 시험](UNLOCKED_UI_REPORT.md)에서는 설치·설치 취소·제거 취소가 통과했지만, 최초 GUI 제거가 접근 거부와 코드 5로 실패했습니다. 시험 설치는 복구 절차로 정리했으며 전체 인수 완료로 표시하지 않습니다.
 
 ## 변경 범위
 
 RC7의 XLAM·Install.cmd·Uninstall.cmd·Setup.ps1·README.md를 그대로 내장한 Inno Setup 설치 화면과 Windows 앱 제거 항목을 추가합니다. [설계 결정](ADR-0009-Single-file-installer.md)과 [사용 안내](ONEFILE_INSTALLATION.md)를 따릅니다.
 
-## 검증 대상과 결과
+## 최초 자동 검증 대상과 결과
 
 환경: Windows 11 23H2 x64 `10.0.22631`, Windows PowerShell `5.1.22621.6133`, 데스크톱 Excel x64 `16.0.20326.20144`, 일반 사용자. 컴파일러는 설치된 Inno Setup `6.7.0`입니다.
 
@@ -37,4 +39,4 @@ RC7의 XLAM·Install.cmd·Uninstall.cmd·Setup.ps1·README.md를 그대로 내�
 
 ## 한계
 
-EXE는 코드 서명이 없는 평가용 배포입니다. 실제 전원 단절, 다른 Windows·Office 환경, 조직 GPO·MDM 정책 배포를 통과했다고 주장하지 않습니다. 데스크톱 잠금 상태에서 설치 창의 접근성 텍스트는 읽었지만 실제 화면·마우스 클릭·취소 버튼을 확인하지 못했습니다. 원시 로그와 사용자별 설치 진단은 로컬 artifacts에만 보관합니다.
+EXE는 코드 서명이 없는 평가용 배포입니다. 실제 전원 단절, 다른 Windows·Office 환경, 조직 GPO·MDM 정책 배포를 통과했다고 주장하지 않습니다. 최초에는 데스크톱 잠금으로 실제 화면·클릭·취소 버튼을 확인하지 못했습니다. 후속 화면 시험의 최초 제거 실패와 복구 성공은 [별도 기록](UNLOCKED_UI_REPORT.md)을 따르며 위 자동 검사 통과로 대체하지 않습니다. 원시 로그와 사용자별 설치 진단은 로컬 artifacts에만 보관합니다.

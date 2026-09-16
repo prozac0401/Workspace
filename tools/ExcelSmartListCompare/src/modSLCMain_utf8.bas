@@ -47,7 +47,7 @@ Public Function SLC_RibbonReady() As Boolean
 End Function
 
 Public Function SLC_ReleaseVersion() As String
-    SLC_ReleaseVersion = "0.2.0-rc.7"
+    SLC_ReleaseVersion = "0.2.0-rc.8"
 End Function
 
 Public Sub SLC_GetContextMenu(ByVal control As Office.IRibbonControl, ByRef content)
@@ -444,21 +444,31 @@ End Function
 
 Private Function MetadataRects(ByVal ws As Worksheet) As Collection
     Dim rects As New Collection, lo As ListObject, hdr As Range, af As AutoFilter
+    Dim optionalError As Long
     On Error Resume Next
     Set af = ws.AutoFilter
+    optionalError = Err.Number
+    Err.Clear
     On Error GoTo 0
+    If optionalError = 18 Then Err.Raise 18
     If Not af Is Nothing Then AddRect rects, af.Range.Rows(1)
     For Each lo In ws.ListObjects
         Set hdr = Nothing
         On Error Resume Next
         Set hdr = lo.HeaderRowRange
+        optionalError = Err.Number
+        Err.Clear
         On Error GoTo 0
+        If optionalError = 18 Then Err.Raise 18
         If Not hdr Is Nothing Then AddRect rects, hdr
         If lo.ShowTotals Then
             Set hdr = Nothing
             On Error Resume Next
             Set hdr = lo.TotalsRowRange
+            optionalError = Err.Number
+            Err.Clear
             On Error GoTo 0
+            If optionalError = 18 Then Err.Raise 18
             If Not hdr Is Nothing Then AddRect rects, hdr
         End If
     Next lo
@@ -586,7 +596,11 @@ End Function
 
 Private Sub Checkpoint()
     Dim elapsed As Double
+    ' Excel may reset this setting while dispatching window/UI callbacks.
+    ' Keep the running operation's handler armed on both sides of DoEvents.
+    Application.EnableCancelKey = xlErrorHandler
     DoEvents
+    Application.EnableCancelKey = xlErrorHandler
     If mCancelled Then Err.Raise ERR_CANCEL, , "Cancelled"
     elapsed = Timer - mStarted
     If elapsed < 0 Then elapsed = elapsed + 86400#
@@ -597,23 +611,41 @@ End Sub
 
 Private Sub SetStatus(ByVal text As String)
     If Not mOwnStatus Then
-        mPreviousStatus = Application.StatusBar
+        mPreviousStatus = PreviousStatus()
         mOwnStatus = True
     End If
     If mOwnStatus Then
         If CStr(Application.StatusBar) <> mLastStatus And Len(mLastStatus) > 0 Then
-            mPreviousStatus = Application.StatusBar
+            mPreviousStatus = PreviousStatus()
         End If
     End If
     mLastStatus = text
     Application.StatusBar = text
 End Sub
 
+Private Function PreviousStatus() As Variant
+    Dim value As Variant
+    value = Application.StatusBar
+    ' Some Excel builds expose their default False sentinel as text after a
+    ' custom status was shown. Do not restore that sentinel as visible text.
+    If VarType(value) = vbString Then
+        If StrComp(CStr(value), CStr(False), vbTextCompare) = 0 Then value = False
+    End If
+    PreviousStatus = value
+End Function
+
 Private Sub ReleaseStatus()
     On Error Resume Next
     If mOwnStatus Then
         If VarType(Application.StatusBar) = vbString Then
-            If CStr(Application.StatusBar) = mLastStatus Then Application.StatusBar = mPreviousStatus
+            If CStr(Application.StatusBar) = mLastStatus Then
+                ' Pass an actual Boolean, not a Variant coerced to display text.
+                If VarType(mPreviousStatus) = vbBoolean Then
+                    Application.StatusBar = False
+                Else
+                    Application.StatusBar = mPreviousStatus
+                End If
+            End If
         End If
     End If
     mOwnStatus = False

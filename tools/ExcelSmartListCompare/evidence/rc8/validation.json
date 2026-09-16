@@ -1,0 +1,347 @@
+{
+  "product": "Excel Smart List Compare",
+  "installerVersion": "0.2.0-rc.8",
+  "date": "2026-09-16",
+  "status": "FAIL: testing completed; release held for native Esc and intermittent interactive install failures",
+  "xlamSha256": "b1d9e044b6976ec385e3e85ba69021e4f892c4c0a8e98acb9584b71f65410f39",
+  "installerSha256": "188578d03ace7d1166c8a3caf0c9e4ed6506d49081eb918ea13e58db954b96f6",
+  "exeSha256": "761195046c8121f5d6489067861e4cb3844b83890c9f0475f2fde7338ccb7e70",
+  "sourceTextSha256": {
+    "src/CSLCList.cls": "ae5121a05f437239543da4392f38339e9dd4a750829033eab00714387d3f4fc8",
+    "src/CSLCAppEvents.cls": "1422aec4fb85ae03241362502982018afea128e2fee6a623b9fffca0fe977247",
+    "src/modSLCNormalize.bas": "668411e189d8945225b842c42e9f5cf55ca73e846ad0d04252123fcc5878feb6",
+    "src/modSLCMain.bas": "10842bb55cf7888a89c56182e18dab829f8b4a408f9d213e12cfdc22d17e2497",
+    "src/ThisWorkbook_events.txt": "8e3dd984a00a569f6c46bc998a2f0f8f68138435f8d934e9dc86ae23c6c7f5ec",
+    "src/customUI14.xml": "3f1ca3b18affc986f4c9c66430598927333cc39a79d381a2b8ba37fa60b184cb"
+  },
+  "environment": {
+    "windows": "11 23H2 x64 10.0.22631",
+    "excel": "16.0.20326.20144 x64",
+    "elevated": false
+  },
+  "checks": {
+    "sourceMatchesBinary": "PASS: five VBA components and RibbonX exact-source audit",
+    "normalizationAndIntegration": "PASS: normalization and 19 Excel integration checks",
+    "wordingAndState": "PASS: native capture, compare, clear, result summary and external status preservation; cancellation judged separately",
+    "selectionMatrix": "PASS: 14 unique cases, 13 plus one separate session after test-host crash",
+    "cancellation": "FAIL: two comparisons ignored Esc and reached time protection; one replacement completed after Esc",
+    "autoLoad": "PASS: installed exact XLAM loaded by normal Excel file opening",
+    "reinstall": "FAIL: automated repair/reinstall passed, but initial interactive installation returned engine 5/EXE 7; unchanged retry passed",
+    "uninstall": "PASS: native registered removal and installed CMD self-removal, followed by Apps cleanup",
+    "python": "PASS: 63 tests, including three real CMD self-removal subcases",
+    "docs": "PASS: MkDocs strict, 14 public pages plus 404, generated links/assets/search/sitemap and changed Markdown links",
+    "windowState": "PASS: scope covered by 164 menu/window assertions and native two-file state",
+    "upgrade": "PASS: RC7 to RC8, write-failure rollback, repair and external-file preservation",
+    "contextMenuContent": "PASS: 164 assertions including eight RibbonX contexts",
+    "nativeContextMenu": "PASS: actual Cell context capture and actual toolbar comparison; other native contexts retained as historical RC7 evidence"
+  },
+  "nativeEsc": [
+    {
+      "name": "Esc compare attempt 1",
+      "status": "FAIL",
+      "requestDelayMs": 12990,
+      "outcome": "Esc not handled; 30-second protection dialog, error -2147219401"
+    },
+    {
+      "name": "Esc compare attempt 2",
+      "status": "FAIL",
+      "requestDelayMs": 13325,
+      "outcome": "Esc not handled; 30-second protection dialog, error -2147219401"
+    },
+    {
+      "name": "Esc replace attempt",
+      "status": "FAIL",
+      "requestDelayMs": 13987,
+      "outcome": "Replacement completed after Esc; pending list changed from 42 to 100000"
+    }
+  ],
+  "interactiveInstaller": [
+    {
+      "name": "Native removal cancellation preserves exact installation",
+      "status": "PASS"
+    },
+    {
+      "name": "Native registered removal succeeds and cleans folders and Apps",
+      "status": "PASS"
+    },
+    {
+      "name": "Native installation cancellation leaves no installation",
+      "status": "PASS"
+    },
+    {
+      "engineExitCode": 5,
+      "wrapperExitCode": 7,
+      "status": "FAIL",
+      "name": "Initial native installation",
+      "message": "Access is denied.",
+      "installationAbsentAfterFailure": true
+    },
+    {
+      "name": "Native installation retry",
+      "initialFailurePreserved": true,
+      "status": "PASS",
+      "checks": [
+        {
+          "file": "ExcelSmartListCompare.xlam",
+          "equal": true
+        },
+        {
+          "file": "Setup.ps1",
+          "equal": true
+        },
+        {
+          "file": "Uninstall.cmd",
+          "equal": true
+        },
+        {
+          "file": "README.md",
+          "equal": true
+        }
+      ]
+    }
+  ],
+  "automatedLifecycle": {
+    "assertions": 47,
+    "execution": "Separate stages, not one continuous successful run",
+    "stages": {
+      "initial": [
+        {
+          "name": "Alternate manager path rejected before engine starts",
+          "status": "PASS"
+        },
+        {
+          "name": "wrapper-lock rejects concurrent installation",
+          "status": "PASS"
+        },
+        {
+          "name": "engine-lock rejects concurrent installation",
+          "status": "PASS"
+        },
+        {
+          "name": "Original engine failure code 4 propagated to installer log",
+          "status": "PASS"
+        },
+        {
+          "name": "Unknown manager directory preserved",
+          "status": "PASS"
+        },
+        {
+          "name": "Fresh EXE installation succeeds",
+          "status": "PASS"
+        },
+        {
+          "name": "Korean engine output preserved in local log",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed exact requested bytes: ExcelSmartListCompare.xlam",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed exact requested bytes: Setup.ps1",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed exact requested bytes: Uninstall.cmd",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed exact requested bytes: README.md",
+          "status": "PASS"
+        },
+        {
+          "name": "Requested ownership schema and version retained",
+          "status": "PASS"
+        },
+        {
+          "name": "Windows Apps entry and remover registered",
+          "status": "PASS"
+        },
+        {
+          "name": "Failed engine uninstall preserves installed product and Apps entry",
+          "status": "PASS"
+        },
+        {
+          "name": "Windows registered remover succeeds",
+          "status": "PASS"
+        },
+        {
+          "name": "Fresh removal leaves no product, manager, or Apps entry",
+          "status": "PASS"
+        }
+      ],
+      "upgrade": [
+        {
+          "name": "Previous version installed for actual upgrade test",
+          "status": "PASS"
+        },
+        {
+          "name": "EXE reports injected upgrade write failure",
+          "status": "PASS"
+        },
+        {
+          "name": "Upgrade rollback restores install.json",
+          "status": "PASS"
+        },
+        {
+          "name": "Upgrade rollback restores README.md",
+          "status": "PASS"
+        },
+        {
+          "name": "Upgrade rollback restores Setup.ps1",
+          "status": "PASS"
+        },
+        {
+          "name": "Upgrade rollback restores ExcelSmartListCompare.xlam",
+          "status": "PASS"
+        },
+        {
+          "name": "Upgrade rollback restores Uninstall.cmd",
+          "status": "PASS"
+        },
+        {
+          "name": "Failed upgrade restores all Office and policy registrations",
+          "status": "PASS"
+        },
+        {
+          "name": "Failed upgrade creates no manager or Apps entry",
+          "status": "PASS"
+        },
+        {
+          "name": "EXE upgrades previous version to requested version",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed exact requested bytes: ExcelSmartListCompare.xlam",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed exact requested bytes: Setup.ps1",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed exact requested bytes: Uninstall.cmd",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed exact requested bytes: README.md",
+          "status": "PASS"
+        },
+        {
+          "name": "Requested ownership schema and version retained",
+          "status": "PASS"
+        },
+        {
+          "name": "Windows Apps entry and remover registered",
+          "status": "PASS"
+        },
+        {
+          "name": "Upgrade retains original trust ownership token",
+          "status": "PASS"
+        },
+        {
+          "name": "Same EXE repairs installed version successfully",
+          "status": "PASS"
+        },
+        {
+          "name": "Repair retains trust ownership token",
+          "status": "PASS"
+        },
+        {
+          "name": "Registered remover recovers a missing installed Setup.ps1",
+          "status": "PASS"
+        },
+        {
+          "name": "Core and manager extra files survive removal",
+          "status": "PASS"
+        },
+        {
+          "name": "Removal clears owned manifest and Apps entry",
+          "status": "PASS"
+        }
+      ],
+      "specialPath": [
+        {
+          "name": "EXE installs from Unicode and shell-metacharacter extraction path",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed engine hash retained after special-path installation",
+          "status": "PASS"
+        }
+      ],
+      "smoke": [
+        {
+          "name": "Running Excel blocks EXE installation without closing Excel",
+          "status": "PASS"
+        },
+        {
+          "name": "Original engine Excel guard returns code 3",
+          "status": "PASS"
+        },
+        {
+          "name": "Running Excel blocks registered removal and preserves Apps entry",
+          "status": "PASS"
+        },
+        {
+          "name": "Installed XLAM normal-start and comparison smoke succeeds",
+          "status": "PASS"
+        },
+        {
+          "name": "All 164 original context-content and comparison assertions pass",
+          "status": "PASS"
+        }
+      ],
+      "installedCmdRemoval": [
+        {
+          "name": "Installed CMD self-removal succeeds with exact exit code",
+          "status": "PASS"
+        },
+        {
+          "name": "Apps remover cleans up after original CMD removal",
+          "status": "PASS"
+        }
+      ]
+    }
+  },
+  "restoration": {
+    "assertions": 2,
+    "registryGroups": 14,
+    "comparison": "Canonical multiset of registry key/name (case insensitive), kind and exact values; entry order ignored; duplicate entries retained",
+    "machine": {
+      "testTasksRemoved": 38,
+      "excelProcesses": 0,
+      "productDirectory": false,
+      "managerDirectory": false,
+      "appsEntry": false
+    },
+    "syntheticFilesByteUnchanged": true,
+    "previousEditedResultPreserved": true
+  },
+  "knownLimitations": [
+    "Native Esc is unresolved; physical keyboard and Ctrl+Break not tested",
+    "Initial interactive install Access denied is unresolved; retry success does not erase it",
+    "Legacy test-host crashes and recovery are documented in RC8_COMPLETION_REPORT.md",
+    "Other Office builds, x86, organization deployment, power loss and third-party add-in combinations not verified",
+    "An externally preset literal FALSE status may be treated as the default sentinel",
+    "Small CMD removal code copies may remain in the user temporary directory"
+  ],
+  "provenance": {
+    "buildBaseCommit": "ec746627f92166c39f44bf1a0b472b65b163b742",
+    "buildSourceTreeDirty": true,
+    "payloadHashes": {
+      "Install.cmd": "951b1f054f193c27b9e6acced6c3148c1026356514689b37a5428efad14b9275",
+      "Uninstall.cmd": "9967e9819da0c1107cbdd4542feb6b3f3df45b9dd38ea0e22c12313844840aa1",
+      "Setup.ps1": "188578d03ace7d1166c8a3caf0c9e4ed6506d49081eb918ea13e58db954b96f6",
+      "README.md": "fe31df299d5e8142173ebc83cdca8a65d342886e25b99698267267620884a845",
+      "ExcelSmartListCompare.xlam": "b1d9e044b6976ec385e3e85ba69021e4f892c4c0a8e98acb9584b71f65410f39"
+    },
+    "runtimeEvidence": "This summary records tests performed after the original build metadata, without rewriting that metadata"
+  },
+  "delivery": {
+    "releaseZipCreated": false,
+    "published": false,
+    "reason": "Acceptance failed; exact test candidates retained locally",
+    "report": "../../docs/RC8_COMPLETION_REPORT.md"
+  }
+}

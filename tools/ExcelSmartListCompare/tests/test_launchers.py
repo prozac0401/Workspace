@@ -179,7 +179,7 @@ class WindowsLaunchers(unittest.TestCase):
                 with self.subTest(launcher=launcher, machine=machine, user=user):
                     folder = self.fixture(launcher)
                     line = next(line for line in (ROOT / launcher).read_text(encoding="ascii").splitlines()
-                                if ' -Command "' in line)
+                                if ' -Command "' in line and 'Get-ExecutionPolicy' in line)
                     bootstrap = line.split(' -Command "', 1)[1][:-1]
                     result = self.run_ps(folder, MOCK_POLICY + bootstrap, launcher,
                                          SLC_SETUP_SCRIPT=str(folder / "Setup.ps1"),

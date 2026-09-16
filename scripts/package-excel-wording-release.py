@@ -94,7 +94,7 @@ def main():
     parser.add_argument("--xlam", type=Path, required=True)
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
-    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7"), default=VERSION)
+    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8"), default=VERSION)
     args = parser.parse_args()
     version = args.installer_version
     rc = int(version.rsplit(".", 1)[1])
@@ -112,6 +112,10 @@ def main():
     if rc >= 7:
         html_names["CONTEXT_MENU_REPORT.md"] = "Context-Menu-Report.html"
         report = "Context-Menu-Report.html"
+    if rc >= 8:
+        html_names["RC8_COMPLETION_REPORT.md"] = "Completion-Report.html"
+        html_names["UNLOCKED_UI_REPORT.md"] = "RC7-Native-Report.html"
+        report = "Completion-Report.html"
     output = args.output_directory.resolve()
     if not output.is_relative_to(REPO / "artifacts") or output == REPO / "artifacts" or output.exists():
         raise SystemExit("Choose a fresh directory under this repository's artifacts.")
@@ -138,7 +142,8 @@ def main():
     # A locked desktop prevents native menu/Esc input. This explicit limitation is
     # allowed only for the unsigned evaluation prerelease and is shipped intact.
     for name in native_checks.intersection(checks):
-        if not str(validation["checks"][name]).startswith(("PASS", "NOT_RUN: desktop locked")):
+        accepted = ("PASS",) if rc >= 8 else ("PASS", "NOT_RUN: desktop locked")
+        if not str(validation["checks"][name]).startswith(accepted):
             raise SystemExit(name + " needs a result or the explicit locked-desktop limitation.")
     source_hashes = {name: text_hash((TOOL / name).read_bytes()) for name in sources}
     if validation["sourceTextSha256"] != source_hashes:

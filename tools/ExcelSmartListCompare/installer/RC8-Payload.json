@@ -1,0 +1,10 @@
+{
+  "engineVersion": "0.2.0-rc.8",
+  "sha256": {
+    "Install.cmd": "951b1f054f193c27b9e6acced6c3148c1026356514689b37a5428efad14b9275",
+    "Uninstall.cmd": "9967e9819da0c1107cbdd4542feb6b3f3df45b9dd38ea0e22c12313844840aa1",
+    "Setup.ps1": "188578d03ace7d1166c8a3caf0c9e4ed6506d49081eb918ea13e58db954b96f6",
+    "README.md": "fe31df299d5e8142173ebc83cdca8a65d342886e25b99698267267620884a845",
+    "ExcelSmartListCompare.xlam": "b1d9e044b6976ec385e3e85ba69021e4f892c4c0a8e98acb9584b71f65410f39"
+  }
+}

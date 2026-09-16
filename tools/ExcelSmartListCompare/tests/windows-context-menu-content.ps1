@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory=$true)][string]$OutputDirectory,
     [Parameter(Mandatory=$true)][string]$ExpectedXlamSha256,
-    [string]$SetupPath = (Join-Path (Split-Path -Parent $PSScriptRoot) 'Setup.ps1')
+    [string]$SetupPath = (Join-Path (Split-Path -Parent $PSScriptRoot) 'Setup.ps1'),
+    [string]$ExpectedReleaseVersion = '0.2.0-rc.8'
 )
 # Uses synthetic files in an owned Excel process. Requires an installed XLAM.
 # Tests RibbonX loading, generated menu content and real selection commands.
@@ -91,7 +92,7 @@ try{
         ConvertTo-Json|Set-Content (Join-Path $run 'owner.private.json') -Encoding UTF8
     $e=$script:Excel;$e.Visible=$true;$q="'ExcelSmartListCompare.xlam'!"
     Check 'Office actually loaded RibbonX onLoad callback' ([bool]$e.Run($q+'SLC_RibbonReady'))
-    Check 'Loaded release identifies RC7' ([string]$e.Run($q+'SLC_ReleaseVersion') -ceq '0.2.0-rc.7')
+    Check 'Loaded release matches requested version' ([string]$e.Run($q+'SLC_ReleaseVersion') -ceq $ExpectedReleaseVersion)
     foreach($name in @('Cell','Row','Column')){
         $bar=$e.CommandBars.Item($name);$count=0
         for($i=1;$i -le $bar.Controls.Count;$i++){$control=$bar.Controls.Item($i);if([string]$control.Tag -ceq 'SLC_68A45C44_2026'){$count++};Release-Com $control}

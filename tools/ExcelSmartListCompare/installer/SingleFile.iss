@@ -12,13 +12,16 @@
 #ifndef ManagerId
   #define ManagerId "ExcelSmartListCompare.OneFile"
 #endif
+#ifndef EngineVersion
+  #define EngineVersion "0.2.0-rc.7"
+#endif
 #include AddBackslash(PayloadDir) + "PayloadHashes.iss"
 
 [Setup]
 AppId={#ManagerId}
 AppName=Excel 명단 비교
-AppVersion=0.2.0-rc.7
-AppVerName=Excel 명단 비교 0.2.0 RC7
+AppVersion={#EngineVersion}
+AppVerName=Excel 명단 비교 {#EngineVersion}
 AppPublisher=Workspace
 AppPublisherURL=https://github.com/prozac0401/Workspace
 AppSupportURL=https://github.com/prozac0401/Workspace/releases
@@ -38,7 +41,7 @@ RestartApplications=no
 AlwaysRestart=no
 UninstallDisplayName=Excel 명단 비교
 UninstallDisplayIcon={uninstallexe}
-OutputBaseFilename=ExcelSmartListCompare-0.2.0-rc.7-Setup
+OutputBaseFilename=ExcelSmartListCompare-{#EngineVersion}-Setup
 Compression=lzma2
 SolidCompression=yes
 VersionInfoVersion=0.2.0.7001
@@ -150,17 +153,19 @@ begin
   Log('Engine: ' + S);
 end;
 
-function EngineError(Code: Integer): String;
+function EngineError(Code: Integer; Action: String): String;
+var ActionText: String;
 begin
+  if Action = 'Uninstall' then ActionText := '제거' else ActionText := '설치';
   case Code of
     2: Result := '설치 또는 제거를 취소했습니다.';
     3: Result := 'Excel 업무를 저장하고 모든 Excel 창을 닫은 뒤 다시 실행하세요.';
     4: Result := '다른 설치 또는 제거가 진행 중입니다. 완료 후 다시 실행하세요.';
     6: Result := '제품 설치 경로 또는 조직의 Excel 신뢰 위치 정책을 확인해 주세요.';
   else
-    Result := '설치를 완료하지 못했습니다. 실행 정책, 기존 설치 상태 또는 파일 접근 권한을 확인해 주세요.';
+    Result := ActionText + '를 완료하지 못했습니다. 실행 정책, 기존 설치 상태 또는 파일 접근 권한을 확인해 주세요.';
   end;
-  Result := Result + #13#10 + '설치 엔진 종료 코드: ' + IntToStr(Code) + #13#10 +
+  Result := Result + #13#10 + ActionText + ' 엔진 종료 코드: ' + IntToStr(Code) + #13#10 +
     '자세한 내용은 로컬 설치 로그를 확인하세요.';
 end;
 
@@ -171,6 +176,7 @@ begin
   if not SetEnvironmentVariable('SLC_SETUP_NO_PAUSE', '1') then
     RaiseException('설치 실행 환경을 준비하지 못했습니다.');
   try
+    Log('SLC_ENGINE_ACTION=' + Action);
     { No path is interpolated into shell code. The fixed launcher is resolved in
       the explicit working directory, including paths with shell metacharacters. }
     Started := ExecAndLogOutput(ExpandConstant('{cmd}'),
@@ -210,7 +216,7 @@ begin
     ExtractChecked('README.md', '{#ReadmeHash}');
     ExtractChecked('ExcelSmartListCompare.xlam', '{#XlamHash}');
     Code := RunEngine(ExpandConstant('{tmp}'), 'Install');
-    if Code <> 0 then Result := EngineError(Code)
+    if Code <> 0 then Result := EngineError(Code, 'Install')
     else EngineComplete := True;
   finally
     EngineRunning := False;
@@ -251,7 +257,7 @@ begin
      not FileCopy(EngineDirectory + '\Uninstall.cmd', StagedDirectory + '\Uninstall.cmd', False) then
     RaiseException('제거 파일을 준비하지 못했습니다. 기존 설치는 유지됩니다.');
   Code := RunEngine(StagedDirectory, 'Uninstall');
-  if Code <> 0 then RaiseException(EngineError(Code));
+  if Code <> 0 then RaiseException(EngineError(Code, 'Uninstall'));
 end;
 
 procedure DeinitializeUninstall;

@@ -4,7 +4,9 @@ param(
     [Parameter(Mandatory=$true)][string]$ReleaseDirectory,
     [Parameter(Mandatory=$true)][string]$PreviousReleaseDirectory,
     [Parameter(Mandatory=$true)][string]$OutputDirectory,
-    [switch]$IncludeExcelSmoke
+    [switch]$IncludeExcelSmoke,
+    [string]$ExpectedInstallerVersion='0.2.0-rc.8',
+    [string]$PreviousInstallerVersion='0.2.0-rc.7'
 )
 # Actual EXE lifecycle, only when the current user has no product or Excel open.
 Set-StrictMode -Version Latest
@@ -35,12 +37,18 @@ function Check([string]$Name,[bool]$Pass){
     Write-Host (($checks.Count).ToString()+' '+$(if($Pass){'PASS '}else{'FAIL '})+$Name)
     if(-not $Pass){throw ('Failed: '+$Name)}
 }
-function Run-Exe([string]$Exe,[string]$Label,[string]$Extra=''){
+function Run-Exe([string]$Exe,[string]$Label,[string]$Extra='',[string]$TempDirectory=''){
     $log=Join-Path $output ($Label+'.private.log')
     $info=New-Object Diagnostics.ProcessStartInfo
     $info.FileName=$Exe
     $info.Arguments='/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /LOG="'+$log+'" '+$Extra
     $info.UseShellExecute=$false;$info.CreateNoWindow=$true
+    if($TempDirectory){
+        # Exercise the installer's extraction environment without changing the
+        # long-running test host's own CLR/PowerShell temporary directory.
+        $info.EnvironmentVariables['TEMP']=$TempDirectory
+        $info.EnvironmentVariables['TMP']=$TempDirectory
+    }
     $process=[Diagnostics.Process]::Start($info)
     try{
         if(-not $process.WaitForExit(60000)){throw ('Owned setup timed out; inspect '+$Label+' PID '+$process.Id)}
@@ -66,14 +74,27 @@ function Run-Exe([string]$Exe,[string]$Label,[string]$Extra=''){
     }finally{$process.Dispose()}
 }
 function Run-Cmd([string]$Directory,[string]$Action){
-    Push-Location $Directory
-    try{& cmd.exe /d /v:off /c ($Action+'.cmd -ConfirmProduct SLC-68A45C44-2026') *> (Join-Path $output ($Action+'-cmd.private.log'));if($LASTEXITCODE){throw ('Original launcher failed: '+$LASTEXITCODE)}}finally{Pop-Location}
+    if($Action -notin @('Install','Uninstall')){throw 'Unknown launcher action.'}
+    $info=New-Object Diagnostics.ProcessStartInfo
+    $info.FileName=$env:ComSpec
+    $info.Arguments='/d /v:off /c '+$Action+'.cmd -ConfirmProduct SLC-68A45C44-2026'
+    $info.WorkingDirectory=$Directory
+    $info.UseShellExecute=$false;$info.CreateNoWindow=$true
+    $info.RedirectStandardOutput=$true;$info.RedirectStandardError=$true
+    $process=[Diagnostics.Process]::Start($info)
+    try{
+        $stdout=$process.StandardOutput.ReadToEndAsync()
+        $stderr=$process.StandardError.ReadToEndAsync()
+        if(-not $process.WaitForExit(60000)){throw ('Owned launcher timed out; inspect PID '+$process.Id)}
+        [IO.File]::WriteAllText((Join-Path $output ($Action+'-cmd.private.log')),($stdout.Result+$stderr.Result),[Text.Encoding]::UTF8)
+        if($process.ExitCode){throw ('Original launcher failed: '+$process.ExitCode)}
+    }finally{$process.Dispose()}
 }
 function Assert-Payload{
     foreach($name in @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md')){
-        Check ('Installed exact RC7 bytes: '+$name) ((Get-FileHash -LiteralPath (Join-Path $product $name)).Hash -ceq (Get-FileHash -LiteralPath (Join-Path $release $name)).Hash)
+        Check ('Installed exact requested bytes: '+$name) ((Get-FileHash -LiteralPath (Join-Path $product $name)).Hash -ceq (Get-FileHash -LiteralPath (Join-Path $release $name)).Hash)
     }
-    Check 'Original RC7 ownership schema and version retained' ((Get-Content -LiteralPath $manifest -Raw|ConvertFrom-Json).installerVersion -eq '0.2.0-rc.7')
+    Check 'Requested ownership schema and version retained' ((Get-Content -LiteralPath $manifest -Raw|ConvertFrom-Json).installerVersion -eq $ExpectedInstallerVersion)
     Check 'Windows Apps entry and remover registered' ((Test-Path -LiteralPath $appKey) -and (Test-Path -LiteralPath (Join-Path $manager 'unins000.exe')))
 }
 function Remove-Synthetic([string]$Path){
@@ -116,7 +137,7 @@ try{
 
     Run-Cmd $previous 'Install'
     $old=Get-Content -LiteralPath $manifest -Raw|ConvertFrom-Json
-    Check 'Previous RC6 installed for actual upgrade test' ($old.installerVersion -eq '0.2.0-rc.6')
+    Check 'Previous version installed for actual upgrade test' ($old.installerVersion -eq $PreviousInstallerVersion)
     [IO.File]::WriteAllText($productNote,$fixtureText)
     $beforeFiles=@{}
     foreach($name in @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md','install.json')){$beforeFiles[$name]=(Get-FileHash -LiteralPath (Join-Path $product $name)).Hash}
@@ -129,10 +150,10 @@ try{
     $upgradeAfter=Get-Content -LiteralPath (Join-Path $output 'upgrade-after.private.json') -Raw|ConvertFrom-Json
     Check 'Failed upgrade restores all Office and policy registrations' (($upgradeBefore.registry|ConvertTo-Json -Depth 15 -Compress) -ceq ($upgradeAfter.registry|ConvertTo-Json -Depth 15 -Compress))
     Check 'Failed upgrade creates no manager or Apps entry' (-not(Test-Path -LiteralPath $manager) -and -not(Test-Path -LiteralPath $appKey))
-    Check 'EXE upgrades RC6 to RC7' ((Run-Exe $installer 'upgrade') -eq 0)
+    Check 'EXE upgrades previous version to requested version' ((Run-Exe $installer 'upgrade') -eq 0)
     Assert-Payload
     Check 'Upgrade retains original trust ownership token' ((Get-Content -LiteralPath $manifest -Raw|ConvertFrom-Json).trustedLocation.token -ceq $old.trustedLocation.token)
-    Check 'Same EXE repairs installed RC7 successfully' ((Run-Exe $installer 'repair') -eq 0)
+    Check 'Same EXE repairs installed version successfully' ((Run-Exe $installer 'repair') -eq 0)
     Check 'Repair retains trust ownership token' ((Get-Content -LiteralPath $manifest -Raw|ConvertFrom-Json).trustedLocation.token -ceq $old.trustedLocation.token)
     [IO.File]::WriteAllText($managerNote,$fixtureText)
 
@@ -150,11 +171,7 @@ try{
     [void](New-Item -ItemType Directory -Path $special)
     $specialExe=Join-Path $special ([IO.Path]::GetFileName($installer))
     [IO.File]::Copy($installer,$specialExe)
-    $oldTemp=$env:TEMP;$oldTmp=$env:TMP
-    try{
-        $env:TEMP=$special;$env:TMP=$special
-        Check 'EXE installs from Unicode and shell-metacharacter extraction path' ((Run-Exe $specialExe 'special-path') -eq 0)
-    }finally{$env:TEMP=$oldTemp;$env:TMP=$oldTmp}
+    Check 'EXE installs from Unicode and shell-metacharacter extraction path' ((Run-Exe $specialExe 'special-path' -TempDirectory $special) -eq 0)
     Check 'Installed engine hash retained after special-path installation' ((Get-FileHash -LiteralPath (Join-Path $product 'Setup.ps1')).Hash -ceq (Get-FileHash -LiteralPath (Join-Path $release 'Setup.ps1')).Hash)
     if($IncludeExcelSmoke){
         $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $release 'Setup.ps1'),[ref]$null,[ref]$null)
@@ -168,13 +185,14 @@ try{
             Check 'Original engine Excel guard returns code 3' ([IO.File]::ReadAllText((Join-Path $output 'excel-running-install.private.log')) -match 'SLC_ENGINE_EXIT_CODE=3')
             Check 'Running Excel blocks registered removal and preserves Apps entry' ((Run-Exe (Join-Path $manager 'unins000.exe') 'excel-running-uninstall') -ne 0 -and (Test-Path -LiteralPath $manifest) -and (Test-Path -LiteralPath $appKey))
         }finally{Stop-OwnExcel}
-        & $psExe -NoProfile -STA -File (Join-Path $PSScriptRoot 'windows-context-menu-content.ps1') -SetupPath (Join-Path $release 'Setup.ps1') -ExpectedXlamSha256 '5da5ff891232dde733d60ee6151cbfb26e251d6b75a51cb6a3f224effde4c18b' -OutputDirectory (Join-Path $output 'excel-smoke') *> (Join-Path $output 'excel-smoke.private.log')
+        $expectedHash=(Get-FileHash -LiteralPath (Join-Path $release 'ExcelSmartListCompare.xlam')).Hash
+        & $psExe -NoProfile -STA -File (Join-Path $PSScriptRoot 'windows-context-menu-content.ps1') -SetupPath (Join-Path $release 'Setup.ps1') -ExpectedXlamSha256 $expectedHash -ExpectedReleaseVersion $ExpectedInstallerVersion -OutputDirectory (Join-Path $output 'excel-smoke') *> (Join-Path $output 'excel-smoke.private.log')
         Check 'Installed XLAM normal-start and comparison smoke succeeds' ($LASTEXITCODE -eq 0)
         $smoke=Get-Content -LiteralPath (Join-Path $output 'excel-smoke/context-menu-content.json') -Raw|ConvertFrom-Json
         Check 'All 164 original context-content and comparison assertions pass' ($smoke.Count -eq 164 -and @($smoke|Where-Object status -ne 'PASS').Count -eq 0)
     }
-    Run-Cmd $release 'Uninstall'
-    Check 'Original CMD removal remains compatible' (-not(Test-Path -LiteralPath $product) -and (Test-Path -LiteralPath $appKey))
+    Run-Cmd $product 'Uninstall'
+    Check 'Installed CMD self-removal succeeds with exact exit code' (-not(Test-Path -LiteralPath $product) -and (Test-Path -LiteralPath $appKey))
     Check 'Apps remover cleans up after original CMD removal' ((Run-Exe (Join-Path $manager 'unins000.exe') 'already-removed') -eq 0 -and -not(Test-Path -LiteralPath $manager) -and -not(Test-Path -LiteralPath $appKey))
 }catch{
     $_|Out-File -LiteralPath (Join-Path $output 'primary-error.private.log') -Encoding UTF8

@@ -1,8 +1,12 @@
 # Excel 목록 비교 · 화면 용어 변경 기록
 
+후속 수정과 현재 파일의 검증 결과는 [RC8 검증 기록](RC8_COMPLETION_REPORT.md)을 따른다. 아래는 해당 버전 당시의 기록이다.
+
 도구 ID: ExcelSmartListCompare · 설치기 버전: 0.2.0-rc.5 · 날짜: 2026-09-15
 
 상태: 새 XLAM으로 기능·문구·설치 수명주기를 검증한 **서명되지 않은 평가용 후보**. 데스크톱 잠금으로 새 화면의 육안 확인·클릭과 실제 Esc 입력은 미실행. 전체 인수나 상용 배포 승인을 뜻하지 않는다.
+
+위 상태는 RC5 최초 실행 당시의 기록이다. 최신 RC7의 화면 확인과 Esc 취소 실패는 [잠금 해제 검증](UNLOCKED_UI_REPORT.md)을 따른다.
 
 적용 정책: [추가 도구 개발 기준](../../../docs/policies/tools.md), [정책 문서 작성 규칙](../../../docs/policies/documentation.md)
 

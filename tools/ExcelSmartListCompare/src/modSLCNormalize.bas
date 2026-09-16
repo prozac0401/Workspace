@@ -54,13 +54,12 @@ Public Function SLC_Normalize(ByVal v As Variant) As String
 End Function
 
 Private Function NormalizeWhitespace(ByVal s As String) As String
-    On Error Resume Next
+    ' String replacements do not need an optional-object error handler.
+    ' In particular, never swallow Excel user interruption error 18 here.
     s = Replace(s, ChrW(&HA0), " ")      ' NBSP
     s = Replace(s, ChrW(&H3000), " ")    ' Ideographic space
     s = Replace(s, ChrW(&H200B), "")     ' Zero-width space
     s = Replace(s, ChrW(&HFEFF), "")     ' BOM / zero-width NBSP
-    On Error GoTo 0
-
     s = Replace(s, vbTab, " ")
     s = Replace(s, vbCr, " ")
     s = Replace(s, vbLf, " ")
