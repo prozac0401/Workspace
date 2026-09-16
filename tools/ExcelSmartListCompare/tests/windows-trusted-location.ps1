@@ -11,7 +11,13 @@ if(Test-Path -LiteralPath $output){throw 'Use a fresh evidence directory.'}
 $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $tool 'Setup.ps1'),[ref]$null,[ref]$null)
 foreach($function in $ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst]},$false)) { . ([scriptblock]::Create($function.Extent.Text)) }
 $ProductId='SLC-68A45C44-2026';$Version='0.2.0';$InstallerVersion='0.2.0-rc.3';$ConfirmProduct=$ProductId
-$Root=Join-Path $tool 'Release'
+# These are isolated registry/file transactions, not an executable XLAM test.
+# Keep the fixture independent of an unrelated historical Release directory.
+$Root=Join-Path $output 'synthetic-package'
+[void](New-Item -ItemType Directory -Path $Root)
+foreach($name in @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md')){
+    [IO.File]::WriteAllText((Join-Path $Root $name),('Synthetic trust fixture: '+$name))
+}
 $sandbox='Software\SLC-Installer-Tests\'+[Guid]::NewGuid().ToString('N')
 $RegistrySandbox=$sandbox+'\Excel'
 function Excel-UserPath([string]$OfficeVersion){return $RegistrySandbox}

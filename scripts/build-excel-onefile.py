@@ -28,15 +28,19 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--release-directory", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
-    parser.add_argument("--engine-version", choices=("0.2.0-rc.7", "0.2.0-rc.8"), default="0.2.0-rc.8")
+    parser.add_argument("--engine-version", choices=("0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9"), default="0.2.0-rc.8")
     parser.add_argument("--iscc", type=Path, default=Path(r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"))
     args = parser.parse_args()
     version = args.engine_version
     payload_hashes = PAYLOAD
-    if version == "0.2.0-rc.8":
-        pins = json.loads((INSTALLER.parent / "RC8-Payload.json").read_text(encoding="utf-8"))
+    if version != "0.2.0-rc.7":
+        rc = version.rsplit(".", 1)[1]
+        manifest = INSTALLER.parent / f"RC{rc}-Payload.json"
+        if not manifest.is_file():
+            raise SystemExit(f"Pinned RC{rc} payload manifest is not available; build and audit the candidate first.")
+        pins = json.loads(manifest.read_text(encoding="utf-8"))
         if pins["engineVersion"] != version or set(pins["sha256"]) != set(PAYLOAD):
-            raise SystemExit("Invalid pinned RC8 payload manifest.")
+            raise SystemExit(f"Invalid pinned RC{rc} payload manifest.")
         payload_hashes = {name: (macro, pins["sha256"][name]) for name, (macro, _) in PAYLOAD.items()}
     output = args.output_directory.resolve()
     if not output.is_relative_to(REPO / "artifacts") or output == REPO / "artifacts" or output.exists():
@@ -56,7 +60,9 @@ def main():
     (payload / "PayloadHashes.iss").write_text("".join(definitions), encoding="ascii")
     (payload / "manager.id").write_text("SLC-68A45C44-2026-OneFile-1\n", encoding="ascii")
     command = [str(args.iscc), "/Qp", "/D" + "PayloadDir=" + str(payload),
-               "/DEngineVersion=" + version, "/O" + str(output), str(INSTALLER)]
+               "/DEngineVersion=" + version,
+               "/DFileVersion=0.2.0." + version.rsplit(".", 1)[1] + "001",
+               "/O" + str(output), str(INSTALLER)]
     result = subprocess.run(command, capture_output=True)
     (output / "compiler.private.log").write_bytes(result.stdout + result.stderr)
     if result.returncode:
@@ -75,7 +81,7 @@ def main():
         "sourceTreeDirty": dirty, "wrapperSourceSha256": sha256(INSTALLER),
         "buildScriptSha256": sha256(Path(__file__)), "compilerSha256": sha256(args.iscc),
         "payloadHashes": {name: expected for name, (_, expected) in payload_hashes.items()},
-        "payloadByteIdenticalToRC7": version.endswith(".7"), "xlamRebuilt": version.endswith(".8"),
+        "payloadByteIdenticalToRC7": version.endswith(".7"), "xlamRebuilt": not version.endswith(".7"),
         "status": "unsigned evaluation prerelease", "runtimeValidation": "not performed by this build script",
     }
     (output / "OneFile-Build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")

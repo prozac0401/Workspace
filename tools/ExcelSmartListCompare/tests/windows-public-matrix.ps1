@@ -14,6 +14,12 @@ $q="'ExcelSmartListCompare.xlam'!"
 $ownedBooks=[Collections.Generic.List[object]]::new()
 $previous=$null
 function Release-Com($v){if($null -ne $v -and [Runtime.InteropServices.Marshal]::IsComObject($v)){[void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($v)}}
+function Close-OwnedBook($v){
+    if($null -eq $v){return}
+    $v.Close($false)
+    [void]$ownedBooks.Remove($v)
+    Release-Com $v
+}
 function Fill($s,[string[]]$addresses,[string[]]$values){for($i=0;$i -lt $addresses.Count;$i++){$c=$s.Range($addresses[$i]);$c.NumberFormat='@';$c.Value2=$values[$i];Release-Com $c}}
 try {
     $caseNames=@('HORIZONTAL-VERTICAL','VERTICAL-HORIZONTAL','RECTANGLE-LINE','SINGLE-ONLY','MULTI-AREA','OVERLAP','WHOLE-ROW','WHOLE-COLUMN','HIDDEN-ROW','HIDDEN-COLUMN','AUTOFILTER-HEADER','TABLE-FILTER-TOTALS','MANUAL-CALCULATION','SAME-RANGE-SNAPSHOT')
@@ -58,9 +64,27 @@ try {
         $results | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $output 'public-matrix.json') -Encoding UTF8
         Write-Host ($id+': '+$pass)
         $e.Calculation=$oldCalculation
-        $rs.Range('T1').Value2='USER_EDIT_SENTINEL';$previous=$result
+        $rs.Range('T1').Value2='USER_EDIT_SENTINEL'
         Release-Com $rs
         if(-not $pass){throw ('Public selection failed: '+$id)}
+        # Keep one edited result for the NEXT operation's preservation check.
+        # At most three synthetic books coexist, independent of case count.
+        $sameRange=[object]::ReferenceEquals($ra,$rb)
+        $sameSheet=[object]::ReferenceEquals($a,$b)
+        Release-Com $ra
+        if(-not $sameRange){Release-Com $rb}
+        Release-Com $a
+        if(-not $sameSheet){Release-Com $b}
+        $ra=$null;$rb=$null;$a=$null;$b=$null;$rs=$null
+        Close-OwnedBook $book
+        $book=$null
+        Close-OwnedBook $previous
+        $previous=$result
+        $results[$results.Count-1]['retainedOwnedBooks']=$ownedBooks.Count
+        if($ownedBooks.Count -ne 1){throw 'Synthetic workbook retention exceeded the single-result bound.'}
+        # Release temporary property RCWs after each small case, not 14 cases later.
+        [GC]::Collect();[GC]::WaitForPendingFinalizers()
+        $results | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $output 'public-matrix.json') -Encoding UTF8
     }
 } finally {
     if($null -ne (Get-Variable oldCalculation -ErrorAction SilentlyContinue)){$e.Calculation=$oldCalculation}

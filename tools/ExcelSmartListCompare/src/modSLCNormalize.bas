@@ -72,15 +72,15 @@ Private Function NormalizeWhitespace(ByVal s As String) As String
 End Function
 
 Private Function SafeNarrow(ByVal s As String) As String
-    Dim i As Long, code As Long, ch As String, result As String
+    Dim i As Long, code As Long
     For i = 1 To Len(s)
-        ch = Mid$(s, i, 1)
-        code = AscW(ch)
+        code = AscW(Mid$(s, i, 1))
         If code < 0 Then code = code + 65536
-        If code >= &HFF01& And code <= &HFF5E& Then ch = ChrW(code - &HFEE0&)
-        result = result & ch
+        If code >= &HFF01& And code <= &HFF5E& Then
+            Mid$(s, i, 1) = ChrW(code - &HFEE0&)
+        End If
     Next i
-    SafeNarrow = result
+    SafeNarrow = s
 End Function
 
 Private Function NumericValueToInvariantText(ByVal v As Variant) As String
@@ -263,6 +263,10 @@ Public Sub SLC_NormalizeTests()
     CheckDifferent SLC_Normalize(True), SLC_Normalize(-1), "boolean"
     CheckEqual SLC_Normalize(" " & ChrW(160)), "", "empty normalized"
     CheckEqual SLC_Normalize("9007199254740993"), "#n:9007199254740993", "long text precision"
+    CheckEqual SLC_Normalize(SLC_U("D64D AE38 B3D9 FF21 FF01 FF5E")), SLC_U("0023 0074 003A D64D AE38 B3D9 0061 0021 007E"), "mixed Unicode narrowing"
+    CheckEqual SLC_Normalize(String$(4096, SLC_U("FF21"))), "#t:" & String$(4096, "a"), "maximum-length narrowing"
+    CheckEqual SLC_Normalize(ChrW(&HFF00) & SLC_U("FF21") & ChrW(&HFF5F)), _
+        "#t:" & ChrW(&HFF00) & "a" & ChrW(&HFF5F), "narrowing boundaries"
 End Sub
 
 Private Sub CheckEqual(ByVal a As String, ByVal b As String, ByVal label As String)

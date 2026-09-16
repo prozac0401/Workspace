@@ -94,7 +94,7 @@ def main():
     parser.add_argument("--xlam", type=Path, required=True)
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
-    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8"), default=VERSION)
+    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9"), default=VERSION)
     args = parser.parse_args()
     version = args.installer_version
     rc = int(version.rsplit(".", 1)[1])
@@ -116,6 +116,9 @@ def main():
         html_names["RC8_COMPLETION_REPORT.md"] = "Completion-Report.html"
         html_names["UNLOCKED_UI_REPORT.md"] = "RC7-Native-Report.html"
         report = "Completion-Report.html"
+    if rc >= 9:
+        html_names["RC8_COMPLETION_REPORT.md"] = "RC8-Previous-Report.html"
+        html_names["RC9_STABILITY_REPORT.md"] = "Completion-Report.html"
     output = args.output_directory.resolve()
     if not output.is_relative_to(REPO / "artifacts") or output == REPO / "artifacts" or output.exists():
         raise SystemExit("Choose a fresh directory under this repository's artifacts.")

@@ -47,7 +47,7 @@ Public Function SLC_RibbonReady() As Boolean
 End Function
 
 Public Function SLC_ReleaseVersion() As String
-    SLC_ReleaseVersion = "0.2.0-rc.8"
+    SLC_ReleaseVersion = "0.2.0-rc.9"
 End Function
 
 Public Sub SLC_GetContextMenu(ByVal control As Office.IRibbonControl, ByRef content)
@@ -254,10 +254,11 @@ End Sub
 
 Private Sub RunSelection(ByVal replaceOnly As Boolean)
     Dim selected As Range, parts As Collection, exclusions As Collection
-    Dim current As CSLCList
+    Dim current As CSLCList, previousPending As CSLCList
     Dim oldCancel As XlEnableCancelKey
     Dim errNo As Long, errText As String
     Dim setState As Boolean, combining As Boolean, oldInteractive As Boolean
+    Dim operationCommitted As Boolean
 
     If mBusy Then Exit Sub
     On Error GoTo Failed
@@ -276,6 +277,7 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     End If
 
     mBusy = True
+    Set previousPending = mPending
     mCancelled = False
     mStarted = Timer
     oldCancel = Application.EnableCancelKey
@@ -291,6 +293,8 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     ' The selected Range is already captured and mBusy rejects re-entry.
     Set exclusions = MetadataRects(selected.Worksheet)
     Set current = ReadParts(selected, parts, exclusions)
+    ' A cancellation queued during the last partial chunk must precede commit.
+    Checkpoint
     If current.Total = 0 Then
         ReleaseStatus
         MsgBox SLC_U("C120 D0DD D55C 0020 C140 C5D0 0020 BE44 AD50 D560 0020 AC12 C774 0020 C5C6 C2B5 B2C8 B2E4 002E") & vbCrLf & _
@@ -300,17 +304,23 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
         GoTo Finished
     End If
     If Not combining Then
-        Set mPending = current
         SetStatus SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(current.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9")
+        Checkpoint
+        ' No event dispatch or dialogs between the final check and commit.
+        Application.EnableCancelKey = xlDisabled
+        Set mPending = current
+        operationCommitted = True
     Else
         ShowComparison mPending, current
+        operationCommitted = True
+        Application.EnableCancelKey = xlDisabled
         Set mPending = Nothing
         ReleaseStatus
     End If
 Finished:
     If setState Then
-        Application.EnableCancelKey = oldCancel
         Application.Interactive = oldInteractive
+        Application.EnableCancelKey = oldCancel
     End If
     mBusy = False
     RefreshUI
@@ -319,15 +329,21 @@ Failed:
     errNo = Err.Number
     errText = Err.Description
     On Error Resume Next
+    If mBusy And Not operationCommitted Then Set mPending = previousPending
     If setState Then
-        Application.EnableCancelKey = oldCancel
+        Application.EnableCancelKey = xlDisabled
         Application.Interactive = oldInteractive
     End If
     ReleaseStatus
     mBusy = False
     RefreshUI
+    If setState Then Application.EnableCancelKey = oldCancel
     On Error GoTo 0
-    If errNo = 18 Or errNo = ERR_CANCEL Then
+    If operationCommitted Then
+        MsgBox SLC_U("C791 C5C5 0020 ACB0 ACFC B294 0020 B9CC B4E4 C5B4 C84C C9C0 B9CC 0020 0045 0078 0063 0065 006C 0020 C0C1 D0DC B97C 0020 BCF5 C6D0 D558 B294 0020 C911 0020 BB38 C81C AC00 0020 C0DD ACBC C2B5 B2C8 B2E4 002E") & vbCrLf & _
+               SLC_U("ACB0 ACFC B97C 0020 D655 C778 D558 ACE0 0020 D544 C694 D55C 0020 D30C C77C C744 0020 C800 C7A5 D55C 0020 B4A4 0020 0045 0078 0063 0065 006C C744 0020 B2E4 C2DC 0020 C2E4 D589 D574 0020 C8FC C138 C694 002E") & vbCrLf & _
+               SLC_U("C624 B958 0020 CF54 B4DC 003A 0020") & CStr(errNo), vbExclamation, SLC_U("BA85 B2E8 0020 BE44 AD50")
+    ElseIf errNo = 18 Or errNo = ERR_CANCEL Then
         MsgBox SLC_U("C791 C5C5 C744 0020 CDE8 C18C D588 C2B5 B2C8 B2E4 002E 0020 B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C774 0020 C788 B2E4 BA74 0020 ADF8 B300 B85C 0020 B0A8 C544 0020 C788 C2B5 B2C8 B2E4 002E"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
     Else
         MsgBox errText & vbCrLf & vbCrLf & SLC_U("B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D ACFC 0020 C6D0 BCF8 0020 B0B4 C6A9 C740 0020 BC14 B00C C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E") & _
@@ -456,6 +472,7 @@ Private Function MetadataRects(ByVal ws As Worksheet) As Collection
     If optionalError = 18 Then Err.Raise 18
     If Not af Is Nothing Then AddRect rects, af.Range.Rows(1)
     For Each lo In ws.ListObjects
+        Checkpoint
         Set hdr = Nothing
         On Error Resume Next
         Set hdr = lo.HeaderRowRange
@@ -497,8 +514,10 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
     Dim ar As Range, block As Range, vals As Variant, v As Variant
     Dim r0 As Long, takeRows As Long, rowStep As Long, nr As Long, nc As Long
     Dim r As Long, c As Long, absR As Long, absC As Long, tick As Long
+    Dim firstRow As Long, firstColumn As Long, unseen As Boolean
     Dim coordinate As String
-    Set seen = CreateObject("Scripting.Dictionary")
+    ' A single rectangular part cannot visit the same cell twice.
+    If parts.Count > 1 Then Set seen = CreateObject("Scripting.Dictionary")
     result.Source = SourceLabel(sel)
     result.CapturedAt = Now
     result.FragmentCount = parts.Count
@@ -514,13 +533,20 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
             If r0 + takeRows - 1 > nr Then takeRows = nr - r0 + 1
             Set block = ar.Cells(r0, 1).Resize(takeRows, nc)
             vals = block.Value2
+            ' Keep Excel object-model calls outside the per-cell loop.
+            firstRow = block.Row
+            firstColumn = block.Column
             For r = 1 To takeRows
-                absR = block.Row + r - 1
+                absR = firstRow + r - 1
                 For c = 1 To nc
-                    absC = block.Column + c - 1
-                    coordinate = CStr(absR) & ":" & CStr(absC)
-                    If Not seen.Exists(coordinate) Then
-                        seen.Add coordinate, True
+                    absC = firstColumn + c - 1
+                    unseen = True
+                    If Not seen Is Nothing Then
+                        coordinate = CStr(absR) & ":" & CStr(absC)
+                        unseen = Not seen.Exists(coordinate)
+                        If unseen Then seen.Add coordinate, True
+                    End If
+                    If unseen Then
                         result.VisibleCellCount = result.VisibleCellCount + 1
                         If IsMetadata(absR, absC, exclusions) Then
                             result.MetadataCount = result.MetadataCount + 1
@@ -538,6 +564,7 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
             Next r
         Next r0
     Next ar
+    Checkpoint
     Set ReadParts = result
 End Function
 
@@ -669,9 +696,13 @@ Private Sub ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList)
     Set keys = CreateObject("Scripting.Dictionary")
     For Each k In a.Counts.Keys
         keys.Add CStr(k), True
+        tick = tick + 1
+        If tick Mod 1024 = 0 Then Checkpoint
     Next k
     For Each k In b.Counts.Keys
         If Not keys.Exists(CStr(k)) Then keys.Add CStr(k), True
+        tick = tick + 1
+        If tick Mod 1024 = 0 Then Checkpoint
     Next k
     For Each k In keys.Keys
         ca = CountOf(a, CStr(k))
@@ -682,6 +713,7 @@ Private Sub ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList)
         tick = tick + 1
         If tick Mod 1024 = 0 Then Checkpoint
     Next k
+    Checkpoint
     If excessA = 0 And excessB = 0 And a.DuplicateExcess = 0 And b.DuplicateExcess = 0 _
         And a.ErrorCount = 0 And b.ErrorCount = 0 Then
         ReleaseStatus
@@ -822,6 +854,9 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
     ws.Range("A9").Select
     wb.Windows(1).FreezePanes = True
     ws.Range("A1").Select
+    ' Until this checkpoint, the new workbook is provisional and the failure
+    ' handler closes only that workbook, preserving all older results.
+    Checkpoint
     ' Deliberately leave Saved=False: never discard the user's result edits.
     Application.ScreenUpdating = oldScreen
     Application.EnableEvents = oldEvents

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "product": "Excel Smart List Compare",
+  "installerVersion": "0.2.0-rc.9",
+  "date": "2026-09-17",
+  "status": "BLOCKED_POLICY",
+  "releaseDecision": "HOLD",
+  "xlamSha256": null,
+  "exeSha256": null,
+  "installerSha256": "2b96e95f8de103f8ebfb449ffa5e525bc2a26b4b5316a3ffd4fea7f8f93fedd1",
+  "sourceTextSha256": {
+    "src/CSLCList.cls": "ae5121a05f437239543da4392f38339e9dd4a750829033eab00714387d3f4fc8",
+    "src/modSLCNormalize.bas": "4b8750adb6dc5115b379450af15d1ffde998157a7df03a7cef9575c74dcc4c45",
+    "src/modSLCMain.bas": "8ef390829b5bfd679f048dd88140174c00e3e1a4c42162a240af8ae4f2d55382",
+    "src/ThisWorkbook_events.txt": "8e3dd984a00a569f6c46bc998a2f0f8f68138435f8d934e9dc86ae23c6c7f5ec",
+    "src/CSLCAppEvents.cls": "1422aec4fb85ae03241362502982018afea128e2fee6a623b9fffca0fe977247",
+    "src/customUI14.xml": "3f1ca3b18affc986f4c9c66430598927333cc39a79d381a2b8ba37fa60b184cb"
+  },
+  "checks": {
+    "sourceMatchesBinary": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "normalizationAndIntegration": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "wordingAndState": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "selectionMatrix": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "cancellation": "NEEDS_MANUAL: actual Esc is not tested; previous RC8 failures remain unresolved",
+    "autoLoad": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "reinstall": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "uninstall": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "python": "PASS: 76 tests in 67.921 seconds; no native Excel cancellation claim",
+    "docs": "PASS: strict build; 15 public pages plus 404, routes/assets/search/sitemap; changed Markdown local links",
+    "windowState": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "upgrade": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "contextMenuContent": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
+    "nativeContextMenu": "NEEDS_MANUAL: no node_repl Computer Use runtime in current session"
+  },
+  "independentChecks": {
+    "upgradeRollbackFunctions": {
+      "status": "PASS",
+      "assertions": 23,
+      "scope": "isolated synthetic files and HKCU branch"
+    },
+    "trustedLocationFunctions": {
+      "status": "PASS",
+      "assertions": 23,
+      "scope": "isolated synthetic files and HKCU branch"
+    },
+    "innoCompilation": {
+      "status": "PASS",
+      "scope": "synthetic non-executable payload, not a release candidate"
+    },
+    "temporaryVbaSettingChanged": false,
+    "restoration": {
+      "status": "PASS",
+      "registryGroupsUnchanged": 14,
+      "productInstalled": false,
+      "remainingExcelProcesses": 0
+    }
+  },
+  "limitations": [
+    "No new XLAM, exact-file Excel runtime validation or installable RC9 release was produced.",
+    "Native input-tool availability and approved developer access are separate requirements.",
+    "Runtime resource telemetry is diagnostic; admission thresholds do not cap running CPU usage.",
+    "Compilation, injection probes and later retries never replace required native acceptance."
+  ]
+}

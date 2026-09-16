@@ -13,7 +13,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProductId = 'SLC-68A45C44-2026'
 $Version = '0.2.0'
-$InstallerVersion = '0.2.0-rc.8'
+$InstallerVersion = '0.2.0-rc.9'
 $Root = $PSScriptRoot
 $InstallDir = Join-Path $env:LOCALAPPDATA 'ExcelSmartListCompare'
 $Target = Join-Path $InstallDir 'ExcelSmartListCompare.xlam'
@@ -26,6 +26,21 @@ $script:ExcelSessionBook = $null
 $mutex = $null
 $acquired = $false
 $script:ExitCode = 0
+$script:SetupPhase = 'EngineEntered'
+
+function Set-SetupPhase([string]$Phase) {
+    $script:SetupPhase = $Phase
+    if ($env:SLC_SETUP_DIAGNOSTICS -eq '1') { Write-Host ('SLC_SETUP_PHASE=' + $Phase) }
+}
+Set-SetupPhase 'EngineEntered'
+if ($env:SLC_SETUP_DIAGNOSTICS -eq '1') {
+    Write-Host ('SLC_SETUP_HOST_VERSION=' + $PSVersionTable.PSVersion.ToString())
+    Write-Host ('SLC_SETUP_HOST_64BIT=' + [Environment]::Is64BitProcess)
+    $diagnosticProcess = [Diagnostics.Process]::GetCurrentProcess()
+    try { Write-Host ('SLC_SETUP_HOST_EXECUTABLE=' + $diagnosticProcess.MainModule.FileName) }
+    catch { Write-Host 'SLC_SETUP_HOST_EXECUTABLE=Unavailable' }
+    finally { $diagnosticProcess.Dispose() }
+}
 
 function Setup-Failure([string]$Message, [int]$Code = 1) {
     $failure = New-Object System.InvalidOperationException($Message)
@@ -571,6 +586,7 @@ function Remove-PreviousVersion($Options, $OpenEntries, $Manager, $ManagerEntry,
     }
 }
 function Install-Addin {
+    Set-SetupPhase 'InstallPlan'
     $oldManifest = Read-OwnManifest
     $plan = Plan-Install $oldManifest
     $ownedFiles = @('ExcelSmartListCompare.xlam','Setup.ps1','Uninstall.cmd','README.md','install.json')
@@ -584,20 +600,24 @@ function Install-Addin {
     if (-not (Test-Path -LiteralPath $payload)) { throw '설치에 필요한 XLAM 파일이 없습니다. 완성된 설치 파일을 다시 받아 주세요. Build_Release.cmd는 개발자가 설치 파일을 만들 때 사용합니다.' }
     # Read every required package file before removing anything, including when
     # the source is inside the installed directory.
+    Set-SetupPhase 'ReadPackage'
     $package = [ordered]@{'ExcelSmartListCompare.xlam'=[IO.File]::ReadAllBytes($payload)}
     foreach ($name in @('Setup.ps1','Uninstall.cmd','README.md')) { $package[$name] = [IO.File]::ReadAllBytes((Join-Path $Root $name)) }
     $payloadHash = Bytes-Sha256 $package['ExcelSmartListCompare.xlam']
     $officeVersion = Excel-RegistrationVersion
     if ($null -ne $oldManifest -and [string]$oldManifest.excelVersion -ne $officeVersion) { throw '이전 설치 때와 Office 버전이 다릅니다. 기존 설치 폴더의 Uninstall.cmd로 Excel 명단 비교를 제거한 뒤 다시 설치해 주세요.' }
+    Set-SetupPhase 'TrustPreflight'
     $trustPlan = Plan-TrustedLocation $officeVersion $oldManifest
     $question = switch ($plan.mode) {
         'Upgrade' { '이전 버전을 제거하고 새 버전을 설치할까요?' + "`r`n" + '이전 버전: '+$plan.previous + "`r`n" + '설치할 버전: '+$InstallerVersion }
         'Repair' { '같은 버전이 이미 설치되어 있습니다. 다시 설치할까요?' + "`r`n" + '버전: '+$InstallerVersion }
         default { '지금 로그인한 Windows 계정에 Excel 명단 비교를 설치할까요?' }
     }
+    Set-SetupPhase 'InstallConfirmation'
     if (-not (Confirm-Action ($question + "`r`n`r`n" +
         'Excel을 열면 명단 비교 메뉴가 나타나도록 설치합니다. 아래 폴더에서 매크로를 실행할 수 있도록 Excel의 신뢰할 수 있는 위치에 등록합니다. 새로 등록할 때는 하위 폴더를 포함하지 않습니다.' + "`r`n" + $InstallDir + "`r`n" +
         '이 폴더 안의 매크로는 별도 확인 없이 실행될 수 있습니다. Excel 명단 비교 파일만 보관해 주세요.'))) { return }
+    Set-SetupPhase 'InstallSnapshot'
     $optionPath = (Excel-UserPath $officeVersion) + '\Options'
     $backup = @{}
     $written = @{}
@@ -613,6 +633,7 @@ function Install-Addin {
     $installFailed = $false
     try {
         if ($plan.mode -eq 'Upgrade') {
+            Set-SetupPhase 'RemovePreviousVersion'
             $manager = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(((Excel-UserPath $officeVersion)+'\Add-in Manager'),$true)
             if ($null -ne $manager -and $manager.GetValueNames() -contains $Target) {
                 $managerBefore = [pscustomobject]@{value=$manager.GetValue($Target,$null,[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames);kind=$manager.GetValueKind($Target)}
@@ -621,6 +642,7 @@ function Install-Addin {
             Remove-PreviousVersion $options $before $manager $managerBefore $backup
             Write-Host ('이전 버전을 제거했습니다. 새로 설치할 버전: '+$InstallerVersion)
         } elseif ($plan.mode -eq 'Repair') { Write-Host ('같은 버전을 다시 설치합니다. 버전: '+$InstallerVersion) }
+        Set-SetupPhase 'WritePackage'
         [void](New-Item -ItemType Directory -Path $InstallDir -Force)
         foreach ($name in $package.Keys) {
             $written[$name] = Bytes-Sha256 $package[$name]
@@ -628,6 +650,7 @@ function Install-Addin {
             Write-InstallFile (Join-Path $InstallDir $name) $package[$name] $expected
         }
         if ((File-Sha256 $Target) -ne $payloadHash) { throw '복사한 추가 기능 파일이 원본과 다릅니다. 설치 파일을 다시 받아 실행해 주세요.' }
+        Set-SetupPhase 'VerifyPhysicalPath'
         Assert-UnredirectedInstallPath $Target
         $names = @($before.Keys | Sort-Object)
         if ($names.Count) { $openName = $names[0] }
@@ -640,19 +663,26 @@ function Install-Addin {
         $manifestBytes = [Text.UTF8Encoding]::new($false).GetBytes(($data | ConvertTo-Json -Depth 4))
         $written['install.json'] = Bytes-Sha256 $manifestBytes
         $expected = if ($backup.ContainsKey('install.json')) { Bytes-Sha256 $backup['install.json'] } else { $null }
+        Set-SetupPhase 'WriteManifest'
         Write-InstallFile $Manifest $manifestBytes $expected
+        Set-SetupPhase 'RegisterTrustedLocation'
         Enable-TrustedLocation $officeVersion $trustPlan
+        Set-SetupPhase 'RegisterAutoload'
         $current = $options.GetValue($openName,$null)
         if ($null -ne $current -and [string]$current -ine ('"'+$Target+'"') -and [string]$current -ine $Target) { throw '설치 중 다른 작업에서 Excel의 자동 실행 설정을 바꿨습니다. 바뀐 설정은 그대로 두었습니다.' }
         $options.SetValue($openName,('"'+$Target+'"'),[Microsoft.Win32.RegistryValueKind]::String)
         foreach ($duplicate in $names) { if ($duplicate -ne $openName -and (Own-OpenEntries $options).ContainsKey($duplicate)) { $options.DeleteValue($duplicate,$false) } }
         $options.Flush()
         if ([string]$options.GetValue($openName) -cne ('"'+$Target+'"')) { throw 'Excel을 열 때 명단 비교가 자동으로 실행되도록 설정하지 못했습니다.' }
+        Set-SetupPhase 'InstallCommitted'
         Write-Host 'Excel 명단 비교를 설치했습니다. Excel을 열고 [추가 기능] 탭에서 시작하세요. 셀을 마우스 오른쪽 버튼으로 누른 뒤 [명단 비교]를 선택해도 됩니다.'
         Write-Host ('매크로 실행을 허용한 폴더: ' + $InstallDir + ' (기존 Excel 신뢰 위치 설정은 그대로 두었습니다.)')
         Write-Host ('제거할 때 실행할 파일: ' + (Join-Path $InstallDir 'Uninstall.cmd'))
     } catch {
         $installFailed = $true
+        $_.Exception.Data['SlcSetupPhase'] = $script:SetupPhase
+        if ($env:SLC_SETUP_DIAGNOSTICS -eq '1') { Write-Host ('SLC_SETUP_FAILURE_PHASE=' + $script:SetupPhase) }
+        Set-SetupPhase 'InstallRollback'
         if ($null -ne $trustPlan.PSObject.Properties['created'] -and $trustPlan.created) { Remove-OwnedTrustedLocation $officeVersion $trustPlan.record }
         # Stop loading the product while restoring its files.
         foreach ($name in @((Own-OpenEntries $options).Keys)) { $options.DeleteValue($name,$false) }
@@ -683,12 +713,15 @@ function Install-Addin {
     }
 }
 function Uninstall-Addin {
+    Set-SetupPhase 'UninstallPlan'
     $data = Read-OwnManifest
     if ($null -eq $data) { Write-Host 'Excel 명단 비교의 설치 기록이 없습니다. 파일과 다른 추가 기능은 그대로 두었습니다.'; return }
     if (-not (Confirm-Action ('Excel 명단 비교를 제거할까요?' + "`r`n`r`n" + '기존 Excel 파일과 다른 추가 기능은 그대로 둡니다.'))) { return }
     $version = [string]$data.excelVersion
     if ($version -notmatch '^\d+\.0$') { throw '설치 기록에서 Excel 버전을 확인할 수 없어 제거를 중단했습니다.' }
+    Set-SetupPhase 'UnregisterTrustedLocation'
     if ($null -ne $data.PSObject.Properties['trustedLocation']) { Remove-OwnedTrustedLocation $version $data.trustedLocation }
+    Set-SetupPhase 'UnregisterAutoload'
     $options = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(((Excel-UserPath $version)+'\Options'),$true)
     if ($null -ne $options) {
         try { foreach ($name in @((Own-OpenEntries $options).Keys)) { $options.DeleteValue($name,$false) }; $options.Flush() }
@@ -696,12 +729,14 @@ function Uninstall-Addin {
     }
     $manager = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(((Excel-UserPath $version)+'\Add-in Manager'),$true)
     if ($null -ne $manager) { try { foreach ($name in $manager.GetValueNames()) { if ($name -ieq $Target) { $manager.DeleteValue($name,$false) } } } finally { $manager.Close() } }
+    Set-SetupPhase 'RemovePackage'
     foreach ($name in @('ExcelSmartListCompare.xlam','README.md','Uninstall.cmd','Setup.ps1','install.json')) {
         $file = Join-Path $InstallDir $name
         if (Test-Path -LiteralPath $file -PathType Leaf) { Remove-Item -LiteralPath $file -Force }
     }
     if ((Get-ChildItem -LiteralPath $InstallDir -Force | Measure-Object).Count -eq 0) { Remove-Item -LiteralPath $InstallDir -Force }
     else { Write-Host '설치 폴더에 따로 추가된 파일은 그대로 두었습니다.' }
+    Set-SetupPhase 'UninstallCommitted'
     Write-Host 'Excel 명단 비교를 제거했습니다. 기존 Excel 파일과 다른 추가 기능은 그대로 두었습니다.'
 }
 
@@ -726,10 +761,12 @@ function Test-Addin {
 }
 
 try {
+    Set-SetupPhase 'AcquireMutex'
     if ($env:OS -ne 'Windows_NT') { throw '이 프로그램은 Windows에 설치된 데스크톱용 Excel에서 사용할 수 있습니다.' }
     $mutex = New-Object Threading.Mutex($false, 'Local\ExcelSmartListCompare-Setup')
     $acquired = $mutex.WaitOne(0)
     if (-not $acquired) { throw (Setup-Failure 'Excel 명단 비교를 설치하거나 제거하는 작업이 진행 중입니다. 끝난 뒤 다시 실행해 주세요.' 4) }
+    Set-SetupPhase 'ExcelPreflight'
     $active = @(Get-Process EXCEL -ErrorAction SilentlyContinue | Where-Object { $_.SessionId -eq (Get-Process -Id $PID).SessionId })
     if ($active.Count -gt 0) { throw (Setup-Failure 'Excel에서 작업 중인 내용을 저장하고 모든 Excel 창을 닫은 뒤 다시 실행해 주세요. 프로그램을 강제로 종료하지 않습니다.' 3) }
     switch ($Action) {
@@ -744,6 +781,13 @@ try {
         'Test' { Test-Addin }
     }
 } catch {
+    if ($env:SLC_SETUP_DIAGNOSTICS -eq '1') {
+        $failurePhase = $script:SetupPhase
+        if ($_.Exception.Data.Contains('SlcSetupPhase')) { $failurePhase = [string]$_.Exception.Data['SlcSetupPhase'] }
+        Write-Host ('SLC_SETUP_FAILURE_PHASE=' + $failurePhase)
+        Write-Host ('SLC_SETUP_FAILURE_TYPE=' + $_.Exception.GetType().FullName)
+        Write-Host ('SLC_SETUP_FAILURE_HRESULT=' + $_.Exception.HResult)
+    }
     Write-Host ('오류가 발생한 스크립트 위치: ' + $_.ScriptStackTrace)
     Write-Error $_ -ErrorAction Continue
     Write-Host '보안 정책은 그대로 두었습니다. 매크로나 PowerShell 실행이 차단된 경우에는 IT 담당자에게 설치 방법을 문의해 주세요.'

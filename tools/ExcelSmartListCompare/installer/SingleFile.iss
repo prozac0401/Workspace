@@ -15,6 +15,9 @@
 #ifndef EngineVersion
   #define EngineVersion "0.2.0-rc.7"
 #endif
+#ifndef FileVersion
+  #define FileVersion "0.2.0.7001"
+#endif
 #include AddBackslash(PayloadDir) + "PayloadHashes.iss"
 
 [Setup]
@@ -44,7 +47,7 @@ UninstallDisplayIcon={uninstallexe}
 OutputBaseFilename=ExcelSmartListCompare-{#EngineVersion}-Setup
 Compression=lzma2
 SolidCompression=yes
-VersionInfoVersion=0.2.0.7001
+VersionInfoVersion={#FileVersion}
 VersionInfoDescription=Excel 명단 비교 설치 프로그램
 VersionInfoProductName=Excel Smart List Compare
 
@@ -232,12 +235,15 @@ begin
 end;
 
 function RunEngine(Directory, Action: String): Integer;
-var PreviousNoPause: String; Started: Boolean;
+var PreviousNoPause, PreviousDiagnostics: String; Started: Boolean;
 begin
   PreviousNoPause := GetEnv('SLC_SETUP_NO_PAUSE');
+  PreviousDiagnostics := GetEnv('SLC_SETUP_DIAGNOSTICS');
   if not SetEnvironmentVariable('SLC_SETUP_NO_PAUSE', '1') then
     RaiseException('설치에 필요한 준비 작업을 마치지 못했습니다. 설치 프로그램을 다시 실행해 주세요.');
   try
+    if not SetEnvironmentVariable('SLC_SETUP_DIAGNOSTICS', '1') then
+      RaiseException('설치 기록을 준비하지 못했습니다. 설치 프로그램을 다시 실행해 주세요.');
     Log('SLC_ENGINE_ACTION=' + Action);
     { No path is interpolated into shell code. The fixed launcher is resolved in
       the explicit working directory, including paths with shell metacharacters. }
@@ -250,6 +256,7 @@ begin
     end;
     Log('SLC_ENGINE_EXIT_CODE=' + IntToStr(Result));
   finally
+    SetEnvironmentVariable('SLC_SETUP_DIAGNOSTICS', PreviousDiagnostics);
     SetEnvironmentVariable('SLC_SETUP_NO_PAUSE', PreviousNoPause);
   end;
 end;

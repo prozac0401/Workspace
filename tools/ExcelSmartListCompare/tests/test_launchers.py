@@ -7,6 +7,7 @@ HKCU/HKLM policies. The real Setup test holds its mutex before starting it.
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import unittest
@@ -25,6 +26,9 @@ $ErrorActionPreference = 'Stop'
     processPolicy = [string](Get-ExecutionPolicy -Scope Process)
     root = $PSScriptRoot
     apartment = [string][Threading.Thread]::CurrentThread.GetApartmentState()
+    hostVersion = $PSVersionTable.PSVersion.ToString()
+    hostExecutable = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+    hostIs64Bit = [Environment]::Is64BitProcess
 } | ConvertTo-Json | Set-Content -LiteralPath $env:SLC_TEST_RESULT -Encoding UTF8
 exit ([int]$env:SLC_TEST_EXIT)
 '''
@@ -129,6 +133,8 @@ class WindowsLaunchers(unittest.TestCase):
                 self.assertEqual(state["policy"], "RemoteSigned")
                 self.assertEqual(state["processPolicy"], "RemoteSigned")
                 self.assertEqual(state["apartment"], "STA")
+                self.assertTrue(state["hostVersion"].startswith("5.1."), state)
+                self.assertEqual(Path(state["hostExecutable"]), Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe")
                 self.assertEqual(Path(state["root"]), folder)
                 self.assertEqual(original, (folder / "Setup.ps1").read_bytes())
                 self.assertFalse(has_zone(folder / "Setup.ps1"))
@@ -144,6 +150,42 @@ class WindowsLaunchers(unittest.TestCase):
         self.assertIn("설치에 필요한 Setup.ps1 파일이 없습니다", result.stdout + result.stderr)
         self.assertFalse((folder / "result.json").exists())
         self.assert_parent_preserved(folder)
+
+    def test_launchers_ignore_a_powershell_executable_on_path(self):
+        # A file in the distribution/PATH must not select the host. This invalid
+        # executable would make the old unqualified invocation fail to start.
+        for launcher, action in LAUNCHERS.items():
+            with self.subTest(launcher=launcher):
+                folder = self.fixture(launcher)
+                (folder / "powershell.exe").write_bytes(b"not a Windows executable")
+                result = self.run_ps(folder, INVOKE, launcher, PATH=str(folder), SLC_SETUP_DIAGNOSTICS="1")
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                state = json.loads((folder / "result.json").read_text(encoding="utf-8-sig"))
+                self.assertEqual(state["action"], action)
+                self.assertTrue(state["hostVersion"].startswith("5.1."), state)
+                self.assertEqual(Path(state["hostExecutable"]), Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe")
+                self.assertIn("SLC_LAUNCHER_PREPARE_ENTERED", result.stdout)
+                self.assertIn("SLC_LAUNCHER_ENGINE_EXIT=0", result.stdout)
+                self.assert_parent_preserved(folder)
+
+    def test_failed_host_launch_preserves_stage_and_exit_without_retry(self):
+        for phase in ("PREPARE", "ENGINE"):
+            with self.subTest(phase=phase):
+                folder = self.fixture()
+                launcher = folder / "Install.cmd"
+                lines = launcher.read_text(encoding="ascii").splitlines()
+                selector = " -Command " if phase == "PREPARE" else " -STA "
+                index = next(i for i, line in enumerate(lines) if selector in line)
+                lines[index] = '"%ComSpec%" /D /C exit 5'
+                launcher.write_bytes(("\r\n".join(lines) + "\r\n").encode("ascii"))
+                result = self.run_ps(folder, INVOKE, SLC_SETUP_DIAGNOSTICS="1")
+                self.assertEqual(result.returncode, 5, result.stdout + result.stderr)
+                self.assertIn(f"SLC_LAUNCHER_{phase}_EXIT=5", result.stdout)
+                self.assertEqual(result.stdout.count(f"SLC_LAUNCHER_{phase}_START"), 1)
+                self.assertFalse((folder / "result.json").exists())
+                if phase == "PREPARE":
+                    self.assertNotIn("SLC_LAUNCHER_ENGINE_START", result.stdout)
+                self.assert_parent_preserved(folder)
 
     def test_unblock_failure_stops_before_setup(self):
         folder = self.fixture()
@@ -202,11 +244,16 @@ exit $code
         for launcher in ("Install.cmd", "Uninstall.cmd"):
             with self.subTest(launcher=launcher):
                 folder = self.fixture(launcher, real_setup=True)
-                result = self.run_ps(folder, command, launcher)
+                result = self.run_ps(folder, command, launcher, SLC_SETUP_DIAGNOSTICS="1")
                 if result.returncode == 99:
                     self.skipTest("Another setup owns the product mutex")
                 self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
-                self.assertIn("Excel 명단 비교를 설치하거나 제거하는 작업이 진행 중입니다", result.stdout + result.stderr)
+                # Windows PowerShell wraps error text based on the full fixture
+                # path; wrapping may split a Korean word as well as whitespace.
+                self.assertIn("Excel명단비교를설치하거나제거하는작업이진행중입니다",
+                              re.sub(r"\s+", "", result.stdout + result.stderr))
+                self.assertIn("SLC_SETUP_PHASE=EngineEntered", result.stdout)
+                self.assertIn("SLC_SETUP_FAILURE_PHASE=AcquireMutex", result.stdout)
                 self.assert_parent_preserved(folder)
 
 
