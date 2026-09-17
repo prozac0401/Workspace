@@ -73,7 +73,13 @@
   },
   "remainingLimitations": "Raw StatusBar restoration FAIL, cancellation and context content PARTIAL, and remaining native/lifecycle gates incomplete as recorded in validation.json. No additional Excel, UAC, restart or installer execution was performed for publication.",
   "pages": {
-    "status": "PREPARING_PUBLIC_LINK_UPDATE",
-    "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/"
+    "status": "PUBLISHED_VERIFIED",
+    "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/",
+    "httpStatus": 200,
+    "workflowUrl": "https://github.com/prozac0401/Workspace/actions/runs/35169043562",
+    "workflowConclusion": "success",
+    "sourceCommit": "c682457b454530c31ffec2a0793a54cc2f38f255",
+    "rc9DownloadLinks": "PASS",
+    "limitationsBeforeDownload": "PASS"
   }
 }

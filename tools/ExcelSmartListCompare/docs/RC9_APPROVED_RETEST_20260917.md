@@ -235,20 +235,8 @@ candidate-05·07 시험 XLAM의 해시는 각각 고정했다. 공개한 제한 
 | `ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-win-x64.zip` | `42426395d5f6ec00d4658e61c16fea655950dfd730682fb0839f8078b4923056` |
 | `ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-Source.zip` | `7bc2dd24861c61b208ab1a43042ba257a6f1186f8e0464db9c89bc2eac5832e4` |
 
-위 세 파일과 SHA-256 파일 3개, `Validation.json`, `OneFile-Build.json`의 **업로드 자산 8개 모두 공개 HTTP 200과 다운로드 바이트·해시 일치**를 확인했다. 설치 ZIP·소스 ZIP 무결성과 EXE/ZIP의 동일 payload 핀도 확인했다. 공개 링크 반영 후 MkDocs strict 빌드와 공개 15페이지+404·링크·공개 범위 검사가 PASS다. 게시 증거는 [공개 배포 기록](../evidence/rc9/release.json)에 남겼다.
+위 세 파일과 SHA-256 파일 3개, `Validation.json`, `OneFile-Build.json`의 **업로드 자산 8개 모두 공개 HTTP 200과 다운로드 바이트·해시 일치**를 확인했다. 설치 ZIP·소스 ZIP 무결성과 EXE/ZIP의 동일 payload 핀도 확인했다. 공개 링크 반영 후 MkDocs strict 빌드와 공개 15페이지+404·링크·공개 범위 검사가 PASS다. 게시 증거는 [공개 배포 기록](https://github.com/prozac0401/Workspace/blob/main/tools/ExcelSmartListCompare/evidence/rc9/release.json)에 남겼다.
 
 게시 프로필은 `limited-evaluation`, 배포 등급은 `LIMITED_EVALUATION`, 전체 인수는 **NOT_MET**다. EXE 실행·설치 수명주기는 **NOT_RUN**이며 원시 StatusBar 복원 FAIL, 취소 PARTIAL, 다른 미완료 실기와 환경 원복 미완료를 유지한다. 게시를 위해 Excel·UAC·재시작·설치기를 추가 실행하지 않았고 고정한 RELEASE_README 바이트와 공개 자산도 수정하지 않았다.
 
-## 실제 공개와 다운로드 검증
-
-2026-09-17 00:58:14 UTC에 [RC9 제한 평가판](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9)을 공개했다. 태그 대상은 `6196ca9f80f16c0496b25db3d9a5e28859aa243f`이며 GitHub prerelease다. EXE 제작 커밋과 배포 커밋의 제품·설치 입력은 같으며 배포 커밋에는 제작 기록만 추가됐다.
-
-| 공개 파일 | SHA-256 |
-|---|---|
-| ExcelSmartListCompare-0.2.0-rc.9-Setup.exe | `416978e5bf455c1980e5ef6a3d290d9f7c2d726996fa44349c00d9d5428b8996` |
-| ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-win-x64.zip | `42426395d5f6ec00d4658e61c16fea655950dfd730682fb0839f8078b4923056` |
-| ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-Source.zip | `7bc2dd24861c61b208ab1a43042ba257a6f1186f8e0464db9c89bc2eac5832e4` |
-
-업로드 자산 8개를 다시 내려받아 원본 바이트와 비교했고, 공개 주소에서도 인증 없이 모두 HTTP 200·동일 SHA-256을 확인했다. EXE 구성 입력 5개와 ZIP의 동일 파일 해시, XLAM 직렬화 소스·RibbonX, ZIP CRC 및 HTML 로컬 링크를 확인했다. EXE는 유효한 PE이며 코드 서명이 없다. 이 기록은 EXE 내부 payload의 독립 추출·설치 화면·설치 수명주기 실행 검증을 뜻하지 않는다.
-
-[기계 판독용 게시 기록](https://github.com/prozac0401/Workspace/blob/main/tools/ExcelSmartListCompare/evidence/rc9/release.json)에 자산 전체 해시와 공개 상태를 남긴다. 전체 인수 NOT_MET, 원시 상태표시줄 복원 FAIL, 취소 PARTIAL 및 남은 NOT_RUN은 그대로다. 이 게시를 위해 Excel·UAC·재시작·설치기를 추가 실행하지 않았다.
+EXE 정적 검사는 유효한 PE·버전·서명 없음과 구성 입력의 해시 일치를 확인했다. EXE 내부 payload의 독립 추출·설치 화면·설치 수명주기 실행 검증을 뜻하지 않는다.
