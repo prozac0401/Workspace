@@ -1,10 +1,10 @@
 # RC9 · 임시 개발 접근 허용 후 제작·재검증
 
-날짜: 2026-09-17 · 상태: **candidate-07 제한 평가판(LIMITED EVALUATION) 배포 결정. 전체 인수 NOT_MET, 실제 게시 확인 대기.**
+날짜: 2026-09-17 · 상태: **candidate-07 제한 평가판(LIMITED EVALUATION) prerelease 게시 완료. 전체 인수 NOT_MET 유지.**
 
 사용자는 임시 VBA 프로젝트 접근과 후속 검증·릴리즈 작업의 자율 진행을 명시적으로 허용했다. 앞선 [RC7 오류 재실험](RETEST_20260917.md)의 허용 답변 대기는 해소됐다. 이 보고서는 승인 후 시작한 RC9 작업의 기록이며, RC7·RC8의 통과·실패 결과를 새 바이너리 결과로 사용하지 않는다.
 
-후속 진단 충돌과 잔류 프로세스로 추가 설치 실기가 막힌 뒤, 사용자는 재시작·관리자 작업 없이 현재 가능한 상태를 릴리즈하도록 명시했다. [ADR-0015](ADR-0015-Limited-evaluation-release.md)에 따라 확인한 candidate-07 XLAM을 서명 없는 EXE·ZIP의 **제한 평가판 prerelease**로 준비한다. 전체 인수는 `NOT_MET`이고 raw StatusBar 복원 FAIL, 취소 PARTIAL, 자동 로드·전체 창/프로세스·새 EXE 수명주기 NOT_RUN과 환경 차단을 유지한다. 회사의 정식 도입·상용 승인과 구분하며 실제 파일 제작·게시는 별도 확인한다.
+후속 진단 충돌과 잔류 프로세스로 추가 설치 실기가 막힌 뒤, 사용자는 재시작·관리자 작업 없이 현재 가능한 상태를 릴리즈하도록 명시했다. [ADR-0015](ADR-0015-Limited-evaluation-release.md)에 따라 확인한 candidate-07 XLAM을 서명 없는 EXE·ZIP의 **제한 평가판 prerelease**로 공개했다. 전체 인수는 `NOT_MET`이고 raw StatusBar 복원 FAIL, 취소 PARTIAL, 자동 로드·전체 창/프로세스·새 EXE 수명주기 NOT_RUN과 환경 차단을 유지한다. 회사의 정식 도입·상용 승인과 구분하며 실제 파일·게시·다운로드 대조 결과는 아래에 기록했다.
 
 현재 RC9 `candidate-05`의 저장된 XLAM을 실제로 시험했다. 기본 용량 10가지와 대용량 3가지, 100ms 비교 취소는 확인했지만, 100ms 바꾸기는 취소되지 않고 100,000개로 교체됐다. 첫 바꾸기 시험의 호스트 비정상 종료 뒤 보조 코드를 보강해 재실행하자 시험과 Excel 종료는 완료됐지만 같은 취소 실패가 남았다. 새 릴리즈를 검증 완료로 표시하지 않는다.
 
@@ -204,9 +204,9 @@ candidate-06 복구에서는 처음 시도의 JSON 필드명 오류와 잠긴 �
 | T05 / 취소·확정 시점 오류 주입 | 최초 상태·체크포인트 4개 PASS와 집계 오류 FAIL 보존. r3 설정 복원 FAIL, r4 진단 오류창·Excel 비정상 종료/RPC·실행 중 helper 변경 FAIL | 진단 파일 고정·오류 반환 보완 후 별도 재실행. 실제 키 취소와 구분 |
 | T06 / 실제 입력 거절·크기 보호 안내 | 07 범위 보호 7조건 PASS, 정확한 안내/버튼과 상태 단언 128개 결합 평가 | 원래 조정기 FAIL·관찰기 OS 종료 코드 미수집을 보존. 처리 중 Esc와 별도 집계 |
 | I01 / 최종 실행기·EXE 수명주기 | 07 수정 CMD 설치 종료 0·실제 설치 해시 일치. 새 EXE 전체 수명주기 NOT_RUN, 잔류 환경 때문에 추가 설치 차단 | 제한 평가판의 새 EXE 설치·자동 로드·반복·업데이트·제거 미검증을 명시 |
-| V01 / 최종 소스 회귀·문법·문서 | 해당 소스 시점 Python 전체 97 PASS/83.142초/SKIP 없음, 최신 보고서 포장 매핑 반영 | 최종 문서 strict 빌드·공개 링크·비공개 노출 및 실제 패키지 확인 필요 |
+| V01 / 최종 소스 회귀·문법·문서 | 최종 포장 프로필 포함 Python 전체 115 PASS/80.259초/SKIP 없음, strict 문서·공개 링크 PASS | 공개 15페이지·404·검색·사이트맵·로컬 링크와 ZIP 무결성·입력 해시 확인. 실제 Excel 미완료 항목은 별도 유지 |
 | R01 / 최종 원복 | 미완료. r4 복구 합성 문서는 정상 닫음, 창 없는 시험 자식 잔류와 보안 재확인 대기 | 초기 미설치·개발 접근·정책·타 등록·소유 프로세스와 임시 작업 최종 비교 |
-| R02 / 지원 범위·릴리즈 | LIMITED_EVALUATION 결정 / 전체 인수 NOT_MET / 실제 제작·게시 확인 대기 | 같은 XLAM을 포장한 unsigned EXE·ZIP의 해시·제한 안내·prerelease 게시를 별도 확인 |
+| R02 / 지원 범위·릴리즈 | LIMITED_EVALUATION prerelease 게시 완료 / 전체 인수 NOT_MET | 동일 XLAM의 unsigned EXE·ZIP과 자산 8개 HTTP 200·다운로드 해시 일치. 실제 EXE 설치 NOT_RUN 유지 |
 
 ## 과거 실패와 이번 판정의 경계
 
@@ -214,12 +214,41 @@ RC7에서는 48자 고유값 각 20,000개가 끝까지 출력됐지만 각 50,0
 
 상속된 PowerShell 모듈 검색 경로의 준비 오류는 실행기 소스에서 수정했다. RC7 기존 본체와 수정 CMD를 조합한 반복 성공 이후 추가 설치 코드 1 실패가 한 번 남았고 후속 10개 작업은 성공했다. 새 RC9 패키지도 고정 입력 해시로 실제 설치를 확인하기 전에는 간헐 실패가 해결됐다고 판정하지 않는다.
 
-candidate-05·07 시험 XLAM의 해시는 각각 고정했다. 사용자 요청에 따른 제한 평가판은 candidate-07의 관찰 범위·실패·미실행·원복 미완료를 함께 제공한다. 새 EXE·ZIP 해시와 실제 게시 여부는 별도 확정하며 포장 성공을 설치 실행 통과로 바꾸지 않는다. VBA 파일이 바뀌면 앞선 바이너리의 실기를 재사용하지 않는다.
+candidate-05·07 시험 XLAM의 해시는 각각 고정했다. 공개한 제한 평가판은 candidate-07의 관찰 범위·실패·미실행·원복 미완료를 함께 제공한다. 새 EXE·ZIP 해시와 실제 게시·다운로드 일치를 확인했으며 포장 성공을 설치 실행 통과로 바꾸지 않는다. VBA 파일이 바뀌면 앞선 바이너리의 실기를 재사용하지 않는다.
 
-2026-09-17: 사용자 허용 후 RC9 제작·재검증 기록을 분리했다. candidate-05·07의 실제 통과·실패와 진단 충돌을 보존했고, 추가 환경 복구가 불가능한 상태에서 현재 파일을 배포하라는 요청에 따라 제한 평가판을 결정했다. 전체 인수는 NOT_MET이며 실제 게시 확인은 대기 중이다.
+2026-09-17: 사용자 허용 후 RC9 제작·재검증 기록을 분리했다. candidate-05·07의 실제 통과·실패와 진단 충돌을 보존했고, 현재 파일을 배포하라는 요청에 따라 제한 평가판을 공개했다. 전체 인수는 NOT_MET이며 게시 성공으로 기존 실패·미실행 판정을 바꾸지 않았다.
 
 ## 제한 평가판 포장 검증
 
 사용자 요청을 반영한 포장 프로필 변경 후 Python 전체 회귀 **115개 PASS, 80.259초, SKIP 없음**을 확인했다. 기존 전체 인수 게이트와 제한 평가판의 명시적 승인·동일 파일·핵심 검사·실패 기록 보존을 함께 검사했다. 문서 strict 빌드와 공개 페이지 15개·404·로컬 링크·검색·사이트맵 검사도 PASS다. 이 결과는 Excel 추가 실행이나 새 EXE 설치 수명주기 통과를 뜻하지 않는다.
 
-최종 EXE는 깨끗한 소스 커밋 `239467f6d3b19670280c60b19ca6fbcb34eed919`에서 Inno Setup으로 제작했다. SHA-256은 `416978e5bf455c1980e5ef6a3d290d9f7c2d726996fa44349c00d9d5428b8996`이며, 같은 candidate-07 XLAM과 고정한 설치 파일 5개를 포함한다. 설치 전에 표준 안내 화면으로 제한 평가판과 알려진 실패·미검증을 표시한다. **컴파일 성공 / EXE 실제 실행 NOT_RUN / 전체 인수 NOT_MET**다. 공개용 [EXE 빌드 기록](https://github.com/prozac0401/Workspace/blob/excel-smart-list-compare-v0.2.0-rc.9/tools/ExcelSmartListCompare/evidence/rc9/onefile-build.json)에 프로필·입력 해시·제작 커밋을 남겼다. ZIP 제작과 게시·다운로드 재검증은 후속 배포 기록으로 남긴다.
+최종 EXE는 깨끗한 소스 커밋 `239467f6d3b19670280c60b19ca6fbcb34eed919`에서 Inno Setup으로 제작했다. SHA-256은 `416978e5bf455c1980e5ef6a3d290d9f7c2d726996fa44349c00d9d5428b8996`이며, 같은 candidate-07 XLAM과 고정한 설치 파일 5개를 포함한다. 설치 전에 표준 안내 화면으로 제한 평가판과 알려진 실패·미검증을 표시한다. **컴파일 성공 / EXE 실제 실행 NOT_RUN / 전체 인수 NOT_MET**다. 공개용 [EXE 빌드 기록](https://github.com/prozac0401/Workspace/blob/excel-smart-list-compare-v0.2.0-rc.9/tools/ExcelSmartListCompare/evidence/rc9/onefile-build.json)에 프로필·입력 해시·제작 커밋을 남겼다. ZIP 제작과 게시·다운로드 재검증 결과는 다음 배포 기록에 남겼다.
+
+
+## 제한 평가판 실제 게시 · 2026-09-17
+
+[RC9 제한 평가판 prerelease](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9)는 **2026-09-17 00:58:14 UTC / 09:58:14 KST**에 공개됐다. 태그 `excel-smart-list-compare-v0.2.0-rc.9`의 소스 커밋은 `6196ca9f80f16c0496b25db3d9a5e28859aa243f`다. EXE 제작 커밋 `239467f6d3b19670280c60b19ca6fbcb34eed919`와 배포 소스 커밋의 제품·설치 입력은 같다.
+
+| 공개 산출물 | SHA-256 |
+|---|---|
+| `ExcelSmartListCompare-0.2.0-rc.9-Setup.exe` | `416978e5bf455c1980e5ef6a3d290d9f7c2d726996fa44349c00d9d5428b8996` |
+| `ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-win-x64.zip` | `42426395d5f6ec00d4658e61c16fea655950dfd730682fb0839f8078b4923056` |
+| `ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-Source.zip` | `7bc2dd24861c61b208ab1a43042ba257a6f1186f8e0464db9c89bc2eac5832e4` |
+
+위 세 파일과 SHA-256 파일 3개, `Validation.json`, `OneFile-Build.json`의 **업로드 자산 8개 모두 공개 HTTP 200과 다운로드 바이트·해시 일치**를 확인했다. 설치 ZIP·소스 ZIP 무결성과 EXE/ZIP의 동일 payload 핀도 확인했다. 공개 링크 반영 후 MkDocs strict 빌드와 공개 15페이지+404·링크·공개 범위 검사가 PASS다. 게시 증거는 [공개 배포 기록](../evidence/rc9/release.json)에 남겼다.
+
+게시 프로필은 `limited-evaluation`, 배포 등급은 `LIMITED_EVALUATION`, 전체 인수는 **NOT_MET**다. EXE 실행·설치 수명주기는 **NOT_RUN**이며 원시 StatusBar 복원 FAIL, 취소 PARTIAL, 다른 미완료 실기와 환경 원복 미완료를 유지한다. 게시를 위해 Excel·UAC·재시작·설치기를 추가 실행하지 않았고 고정한 RELEASE_README 바이트와 공개 자산도 수정하지 않았다.
+
+## 실제 공개와 다운로드 검증
+
+2026-09-17 00:58:14 UTC에 [RC9 제한 평가판](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9)을 공개했다. 태그 대상은 `6196ca9f80f16c0496b25db3d9a5e28859aa243f`이며 GitHub prerelease다. EXE 제작 커밋과 배포 커밋의 제품·설치 입력은 같으며 배포 커밋에는 제작 기록만 추가됐다.
+
+| 공개 파일 | SHA-256 |
+|---|---|
+| ExcelSmartListCompare-0.2.0-rc.9-Setup.exe | `416978e5bf455c1980e5ef6a3d290d9f7c2d726996fa44349c00d9d5428b8996` |
+| ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-win-x64.zip | `42426395d5f6ec00d4658e61c16fea655950dfd730682fb0839f8078b4923056` |
+| ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-Source.zip | `7bc2dd24861c61b208ab1a43042ba257a6f1186f8e0464db9c89bc2eac5832e4` |
+
+업로드 자산 8개를 다시 내려받아 원본 바이트와 비교했고, 공개 주소에서도 인증 없이 모두 HTTP 200·동일 SHA-256을 확인했다. EXE 구성 입력 5개와 ZIP의 동일 파일 해시, XLAM 직렬화 소스·RibbonX, ZIP CRC 및 HTML 로컬 링크를 확인했다. EXE는 유효한 PE이며 코드 서명이 없다. 이 기록은 EXE 내부 payload의 독립 추출·설치 화면·설치 수명주기 실행 검증을 뜻하지 않는다.
+
+[기계 판독용 게시 기록](https://github.com/prozac0401/Workspace/blob/main/tools/ExcelSmartListCompare/evidence/rc9/release.json)에 자산 전체 해시와 공개 상태를 남긴다. 전체 인수 NOT_MET, 원시 상태표시줄 복원 FAIL, 취소 PARTIAL 및 남은 NOT_RUN은 그대로다. 이 게시를 위해 Excel·UAC·재시작·설치기를 추가 실행하지 않았다.

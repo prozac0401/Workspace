@@ -1,6 +1,6 @@
 # Excel 명단 비교 설치 안내
 
-**0.2.0 RC9 제한 평가판 · LIMITED EVALUATION**입니다. 사용자가 현재 가능한 파일의 배포를 요청해 서명 없는 EXE·ZIP을 준비합니다. 실제 게시 여부는 배포 페이지를 확인하세요. **전체 인수는 NOT_MET이며 새 EXE의 실제 설치·업데이트·제거는 미검증입니다.**
+**0.2.0 RC9 제한 평가판 · LIMITED EVALUATION**을 2026-09-17에 [prerelease로 공개했습니다](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9). 서명 없는 EXE·ZIP과 업로드 자산 8개의 다운로드 바이트 일치를 확인했습니다. **전체 인수는 NOT_MET이며 새 EXE의 실제 설치·업데이트·제거는 미검증입니다.**
 
 candidate-07 XLAM은 수정 CMD로 설치해 실제 해시 일치를 확인했습니다. 이후 복구 진단에서 Excel이 비정상 종료했고 창 없는 시험 프로세스가 남아 기존 설치 보호가 추가 설치를 막고 있습니다. 모든 창을 닫았더라도 이 상태의 PC에서는 설치가 계속 차단될 수 있습니다. 보호를 끄거나 반복 설치하지 마세요.
 
