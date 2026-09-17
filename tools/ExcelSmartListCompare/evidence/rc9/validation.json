@@ -6,7 +6,7 @@
   "status": "BLOCKED_ENVIRONMENT",
   "releaseDecision": "LIMITED_EVALUATION",
   "xlamSha256": "61574c0f0acc68fb7b49507fa95c7201768515f4c5edfd563e3caf3915c19efc",
-  "exeSha256": null,
+  "exeSha256": "416978e5bf455c1980e5ef6a3d290d9f7c2d726996fa44349c00d9d5428b8996",
   "installerSha256": "2b96e95f8de103f8ebfb449ffa5e525bc2a26b4b5316a3ffd4fea7f8f93fedd1",
   "sourceTextSha256": {
     "src/CSLCList.cls": "ae5121a05f437239543da4392f38339e9dd4a750829033eab00714387d3f4fc8",
@@ -81,7 +81,7 @@
     "remainingIssue": "A windowless child from the owned diagnostic crash remains visible to Windows process checks; cleanup and final security/state verification are pending"
   },
   "limitations": [
-    "The exact saved candidate is being packaged under the explicit limited-evaluation profile. Full acceptance remains unmet.",
+    "The exact saved candidate was compiled into an EXE under the explicit limited-evaluation profile. Runtime installation is NOT_RUN and full acceptance remains unmet.",
     "The candidate build retained a normal-exit cleanup failure. Later independent binary tests do not relabel that build or the failed diagnostic runs as PASS.",
     "Controlled replacement evidence supports the tested state-preservation behavior, not direct key reception, an observed cancellation popup, or guaranteed cancellation for every operation and input duration.",
     "Remaining native, state-restoration and installation gates stay incomplete while Windows cleanup blocks further isolated trials.",
@@ -105,8 +105,12 @@
     "decision": "Publish the current verified candidate as an unsigned limited evaluation at the user request. Administrator cleanup and restart are unavailable; remaining native and lifecycle checks are not waived or relabeled as PASS."
   },
   "packaging": {
-    "status": "PREPARING",
+    "status": "EXE_COMPILED",
+    "exeBuildSourceCommit": "239467f6d3b19670280c60b19ca6fbcb34eed919",
     "exeRuntimeValidation": "NOT_RUN",
-    "codeSigning": "UNSIGNED"
+    "codeSigning": "UNSIGNED",
+    "payloadPinned": true,
+    "sameTestedXlam": true,
+    "limitedNoticeIncluded": true
   }
 }

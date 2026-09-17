@@ -221,3 +221,5 @@ candidate-05·07 시험 XLAM의 해시는 각각 고정했다. 사용자 요청�
 ## 제한 평가판 포장 검증
 
 사용자 요청을 반영한 포장 프로필 변경 후 Python 전체 회귀 **115개 PASS, 80.259초, SKIP 없음**을 확인했다. 기존 전체 인수 게이트와 제한 평가판의 명시적 승인·동일 파일·핵심 검사·실패 기록 보존을 함께 검사했다. 문서 strict 빌드와 공개 페이지 15개·404·로컬 링크·검색·사이트맵 검사도 PASS다. 이 결과는 Excel 추가 실행이나 새 EXE 설치 수명주기 통과를 뜻하지 않는다.
+
+최종 EXE는 깨끗한 소스 커밋 `239467f6d3b19670280c60b19ca6fbcb34eed919`에서 Inno Setup으로 제작했다. SHA-256은 `416978e5bf455c1980e5ef6a3d290d9f7c2d726996fa44349c00d9d5428b8996`이며, 같은 candidate-07 XLAM과 고정한 설치 파일 5개를 포함한다. 설치 전에 표준 안내 화면으로 제한 평가판과 알려진 실패·미검증을 표시한다. **컴파일 성공 / EXE 실제 실행 NOT_RUN / 전체 인수 NOT_MET**다. 공개용 [EXE 빌드 기록](https://github.com/prozac0401/Workspace/blob/excel-smart-list-compare-v0.2.0-rc.9/tools/ExcelSmartListCompare/evidence/rc9/onefile-build.json)에 프로필·입력 해시·제작 커밋을 남겼다. ZIP 제작과 게시·다운로드 재검증은 후속 배포 기록으로 남긴다.
