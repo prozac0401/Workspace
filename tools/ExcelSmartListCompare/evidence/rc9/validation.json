@@ -6,7 +6,7 @@
   "status": "BLOCKED_ENVIRONMENT",
   "releaseDecision": "PUBLISH_WITH_RECORDED_RESULTS",
   "xlamSha256": "61574c0f0acc68fb7b49507fa95c7201768515f4c5edfd563e3caf3915c19efc",
-  "exeSha256": null,
+  "exeSha256": "afafd3a286fb9bfc36d91e146b30560139d405a1b0dc1ba30a0678b27dc5765a",
   "installerSha256": "2b96e95f8de103f8ebfb449ffa5e525bc2a26b4b5316a3ffd4fea7f8f93fedd1",
   "sourceTextSha256": {
     "src/CSLCList.cls": "ae5121a05f437239543da4392f38339e9dd4a750829033eab00714387d3f4fc8",
@@ -90,7 +90,7 @@
   "releaseProfile": "documented-exceptions",
   "fullAcceptancePassed": false,
   "packaging": {
-    "status": "PREPARING_PACKAGE_REVISION_2",
+    "status": "EXE_COMPILED",
     "exeRuntimeValidation": "NOT_RUN",
     "codeSigning": "UNSIGNED",
     "sameTestedXlam": true,
@@ -103,7 +103,12 @@
       "QuickGuide.html",
       "SHA256SUMS.txt"
     ],
-    "technicalRecords": "Separate Verification.zip and source repository; excluded from installation ZIP and EXE user guide"
+    "technicalRecords": "Separate Verification.zip and source repository; excluded from installation ZIP and EXE user guide",
+    "exeBuildSourceCommit": "0ceda4d7911cea0d34749f741f478f99c027ae5a",
+    "packageRevision": 2,
+    "fileVersion": "0.2.0.9002",
+    "specialInfoBeforePage": false,
+    "payloadPinned": true
   },
   "packageRevision": 2,
   "releaseExceptions": {

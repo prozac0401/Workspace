@@ -1,8 +1,30 @@
 {
   "product": "Excel Smart List Compare",
   "engineVersion": "0.2.0-rc.9",
+  "wrapperVersion": "2",
+  "exe": "ExcelSmartListCompare-0.2.0-rc.9-Setup.exe",
+  "exeSha256": "afafd3a286fb9bfc36d91e146b30560139d405a1b0dc1ba30a0678b27dc5765a",
+  "payloadSourceCommit": "0ceda4d7911cea0d34749f741f478f99c027ae5a",
+  "wrapperSourceCommit": "0ceda4d7911cea0d34749f741f478f99c027ae5a",
+  "baseCommit": "0ceda4d7911cea0d34749f741f478f99c027ae5a",
+  "sourceTreeDirty": false,
+  "wrapperSourceSha256": "0f9f59b611bfeafdf53251e2c04cf83798ef64a25dbec9d9ea43ccee16bece3f",
+  "buildScriptSha256": "e65a4c58f49abe688fae2d2ad3ccb1c867053c14e7bbfba0a49746609d711074",
+  "compilerSha256": "a7472a35be9cd63da59e54c2622a0d8b048ab2ec85382e2b2d47a5a79dbf9bef",
+  "payloadHashes": {
+    "Install.cmd": "856101b23c7296a97406e41ccb1bbf475d4d196e392f0d1dcce085eb5cdd6bd5",
+    "Uninstall.cmd": "35874701e8d930f1258d7cd9e7de554855c7e989e02f54f686014908c56b1712",
+    "Setup.ps1": "2b96e95f8de103f8ebfb449ffa5e525bc2a26b4b5316a3ffd4fea7f8f93fedd1",
+    "README.md": "ee80afb4ae14dfccd3a41a4d45d51a4d00bc7ee757ece6f0592025799b1e5b0a",
+    "ExcelSmartListCompare.xlam": "61574c0f0acc68fb7b49507fa95c7201768515f4c5edfd563e3caf3915c19efc"
+  },
+  "payloadByteIdenticalToRC7": false,
+  "xlamRebuilt": true,
+  "xlamRebuiltThisRun": false,
+  "xlamReused": true,
+  "releaseProfile": "documented-exceptions",
   "packageRevision": 2,
-  "status": "BUILD_PENDING",
-  "previousBuildSourceCommit": "239467f6d3b19670280c60b19ca6fbcb34eed919",
-  "previousBuildRecordPath": "tools/ExcelSmartListCompare/evidence/rc9/onefile-build.json"
+  "fileVersion": "0.2.0.9002",
+  "status": "unsigned prerelease",
+  "runtimeValidation": "not performed by this build script"
 }
