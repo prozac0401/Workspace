@@ -22,6 +22,8 @@ OLD_XLAM = "c6f55886c368294c4e21396366d0cf3c368605e965f3ca2bd153f2e75bc8ae86"
 SOURCES = ("src/CSLCList.cls", "src/modSLCNormalize.bas", "src/modSLCMain.bas", "src/ThisWorkbook_events.txt")
 CHECKS = ("sourceMatchesBinary", "normalizationAndIntegration", "wordingAndState", "selectionMatrix",
           "cancellation", "autoLoad", "reinstall", "uninstall", "python", "docs")
+LIMITED_CORE_CHECKS = frozenset(("sourceMatchesBinary", "normalizationAndIntegration", "selectionMatrix",
+                               "nativeContextMenu", "python", "docs"))
 HTML_NAMES = {
     "QUICK_GUIDE.md": "QuickGuide.html",
     "WORDING_UPDATE.md": "Wording-Report.html",
@@ -147,12 +149,65 @@ def release_report_layout(rc):
     return html_names, report
 
 
+def validate_acceptance_profile(validation, checks, rc, profile):
+    """A separately authorized RC9 evaluation never relabels incomplete checks."""
+    results = validation["checks"]
+    if set(results) != set(checks):
+        raise SystemExit("Required validation is incomplete or failed.")
+    if profile == "limited-evaluation":
+        if rc != 9:
+            raise SystemExit("Limited evaluation is defined only for RC9.")
+        decision = validation.get("limitedEvaluation", {})
+        if (validation.get("releaseProfile") != profile
+                or validation.get("releaseDecision") != "LIMITED_EVALUATION"
+                or not isinstance(decision, dict)
+                or decision.get("userAuthorized") is not True
+                or decision.get("notForProduction") is not True):
+            raise SystemExit("Limited evaluation requires explicit matching user-authorized decision metadata.")
+        for name in LIMITED_CORE_CHECKS:
+            result = results[name]
+            if not isinstance(result, str) or not (result == "PASS" or result.startswith("PASS:")):
+                raise SystemExit("Limited evaluation requires PASS for " + name + ".")
+        incomplete = []
+        for name in checks:
+            result = results[name]
+            if not isinstance(result, str):
+                raise SystemExit("Limited evaluation requires explicit result strings.")
+            status = result.split(":", 1)[0]
+            if status not in {"PASS", "FAIL", "PARTIAL", "NOT_RUN", "NEEDS_MANUAL", "BLOCKED_ENV", "BLOCKED_ENVIRONMENT", "BLOCKED_POLICY"}:
+                raise SystemExit("Unknown limited evaluation check status: " + name)
+            if status != "PASS":
+                incomplete.append(name)
+        accepted = decision.get("acceptedIncompleteChecks")
+        if (not isinstance(accepted, list) or any(not isinstance(name, str) for name in accepted)
+                or len(accepted) != len(set(accepted)) or set(accepted) != set(incomplete)):
+            raise SystemExit("Accepted incomplete checks must exactly match the unchanged non-PASS results.")
+        return incomplete
+    if (validation.get("releaseProfile") not in (None, "full")
+            or validation.get("releaseDecision") == "LIMITED_EVALUATION"
+            or "limitedEvaluation" in validation):
+        raise SystemExit("Limited evaluation metadata requires the explicit limited-evaluation profile.")
+    native_checks = {"cancellation", "nativeContextMenu"}
+    required = tuple(c for c in checks if c not in native_checks)
+    if any(not str(results[c]).startswith("PASS") for c in required):
+        raise SystemExit("Required validation is incomplete or failed.")
+    # Preserve the original full-profile rules, including the historical <=RC7
+    # locked-desktop exception. RC8/RC9 continue to require native PASS results.
+    for name in native_checks.intersection(checks):
+        accepted = ("PASS",) if rc >= 8 else ("PASS", "NOT_RUN: desktop locked")
+        if not str(results[name]).startswith(accepted):
+            raise SystemExit(name + " needs a result or the explicit locked-desktop limitation.")
+    return []
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--xlam", type=Path, required=True)
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
     parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9"), default=VERSION)
+    parser.add_argument("--release-profile", choices=("full", "limited-evaluation"), default="full",
+                        help="Full acceptance by default; RC9 limited evaluation requires explicit reviewed authorization metadata.")
     args = parser.parse_args()
     version = args.installer_version
     rc = int(version.rsplit(".", 1)[1])
@@ -181,16 +236,8 @@ def main():
         raise SystemExit("Validation does not describe this version and exact XLAM.")
     if rc >= 6 and validation.get("installerSha256") != sha256(TOOL / "Setup.ps1"):
         raise SystemExit("Installer changed after upgrade validation.")
-    native_checks = {"cancellation", "nativeContextMenu"}
-    required = tuple(c for c in checks if c not in native_checks)
-    if set(validation["checks"]) != set(checks) or any(not str(validation["checks"][c]).startswith("PASS") for c in required):
-        raise SystemExit("Required validation is incomplete or failed.")
-    # A locked desktop prevents native menu/Esc input. This explicit limitation is
-    # allowed only for the unsigned evaluation prerelease and is shipped intact.
-    for name in native_checks.intersection(checks):
-        accepted = ("PASS",) if rc >= 8 else ("PASS", "NOT_RUN: desktop locked")
-        if not str(validation["checks"][name]).startswith(accepted):
-            raise SystemExit(name + " needs a result or the explicit locked-desktop limitation.")
+    incomplete = validate_acceptance_profile(validation, checks, rc, args.release_profile)
+    limited = args.release_profile == "limited-evaluation"
     source_hashes = {name: text_hash((TOOL / name).read_bytes()) for name in sources}
     if validation["sourceTextSha256"] != source_hashes:
         raise SystemExit("Sources have changed since binary validation.")
@@ -198,12 +245,21 @@ def main():
         validate_ribbon_package(args.xlam)
     if "$InstallerVersion = '" + version + "'" not in (TOOL / "Setup.ps1").read_text(encoding="utf-8-sig"):
         raise SystemExit("Installer version mismatch.")
+    if limited and "LIMITED EVALUATION" not in (TOOL / "docs/RELEASE_README.md").read_text(encoding="utf-8-sig")[:2048]:
+        raise SystemExit("Limited evaluation requires a visible LIMITED EVALUATION marker in the source README.")
     release = output / "Release"
     release.mkdir(parents=True)
     shutil.copyfile(args.xlam, release / "ExcelSmartListCompare.xlam")
     for name in ("Setup.ps1", "Install.cmd", "Uninstall.cmd", "Test_Excel.cmd"):
         shutil.copyfile(TOOL / name, release / name)
     shutil.copyfile(TOOL / "docs/RELEASE_README.md", release / "README.md")
+    if limited:
+        # Keep README bytes identical to the pinned source and optional EXE
+        # payload; add a separate notice without rewriting any input file.
+        notice = ("LIMITED EVALUATION - NOT FOR PRODUCTION\n"
+                  "Full acceptance is incomplete. Raw results remain in Validation.json.\n\n")
+        notice += "\n".join(name + ": " + validation["checks"][name] for name in incomplete) + "\n"
+        (release / "RELEASE_STATUS.txt").write_text(notice, encoding="utf-8")
     for source, target in html_names.items():
         report_source = TOOL / "docs" / source
         rendering.render(report_source, release / target, commit,
@@ -211,19 +267,25 @@ def main():
                          html_names=public_report_link_map(report_source, commit, html_names))
     # This input is a reviewed, public summary; raw installer diagnostics stay local.
     (release / "Validation.json").write_text(json.dumps(validation, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    (release / "EXCEL_TEST_RESULT.txt").write_text(validation["checks"]["normalizationAndIntegration"] + "\n", encoding="utf-8")
+    result_prefix = "LIMITED EVALUATION: full acceptance is incomplete; see Validation.json.\n" if limited else ""
+    (release / "EXCEL_TEST_RESULT.txt").write_text(result_prefix + validation["checks"]["normalizationAndIntegration"] + "\n", encoding="utf-8")
     (release / "SOURCE_COMMIT.txt").write_text(commit + "\n", encoding="ascii")
     (release / "BUILD_INFO.json").write_text(json.dumps({
         "product": "Excel Smart List Compare", "installerVersion": version,
         "sourceCommit": commit, "xlamSha256": digest, "xlamRebuilt": True,
         "installerSha256": sha256(TOOL / "Setup.ps1"),
         "sourceTextSha256": source_hashes, "verificationReport": report,
-        "status": "unsigned evaluation prerelease",
+        "status": "unsigned limited evaluation prerelease" if limited else "unsigned evaluation prerelease",
+        "releaseProfile": args.release_profile,
+        "releaseDecision": validation.get("releaseDecision"), "validationStatus": validation.get("status"),
+        "fullAcceptancePassed": not limited and all(str(validation["checks"][name]).startswith("PASS") for name in checks),
+        "notForProduction": True, "acceptedIncompleteChecks": incomplete,
     }, indent=2) + "\n", encoding="utf-8")
     validate_release_local_links(release)
     hashes = {p.name: sha256(p) for p in sorted(release.iterdir()) if p.is_file()}
     (release / "SHA256SUMS.txt").write_text("".join(d + "  " + n + "\n" for n, d in hashes.items()), encoding="ascii")
-    install_zip = output / ("ExcelSmartListCompare-" + version + "-win-x64.zip")
+    profile_suffix = "-limited-evaluation" if limited else ""
+    install_zip = output / ("ExcelSmartListCompare-" + version + profile_suffix + "-win-x64.zip")
     with zipfile.ZipFile(install_zip, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(release.iterdir()):
             archive.write(path, "Release/" + path.name)
@@ -233,7 +295,7 @@ def main():
         for name, expected in hashes.items():
             if hashlib.sha256(archive.read("Release/" + name)).hexdigest() != expected:
                 raise SystemExit("Packaged file hash mismatch: " + name)
-    source_zip = output / ("ExcelSmartListCompare-" + version + "-Source.zip")
+    source_zip = output / ("ExcelSmartListCompare-" + version + profile_suffix + "-Source.zip")
     prefix = f"Workspace-Excel-RC{rc}/"
     subprocess.run(["git", "archive", "--format=zip", "--prefix=" + prefix,
                     "--output=" + str(source_zip), commit], cwd=REPO, check=True)
@@ -247,6 +309,7 @@ def main():
     for path in (install_zip, source_zip):
         Path(str(path) + ".sha256").write_text(sha256(path) + "  " + path.name + "\n", encoding="ascii")
     print(json.dumps({"sourceCommit": commit, "xlamSha256": digest,
+                      "releaseProfile": args.release_profile, "acceptedIncompleteChecks": incomplete,
                       "installZip": str(install_zip), "sourceZip": str(source_zip),
                       "zipIntegrity": "PASS", "fileHashes": "PASS", "localLinks": "PASS"}, indent=2))
 
