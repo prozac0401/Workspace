@@ -18,18 +18,13 @@
 #ifndef FileVersion
   #define FileVersion "0.2.0.7001"
 #endif
-#ifdef LimitedEvaluation
-  #define DisplayName "Excel 명단 비교 (제한 평가판)"
-#else
-  #define DisplayName "Excel 명단 비교"
-#endif
 #include AddBackslash(PayloadDir) + "PayloadHashes.iss"
 
 [Setup]
 AppId={#ManagerId}
-AppName={#DisplayName}
+AppName=Excel 명단 비교
 AppVersion={#EngineVersion}
-AppVerName={#DisplayName} {#EngineVersion}
+AppVerName=Excel 명단 비교 {#EngineVersion}
 AppPublisher=Workspace
 AppPublisherURL=https://github.com/prozac0401/Workspace
 AppSupportURL=https://github.com/prozac0401/Workspace/releases
@@ -38,9 +33,6 @@ UsePreviousAppDir=no
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 DisableWelcomePage=yes
-#ifdef LimitedEvaluation
-InfoBeforeFile={#PayloadDir}\LimitedEvaluation.txt
-#endif
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -63,7 +55,7 @@ VersionInfoProductName=Excel Smart List Compare
 Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
 
 [Messages]
-SetupWindowTitle={#DisplayName} 설치
+SetupWindowTitle=Excel 명단 비교 설치
 SetupLdrStartupMessage=Excel 명단 비교를 설치할까요?
 LdrCannotCreateTemp=설치에 필요한 임시 파일을 만들지 못해 설치를 중단했습니다.
 LdrCannotExecTemp=임시 폴더에서 설치 파일을 실행하지 못해 설치를 중단했습니다.

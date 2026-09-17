@@ -2,7 +2,7 @@
 
 도구 ID: ExcelSmartListCompare · 설치기 버전: 0.2.0-rc.6 · 날짜: 2026-09-15
 
-상태: 서명되지 않은 평가용 후보. 실제 Excel COM 검사와 창 활성화 이벤트를 사용하며, 잠긴 데스크톱의 실제 우클릭·Esc 입력·화면 육안 검증은 구분한다.
+상태: 서명되지 않은 후보. 실제 Excel COM 검사와 창 활성화 이벤트를 사용하며, 잠긴 데스크톱의 실제 우클릭·Esc 입력·화면 육안 검증은 구분한다.
 
 적용 기준: [추가 도구 개발 기준](../../../docs/policies/tools.md), [문서 작성 규칙](../../../docs/policies/documentation.md), [ADR-0006](ADR-0006-Window-menu-state.md), [인수 요구 U07~U10](ACCEPTANCE_TESTS.md)
 
@@ -60,4 +60,4 @@ Excel을 모두 종료한 뒤 임시 VBA 접근을 원래의 미설정 상태로
 
 ## 배포 요약
 
-최종 검사 결과와 해시는 설치 ZIP의 `Validation.json`, `BUILD_INFO.json`, `SHA256SUMS.txt`에 포함한다. `scripts/package-excel-wording-release.py --installer-version 0.2.0-rc.6`은 새 이벤트 소스·창 상태·업데이트 검사와 설치기 해시를 추가로 확인하며, 소스 커밋·ZIP 내부 해시·오프라인 링크를 검증한다. RC6는 평가용 prerelease로 배포한다.
+최종 검사 결과와 해시는 설치 ZIP의 `Validation.json`, `BUILD_INFO.json`, `SHA256SUMS.txt`에 포함한다. `scripts/package-excel-wording-release.py --installer-version 0.2.0-rc.6`은 새 이벤트 소스·창 상태·업데이트 검사와 설치기 해시를 추가로 확인하며, 소스 커밋·ZIP 내부 해시·오프라인 링크를 검증한다. RC6는 prerelease로 배포한다.

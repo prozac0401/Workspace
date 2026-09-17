@@ -1,85 +1,16 @@
 {
   "product": "Excel Smart List Compare",
   "version": "0.2.0-rc.9",
-  "releaseProfile": "limited-evaluation",
-  "status": "PUBLISHED",
-  "url": "https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9",
-  "tag": "excel-smart-list-compare-v0.2.0-rc.9",
-  "sourceCommit": "6196ca9f80f16c0496b25db3d9a5e28859aa243f",
-  "publishedAt": "2026-09-17T00:58:14Z",
-  "prerelease": true,
+  "packageRevision": 2,
+  "releaseProfile": "documented-exceptions",
+  "status": "PREPARING",
   "fullAcceptancePassed": false,
   "exeRuntimeValidation": "NOT_RUN",
-  "assets": [
-    {
-      "name": "ExcelSmartListCompare-0.2.0-rc.9-Setup.exe",
-      "sha256": "416978e5bf455c1980e5ef6a3d290d9f7c2d726996fa44349c00d9d5428b8996",
-      "downloadMatch": true,
-      "publicHttpStatus": 200
-    },
-    {
-      "name": "ExcelSmartListCompare-0.2.0-rc.9-Setup.exe.sha256",
-      "sha256": "3e55a89e7d11f47e6392cb34d5c9db9f8e665701ad97865315d7d26fabf3724f",
-      "downloadMatch": true,
-      "publicHttpStatus": 200
-    },
-    {
-      "name": "OneFile-Build.json",
-      "sha256": "6c2b51172d59ff993023f9cf9f5f29b8f74ea7531ceefd29c1381d3df6e22749",
-      "downloadMatch": true,
-      "publicHttpStatus": 200
-    },
-    {
-      "name": "ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-Source.zip",
-      "sha256": "7bc2dd24861c61b208ab1a43042ba257a6f1186f8e0464db9c89bc2eac5832e4",
-      "downloadMatch": true,
-      "publicHttpStatus": 200
-    },
-    {
-      "name": "ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-Source.zip.sha256",
-      "sha256": "a03f00a28cbcdd0de6e9f0a43ab595c46350e38ea7acdb63a2d9bfb6a5716d6f",
-      "downloadMatch": true,
-      "publicHttpStatus": 200
-    },
-    {
-      "name": "ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-win-x64.zip",
-      "sha256": "42426395d5f6ec00d4658e61c16fea655950dfd730682fb0839f8078b4923056",
-      "downloadMatch": true,
-      "publicHttpStatus": 200
-    },
-    {
-      "name": "ExcelSmartListCompare-0.2.0-rc.9-limited-evaluation-win-x64.zip.sha256",
-      "sha256": "b402e7d9ff9f30d7d828d28581342478f15f938d0ca3e0aa0c6d5ffa0e5617c8",
-      "downloadMatch": true,
-      "publicHttpStatus": 200
-    },
-    {
-      "name": "Validation.json",
-      "sha256": "a5baf9212913bc24f5bfe72726de6fadfa4e6e305abf650e6b343e9ed4f364ea",
-      "downloadMatch": true,
-      "publicHttpStatus": 200
-    }
-  ],
-  "verification": {
-    "uploadedAssetByteComparison": "PASS: eight assets downloaded from GitHub and compared with originals",
-    "installZipIntegrity": "PASS",
-    "sourceZipIntegrity": "PASS",
-    "fivePinnedPayloadsSameInExeBuildAndZip": "PASS",
-    "candidateSourceAndRibbonAudit": "PASS",
-    "python": "PASS: 115 tests, 80.259 seconds, no skips",
-    "documentation": "PASS: final published-link strict build and 15 public pages plus 404, search, sitemap and local links",
-    "unsignedPe": "CONFIRMED: no certificate table",
-    "publicDownload": "PASS: all eight assets returned HTTP 200 without authentication and matched original SHA-256"
+  "previousPublication": {
+    "tag": "excel-smart-list-compare-v0.2.0-rc.9",
+    "sourceCommit": "6196ca9f80f16c0496b25db3d9a5e28859aa243f",
+    "recordCommit": "8e5ea15",
+    "recordPath": "tools/ExcelSmartListCompare/evidence/rc9/release.json"
   },
-  "remainingLimitations": "Raw StatusBar restoration FAIL, cancellation and context content PARTIAL, and remaining native/lifecycle gates incomplete as recorded in validation.json. No additional Excel, UAC, restart or installer execution was performed for publication.",
-  "pages": {
-    "status": "PUBLISHED_VERIFIED",
-    "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/",
-    "httpStatus": 200,
-    "workflowUrl": "https://github.com/prozac0401/Workspace/actions/runs/35169043562",
-    "workflowConclusion": "success",
-    "sourceCommit": "c682457b454530c31ffec2a0793a54cc2f38f255",
-    "rc9DownloadLinks": "PASS",
-    "limitationsBeforeDownload": "PASS"
-  }
+  "changeScope": "Installer and documentation wording; tested XLAM unchanged."
 }

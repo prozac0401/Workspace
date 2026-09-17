@@ -1,6 +1,6 @@
 """Exercise distribution guards without running a compiler or installing anything."""
 from pathlib import Path
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 import importlib.util
 import io
 import json
@@ -71,15 +71,13 @@ class OneFileReleaseProfileTests(unittest.TestCase):
         self.installer = self.root / "installer" / "SingleFile.iss"
         self.installer.parent.mkdir()
         self.installer.write_bytes(builder.INSTALLER.read_bytes())
-        self.notice = self.installer.parent / "LIMITED_EVALUATION.txt"
-        self.notice.write_text("제한 평가판\nLIMITED EVALUATION\nKnown limits.\n", encoding="utf-8")
         self.compiler = self.root / "synthetic-compiler.exe"
         self.compiler.write_bytes(b"Never executed; subprocess.run is mocked.")
         for name in builder.PAYLOAD:
-            content = "LIMITED EVALUATION\n" if name == "README.md" else "Synthetic " + name
+            content = "Known failures and untested behavior.\n" if name == "README.md" else "Synthetic " + name
             (self.release / name).write_text(content, encoding="utf-8")
 
-    def pins(self, version="0.2.0-rc.9", profile="limited-evaluation"):
+    def pins(self, version="0.2.0-rc.9", profile="documented-exceptions"):
         document = {"engineVersion": version, "sha256": {
             name: builder.sha256(self.release / name) for name in builder.PAYLOAD}}
         if profile is not None:
@@ -87,12 +85,14 @@ class OneFileReleaseProfileTests(unittest.TestCase):
         rc = version.rsplit(".", 1)[1]
         (self.installer.parent / f"RC{rc}-Payload.json").write_text(json.dumps(document), encoding="utf-8")
 
-    def invoke(self, version="0.2.0-rc.9", profile="limited-evaluation", compiler_action=None):
+    def invoke(self, version="0.2.0-rc.9", profile="documented-exceptions", revision=None, compiler_action=None):
         argv = [str(SCRIPT), "--release-directory", str(self.release),
                 "--output-directory", str(self.output), "--engine-version", version,
                 "--iscc", str(self.compiler)]
         if profile is not None:
             argv.extend(("--release-profile", profile))
+        if revision is not None:
+            argv.extend(("--package-revision", str(revision)))
 
         def compile_only(command, **kwargs):
             if compiler_action:
@@ -106,7 +106,7 @@ class OneFileReleaseProfileTests(unittest.TestCase):
         with patch.object(builder, "INSTALLER", self.installer), patch.object(sys, "argv", argv), \
                 patch.object(builder.subprocess, "run", side_effect=compile_only) as compiler, \
                 patch.object(builder.subprocess, "check_output", side_effect=git_output), \
-                redirect_stdout(io.StringIO()):
+                redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             try:
                 builder.main()
             except SystemExit:
@@ -120,66 +120,77 @@ class OneFileReleaseProfileTests(unittest.TestCase):
             self.invoke()
         self.assertFalse(self.output.exists())
 
-    def test_limited_pins_cannot_be_used_as_default_full_release(self):
+    def test_exception_pins_cannot_be_used_as_default_full_release(self):
         self.pins()
         with self.assertRaisesRegex(SystemExit, "releaseProfile does not match"):
             self.invoke(profile=None)
         self.assertFalse(self.output.exists())
 
-    def test_limited_profile_rejects_older_versions(self):
+    def test_exception_profile_rejects_older_versions(self):
         for version in ("0.2.0-rc.7", "0.2.0-rc.8"):
             with self.subTest(version=version), self.assertRaisesRegex(SystemExit, "only for RC9"):
                 self.invoke(version=version)
         self.assertFalse(self.output.exists())
 
-    def test_limited_readme_requires_explicit_marker(self):
-        (self.release / "README.md").write_text("Ordinary package", encoding="utf-8")
+    def test_readme_without_classification_marker_and_no_notice_are_accepted(self):
+        (self.release / "README.md").write_text("Product usage and recorded test results.", encoding="utf-8")
         self.pins()
-        with self.assertRaisesRegex(SystemExit, "Limited README must contain"):
-            self.invoke()
+        metadata = self.invoke()
+        self.assertEqual(metadata["releaseProfile"], "documented-exceptions")
+        self.assertEqual(set(p.name for p in (self.output / "payload").iterdir()),
+                         set(builder.PAYLOAD) | {"PayloadHashes.iss", "manager.id"})
+        self.assertFalse(any("notice" in key.lower() for key in metadata))
+
+    def test_invalid_package_revisions_are_rejected_before_compiler(self):
+        self.pins()
+        for revision in (0, -1, "1.5", "invalid"):
+            with self.subTest(revision=revision), self.assertRaises(SystemExit):
+                self.invoke(revision=revision)
         self.assertFalse(self.output.exists())
 
-    def test_limited_notice_requires_explicit_marker(self):
-        self.notice.write_text("Missing classification", encoding="utf-8")
+    def test_revision_overflow_is_rejected_before_compiler(self):
         self.pins()
-        with self.assertRaisesRegex(SystemExit, "installation notice must contain"):
-            self.invoke()
+        with self.assertRaisesRegex(SystemExit, "65535 file-version"):
+            self.invoke(revision=56536)
         self.assertFalse(self.output.exists())
 
-    def test_limited_compiler_receives_standard_notice_and_profile_define(self):
+    def test_revision_two_changes_file_version_and_metadata_only(self):
         self.pins()
 
         def check_command(command):
-            self.assertIn("/DLimitedEvaluation=1", command)
             self.assertIn("/DEngineVersion=0.2.0-rc.9", command)
-            self.assertIn("/DFileVersion=0.2.0.9001", command)
-            staged = (self.output / "payload/LimitedEvaluation.txt").read_bytes()
-            self.assertTrue(staged.startswith(b"\xef\xbb\xbf"))
-            self.assertEqual(staged.decode("utf-8-sig"), self.notice.read_bytes().decode("utf-8"))
+            self.assertIn("/DFileVersion=0.2.0.9002", command)
+            definitions = [part.split("=", 1)[0] for part in command if part.startswith("/D")]
+            self.assertEqual(definitions, ["/DPayloadDir", "/DEngineVersion", "/DFileVersion"])
 
-        metadata = self.invoke(compiler_action=check_command)
-        self.assertEqual(metadata["releaseProfile"], "limited-evaluation")
-        self.assertEqual(metadata["limitedNoticeSourceSha256"], builder.sha256(self.notice))
-        self.assertEqual(metadata["limitedNoticeSha256"], builder.sha256(self.output / "payload/LimitedEvaluation.txt"))
+        metadata = self.invoke(revision=2, compiler_action=check_command)
+        self.assertEqual(metadata["releaseProfile"], "documented-exceptions")
+        self.assertEqual(metadata["packageRevision"], 2)
+        self.assertEqual(metadata["fileVersion"], "0.2.0.9002")
+        self.assertEqual((metadata["xlamRebuiltThisRun"], metadata["xlamReused"]), (False, True))
+        self.assertEqual(metadata["exe"], "ExcelSmartListCompare-0.2.0-rc.9-Setup.exe")
         self.assertEqual(set(metadata["payloadHashes"]), set(builder.PAYLOAD))
+        self.assertEqual(metadata["status"], "unsigned prerelease")
         self.assertEqual(metadata["runtimeValidation"], "not performed by this build script")
         source = self.installer.read_text(encoding="utf-8-sig")
-        self.assertIn('#ifdef LimitedEvaluation\nInfoBeforeFile={#PayloadDir}\\LimitedEvaluation.txt\n#endif',
-                      source.replace("\r\n", "\n"))
-        self.assertIn('AppName={#DisplayName}', source)
-        self.assertIn('SetupWindowTitle={#DisplayName} 설치', source)
+        self.assertIn('AppName=Excel 명단 비교\n', source)
+        self.assertIn('SetupWindowTitle=Excel 명단 비교 설치\n', source)
+        self.assertNotIn('InfoBeforeFile=', source)
+        self.assertIn('PrivilegesRequired=lowest', source)
+        self.assertIn('AlwaysRestart=no', source)
 
     def test_legacy_rc8_default_profile_keeps_full_compiler_behavior(self):
         self.pins(version="0.2.0-rc.8", profile=None)
 
         def check_command(command):
-            self.assertFalse(any(item.startswith("/DLimitedEvaluation") for item in command))
-            self.assertFalse((self.output / "payload/LimitedEvaluation.txt").exists())
+            self.assertIn("/DFileVersion=0.2.0.8001", command)
+            self.assertEqual(set(p.name for p in (self.output / "payload").iterdir()),
+                             set(builder.PAYLOAD) | {"PayloadHashes.iss", "manager.id"})
 
         metadata = self.invoke(version="0.2.0-rc.8", profile=None, compiler_action=check_command)
         self.assertEqual(metadata["releaseProfile"], "full")
-        self.assertIsNone(metadata["limitedNoticeSourceSha256"])
-        self.assertIsNone(metadata["limitedNoticeSha256"])
+        self.assertEqual(metadata["packageRevision"], 1)
+        self.assertEqual(metadata["fileVersion"], "0.2.0.8001")
 
 
 if __name__ == "__main__":

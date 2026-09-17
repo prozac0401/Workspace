@@ -1,6 +1,6 @@
 # ADR-0014 · 실행 중인 Excel에서 눌린 Esc 확인
 
-상태: 채택·candidate-07 반영, 100ms 바꾸기 상태 보존은 대조 실험에 근거한 부분 검증. 전체 취소 인수 NOT_MET, [제한 평가판 결정](ADR-0015-Limited-evaluation-release.md) 적용
+상태: 채택·candidate-07 반영, 100ms 바꾸기 상태 보존은 대조 실험에 근거한 부분 검증. 전체 취소 인수 NOT_MET, [배포 파일 결정](ADR-0015-Recorded-release-results.md) 적용
 
 날짜: 2026-09-17
 

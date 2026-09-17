@@ -4,7 +4,7 @@
 
 도구 ID: ExcelSmartListCompare · 설치기 버전: 0.2.0-rc.7 · 날짜: 2026-09-15
 
-상태: 서명되지 않은 평가용 후보. 아래는 잠금 상태에서 수행한 최초 자동 검증 기록이다. **잠금 해제 후 실제 우클릭 8종과 두 파일 열기 경로는 통과했고, Esc 취소는 2회 실패했다.** 최신 화면·설치·원복 결과는 [실제 화면 검증](UNLOCKED_UI_REPORT.md)을 따른다. 전체 인수 완료로 표시하지 않는다.
+상태: 서명되지 않은 후보. 아래는 잠금 상태에서 수행한 최초 자동 검증 기록이다. **잠금 해제 후 실제 우클릭 8종과 두 파일 열기 경로는 통과했고, Esc 취소는 2회 실패했다.** 최신 화면·설치·원복 결과는 [실제 화면 검증](UNLOCKED_UI_REPORT.md)을 따른다. 전체 인수 완료로 표시하지 않는다.
 
 적용 기준: [추가 도구 개발 기준](../../../docs/policies/tools.md), [문서 작성 규칙](../../../docs/policies/documentation.md), [ADR-0008](ADR-0008-Context-menu-content.md), [인수 요구 U07~U13](ACCEPTANCE_TESTS.md)
 
@@ -65,4 +65,4 @@ XLAM의 RibbonX `dynamicMenu`가 열릴 때마다 현재 첫 번째 목록을 �
 
 최초에는 경고·일치·오류·도움말 대화상자와 실제 Esc 입력을 실행하지 못했다. 후속 화면 시험에서 대화상자는 확인했지만 UI 도구로 입력한 Esc는 두 번 모두 취소되지 않았다. 이전 캡처·이전 버전 결과로 통과 처리하지 않는다. 모든 문서를 닫은 채 Excel만 남긴 뒤 다시 여는 경로, 다른 Office 버전·x86·조직 정책·전자 서명·타사 추가 기능 전반의 공존은 이번 인수 범위에 포함하지 않는다. 업데이트 중단과 복구의 범위는 [RC6 설치 검증의 제한](UPGRADE_REPORT.md)을 유지한다.
 
-RC7 배포본의 `Validation.json`은 `contextMenuContent`와 `nativeContextMenu`를 별도 항목으로 기록한다. 전자가 통과해도 후자는 미실행일 수 있다. `BUILD_INFO.json`, `SOURCE_COMMIT.txt`, `SHA256SUMS.txt`에 정확한 파일·소스 정보를 포함하며 평가용 prerelease로 배포한다.
+RC7 배포본의 `Validation.json`은 `contextMenuContent`와 `nativeContextMenu`를 별도 항목으로 기록한다. 전자가 통과해도 후자는 미실행일 수 있다. `BUILD_INFO.json`, `SOURCE_COMMIT.txt`, `SHA256SUMS.txt`에 정확한 파일·소스 정보를 포함하며 prerelease로 배포한다.

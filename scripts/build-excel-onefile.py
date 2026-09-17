@@ -24,19 +24,34 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def positive_int(value):
+    try:
+        number = int(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("package revision must be a positive integer") from error
+    if number <= 0:
+        raise argparse.ArgumentTypeError("package revision must be a positive integer")
+    return number
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--release-directory", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
     parser.add_argument("--engine-version", choices=("0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9"), default="0.2.0-rc.8")
-    parser.add_argument("--release-profile", choices=("full", "limited-evaluation"), default="full")
+    parser.add_argument("--release-profile", choices=("full", "documented-exceptions"), default="full")
+    parser.add_argument("--package-revision", type=positive_int, default=1)
     parser.add_argument("--iscc", type=Path, default=Path(r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"))
     args = parser.parse_args()
     version = args.engine_version
     profile = args.release_profile
-    limited = profile == "limited-evaluation"
-    if limited and version != "0.2.0-rc.9":
-        raise SystemExit("The limited-evaluation profile is supported only for RC9.")
+    if profile == "documented-exceptions" and version != "0.2.0-rc.9":
+        raise SystemExit("The documented-exceptions profile is supported only for RC9.")
+    revision = args.package_revision
+    file_build = int(version.rsplit(".", 1)[1]) * 1000 + revision
+    if file_build > 65535:
+        raise SystemExit("Package revision exceeds the 65535 file-version component limit.")
+    file_version = "0.2.0." + str(file_build)
     payload_hashes = PAYLOAD
     if version != "0.2.0-rc.7":
         rc = version.rsplit(".", 1)[1]
@@ -58,22 +73,6 @@ def main():
         path = args.release_directory / name
         if not path.is_file() or sha256(path) != expected:
             raise SystemExit("Pinned payload is missing or changed: " + name)
-    notice_data = None
-    notice_source_hash = None
-    if limited:
-        if "LIMITED EVALUATION" not in (args.release_directory / "README.md").read_text(encoding="utf-8-sig"):
-            raise SystemExit("Limited README must contain the LIMITED EVALUATION marker.")
-        notice_source = INSTALLER.parent / "LIMITED_EVALUATION.txt"
-        if not notice_source.is_file():
-            raise SystemExit("Tracked limited-evaluation notice is missing.")
-        raw_notice = notice_source.read_bytes()
-        notice_text = raw_notice.decode("utf-8-sig")
-        if "LIMITED EVALUATION" not in notice_text:
-            raise SystemExit("Limited installation notice must contain the LIMITED EVALUATION marker.")
-        notice_source_hash = hashlib.sha256(raw_notice).hexdigest()
-        # Standard Inno InfoBeforeFile accepts UTF-8. Keep an explicit BOM for
-        # the Korean plain-text notice, independent of the build host locale.
-        notice_data = notice_text.encode("utf-8-sig")
     payload = output / "payload"
     payload.mkdir(parents=True)
     definitions = []
@@ -82,14 +81,10 @@ def main():
         definitions.append(f'#define {macro} "{expected}"\n')
     (payload / "PayloadHashes.iss").write_text("".join(definitions), encoding="ascii")
     (payload / "manager.id").write_text("SLC-68A45C44-2026-OneFile-1\n", encoding="ascii")
-    if notice_data is not None:
-        (payload / "LimitedEvaluation.txt").write_bytes(notice_data)
     command = [str(args.iscc), "/Qp", "/D" + "PayloadDir=" + str(payload),
                "/DEngineVersion=" + version,
-               "/DFileVersion=0.2.0." + version.rsplit(".", 1)[1] + "001",
+               "/DFileVersion=" + file_version,
                "/O" + str(output), str(INSTALLER)]
-    if limited:
-        command.insert(-1, "/DLimitedEvaluation=1")
     result = subprocess.run(command, capture_output=True)
     (output / "compiler.private.log").write_bytes(result.stdout + result.stderr)
     if result.returncode:
@@ -109,10 +104,9 @@ def main():
         "buildScriptSha256": sha256(Path(__file__)), "compilerSha256": sha256(args.iscc),
         "payloadHashes": {name: expected for name, (_, expected) in payload_hashes.items()},
         "payloadByteIdenticalToRC7": version.endswith(".7"), "xlamRebuilt": not version.endswith(".7"),
-        "releaseProfile": profile,
-        "limitedNoticeSourceSha256": notice_source_hash,
-        "limitedNoticeSha256": hashlib.sha256(notice_data).hexdigest() if notice_data is not None else None,
-        "status": "unsigned evaluation prerelease", "runtimeValidation": "not performed by this build script",
+        "xlamRebuiltThisRun": False, "xlamReused": True,
+        "releaseProfile": profile, "packageRevision": revision, "fileVersion": file_version,
+        "status": "unsigned prerelease", "runtimeValidation": "not performed by this build script",
     }
     (output / "OneFile-Build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"exe": str(exe), "bytes": exe.stat().st_size, "sha256": digest,

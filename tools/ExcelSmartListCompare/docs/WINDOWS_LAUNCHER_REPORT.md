@@ -1,6 +1,6 @@
 # Excel RC4 · 간편 설치 실행기 검증
 
-상태: 실행기 검증 완료, 서명 없는 평가용 후보 · 날짜: 2026-09-15
+상태: 실행기 검증 완료, 서명 없는 후보 · 날짜: 2026-09-15
 
 ## 문제와 변경
 
@@ -38,4 +38,4 @@ RC4에서 Windows Excel 전체 수명주기·설치 확인창 클릭을 다시 �
 
 RC4 설치 ZIP에는 완성 XLAM, 설치·제거·진단 CMD, Setup.ps1, 오프라인 퀵가이드, 이번 보고서와 RC3 실기 기록을 포함한다. 수정 소스 ZIP은 릴리즈 커밋의 저장소 소스이며 실행기와 테스트·문서·패키징 스크립트를 포함한다. `SOURCE_COMMIT.txt`, `BUILD_INFO.json`, `SHA256SUMS.txt`로 소스와 파일을 구분한다. RC3 릴리즈 자산은 교체하지 않는다.
 
-소스를 커밋한 뒤 `scripts/package-excel-launcher-release.py`에 기존 RC3의 Release 폴더와 저장소 `artifacts` 아래 새 출력 폴더를 지정한다. 패키징은 XLAM 기준 해시, ZIP 내 파일 해시, 소스와 스크립트 일치, 오프라인 HTML 로컬 링크를 검사한다. 결과를 서명된 상용 승인판으로 표시하지 않는다.
+소스를 커밋한 뒤 `scripts/package-excel-launcher-release.py`에 기존 RC3의 Release 폴더와 저장소 `artifacts` 아래 새 출력 폴더를 지정한다. 패키징은 XLAM 기준 해시, ZIP 내 파일 해시, 소스와 스크립트 일치, 오프라인 HTML 로컬 링크를 검사한다. 결과물에는 코드 서명이 없다.

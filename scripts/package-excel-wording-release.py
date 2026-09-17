@@ -22,8 +22,10 @@ OLD_XLAM = "c6f55886c368294c4e21396366d0cf3c368605e965f3ca2bd153f2e75bc8ae86"
 SOURCES = ("src/CSLCList.cls", "src/modSLCNormalize.bas", "src/modSLCMain.bas", "src/ThisWorkbook_events.txt")
 CHECKS = ("sourceMatchesBinary", "normalizationAndIntegration", "wordingAndState", "selectionMatrix",
           "cancellation", "autoLoad", "reinstall", "uninstall", "python", "docs")
-LIMITED_CORE_CHECKS = frozenset(("sourceMatchesBinary", "normalizationAndIntegration", "selectionMatrix",
+EXCEPTION_CORE_CHECKS = frozenset(("sourceMatchesBinary", "normalizationAndIntegration", "selectionMatrix",
                                "nativeContextMenu", "python", "docs"))
+USER_PACKAGE_FILES = frozenset(("ExcelSmartListCompare.xlam", "Setup.ps1", "Install.cmd",
+                                "Uninstall.cmd", "README.md", "QuickGuide.html", "SHA256SUMS.txt"))
 HTML_NAMES = {
     "QUICK_GUIDE.md": "QuickGuide.html",
     "WORDING_UPDATE.md": "Wording-Report.html",
@@ -80,6 +82,30 @@ def validate_release_local_links(release):
             target = (path.parent / unquote(parsed.path)).resolve()
             if not target.is_relative_to(release) or not target.is_file():
                 raise SystemExit("Broken local HTML reference: " + path.name + " -> " + href)
+
+
+def package_directory(directory, archive_path):
+    """Validate one self-contained document set and verify every archived byte."""
+    validate_release_local_links(directory)
+    paths = sorted(directory.iterdir())
+    if any(not path.is_file() for path in paths):
+        raise SystemExit("Unexpected package subdirectory: " + str(directory))
+    hashes = {path.name: sha256(path) for path in paths}
+    sums = directory / "SHA256SUMS.txt"
+    sums.write_text("".join(digest + "  " + name + "\n" for name, digest in hashes.items()), encoding="ascii")
+    hashes[sums.name] = sha256(sums)
+    with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for name in sorted(hashes):
+            archive.write(directory / name, directory.name + "/" + name)
+    with zipfile.ZipFile(archive_path) as archive:
+        expected_names = {directory.name + "/" + name for name in hashes}
+        if set(archive.namelist()) != expected_names or len(archive.namelist()) != len(expected_names):
+            raise SystemExit("Unexpected ZIP entries: " + archive_path.name)
+        if archive.testzip() is not None:
+            raise SystemExit("ZIP integrity failure: " + archive_path.name)
+        for name, expected in hashes.items():
+            if hashlib.sha256(archive.read(directory.name + "/" + name)).hexdigest() != expected:
+                raise SystemExit("Packaged file hash mismatch: " + name)
 
 
 def validate_ribbon_package(path):
@@ -150,32 +176,32 @@ def release_report_layout(rc):
 
 
 def validate_acceptance_profile(validation, checks, rc, profile):
-    """A separately authorized RC9 evaluation never relabels incomplete checks."""
+    """Separately authorized RC9 publication never relabels incomplete checks."""
     results = validation["checks"]
     if set(results) != set(checks):
         raise SystemExit("Required validation is incomplete or failed.")
-    if profile == "limited-evaluation":
+    if profile == "documented-exceptions":
         if rc != 9:
-            raise SystemExit("Limited evaluation is defined only for RC9.")
-        decision = validation.get("limitedEvaluation", {})
+            raise SystemExit("Documented exceptions are defined only for RC9.")
+        decision = validation.get("releaseExceptions", {})
         if (validation.get("releaseProfile") != profile
-                or validation.get("releaseDecision") != "LIMITED_EVALUATION"
+                or validation.get("releaseDecision") != "PUBLISH_WITH_RECORDED_RESULTS"
                 or not isinstance(decision, dict)
                 or decision.get("userAuthorized") is not True
-                or decision.get("notForProduction") is not True):
-            raise SystemExit("Limited evaluation requires explicit matching user-authorized decision metadata.")
-        for name in LIMITED_CORE_CHECKS:
+                or decision.get("fullAcceptancePassed") is not False):
+            raise SystemExit("Documented exceptions require explicit matching user-authorized decision metadata.")
+        for name in EXCEPTION_CORE_CHECKS:
             result = results[name]
             if not isinstance(result, str) or not (result == "PASS" or result.startswith("PASS:")):
-                raise SystemExit("Limited evaluation requires PASS for " + name + ".")
+                raise SystemExit("Documented exceptions require PASS for " + name + ".")
         incomplete = []
         for name in checks:
             result = results[name]
             if not isinstance(result, str):
-                raise SystemExit("Limited evaluation requires explicit result strings.")
+                raise SystemExit("Documented exceptions require explicit result strings.")
             status = result.split(":", 1)[0]
             if status not in {"PASS", "FAIL", "PARTIAL", "NOT_RUN", "NEEDS_MANUAL", "BLOCKED_ENV", "BLOCKED_ENVIRONMENT", "BLOCKED_POLICY"}:
-                raise SystemExit("Unknown limited evaluation check status: " + name)
+                raise SystemExit("Unknown documented-exceptions check status: " + name)
             if status != "PASS":
                 incomplete.append(name)
         accepted = decision.get("acceptedIncompleteChecks")
@@ -184,9 +210,9 @@ def validate_acceptance_profile(validation, checks, rc, profile):
             raise SystemExit("Accepted incomplete checks must exactly match the unchanged non-PASS results.")
         return incomplete
     if (validation.get("releaseProfile") not in (None, "full")
-            or validation.get("releaseDecision") == "LIMITED_EVALUATION"
-            or "limitedEvaluation" in validation):
-        raise SystemExit("Limited evaluation metadata requires the explicit limited-evaluation profile.")
+            or validation.get("releaseDecision") == "PUBLISH_WITH_RECORDED_RESULTS"
+            or "releaseExceptions" in validation):
+        raise SystemExit("Recorded exception metadata requires the explicit documented-exceptions profile.")
     native_checks = {"cancellation", "nativeContextMenu"}
     required = tuple(c for c in checks if c not in native_checks)
     if any(not str(results[c]).startswith("PASS") for c in required):
@@ -206,8 +232,8 @@ def main():
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
     parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9"), default=VERSION)
-    parser.add_argument("--release-profile", choices=("full", "limited-evaluation"), default="full",
-                        help="Full acceptance by default; RC9 limited evaluation requires explicit reviewed authorization metadata.")
+    parser.add_argument("--release-profile", choices=("full", "documented-exceptions"), default="full",
+                        help="Full acceptance by default; RC9 documented exceptions require explicit reviewed authorization metadata.")
     args = parser.parse_args()
     version = args.installer_version
     rc = int(version.rsplit(".", 1)[1])
@@ -237,7 +263,7 @@ def main():
     if rc >= 6 and validation.get("installerSha256") != sha256(TOOL / "Setup.ps1"):
         raise SystemExit("Installer changed after upgrade validation.")
     incomplete = validate_acceptance_profile(validation, checks, rc, args.release_profile)
-    limited = args.release_profile == "limited-evaluation"
+    documented_exceptions = args.release_profile == "documented-exceptions"
     source_hashes = {name: text_hash((TOOL / name).read_bytes()) for name in sources}
     if validation["sourceTextSha256"] != source_hashes:
         raise SystemExit("Sources have changed since binary validation.")
@@ -245,57 +271,55 @@ def main():
         validate_ribbon_package(args.xlam)
     if "$InstallerVersion = '" + version + "'" not in (TOOL / "Setup.ps1").read_text(encoding="utf-8-sig"):
         raise SystemExit("Installer version mismatch.")
-    if limited and "LIMITED EVALUATION" not in (TOOL / "docs/RELEASE_README.md").read_text(encoding="utf-8-sig")[:2048]:
-        raise SystemExit("Limited evaluation requires a visible LIMITED EVALUATION marker in the source README.")
     release = output / "Release"
+    verification = output / "Verification"
     release.mkdir(parents=True)
+    verification.mkdir()
     shutil.copyfile(args.xlam, release / "ExcelSmartListCompare.xlam")
-    for name in ("Setup.ps1", "Install.cmd", "Uninstall.cmd", "Test_Excel.cmd"):
+    for name in ("Setup.ps1", "Install.cmd", "Uninstall.cmd"):
         shutil.copyfile(TOOL / name, release / name)
     shutil.copyfile(TOOL / "docs/RELEASE_README.md", release / "README.md")
-    if limited:
-        # Keep README bytes identical to the pinned source and optional EXE
-        # payload; add a separate notice without rewriting any input file.
-        notice = ("LIMITED EVALUATION - NOT FOR PRODUCTION\n"
+    rendering.render(TOOL / "docs/RELEASE_README.md", release / "QuickGuide.html", commit,
+                     title="Excel 명단 비교 · 설치와 사용",
+                     html_names={"RELEASE_README.md": "QuickGuide.html"})
+    shutil.copyfile(release / "QuickGuide.html", verification / "QuickGuide.html")
+    if documented_exceptions:
+        notice = ("Validation results\n"
                   "Full acceptance is incomplete. Raw results remain in Validation.json.\n\n")
         notice += "\n".join(name + ": " + validation["checks"][name] for name in incomplete) + "\n"
-        (release / "RELEASE_STATUS.txt").write_text(notice, encoding="utf-8")
+        (verification / "RELEASE_STATUS.txt").write_text(notice, encoding="utf-8")
     for source, target in html_names.items():
+        if target == "QuickGuide.html":
+            continue
         report_source = TOOL / "docs" / source
-        rendering.render(report_source, release / target, commit,
+        rendering.render(report_source, verification / target, commit,
                          title=f"Excel Smart List Compare RC{rc}",
                          html_names=public_report_link_map(report_source, commit, html_names))
     # This input is a reviewed, public summary; raw installer diagnostics stay local.
-    (release / "Validation.json").write_text(json.dumps(validation, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    result_prefix = "LIMITED EVALUATION: full acceptance is incomplete; see Validation.json.\n" if limited else ""
-    (release / "EXCEL_TEST_RESULT.txt").write_text(result_prefix + validation["checks"]["normalizationAndIntegration"] + "\n", encoding="utf-8")
-    (release / "SOURCE_COMMIT.txt").write_text(commit + "\n", encoding="ascii")
-    (release / "BUILD_INFO.json").write_text(json.dumps({
+    (verification / "Validation.json").write_text(json.dumps(validation, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (verification / "EXCEL_TEST_RESULT.txt").write_text(validation["checks"]["normalizationAndIntegration"] + "\n", encoding="utf-8")
+    (verification / "SOURCE_COMMIT.txt").write_text(commit + "\n", encoding="ascii")
+    (verification / "BUILD_INFO.json").write_text(json.dumps({
         "product": "Excel Smart List Compare", "installerVersion": version,
-        "sourceCommit": commit, "xlamSha256": digest, "xlamRebuilt": True,
+        "packageRevision": validation.get("packageRevision", 1),
+        "sourceCommit": commit, "xlamSha256": digest,
+        "xlamRebuiltThisRun": False, "xlamReused": True,
         "installerSha256": sha256(TOOL / "Setup.ps1"),
         "sourceTextSha256": source_hashes, "verificationReport": report,
-        "status": "unsigned limited evaluation prerelease" if limited else "unsigned evaluation prerelease",
+        "userPackageFileSha256": {path.name: sha256(path) for path in sorted(release.iterdir())},
+        "status": "unsigned prerelease",
         "releaseProfile": args.release_profile,
         "releaseDecision": validation.get("releaseDecision"), "validationStatus": validation.get("status"),
-        "fullAcceptancePassed": not limited and all(str(validation["checks"][name]).startswith("PASS") for name in checks),
-        "notForProduction": True, "acceptedIncompleteChecks": incomplete,
+        "fullAcceptancePassed": not documented_exceptions and all(str(validation["checks"][name]).startswith("PASS") for name in checks),
+        "acceptedIncompleteChecks": incomplete,
     }, indent=2) + "\n", encoding="utf-8")
-    validate_release_local_links(release)
-    hashes = {p.name: sha256(p) for p in sorted(release.iterdir()) if p.is_file()}
-    (release / "SHA256SUMS.txt").write_text("".join(d + "  " + n + "\n" for n, d in hashes.items()), encoding="ascii")
-    profile_suffix = "-limited-evaluation" if limited else ""
-    install_zip = output / ("ExcelSmartListCompare-" + version + profile_suffix + "-win-x64.zip")
-    with zipfile.ZipFile(install_zip, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        for path in sorted(release.iterdir()):
-            archive.write(path, "Release/" + path.name)
-    with zipfile.ZipFile(install_zip) as archive:
-        if archive.testzip() is not None:
-            raise SystemExit("Install ZIP integrity failure.")
-        for name, expected in hashes.items():
-            if hashlib.sha256(archive.read("Release/" + name)).hexdigest() != expected:
-                raise SystemExit("Packaged file hash mismatch: " + name)
-    source_zip = output / ("ExcelSmartListCompare-" + version + profile_suffix + "-Source.zip")
+    if {path.name for path in release.iterdir()} != USER_PACKAGE_FILES - {"SHA256SUMS.txt"}:
+        raise SystemExit("Unexpected user package contents.")
+    install_zip = output / ("ExcelSmartListCompare-" + version + "-win-x64.zip")
+    verification_zip = output / ("ExcelSmartListCompare-" + version + "-Verification.zip")
+    package_directory(release, install_zip)
+    package_directory(verification, verification_zip)
+    source_zip = output / ("ExcelSmartListCompare-" + version + "-Source.zip")
     prefix = f"Workspace-Excel-RC{rc}/"
     subprocess.run(["git", "archive", "--format=zip", "--prefix=" + prefix,
                     "--output=" + str(source_zip), commit], cwd=REPO, check=True)
@@ -306,11 +330,12 @@ def main():
             data = archive.read(prefix + "tools/ExcelSmartListCompare/" + name)
             if text_hash(data) != text_hash((TOOL / name).read_bytes()):
                 raise SystemExit("Source ZIP disagreement: " + name)
-    for path in (install_zip, source_zip):
+    for path in (install_zip, source_zip, verification_zip):
         Path(str(path) + ".sha256").write_text(sha256(path) + "  " + path.name + "\n", encoding="ascii")
     print(json.dumps({"sourceCommit": commit, "xlamSha256": digest,
                       "releaseProfile": args.release_profile, "acceptedIncompleteChecks": incomplete,
                       "installZip": str(install_zip), "sourceZip": str(source_zip),
+                      "verificationZip": str(verification_zip),
                       "zipIntegrity": "PASS", "fileHashes": "PASS", "localLinks": "PASS"}, indent=2))
 
 

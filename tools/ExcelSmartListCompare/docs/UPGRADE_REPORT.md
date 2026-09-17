@@ -2,7 +2,7 @@
 
 도구 ID: ExcelSmartListCompare · 설치기 버전: 0.2.0-rc.6 · 날짜: 2026-09-15
 
-상태: 서명되지 않은 평가용 후보. [ADR-0007](ADR-0007-Replace-previous-installation.md), [인수 요구 I21~I25](ACCEPTANCE_TESTS.md), [추가 도구 개발 기준](../../../docs/policies/tools.md)을 따른다.
+상태: 서명되지 않은 후보. [ADR-0007](ADR-0007-Replace-previous-installation.md), [인수 요구 I21~I25](ACCEPTANCE_TESTS.md), [추가 도구 개발 기준](../../../docs/policies/tools.md)을 따른다.
 
 ## 변경 내용
 

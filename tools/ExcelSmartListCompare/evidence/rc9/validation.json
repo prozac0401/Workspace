@@ -4,9 +4,9 @@
   "installerVersion": "0.2.0-rc.9",
   "date": "2026-09-17",
   "status": "BLOCKED_ENVIRONMENT",
-  "releaseDecision": "LIMITED_EVALUATION",
+  "releaseDecision": "PUBLISH_WITH_RECORDED_RESULTS",
   "xlamSha256": "61574c0f0acc68fb7b49507fa95c7201768515f4c5edfd563e3caf3915c19efc",
-  "exeSha256": "416978e5bf455c1980e5ef6a3d290d9f7c2d726996fa44349c00d9d5428b8996",
+  "exeSha256": null,
   "installerSha256": "2b96e95f8de103f8ebfb449ffa5e525bc2a26b4b5316a3ffd4fea7f8f93fedd1",
   "sourceTextSha256": {
     "src/CSLCList.cls": "ae5121a05f437239543da4392f38339e9dd4a750829033eab00714387d3f4fc8",
@@ -25,8 +25,8 @@
     "autoLoad": "NOT_RUN: final candidate normal-start and restart acceptance remains incomplete",
     "reinstall": "NOT_RUN: final packaged CMD and EXE reinstall lifecycle remains incomplete",
     "uninstall": "NOT_RUN: final packaged uninstall, repeat-uninstall and initial-state restoration remain incomplete",
-    "python": "PASS: 115 tests in 80.259 seconds, no skips, including full and limited release profile guards; this does not replace native acceptance",
-    "docs": "PASS: final limited-profile strict build and site check, 15 public pages plus 404; routes, assets, search and sitemap",
+    "python": "PASS: final package revision 2 regression, 117 tests in 76.967 seconds, no skips; user package allowlist and separate verification archive included",
+    "docs": "PASS: revised documentation strict build and site check, 15 public pages plus 404; user guide and report links resolve",
     "windowState": "NOT_RUN: complete final-candidate window and event-state matrix remains pending",
     "upgrade": "NOT_RUN: final exact installer and EXE upgrade lifecycle remains pending",
     "contextMenuContent": "PARTIAL: tested Cell, Row and Column states and serialized eight-menu registration; full content-state matrix remains pending",
@@ -81,17 +81,33 @@
     "remainingIssue": "A windowless child from the owned diagnostic crash remains visible to Windows process checks; cleanup and final security/state verification are pending"
   },
   "limitations": [
-    "The exact saved candidate was compiled into an EXE under the explicit limited-evaluation profile. Runtime installation is NOT_RUN and full acceptance remains unmet.",
+    "Package revision 2 changes installer presentation and documentation while preserving the same tested XLAM. Runtime installation is NOT_RUN and full acceptance remains unmet.",
     "The candidate build retained a normal-exit cleanup failure. Later independent binary tests do not relabel that build or the failed diagnostic runs as PASS.",
     "Controlled replacement evidence supports the tested state-preservation behavior, not direct key reception, an observed cancellation popup, or guaranteed cancellation for every operation and input duration.",
     "Remaining native, state-restoration and installation gates stay incomplete while Windows cleanup blocks further isolated trials.",
     "Complete initial-state restoration, code-signing, commercial acceptance and organization-specific deployment approval are not claimed. The newly compiled EXE will not receive a runtime installation test in this blocked environment."
   ],
-  "releaseProfile": "limited-evaluation",
+  "releaseProfile": "documented-exceptions",
   "fullAcceptancePassed": false,
-  "limitedEvaluation": {
+  "packaging": {
+    "status": "PREPARING_PACKAGE_REVISION_2",
+    "exeRuntimeValidation": "NOT_RUN",
+    "codeSigning": "UNSIGNED",
+    "sameTestedXlam": true,
+    "userPackageContents": [
+      "ExcelSmartListCompare.xlam",
+      "Setup.ps1",
+      "Install.cmd",
+      "Uninstall.cmd",
+      "README.md",
+      "QuickGuide.html",
+      "SHA256SUMS.txt"
+    ],
+    "technicalRecords": "Separate Verification.zip and source repository; excluded from installation ZIP and EXE user guide"
+  },
+  "packageRevision": 2,
+  "releaseExceptions": {
     "userAuthorized": true,
-    "notForProduction": true,
     "acceptedIncompleteChecks": [
       "wordingAndState",
       "cancellation",
@@ -102,15 +118,7 @@
       "upgrade",
       "contextMenuContent"
     ],
-    "decision": "Publish the current verified candidate as an unsigned limited evaluation at the user request. Administrator cleanup and restart are unavailable; remaining native and lifecycle checks are not waived or relabeled as PASS."
-  },
-  "packaging": {
-    "status": "EXE_COMPILED",
-    "exeBuildSourceCommit": "239467f6d3b19670280c60b19ca6fbcb34eed919",
-    "exeRuntimeValidation": "NOT_RUN",
-    "codeSigning": "UNSIGNED",
-    "payloadPinned": true,
-    "sameTestedXlam": true,
-    "limitedNoticeIncluded": true
+    "decision": "Publish the verified candidate with the actual recorded results. Package revision 2 changes presentation and documentation only; remaining native and lifecycle checks are not relabeled as PASS.",
+    "fullAcceptancePassed": false
   }
 }
