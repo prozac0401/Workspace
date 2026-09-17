@@ -3,7 +3,7 @@
   "version": "0.2.0-rc.9",
   "packageRevision": 2,
   "releaseProfile": "documented-exceptions",
-  "status": "PREPARING",
+  "status": "PUBLISHED",
   "fullAcceptancePassed": false,
   "exeRuntimeValidation": "NOT_RUN",
   "previousPublication": {
@@ -12,5 +12,91 @@
     "recordCommit": "8e5ea15",
     "recordPath": "tools/ExcelSmartListCompare/evidence/rc9/release.json"
   },
-  "changeScope": "Installer and documentation wording; tested XLAM unchanged."
+  "changeScope": "Installer and documentation wording; tested XLAM unchanged.",
+  "url": "https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9-setup.2",
+  "tag": "excel-smart-list-compare-v0.2.0-rc.9-setup.2",
+  "sourceCommit": "75377171f0411339d306af0006d03f797740fdad",
+  "exeBuildSourceCommit": "0ceda4d7911cea0d34749f741f478f99c027ae5a",
+  "publishedAt": "2026-09-17T01:30:32Z",
+  "prerelease": true,
+  "assets": [
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.9-Setup.exe",
+      "sha256": "afafd3a286fb9bfc36d91e146b30560139d405a1b0dc1ba30a0678b27dc5765a",
+      "bytes": 2193251
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.9-Setup.exe.sha256",
+      "sha256": "ba9b6de11e32151cd1afa1df5b8a6c6507816aefde65dc0017989b42aa3d8e86",
+      "bytes": 110
+    },
+    {
+      "name": "OneFile-Build.json",
+      "sha256": "ecded135f37d9272e0e38da7a2d40a1c83b2d5b8dc333b889fef5931565eea1f",
+      "bytes": 1551
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.9-Source.zip",
+      "sha256": "c9379b0d3de14d19d3e63a78da821b952023cb5cbe6f971348ab220e49533215",
+      "bytes": 9411537
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.9-Source.zip.sha256",
+      "sha256": "c15bd6214e25cbf60ac0d771b320b705d404964b1448cec851a89f345decc01b",
+      "bytes": 111
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.9-Verification.zip",
+      "sha256": "0718be946c5a8c6047d32205cc61d91a6cdcb42abaa57c5c24fb2d8ae1e82cc8",
+      "bytes": 143115
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.9-Verification.zip.sha256",
+      "sha256": "904e67132e5c23b330403db690014f3e7c404ed0d70c6b63c3ff579882c227c5",
+      "bytes": 117
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.9-win-x64.zip",
+      "sha256": "d105fc3c03fcfeba2ea20c76ff464305b72228522dca3d1a7a8dfe9adc18f81c",
+      "bytes": 101409
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.9-win-x64.zip.sha256",
+      "sha256": "38146ff32010d5c6f6a59cee11339a4e5cfbbccd42c383ab6a99d96282382d83",
+      "bytes": 112
+    },
+    {
+      "name": "Validation.json",
+      "sha256": "f923366f9b892adacbb54753ea7730fb7ef847c51a6c69d8c16babe11f8c3326",
+      "bytes": 7530
+    }
+  ],
+  "userPackageFiles": [
+    "ExcelSmartListCompare.xlam",
+    "Setup.ps1",
+    "Install.cmd",
+    "Uninstall.cmd",
+    "README.md",
+    "QuickGuide.html",
+    "SHA256SUMS.txt"
+  ],
+  "verification": {
+    "python": "PASS: 117 tests in 76.967 seconds; no skips",
+    "documentation": "PASS: strict build, public routes, links and user guide",
+    "package": "PASS: seven user files, exact five pins, no experiment narrative in user guides; technical records in separate Verification.zip",
+    "publicDownload": "PASS: two release pages x ten assets, public HTTP 200 and original SHA-256 match",
+    "sourceAndProduct": "Same six compiled sources and tested XLAM; native result entries unchanged",
+    "unsignedPe": "Confirmed; file version 0.2.0.9002; normal product name; no special InfoBefore page"
+  },
+  "previousDownloadPage": {
+    "url": "https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9",
+    "attachedFilesSameAsCurrent": true,
+    "supersededFilenameEntriesRemoved": 4,
+    "tagUnchanged": true,
+    "sourceArchiveGuidance": "Use attached Source.zip or setup.2 tag for the current package sources"
+  },
+  "pages": {
+    "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/",
+    "status": "PENDING_DEPLOYMENT"
+  }
 }

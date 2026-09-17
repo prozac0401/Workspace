@@ -6,12 +6,12 @@
 
 **Excel 명단 비교 0.2.0 RC9**입니다. 64비트 Windows와 PC에 설치된 데스크톱 Excel이 필요합니다. 설치 파일에는 코드 서명이 없습니다.
 
-[RC9 받기 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.9/ExcelSmartListCompare-0.2.0-rc.9-Setup.exe){ .md-button .md-button--primary }
-[ZIP과 배포 내용](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9){ .md-button }
+[RC9 받기 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.9-setup.2/ExcelSmartListCompare-0.2.0-rc.9-Setup.exe){ .md-button .md-button--primary }
+[ZIP으로 받기](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.9-setup.2/ExcelSmartListCompare-0.2.0-rc.9-win-x64.zip){ .md-button }
 
-파일 이름: `ExcelSmartListCompare-0.2.0-rc.9-Setup.exe` · 공개일: `2026-09-17` · 코드 서명 없음
+파일 이름: `ExcelSmartListCompare-0.2.0-rc.9-Setup.exe` · 수정일: `2026-09-17` · 코드 서명 없음
 
-[받은 파일을 확인하는 SHA-256 값](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.9/ExcelSmartListCompare-0.2.0-rc.9-Setup.exe.sha256) · [이 버전의 배포 내용](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9)
+[받은 파일을 확인하는 SHA-256 값](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.9-setup.2/ExcelSmartListCompare-0.2.0-rc.9-Setup.exe.sha256) · [이 버전의 배포 내용](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9-setup.2)
 
 64비트 Windows와 PC에 설치된 데스크톱 Excel이 필요합니다. Mac과 브라우저용 Excel은 지원하지 않습니다.
 
@@ -65,7 +65,7 @@
 
 취소를 시도할 때는 작업 중인 Excel 창을 앞에 두고 **Esc를 누른 채 유지**하세요. 키 입력만으로 중단됐다고 판단하지 말고 작업 종료와 첫 목록 항목 수를 확인하세요. 경고창에서 **아니요**를 누르면 시작하지 않습니다. 오류 이후 상태표시줄 문구가 남을 수 있습니다.
 
-기술적인 검증 결과는 [배포 기록](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9)에서 확인할 수 있습니다.
+기술적인 검증 결과는 [배포 기록](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9-setup.2)에서 확인할 수 있습니다.
 
 ## 프로그램 제거하기
 

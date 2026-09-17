@@ -2,9 +2,9 @@
 
 **첫 번째 목록을 담고, 두 번째 목록을 선택해 비교하세요.** 이름, 메일 주소, 일반 텍스트를 비교하는 Windows 데스크톱 Excel 추가 기능입니다. 원본 파일은 그대로 두고 차이가 있으면 새 파일에 결과를 보여 줍니다.
 
-> **Excel 명단 비교 0.2.0 RC9** · [배포 파일](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9) · [설치·사용 안내](docs/RELEASE_README.md)
+> **Excel 명단 비교 0.2.0 RC9** · [배포 파일](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9-setup.2) · [설치·사용 안내](docs/RELEASE_README.md)
 >
-> 설치 파일에는 코드 서명이 없습니다. 설치 안내 수정판 setup.2는 제작·게시 확인 중입니다. 기술적인 검증 범위와 남은 문제는 [실제 검증 기록](docs/RC9_APPROVED_RETEST_20260917.md)과 [배포 결정](docs/ADR-0015-Recorded-release-results.md)에 따로 기록합니다.
+> 설치 파일에는 코드 서명이 없습니다. 설치 패키지 수정 2를 공개했습니다. 설치 ZIP에는 프로그램과 사용 안내만 담고 기술 자료는 별도로 제공합니다. 기술적인 검증 범위와 남은 문제는 [실제 검증 기록](docs/RC9_APPROVED_RETEST_20260917.md)과 [배포 결정](docs/ADR-0015-Recorded-release-results.md)에 따로 기록합니다.
 
 2026-09-17 후속 재실험에서 공개 RC7의 정상 완료 범위와 실패를 다시 측정했고, 상속된 PowerShell 모듈 경로 때문에 생기는 설치 준비 오류를 실행기 소스에서 수정했습니다. 실제 파일별 결과와 미완료 항목은 [재실험 보고서](docs/RETEST_20260917.md), 요구사항과 지원 범위는 [제품 명세](../../docs/tools/excel-list-compare/specification.md)를 따릅니다. RC7의 측정값을 새 RC9 바이너리의 검증으로 사용하지 않습니다.
 

@@ -250,3 +250,16 @@ EXE 정적 검사는 유효한 PE·버전·서명 없음과 구성 입력의 해
 수정 패키지의 EXE·ZIP 해시와 게시 결과는 후속 기록에 추가한다. 위 최초 패키지 해시는 당시 파일의 이력이며 수정 2의 파일 해시가 아니다.
 
 수정 2 EXE를 깨끗한 소스 커밋 `0ceda4d7911cea0d34749f741f478f99c027ae5a`에서 제작했다. SHA-256은 `afafd3a286fb9bfc36d91e146b30560139d405a1b0dc1ba30a0678b27dc5765a`이고 Windows 파일 버전은 `0.2.0.9002`다. XLAM은 기존 파일을 재사용했고 설치 전 별도 안내 화면은 제거했다. 컴파일 성공과 실제 설치 실행 미검증은 구분한다.
+
+## 설치 패키지 수정 2 게시
+
+2026-09-17 01:30:32 UTC에 [설치 패키지 수정 2](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.9-setup.2)를 공개했다. 태그 소스는 `75377171f0411339d306af0006d03f797740fdad`다. 기존 RC9 다운로드 페이지의 첨부 파일도 같은 새 파일로 교체했다. 기존 태그의 자동 소스 압축과 현재 첨부 소스 ZIP의 차이는 배포 안내에 명시했다.
+
+| 수정 2 파일 | SHA-256 |
+|---|---|
+| ExcelSmartListCompare-0.2.0-rc.9-Setup.exe | `afafd3a286fb9bfc36d91e146b30560139d405a1b0dc1ba30a0678b27dc5765a` |
+| ExcelSmartListCompare-0.2.0-rc.9-Source.zip | `c9379b0d3de14d19d3e63a78da821b952023cb5cbe6f971348ab220e49533215` |
+| ExcelSmartListCompare-0.2.0-rc.9-Verification.zip | `0718be946c5a8c6047d32205cc61d91a6cdcb42abaa57c5c24fb2d8ae1e82cc8` |
+| ExcelSmartListCompare-0.2.0-rc.9-win-x64.zip | `d105fc3c03fcfeba2ea20c76ff464305b72228522dca3d1a7a8dfe9adc18f81c` |
+
+두 배포 페이지의 자산 10개씩을 공개 주소에서 다시 읽어 총 20건 HTTP 200·원본 SHA-256 일치를 확인했다. 설치 ZIP은 7개 파일, 안내문에는 실험 판정·횟수·진단 과정이 없고 상세 결과는 Verification ZIP으로 분리했다. 소스·검증·설치 ZIP의 이름과 문구 검사를 통과했다. 실제 설치 실행은 추가하지 않았으며 기존 실패·부분 검증·미실행 판정을 유지한다.
