@@ -97,6 +97,12 @@
   },
   "pages": {
     "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/",
-    "status": "PENDING_DEPLOYMENT"
+    "status": "PUBLISHED_VERIFIED",
+    "httpStatus": 200,
+    "workflowUrl": "https://github.com/prozac0401/Workspace/actions/runs/35171047591",
+    "workflowConclusion": "success",
+    "sourceCommit": "0b04da187a8b66ac2cdd103b71413e6fac462419",
+    "currentDownloadLinks": "PASS",
+    "userFacingText": "PASS: installation and usage guidance; experiment narrative excluded"
   }
 }
