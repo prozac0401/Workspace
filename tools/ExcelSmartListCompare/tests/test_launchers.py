@@ -29,12 +29,15 @@ $ErrorActionPreference = 'Stop'
     hostVersion = $PSVersionTable.PSVersion.ToString()
     hostExecutable = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
     hostIs64Bit = [Environment]::Is64BitProcess
+    modulePath = $env:PSModulePath
+    securityModule = (Get-Module Microsoft.PowerShell.Security).ModuleBase
 } | ConvertTo-Json | Set-Content -LiteralPath $env:SLC_TEST_RESULT -Encoding UTF8
 exit ([int]$env:SLC_TEST_EXIT)
 '''
 INVOKE = r'''
 $before = @(Get-ExecutionPolicy -List | Select-Object Scope,ExecutionPolicy)
 $parentPolicy = $env:PSExecutionPolicyPreference
+$parentModules = $env:PSModulePath
 & $env:SLC_TEST_LAUNCHER -ConfirmProduct SLC-68A45C44-2026
 $code = $LASTEXITCODE
 [ordered]@{
@@ -42,6 +45,8 @@ $code = $LASTEXITCODE
     after = @(Get-ExecutionPolicy -List | Select-Object Scope,ExecutionPolicy)
     parentPolicyBefore = $parentPolicy
     parentPolicyAfter = $env:PSExecutionPolicyPreference
+    parentModulePathBefore = $parentModules
+    parentModulePathAfter = $env:PSModulePath
     launcherVariableLeaked = (Test-Path Env:SLC_SETUP_SCRIPT)
 } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $env:SLC_TEST_PARENT -Encoding UTF8
 exit $code
@@ -118,6 +123,7 @@ class WindowsLaunchers(unittest.TestCase):
         parent = json.loads((folder / "parent.json").read_text(encoding="utf-8-sig"))
         self.assertEqual(parent["before"], parent["after"])
         self.assertEqual(parent["parentPolicyBefore"], parent["parentPolicyAfter"])
+        self.assertEqual(parent["parentModulePathBefore"], parent["parentModulePathAfter"])
         self.assertFalse(parent["launcherVariableLeaked"])
 
     def test_restricted_launchers_unblock_only_setup_and_preserve_exit_codes(self):
@@ -186,6 +192,40 @@ class WindowsLaunchers(unittest.TestCase):
                 if phase == "PREPARE":
                     self.assertNotIn("SLC_LAUNCHER_ENGINE_START", result.stdout)
                 self.assert_parent_preserved(folder)
+
+    def test_inherited_module_path_cannot_replace_windows_security_module(self):
+        # Launch CMD directly, as a PS7 caller does. The existing run_ps helper
+        # intentionally sanitizes this variable and therefore hid this failure.
+        for launcher, action in LAUNCHERS.items():
+            with self.subTest(launcher=launcher):
+                folder = self.fixture(launcher)
+                modules = folder / "incompatible-host-modules"
+                security = modules / "Microsoft.PowerShell.Security"
+                security.mkdir(parents=True)
+                (security / "Microsoft.PowerShell.Security.psd1").write_text(
+                    "@{RootModule='Microsoft.PowerShell.Security.psm1';ModuleVersion='99.0.0';"
+                    "FunctionsToExport=@('Get-ExecutionPolicy','Unblock-File')}", encoding="ascii")
+                (security / "Microsoft.PowerShell.Security.psm1").write_text(
+                    "throw 'SLC_TEST_INHERITED_MODULE_MUST_NOT_LOAD'", encoding="ascii")
+                env = dict(os.environ)
+                env.update({"PSModulePath": str(modules), "PSExecutionPolicyPreference": "Restricted",
+                            "SLC_SETUP_NO_PAUSE": "1", "SLC_SETUP_DIAGNOSTICS": "1",
+                            "SLC_TEST_RESULT": str(folder / "result.json"), "SLC_TEST_EXIT": "37"})
+                result = subprocess.run(
+                    [os.environ["ComSpec"], "/d", "/v:off", "/c", launcher,
+                     "-ConfirmProduct", "SLC-68A45C44-2026"], cwd=folder, env=env,
+                    capture_output=True, timeout=40)
+                (folder / "inherited-modules.private.log").write_bytes(result.stdout + result.stderr)
+                self.assertEqual(result.returncode, 37, result.stdout + result.stderr)
+                state = json.loads((folder / "result.json").read_text(encoding="utf-8-sig"))
+                self.assertEqual(state["action"], action)
+                self.assertEqual(state["policy"], "RemoteSigned")
+                self.assertNotIn(str(modules), state["modulePath"])
+                self.assertEqual(Path(state["securityModule"]), Path(os.environ["SystemRoot"]) /
+                                 "System32/WindowsPowerShell/v1.0")
+                self.assertFalse(has_zone(folder / "Setup.ps1"))
+                self.assertTrue(has_zone(folder / "other.ps1"))
+                self.assertEqual(env["PSModulePath"], str(modules))
 
     def test_unblock_failure_stops_before_setup(self):
         folder = self.fixture()

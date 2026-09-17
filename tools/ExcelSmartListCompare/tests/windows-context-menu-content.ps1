@@ -23,7 +23,40 @@ foreach($f in $ast.FindAll({param($n)$n -is [Management.Automation.Language.Func
 }
 $script:Excel=$null;$script:ExcelVersion=$null;$script:ExcelProcess=$null
 $script:ExcelBootstrap=$null;$script:ExcelSessionBook=$null
+$ownerPid=0;$ownerTicks=0L;$primaryFailure=$null;$failureStack=$null
+$cleanupErrors=[Collections.Generic.List[string]]::new()
+$runRecord=[ordered]@{status='STARTED';owner=$null;primaryFailure=$null;failureStack=$null;cleanupErrors=@();ownedExcelExited=$null;expectedXlamSha256=$ExpectedXlamSha256;expectedReleaseVersion=$ExpectedReleaseVersion;resultBefore=@();resultAfter=@();candidateResult=$null}
 $records=New-Object 'System.Collections.Generic.List[object]'
+function Get-ContextSnapshot {
+    $known=@(@($a,$b,$c,$result,$holding) | Where-Object {$null -ne $_} | ForEach-Object {[pscustomobject]@{name=[string]$_.Name;fullName=[string]$_.FullName}})
+    $snapshot=[Collections.Generic.List[object]]::new()
+    for($index=1;$index -le [int]$script:Excel.Workbooks.Count;$index++){
+        # Borrowed workbook RCWs are not force-released while owned aliases live.
+        $item=$script:Excel.Workbooks.Item($index);$name=[string]$item.Name;$fullName=[string]$item.FullName
+        $isKnown=@($known | Where-Object {$_.name -ceq $name -and $_.fullName -ceq $fullName}).Count -eq 1
+        if(-not $isKnown -and -not ([bool]$item.IsAddin -and [IO.Path]::GetFullPath($fullName) -ieq $installed)){throw 'Unexpected workbook before command; preserving it.'}
+        $snapshot.Add([pscustomobject]@{name=$name;fullName=$fullName})
+    }
+    return $snapshot.ToArray()
+}
+function Get-ContextResult([object[]]$Before){
+    $after=[Collections.Generic.List[object]]::new()
+    for($index=1;$index -le [int]$script:Excel.Workbooks.Count;$index++){$item=$script:Excel.Workbooks.Item($index);$after.Add([pscustomobject]@{name=[string]$item.Name;fullName=[string]$item.FullName})}
+    $runRecord.resultBefore=$Before;$runRecord.resultAfter=$after.ToArray()
+    if($after.Count -ne $Before.Count+1){throw 'Expected exactly one additional result; unrecognized workbooks preserved.'}
+    foreach($entry in $Before){if(@($after | Where-Object {$_.name -ceq $entry.name -and $_.fullName -ceq $entry.fullName}).Count -ne 1){throw 'Known workbook changed or disappeared.'}}
+    $new=@($after | Where-Object {$Before.name -cnotcontains $_.name})
+    if($new.Count -ne 1){throw 'Ambiguous additional result workbook.'}
+    $candidate=$script:Excel.ActiveWorkbook;$tab=$null;$cell=$null
+    try{
+        $runRecord.candidateResult=[ordered]@{name=[string]$candidate.Name;fullName=[string]$candidate.FullName;path=[string]$candidate.Path;saved=[bool]$candidate.Saved;sheets=[int]$candidate.Sheets.Count;worksheets=[int]$candidate.Worksheets.Count}
+        if([string]$candidate.Name -cne $new[0].name -or [string]$candidate.FullName -cne $new[0].fullName -or [string]$candidate.Path -cne '' -or [bool]$candidate.Saved -or [int]$candidate.Sheets.Count -ne 1 -or [int]$candidate.Worksheets.Count -ne 1){throw 'ActiveWorkbook is not the new unsaved result; preserved.'}
+        $tab=$candidate.Worksheets.Item(1);$cell=$tab.Range('A1')
+        $runRecord.candidateResult['sheetName']=[string]$tab.Name;$runRecord.candidateResult['title']=[string]$cell.Value2
+        if([string]$tab.Name -cne '명단비교_결과' -or [string]$cell.Value2 -cne '명단 비교 결과'){throw 'Unknown result sheet/title; preserved.'}
+        return ,$candidate
+    }finally{Release-Com $cell;Release-Com $tab}
+}
 function Check([string]$name,[bool]$ok){
     $records.Add([ordered]@{id=$name;status=$(if($ok){'PASS'}else{'FAIL'})})
     $records.ToArray()|ConvertTo-Json -Depth 6|Set-Content (Join-Path $run 'context-menu-content.json') -Encoding UTF8
@@ -78,6 +111,7 @@ function Check-Content([string]$phase,[string]$kind,[int]$count){
     Check ($phase+'/'+$kind+' content') $ok
 }
 function Invoke-Menu([int]$command){
+    $script:contextBeforeCommand=@(Get-ContextSnapshot)
     if($command -eq 1){
         $xml=[xml][string]$script:Excel.Run("'ExcelSmartListCompare.xlam'!SLC_MenuXml",'Cell')
         $action=$xml.DocumentElement.FirstChild.GetAttribute('onAction')
@@ -88,9 +122,15 @@ function Invoke-Menu([int]$command){
 $a=$null;$b=$null;$c=$null;$result=$null;$extraWindow=$null;$holding=$null
 try{
     Start-OwnExcel -NormalStart
+    $ownerPid=$script:ExcelProcess.Id;$ownerTicks=$script:ExcelProcess.StartTime.ToUniversalTime().Ticks
+    $runRecord.owner=[ordered]@{pid=$ownerPid;startTicks=$ownerTicks}
     [ordered]@{pid=$script:ExcelProcess.Id;started=$script:ExcelProcess.StartTime.ToString('o')}|
         ConvertTo-Json|Set-Content (Join-Path $run 'owner.private.json') -Encoding UTF8
     $e=$script:Excel;$e.Visible=$true;$q="'ExcelSmartListCompare.xlam'!"
+    $loaded=$e.Workbooks.Item('ExcelSmartListCompare.xlam')
+    if([IO.Path]::GetFullPath([string]$loaded.FullName) -ine $installed -or -not [bool]$loaded.IsAddin){throw 'Normal startup loaded a different add-in; no macro was invoked.'}
+    $loaded=$null
+    $null=@(Get-ContextSnapshot)
     Check 'Office actually loaded RibbonX onLoad callback' ([bool]$e.Run($q+'SLC_RibbonReady'))
     Check 'Loaded release matches requested version' ([string]$e.Run($q+'SLC_ReleaseVersion') -ceq $ExpectedReleaseVersion)
     foreach($name in @('Cell','Row','Column')){
@@ -143,7 +183,7 @@ try{
     $b.Close($false);Release-Com $b;$b=$null
     $a.Activate();Check-Window 'source file closed snapshot retained' 4
     $a.Worksheets.Item(1).Range('A1:A3').Select();Invoke-Menu 1
-    $result=$e.ActiveWorkbook
+    $result=Get-ContextResult $script:contextBeforeCommand
     Check 'comparison uses replacement snapshot' ($result.Worksheets.Item(1).Range('B4').Value2 -ceq '첫 번째 목록: 4개 항목 / 두 번째 목록: 3개 항목 / 일치 0개 / 첫 번째 목록 남은 항목 4개 / 두 번째 목록 남은 항목 3개')
     Check 'result contains no formulas' ($result.Worksheets.Item(1).UsedRange.HasFormula -eq $false)
     Check-Window 'result window after comparison' 0
@@ -153,12 +193,49 @@ try{
     Check-Window 'repeated attach has one menu set' 0
     Check 'window refresh preserves active workbook' ($e.ActiveWorkbook.Name -ceq $c.Name)
     Check 'events remain enabled' ([bool]$e.EnableEvents)
+}catch{
+    $primaryFailure=$_.Exception.Message;$failureStack=$_.ScriptStackTrace
 }finally{
-    if($null -ne $extraWindow){try{$extraWindow.Close($false)}catch{};Release-Com $extraWindow}
+    if($null -ne $extraWindow){try{$extraWindow.Close($false)}catch{$cleanupErrors.Add($_.Exception.Message)};Release-Com $extraWindow}
     foreach($book in @($result,$c,$b,$a,$holding)){
-        if($null -ne $book){try{$book.Close($false)}catch{};Release-Com $book}
+        if($null -ne $book){try{$book.Close($false)}catch{$cleanupErrors.Add($_.Exception.Message)};Release-Com $book}
     }
-    Stop-OwnExcel
+    $result=$null;$c=$null;$b=$null;$a=$null;$holding=$null;$book=$null;$extraWindow=$null;$e=$null
+    try{
+        if($null -ne $script:Excel){
+            if($ownerPid -eq 0){throw 'Excel ownership was not recorded; Quit refused.'}
+            $process=Get-Process -Id $ownerPid -ErrorAction Stop
+            try{if($process.StartTime.ToUniversalTime().Ticks -ne $ownerTicks){throw 'Excel identity changed; Quit refused.'}}finally{$process.Dispose()}
+            # Only the exact installed add-in may remain after known fixture cleanup.
+            for($index=[int]$script:Excel.Workbooks.Count;$index -ge 1;$index--){
+                $remaining=$script:Excel.Workbooks.Item($index)
+                if(-not [bool]$remaining.IsAddin -or [IO.Path]::GetFullPath([string]$remaining.FullName) -ine $installed){throw 'Unexpected workbook remains; Quit refused to preserve it.'}
+                $remaining.Close($false);Release-Com $remaining;$remaining=$null
+            }
+            if([int]$script:Excel.Workbooks.Count -ne 0){throw 'A workbook remains; normal Quit refused.'}
+        }
+        Stop-OwnExcel
+    }catch{
+        $cleanupErrors.Add($_.Exception.Message)
+        try{Release-Com $script:Excel}catch{$cleanupErrors.Add($_.Exception.Message)}
+        $script:Excel=$null
+    }
+    [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
+    if($ownerPid -ne 0){
+        $wait=[Diagnostics.Stopwatch]::StartNew();$same=$false
+        do{
+            $process=Get-Process -Id $ownerPid -ErrorAction SilentlyContinue;$same=$false
+            if($null -ne $process){try{$same=$process.StartTime.ToUniversalTime().Ticks -eq $ownerTicks}finally{$process.Dispose()}}
+            if(-not $same){break};Start-Sleep -Milliseconds 100
+        }while($wait.Elapsed.TotalSeconds -lt 10)
+        $runRecord.ownedExcelExited=-not $same
+        if($same){$cleanupErrors.Add('Owned Excel remains after normal cleanup; no process was killed.')}
+    }
+    $runRecord.primaryFailure=$primaryFailure;$runRecord.failureStack=$failureStack;$runRecord.cleanupErrors=$cleanupErrors.ToArray()
+    $runRecord.status=if($null -ne $primaryFailure -or $cleanupErrors.Count -gt 0){'FAIL'}else{'PASS'}
+    $runRecord | ConvertTo-Json -Depth 9 | Set-Content -LiteralPath (Join-Path $run 'context-run.private.json') -Encoding UTF8
 }
+if($null -ne $primaryFailure){throw $primaryFailure}
+if($cleanupErrors.Count -gt 0){throw ('Context cleanup failed: '+($cleanupErrors -join '; '))}
 Check 'source file bytes unchanged' ($sourceHashes[0] -ceq (Get-FileHash (Join-Path $run 'First.xlsx')).Hash -and $sourceHashes[1] -ceq (Get-FileHash (Join-Path $run 'Second.xlsx')).Hash)
 Write-Output ('PASS: '+$records.Count+' context-content, window and integration assertions (no native clicks).')

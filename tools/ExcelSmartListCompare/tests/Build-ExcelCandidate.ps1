@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)][string]$OutputDirectory,
     [switch]$ApprovedTemporaryVbaAccess
@@ -33,22 +33,25 @@ $sourceSnapshot=Join-Path $evidence 'source'
 $utf8=New-Object Text.UTF8Encoding($false)
 $audit=[ordered]@{
     schemaVersion=1;status='NOT_RUN';phase='preflight';reason=$null;startedUtc=[DateTime]::UtcNow.ToString('o');finishedUtc=$null
+    primaryFailure=$null;failurePhase=$null;failureStack=$null
     approvedTemporaryVbaAccess=[bool]$ApprovedTemporaryVbaAccess;securityValueChanged=$false
     accessBefore=$null;accessAfter=$null;accessRestored=$null;externalSecurityChangeDetected=$false
     officeVersion=$null;owner=$null;excelExited=$null;observedExcelAtEnd=@();cleanupErrors=@()
+    postQuitObservationSeconds=$null;ownedExcelExitedBeforeAccessRestore=$null
     candidateSaved=$false;candidateSha256=$null;sourceAudit=@();inputHashes=@();payloadHashes=@()
     inMemoryImportAudit='NOT_RUN';serializedSourceAudit='NOT_RUN';runtimeTests='NOT_RUN';installedTests='NOT_RUN'
     requiresInstalledTesting=$true;releaseApproved=$false
 }
 $mutex=$null;$locked=$false;$exitCode=1;$securityPath=$null;$securityWritten=$false
-$book=$null;$project=$null;$components=$null;$component=$null;$codeModule=$null
+$workbooks=$null;$book=$null;$project=$null;$components=$null;$component=$null;$codeModule=$null
 $script:Excel=$null;$script:ExcelVersion=$null;$script:ExcelProcess=$null;$script:ExcelBootstrap=$null;$script:ExcelSessionBook=$null
 $functionsLoaded=$false;$securitySnapshotTaken=$false
 function Save-CandidateAudit {
     $destination=Join-Path $evidence 'build-result.private.json'
     $temporary=Join-Path $evidence 'build-result.private.writing'
     [IO.File]::WriteAllText($temporary,($audit | ConvertTo-Json -Depth 14),$utf8)
-    if([IO.File]::Exists($destination)){[IO.File]::Replace($temporary,$destination,$null)}
+    # PS5 converts $null to an empty path for a string argument; pass a real null.
+    if([IO.File]::Exists($destination)){[IO.File]::Replace($temporary,$destination,[NullString]::Value)}
     else{[IO.File]::Move($temporary,$destination)}
 }
 function Candidate-Failure([string]$Message,[string]$Status='FAIL',[int]$Code=1){
@@ -128,13 +131,82 @@ function Normalize-Vba([string]$Text){
     for($index=0;$index -lt $lines.Length;$index++){if($lines[$index].Trim() -ceq 'Option Explicit'){$first=$index;break}}
     if($first -lt 0){throw 'VBA source is missing its expected Option Explicit boundary.'}
     $normalized=@($lines[$first..($lines.Length-1)] | Where-Object {$_ -notmatch '^Attribute VB_'} | ForEach-Object {$_.TrimEnd()})
+    # VBE rewrites identifier/member capitalization on import. Fold only code
+    # identifiers; preserve string literals (including escaped quotes), comments,
+    # numbers and punctuation so this cannot hide an executable source change.
+    $codeTokens=[regex]'"(?:[^"]|"")*"|''.*|[A-Za-z_][A-Za-z0-9_]*'
+    $normalized=@($normalized | ForEach-Object {
+        $codeTokens.Replace($_,[Text.RegularExpressions.MatchEvaluator]{param($match)
+            if($match.Value.StartsWith('"') -or $match.Value.StartsWith("'")){return $match.Value}
+            return $match.Value.ToLowerInvariant()
+        })
+    })
     return ($normalized -join "`n").TrimEnd("`n")
 }
 function Record-SourceAudit([string]$Name,[string]$Expected,[string]$Actual){
     $wanted=Normalize-Vba $Expected;$observed=Normalize-Vba $Actual
     $record=[ordered]@{component=$Name;status=$(if($wanted -ceq $observed){'PASS'}else{'FAIL'});sourceNormalizedSha256=(Bytes-Sha256 ([Text.Encoding]::UTF8.GetBytes($wanted))).ToLowerInvariant();importedNormalizedSha256=(Bytes-Sha256 ([Text.Encoding]::UTF8.GetBytes($observed))).ToLowerInvariant()}
     $audit.sourceAudit+=@($record)
-    if($record.status -ne 'PASS'){throw ('Imported VBA source differs before SaveAs: '+$Name)}
+    if($record.status -ne 'PASS'){
+        [IO.File]::WriteAllText((Join-Path $evidence ($Name+'.expected.txt')),$wanted,$utf8)
+        [IO.File]::WriteAllText((Join-Path $evidence ($Name+'.imported.txt')),$observed,$utf8)
+        throw ('Imported VBA source differs before SaveAs: '+$Name)
+    }
+}
+function Invoke-CandidateComBuild {
+    # All document/VBE references leave scope before application Quit and GC.
+    $workbooks=$null;$book=$null;$project=$null;$components=$null;$component=$null;$codeModule=$null
+    try{
+        $script:Excel.EnableEvents=$false
+        $workbooks=$script:Excel.Workbooks
+        if([int]$workbooks.Count -ne 0){throw 'Unexpected workbook before candidate creation; preserving it.'}
+        $book=$workbooks.Add(-4167)
+        try{$project=$book.GetType().InvokeMember('VBProject',[Reflection.BindingFlags]::GetProperty,$null,$book,$null)}
+        catch{throw (Candidate-Failure ('Excel still blocked VBA project access: '+$_.Exception.Message) 'BLOCKED_POLICY' 5)}
+        $components=$project.VBComponents
+        foreach($name in $imports){
+            $component=$components.Import((Join-Path $sourceSnapshot $name));$codeModule=$component.CodeModule
+            Record-SourceAudit ([string]$component.Name) ([IO.File]::ReadAllText((Join-Path $sourceSnapshot $name),[Text.Encoding]::ASCII)) ([string]$codeModule.Lines(1,$codeModule.CountOfLines))
+            Release-Com $codeModule;$codeModule=$null;Release-Com $component;$component=$null
+        }
+        $component=$components.Item([string]$book.CodeName);$codeModule=$component.CodeModule
+        if($codeModule.CountOfLines -gt 0){$codeModule.DeleteLines(1,$codeModule.CountOfLines)}
+        $eventSource=[IO.File]::ReadAllText((Join-Path $sourceSnapshot 'ThisWorkbook_events.txt'),[Text.Encoding]::ASCII)
+        $codeModule.AddFromString($eventSource)
+        Record-SourceAudit 'ThisWorkbook' $eventSource ([string]$codeModule.Lines(1,$codeModule.CountOfLines))
+        Release-Com $codeModule;$codeModule=$null;Release-Com $component;$component=$null
+        $audit.inMemoryImportAudit='PASS';$project.Name='SLC2026'
+        Release-Com $components;$components=$null;Release-Com $project;$project=$null
+        $book.IsAddin=$true
+        $candidatePath=Join-Path $output 'ExcelSmartListCompare.xlam'
+        $book.SaveAs($candidatePath,55)
+        $book.Close($false);Release-Com $book;$book=$null
+        return $candidatePath
+    }finally{
+        foreach($value in @($codeModule,$component,$components,$project)){try{Release-Com $value}catch{$audit.cleanupErrors+=@($_.Exception.Message)}}
+        $value=$null;$codeModule=$null;$component=$null;$components=$null;$project=$null
+        if($null -ne $book){try{$book.Close($false)}catch{$audit.cleanupErrors+=@($_.Exception.Message)}finally{Release-Com $book;$book=$null}}
+        try{Release-Com $workbooks}catch{$audit.cleanupErrors+=@($_.Exception.Message)}
+        $workbooks=$null
+    }
+}
+function Wait-CandidateExcelExit([int]$Seconds=15){
+    [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect();[GC]::WaitForPendingFinalizers()
+    if($null -eq $audit.owner){return}
+    $timer=[Diagnostics.Stopwatch]::StartNew();$sameProcess=$false
+    do{
+        $process=Get-Process -Id $audit.owner.pid -ErrorAction SilentlyContinue
+        $sameProcess=$false
+        if($null -ne $process){
+            try{$sameProcess=$process.StartTime.ToUniversalTime().Ticks -eq $audit.owner.startTimeUtcTicks}
+            finally{$process.Dispose()}
+        }
+        if(-not $sameProcess){break}
+        Start-Sleep -Milliseconds 100
+    }while($timer.Elapsed.TotalSeconds -lt $Seconds)
+    $audit.postQuitObservationSeconds=$timer.Elapsed.TotalSeconds
+    $audit.ownedExcelExitedBeforeAccessRestore=(-not $sameProcess)
+    if($sameProcess){$audit.cleanupErrors+=@('Owned Excel did not exit within the post-Quit observation window; no process was killed.')}
 }
 try{
     $mutex=New-Object Threading.Mutex($false,'Local\ExcelSmartListCompare-Setup')
@@ -203,28 +275,8 @@ try{
     $audit.owner=[ordered]@{pid=$script:ExcelProcess.Id;startedUtc=$script:ExcelProcess.StartTime.ToUniversalTime().ToString('o');startTimeUtcTicks=$script:ExcelProcess.StartTime.ToUniversalTime().Ticks}
     $audit.excelVersion=$script:ExcelVersion
     $audit.phase='excel-started';Save-CandidateAudit
-    $script:Excel.EnableEvents=$false
-    $book=$script:Excel.Workbooks.Add(-4167)
-    try{$project=$book.GetType().InvokeMember('VBProject',[Reflection.BindingFlags]::GetProperty,$null,$book,$null)}
-    catch{throw (Candidate-Failure ('Excel still blocked VBA project access: '+$_.Exception.Message) 'BLOCKED_POLICY' 5)}
-    $components=$project.VBComponents
-    foreach($name in $imports){
-        $component=$components.Import((Join-Path $sourceSnapshot $name));$codeModule=$component.CodeModule
-        Record-SourceAudit ([string]$component.Name) ([IO.File]::ReadAllText((Join-Path $sourceSnapshot $name),[Text.Encoding]::ASCII)) ([string]$codeModule.Lines(1,$codeModule.CountOfLines))
-        Release-Com $codeModule;$codeModule=$null;Release-Com $component;$component=$null
-    }
-    $component=$components.Item([string]$book.CodeName);$codeModule=$component.CodeModule
-    if($codeModule.CountOfLines -gt 0){$codeModule.DeleteLines(1,$codeModule.CountOfLines)}
-    $eventSource=[IO.File]::ReadAllText((Join-Path $sourceSnapshot 'ThisWorkbook_events.txt'),[Text.Encoding]::ASCII)
-    $codeModule.AddFromString($eventSource)
-    Record-SourceAudit 'ThisWorkbook' $eventSource ([string]$codeModule.Lines(1,$codeModule.CountOfLines))
-    Release-Com $codeModule;$codeModule=$null;Release-Com $component;$component=$null
-    $audit.inMemoryImportAudit='PASS';$project.Name='SLC2026'
-    Release-Com $components;$components=$null;Release-Com $project;$project=$null
-    $book.IsAddin=$true
-    $candidate=Join-Path $output 'ExcelSmartListCompare.xlam'
-    $book.SaveAs($candidate,55)
-    $book.Close($false);Release-Com $book;$book=$null
+    $candidate=Invoke-CandidateComBuild
+    [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
     Write-PackageMetadata $candidate (Join-Path $sourceSnapshot 'customUI14.xml')
     $audit.candidateSaved=$true;$audit.candidateSha256=(Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash.ToLowerInvariant()
     $audit.phase='candidate-saved';Save-CandidateAudit
@@ -233,6 +285,7 @@ try{
     }
     $audit.status='PASS';$audit.reason='Build-only candidate saved; compiled, serialized-source and installed testing are still required.';$exitCode=0
 }catch{
+    $audit.primaryFailure=$_.Exception.Message;$audit.failurePhase=$audit.phase;$audit.failureStack=$_.ScriptStackTrace
     $audit.status='FAIL';$exitCode=1
     if($_.Exception.Data.Contains('CandidateStatus')){$audit.status=[string]$_.Exception.Data['CandidateStatus']}
     if($_.Exception.Data.Contains('ExitCode')){$exitCode=[int]$_.Exception.Data['ExitCode']}
@@ -242,10 +295,28 @@ try{
         foreach($value in @($codeModule,$component,$components,$project)){try{Release-Com $value}catch{$audit.cleanupErrors+=@($_.Exception.Message)}}
         $codeModule=$null;$component=$null;$components=$null;$project=$null
         if($null -ne $book){try{$book.Close($false)}catch{$audit.cleanupErrors+=@($_.Exception.Message)}finally{Release-Com $book;$book=$null}}
+        try{Release-Com $workbooks}catch{$audit.cleanupErrors+=@($_.Exception.Message)}
+        $workbooks=$null
+        [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
         if($null -eq $audit.owner -and $null -ne $script:ExcelProcess){
             try{$audit.owner=[ordered]@{pid=$script:ExcelProcess.Id;startedUtc=$script:ExcelProcess.StartTime.ToUniversalTime().ToString('o');startTimeUtcTicks=$script:ExcelProcess.StartTime.ToUniversalTime().Ticks}}catch{$audit.cleanupErrors+=@($_.Exception.Message)}
         }
-        try{Stop-OwnExcel}catch{$audit.cleanupErrors+=@($_.Exception.Message)}
+        try{
+            $quitBooks=$null
+            try{
+                if($null -ne $script:Excel){
+                    $quitBooks=$script:Excel.Workbooks
+                    if([int]$quitBooks.Count -ne 0){throw 'Unexpected workbook remains; Quit refused to preserve it.'}
+                }
+            }finally{Release-Com $quitBooks;$quitBooks=$null}
+            Stop-OwnExcel
+        }catch{
+            $audit.cleanupErrors+=@($_.Exception.Message)
+            # Never use Quit to dispose of an unrecognized workbook.
+            try{Release-Com $script:Excel}catch{$audit.cleanupErrors+=@($_.Exception.Message)}
+            $script:Excel=$null
+        }
+        try{Wait-CandidateExcelExit -Seconds 15}catch{$audit.cleanupErrors+=@($_.Exception.Message)}
     }
     # Restoration happens after Quit/COM release so Excel cannot immediately
     # persist its cached preference over the restored value during normal exit.

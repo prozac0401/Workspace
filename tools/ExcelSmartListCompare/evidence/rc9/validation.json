@@ -3,62 +3,78 @@
   "product": "Excel Smart List Compare",
   "installerVersion": "0.2.0-rc.9",
   "date": "2026-09-17",
-  "status": "BLOCKED_POLICY",
+  "status": "BLOCKED_ENVIRONMENT",
   "releaseDecision": "HOLD",
-  "xlamSha256": null,
+  "xlamSha256": "61574c0f0acc68fb7b49507fa95c7201768515f4c5edfd563e3caf3915c19efc",
   "exeSha256": null,
   "installerSha256": "2b96e95f8de103f8ebfb449ffa5e525bc2a26b4b5316a3ffd4fea7f8f93fedd1",
   "sourceTextSha256": {
     "src/CSLCList.cls": "ae5121a05f437239543da4392f38339e9dd4a750829033eab00714387d3f4fc8",
     "src/modSLCNormalize.bas": "4b8750adb6dc5115b379450af15d1ffde998157a7df03a7cef9575c74dcc4c45",
-    "src/modSLCMain.bas": "8ef390829b5bfd679f048dd88140174c00e3e1a4c42162a240af8ae4f2d55382",
+    "src/modSLCMain.bas": "0fb73c96cbaf4c7ca17cb002439d9efaa91750656feeff528cbe5fafb56f61a1",
     "src/ThisWorkbook_events.txt": "8e3dd984a00a569f6c46bc998a2f0f8f68138435f8d934e9dc86ae23c6c7f5ec",
     "src/CSLCAppEvents.cls": "1422aec4fb85ae03241362502982018afea128e2fee6a623b9fffca0fe977247",
     "src/customUI14.xml": "3f1ca3b18affc986f4c9c66430598927333cc39a79d381a2b8ba37fa60b184cb"
   },
   "checks": {
-    "sourceMatchesBinary": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "normalizationAndIntegration": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "wordingAndState": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "selectionMatrix": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "cancellation": "NEEDS_MANUAL: actual Esc is not tested; previous RC8 failures remain unresolved",
-    "autoLoad": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "reinstall": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "uninstall": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "python": "PASS: 76 tests in 67.921 seconds; no native Excel cancellation claim",
-    "docs": "PASS: strict build; 15 public pages plus 404, routes/assets/search/sitemap; changed Markdown local links",
-    "windowState": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "upgrade": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "contextMenuContent": "NOT_RUN: RC9 XLAM not built; approved developer VBA access is pending",
-    "nativeContextMenu": "NEEDS_MANUAL: no node_repl Computer Use runtime in current session"
+    "sourceMatchesBinary": "PASS: exact candidate-07 serialized VBA components and eight-menu RibbonX contract match the six current source files",
+    "normalizationAndIntegration": "PASS: actual exact-file normalization, 19 Excel integration checks and 12 cancellation decision checks",
+    "wordingAndState": "FAIL: fault runs 2 and 3 observed default StatusBar Boolean false changing to string FALSE; diagnostic run 4 caused an unhandled probe dialog and Excel crash",
+    "selectionMatrix": "PASS: 14 actual public-entry selection cases, literal results, formula prevention, settings and previous edited result preservation",
+    "cancellation": "PARTIAL: two 100ms replacement trials support controlled behavioral inference against a matching no-Esc completion; cancellation popup and internal code were not observed; remaining native profiles are pending",
+    "autoLoad": "NOT_RUN: final candidate normal-start and restart acceptance remains incomplete",
+    "reinstall": "NOT_RUN: final packaged CMD and EXE reinstall lifecycle remains incomplete",
+    "uninstall": "NOT_RUN: final packaged uninstall, repeat-uninstall and initial-state restoration remain incomplete",
+    "python": "PASS: 97 tests in 83.142 seconds, no skips; this does not replace native acceptance",
+    "docs": "PASS: strict build and site check, 15 public pages plus 404; routes, assets, search and sitemap",
+    "windowState": "NOT_RUN: complete final-candidate window and event-state matrix remains pending",
+    "upgrade": "NOT_RUN: final exact installer and EXE upgrade lifecycle remains pending",
+    "contextMenuContent": "PARTIAL: tested Cell, Row and Column states and serialized eight-menu registration; full content-state matrix remains pending",
+    "nativeContextMenu": "PASS: five actual UIA product invocations across Cell, Row and Column; eight owning-driver checks, literal 42/2 result, source preservation and normal exit"
   },
-  "independentChecks": {
-    "upgradeRollbackFunctions": {
-      "status": "PASS",
-      "assertions": 23,
-      "scope": "isolated synthetic files and HKCU branch"
-    },
-    "trustedLocationFunctions": {
-      "status": "PASS",
-      "assertions": 23,
-      "scope": "isolated synthetic files and HKCU branch"
-    },
-    "innoCompilation": {
-      "status": "PASS",
-      "scope": "synthetic non-executable payload, not a release candidate"
-    },
-    "temporaryVbaSettingChanged": false,
-    "restoration": {
-      "status": "PASS",
-      "registryGroupsUnchanged": 14,
-      "productInstalled": false,
-      "remainingExcelProcesses": 0
-    }
+  "environment": {
+    "windows": "Windows 11 Pro 10.0.22631",
+    "excel": "16.0.20326.20144 x64",
+    "scope": "One ordinary-user desktop environment with synthetic data; other Excel builds and 32-bit Excel are unverified"
+  },
+  "capacity": {
+    "completedProfiles": 14,
+    "normalCompletionFailures": 2,
+    "observedUniqueProfile": "20,000 disjoint 48-character values per list completed with 40,000 result rows",
+    "observedDuplicateProfile": "100,000 identical 48-character values per list completed with one result row",
+    "timeoutProfiles": [
+      {"distinctValuesPerList": 50000, "charactersPerValue": 48, "normalCompletion": "FAIL", "observedErrorCode": -2147219401},
+      {"distinctValuesPerList": 100000, "charactersPerValue": 48, "normalCompletion": "FAIL", "observedErrorCode": -2147219401}
+    ],
+    "scope": "Observed profiles are not universal size guarantees. The 100,000-cell read limit does not guarantee comparison completion; wall timings include dialogs"
+  },
+  "rangeGuards": {
+    "status": "PASS",
+    "cases": 7,
+    "recordedAssertions": 128,
+    "scope": "Actual warning-No and limit/error dialogs with state preservation and normal exit; derived verdict preserves the original coordinator reporting failure"
+  },
+  "faultInjection": {
+    "status": "FAIL",
+    "run2TransactionCasesPassed": 9,
+    "run2TransactionAssertions": 347,
+    "hostStateRestorationPassed": false,
+    "run4NormalExit": false,
+    "nativeEscEvidence": false,
+    "actualOrganizationPolicyBlockReproduced": false
+  },
+  "restoration": {
+    "status": "BLOCKED_ENVIRONMENT",
+    "temporaryVbaAccessAuthorized": true,
+    "developmentAccessAtLastCheck": "Original absent value restored; post-exit security recheck is still required",
+    "initialInstallationStateRestored": false,
+    "remainingIssue": "A windowless child from the owned diagnostic crash remains visible to Windows process checks; cleanup and final security/state verification are pending"
   },
   "limitations": [
-    "No new XLAM, exact-file Excel runtime validation or installable RC9 release was produced.",
-    "Native input-tool availability and approved developer access are separate requirements.",
-    "Runtime resource telemetry is diagnostic; admission thresholds do not cap running CPU usage.",
-    "Compilation, injection probes and later retries never replace required native acceptance."
+    "The saved candidate has passed the stated exact-file tests; a final installable RC9 package has not been released.",
+    "The candidate build retained a normal-exit cleanup failure. Later independent binary tests do not relabel that build or the failed diagnostic runs as PASS.",
+    "Controlled replacement evidence supports the tested state-preservation behavior, not direct key reception, an observed cancellation popup, or guaranteed cancellation for every operation and input duration.",
+    "Remaining native, state-restoration and installation gates stay incomplete while Windows cleanup blocks further isolated trials.",
+    "No final EXE hash, complete initial-state restoration, code-signing or organization-specific deployment approval is claimed."
   ]
 }

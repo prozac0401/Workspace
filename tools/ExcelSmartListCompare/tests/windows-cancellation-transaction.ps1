@@ -3,7 +3,9 @@ param(
     [Parameter(Mandatory=$true)]$Excel,
     [Parameter(Mandatory=$true)][int]$OwnedPid,
     [Parameter(Mandatory=$true)][string]$ExpectedAddinPath,
-    [Parameter(Mandatory=$true)][string]$OutputPath
+    [Parameter(Mandatory=$true)][string]$OutputPath,
+    [string]$ExpectedSourcePath=(Join-Path (Split-Path $PSScriptRoot -Parent) 'src/modSLCMain.bas'),
+    [scriptblock]$CanonicalizeSource
 )
 # Developer-only, memory-only fault probes. They do not press Esc or prove native
 # keyboard cancellation. The host owns Excel, authorizes existing VBA access,
@@ -15,8 +17,19 @@ function Release-ProbeCom($Value) {
         [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($Value)
     }
 }
+function Get-ProbeSharedHash([string]$Path) {
+    $stream=[IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+    try{return (Get-FileHash -InputStream $stream -Algorithm SHA256).Hash.ToLowerInvariant()}
+    finally{$stream.Dispose()}
+}
 function Normalize-ProbeModule([string]$Text) {
     return (($Text -replace '(?m)^Attribute [^\r\n]+\r?\n','') -replace '\r\n?',"`n").Trim()
+}
+function Compare-ProbeModule([string]$Left,[string]$Right) {
+    if($null -ne $CanonicalizeSource){
+        return ([string](& $CanonicalizeSource $Left) -ceq [string](& $CanonicalizeSource $Right))
+    }
+    return ((Normalize-ProbeModule $Left) -ceq (Normalize-ProbeModule $Right))
 }
 function Replace-ProbeAnchor([string]$Text,[string]$Anchor,[string]$Replacement,[string]$Label) {
     if([regex]::Matches($Text,[regex]::Escape($Anchor)).Count -ne 1) {
@@ -47,9 +60,11 @@ if(-not ('SlcTransactionProbe.Native' -as [type])) {
 if($actualPid -ne $OwnedPid){throw 'Different Excel process; no changes made.'}
 $book=$null;$project=$null;$component=$null;$module=$null
 $original=$null;$savedBefore=$false;$mutated=$false;$restored=$false
-$errorText=$null;$restoreError=$null
+$errorText=$null;$restoreError=$null;$errorDetails=$null;$failureStack=$null
+$activeCase=$null;$failedCase=$null
+$cleanupErrors=[Collections.Generic.List[string]]::new()
 $checks=[Collections.Generic.List[object]]::new()
-$hashBefore=(Get-FileHash -LiteralPath $expected -Algorithm SHA256).Hash.ToLowerInvariant()
+$hashBefore=Get-ProbeSharedHash $expected
 $hashAfter=$null
 try {
     $book=$Excel.Workbooks.Item([IO.Path]::GetFileName($expected))
@@ -66,17 +81,21 @@ try {
     $component=$project.VBComponents.Item('modSLCMain')
     $module=$component.CodeModule
     $original=[string]$module.Lines(1,$module.CountOfLines)
-    $current=[IO.File]::ReadAllText((Join-Path (Split-Path $PSScriptRoot -Parent) 'src/modSLCMain.bas'),[Text.Encoding]::ASCII)
-    if((Normalize-ProbeModule $original) -cne (Normalize-ProbeModule $current)) {
+    $current=[IO.File]::ReadAllText([IO.Path]::GetFullPath($ExpectedSourcePath),[Text.Encoding]::ASCII)
+    if(-not (Compare-ProbeModule $original $current)) {
         throw 'Loaded main module differs from current ASCII source; rebuild and audit this candidate first.'
     }
-    $injected=Normalize-ProbeModule $original
+    # Once equivalence is verified, use the source snapshot's identifier spelling
+    # for exact injection anchors; VBE may have recased the equivalent live code.
+    $injected=Normalize-ProbeModule $current
     $declarations=@'
 Private mProbeStage As String
 Private mProbeReadCount As Long
 Private mProbeFired As Boolean
 Private mProbeError As Long
 Private mProbeMessages As Long
+Private mProbeLastMessage As String
+Private mProbeLastButtons As Long
 Private mProbeAssertions As Long
 Private mProbeResultBook As Workbook
 Private mProbeOutputNoFormula As Boolean
@@ -108,15 +127,33 @@ Private mProbeOutputNoFormula As Boolean
         param($body)
         Replace-ProbeAnchor $body '    Application.StatusBar = text' "    Application.StatusBar = text`n    If mProbeStage = `"status-error`" Then`n        mProbeFired = True`n        Err.Raise vbObjectError + 2198, `"SLC transaction probe`", `"Synthetic staged status failure`"`n    End If" 'staged status error'
     }
+    $injected=Replace-ProbeProcedure $injected 'OwnForegroundEscapeHeld' {
+        param($body)
+        Replace-ProbeAnchor $body '    If Not mBusy Then Exit Function' "    If Not mBusy Then Exit Function`n    SLC_ProbeApiFailure" 'API failure after busy guard'
+    }
     $probe=@'
 
 Private Function SLC_ProbeMessage(ByVal prompt As Variant, Optional ByVal buttons As Long = 0, _
                                   Optional ByVal title As String = "") As Long
     mProbeMessages = mProbeMessages + 1
+    mProbeLastMessage = CStr(prompt)
+    mProbeLastButtons = buttons
     ' Every fixture is below the warning threshold. An unexpected warning is
     ' declined; assertions must fail rather than silently accepting a warning.
     If (buttons And 7) = vbYesNo Then SLC_ProbeMessage = vbNo Else SLC_ProbeMessage = vbOK
 End Function
+
+Private Sub SLC_ProbeApiFailure()
+    ' Synthetic exceptions test the actual VBA error path, never an ASR policy.
+    Select Case mProbeStage
+        Case "api-unavailable"
+            mProbeFired = True
+            Err.Raise 453, "SLC API availability probe", "Synthetic unavailable Win32 API"
+        Case "api-interruption"
+            mProbeFired = True
+            Err.Raise 18, "SLC API interruption probe", "Synthetic native interruption"
+    End Select
+End Sub
 
 Private Sub SLC_ProbeAfterValue()
     If mProbeStage = "read-tail" Then
@@ -206,6 +243,8 @@ Public Function SLC_CancellationTransactionProbe(ByVal caseName As String) As St
     ReleaseStatus
     Application.StatusBar = "EXTERNAL_SYNTHETIC_STATUS"
     mProbeMessages = 0
+    mProbeLastMessage = ""
+    mProbeLastButtons = 0
     ws.Range("F7:G9").Select
     Select Case caseName
         Case "replacement-tail", "comparison-tail"
@@ -217,10 +256,17 @@ Public Function SLC_CancellationTransactionProbe(ByVal caseName As String) As St
         Case "staged-status-error"
             mProbeStage = "status-error"
             expectedError = vbObjectError + 2198
+        Case "api-unavailable-replacement", "api-unavailable-comparison"
+            mProbeStage = "api-unavailable"
+            expectedError = 453
+        Case "api-interruption-replacement", "api-interruption-comparison"
+            mProbeStage = "api-interruption"
+            expectedError = 18
         Case Else
             Err.Raise 5, , "Unknown transaction probe case"
     End Select
-    If caseName = "replacement-tail" Or caseName = "staged-status-error" Then
+    If caseName = "replacement-tail" Or caseName = "staged-status-error" Or _
+        caseName = "api-unavailable-replacement" Or caseName = "api-interruption-replacement" Then
         SLC_Replace
     Else
         SLC_Compare
@@ -229,6 +275,12 @@ Public Function SLC_CancellationTransactionProbe(ByVal caseName As String) As St
     SLC_ProbeAssert mProbeFired, "Fault site was not reached"
     SLC_ProbeAssert mProbeError = expectedError, "Public error handler did not observe expected error"
     SLC_ProbeAssert mProbeMessages = 1, "Expected exactly one public outcome message"
+    If Left$(caseName, 16) = "api-unavailable-" Then
+        SLC_ProbeAssert mProbeLastButtons = vbExclamation, "API failure was not reported as an error"
+        SLC_ProbeAssert InStr(1, mProbeLastMessage, "453", vbBinaryCompare) > 0, "API failure code missing from outcome"
+    ElseIf Left$(caseName, 17) = "api-interruption-" Then
+        SLC_ProbeAssert mProbeLastButtons = vbInformation, "Native interruption was not reported as cancellation"
+    End If
     SLC_ProbeAssert Not mPending Is Nothing, "Original snapshot lost"
     SLC_ProbeAssert (mPending Is savedPending), "Original snapshot object replaced"
     SLC_ProbeAssert mPending.Total = 3, "Original item count changed"
@@ -291,7 +343,11 @@ Cleanup:
     Application.ScreenUpdating = oldScreen
     Application.EnableEvents = oldEvents
     Application.Interactive = oldInteractive
-    Application.StatusBar = oldStatus
+    If VarType(oldStatus) = vbBoolean Then
+        Application.StatusBar = False
+    Else
+        Application.StatusBar = oldStatus
+    End If
     If Not previousBook Is Nothing Then previousBook.Activate
     RefreshUI
     Application.EnableCancelKey = oldCancel
@@ -365,7 +421,11 @@ Cleanup:
     mCancelled = False
     ReleaseStatus
     If Not wb Is Nothing Then wb.Close SaveChanges:=False
-    Application.StatusBar = oldStatus
+    If VarType(oldStatus) = vbBoolean Then
+        Application.StatusBar = False
+    Else
+        Application.StatusBar = oldStatus
+    End If
     If Not previousBook Is Nothing Then previousBook.Activate
     Application.EnableCancelKey = oldCancel
     On Error GoTo 0
@@ -377,7 +437,9 @@ End Function
     $mutated=$true
     $module.DeleteLines(1,$module.CountOfLines)
     $module.AddFromString($injected)
-    foreach($caseName in @('replacement-tail','comparison-tail','output-tail','staged-status-error','geometry-normalization')) {
+    foreach($caseName in @('replacement-tail','comparison-tail','output-tail','staged-status-error',
+        'api-unavailable-replacement','api-unavailable-comparison','api-interruption-replacement','api-interruption-comparison','geometry-normalization')) {
+        $activeCase=$caseName
         if($caseName -eq 'geometry-normalization') {
             $answer=[string]$Excel.Run($qualified+'SLC_TransactionGeometryProbe')
         } else {
@@ -387,15 +449,20 @@ End Function
         if($answer -notmatch $pattern){throw ('Unexpected probe result: '+$answer)}
         $checks.Add([ordered]@{id=$caseName;status='PASS';assertions=[int]$Matches[1];evidenceLayer='memory-only deterministic probe';nativeEsc=$false})
     }
+    $activeCase=$null
 } catch {
+    # Preserve the original probe failure before any restoration/report work.
     $errorText=$_.Exception.Message
+    $errorDetails=$_.Exception.ToString()
+    $failureStack=$_.ScriptStackTrace
+    $failedCase=$activeCase
 } finally {
     if($mutated) {
         try {
             $module.DeleteLines(1,$module.CountOfLines)
             $module.AddFromString($original)
             $actual=[string]$module.Lines(1,$module.CountOfLines)
-            if((Normalize-ProbeModule $actual) -cne (Normalize-ProbeModule $original)){throw 'Original module restoration comparison failed.'}
+            if(-not (Compare-ProbeModule $actual $original)){throw 'Original module restoration comparison failed.'}
             # This was clean on entry; never suppress pre-existing dirty edits.
             # Running an unchanged public function also checks restored compilation.
             $restoredVersion=[string]$Excel.Run($qualified+'SLC_ReleaseVersion')
@@ -407,30 +474,42 @@ End Function
         }
     }
     try {
-        $hashAfter=(Get-FileHash -LiteralPath $expected -Algorithm SHA256).Hash.ToLowerInvariant()
+        $hashAfter=Get-ProbeSharedHash $expected
     } catch {
         if($null -eq $restoreError){$restoreError='Cannot verify add-in disk hash: '+$_.Exception.Message}
     }
-    foreach($value in @($module,$component,$project,$book)){Release-ProbeCom $value}
-    $passed=($null -eq $errorText -and $null -eq $restoreError -and $restored -and $checks.Count -eq 5 -and $hashBefore -ceq $hashAfter)
+    foreach($value in @($module,$component,$project,$book)){
+        try{Release-ProbeCom $value}catch{$cleanupErrors.Add($_.Exception.Message)}
+    }
+    # Windows PowerShell 5.1 does not reliably adapt ordered dictionary keys
+    # for Measure-Object -Property. Read each verified numeric value directly.
+    [int]$assertionTotal=0
+    foreach($check in $checks){$assertionTotal += [int]$check.assertions}
+    $passed=($null -eq $errorText -and $null -eq $restoreError -and $cleanupErrors.Count -eq 0 -and $restored -and $checks.Count -eq 9 -and $hashBefore -ceq $hashAfter)
     [ordered]@{
         status=if($passed){'PASS'}else{'FAIL'}
         nativeEscVerified=$false
-        scope='Memory-only deterministic cancellation, rollback, coordinates and normalization; no keyboard/UI proof.'
+        apiPolicyBlockReproduced=$false
+        scope='Memory-only deterministic cancellation, synthetic API errors, rollback, coordinates and normalization; no keyboard/UI or actual policy-block proof.'
         ownedPid=$OwnedPid
         checks=@($checks.ToArray())
-        assertions=($checks | Measure-Object -Property assertions -Sum).Sum
+        assertions=$assertionTotal
         originalModuleRestored=$restored
         initiallySaved=$savedBefore
         diskSha256Before=$hashBefore
         diskSha256After=$hashAfter
         diskUnchanged=($hashBefore -ceq $hashAfter)
         error=$errorText
+        errorDetails=$errorDetails
+        failureStack=$failureStack
+        failedCase=$failedCase
         restorationError=$restoreError
+        cleanupErrors=@($cleanupErrors.ToArray())
         requiresHostPostExitHashCheck=$true
     } | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $output -Encoding UTF8
 }
 if($null -ne $restoreError){throw ('PROBE RESTORATION FAILED: '+$restoreError)}
 if($null -ne $errorText){throw $errorText}
+if($cleanupErrors.Count -gt 0){throw ('PROBE COM CLEANUP FAILED: '+($cleanupErrors -join '; '))}
 if(-not $restored -or $hashBefore -cne $hashAfter){throw 'Probe restoration/hash verification failed.'}
 Write-Output 'PASS: deterministic memory-only cancellation/rollback and geometry probes; native Esc is not verified.'

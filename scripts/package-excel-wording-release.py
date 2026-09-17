@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -26,6 +27,10 @@ HTML_NAMES = {
     "WORDING_UPDATE.md": "Wording-Report.html",
     "WINDOWS_LAUNCHER_REPORT.md": "Launcher-Report.html",
 }
+PUBLIC_EVIDENCE_JSON = (
+    "tools/ExcelSmartListCompare/evidence/rc8/validation.json",
+    "tools/ExcelSmartListCompare/evidence/rc9/validation.json",
+)
 
 spec = importlib.util.spec_from_file_location("excel_release_render", REPO / "scripts/package-excel-launcher-release.py")
 rendering = importlib.util.module_from_spec(spec)
@@ -42,6 +47,37 @@ def text_hash(data):
 
 def git(*args):
     return subprocess.check_output(["git", *args], cwd=REPO, text=True, encoding="utf-8").strip()
+
+
+def public_report_link_map(source, commit, html_names):
+    """Link only reviewed public summaries, pinned to the packaged source commit.
+
+    The report list remains separate: JSON evidence is not rendered as Markdown
+    or copied from local artifacts. Other relative JSON links still fail the
+    existing package-local link validation.
+    """
+    links = dict(html_names)
+    for relative in PUBLIC_EVIDENCE_JSON:
+        try:
+            git("cat-file", "-e", commit + ":" + relative)
+        except subprocess.CalledProcessError as error:
+            raise SystemExit("Public evidence is absent from the release commit: " + relative) from error
+        href = Path(os.path.relpath(REPO / relative, source.parent)).as_posix()
+        links[href] = "https://github.com/prozac0401/Workspace/blob/" + commit + "/" + relative
+    return links
+
+
+def validate_release_local_links(release):
+    for path in release.glob("*.html"):
+        links = rendering.LocalLinks()
+        links.feed(path.read_text(encoding="utf-8"))
+        for href in links.links:
+            parsed = urlsplit(href)
+            if parsed.scheme or parsed.netloc or not parsed.path:
+                continue
+            target = (path.parent / unquote(parsed.path)).resolve()
+            if not target.is_relative_to(release) or not target.is_file():
+                raise SystemExit("Broken local HTML reference: " + path.name + " -> " + href)
 
 
 def validate_ribbon_package(path):
@@ -89,20 +125,8 @@ def validate_ribbon_package(path):
             raise SystemExit("Missing or duplicate RibbonX content type.")
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--xlam", type=Path, required=True)
-    parser.add_argument("--validation", type=Path, required=True)
-    parser.add_argument("--output-directory", type=Path, required=True)
-    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9"), default=VERSION)
-    args = parser.parse_args()
-    version = args.installer_version
-    rc = int(version.rsplit(".", 1)[1])
-    sources = SOURCES + (("src/CSLCAppEvents.cls",) if rc >= 6 else ())
-    checks = CHECKS + (("windowState", "upgrade") if rc >= 6 else ())
-    if rc >= 7:
-        sources += ("src/customUI14.xml",)
-        checks += ("contextMenuContent", "nativeContextMenu")
+def release_report_layout(rc):
+    """Keep current completion evidence and earlier reports in separate files."""
     html_names = dict(HTML_NAMES)
     report = "Wording-Report.html"
     if rc >= 6:
@@ -118,7 +142,26 @@ def main():
         report = "Completion-Report.html"
     if rc >= 9:
         html_names["RC8_COMPLETION_REPORT.md"] = "RC8-Previous-Report.html"
-        html_names["RC9_STABILITY_REPORT.md"] = "Completion-Report.html"
+        html_names["RC9_STABILITY_REPORT.md"] = "RC9-Initial-Report.html"
+        html_names["RC9_APPROVED_RETEST_20260917.md"] = "Completion-Report.html"
+    return html_names, report
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--xlam", type=Path, required=True)
+    parser.add_argument("--validation", type=Path, required=True)
+    parser.add_argument("--output-directory", type=Path, required=True)
+    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9"), default=VERSION)
+    args = parser.parse_args()
+    version = args.installer_version
+    rc = int(version.rsplit(".", 1)[1])
+    sources = SOURCES + (("src/CSLCAppEvents.cls",) if rc >= 6 else ())
+    checks = CHECKS + (("windowState", "upgrade") if rc >= 6 else ())
+    if rc >= 7:
+        sources += ("src/customUI14.xml",)
+        checks += ("contextMenuContent", "nativeContextMenu")
+    html_names, report = release_report_layout(rc)
     output = args.output_directory.resolve()
     if not output.is_relative_to(REPO / "artifacts") or output == REPO / "artifacts" or output.exists():
         raise SystemExit("Choose a fresh directory under this repository's artifacts.")
@@ -162,8 +205,10 @@ def main():
         shutil.copyfile(TOOL / name, release / name)
     shutil.copyfile(TOOL / "docs/RELEASE_README.md", release / "README.md")
     for source, target in html_names.items():
-        rendering.render(TOOL / "docs" / source, release / target, commit,
-                         title=f"Excel Smart List Compare RC{rc}", html_names=html_names)
+        report_source = TOOL / "docs" / source
+        rendering.render(report_source, release / target, commit,
+                         title=f"Excel Smart List Compare RC{rc}",
+                         html_names=public_report_link_map(report_source, commit, html_names))
     # This input is a reviewed, public summary; raw installer diagnostics stay local.
     (release / "Validation.json").write_text(json.dumps(validation, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (release / "EXCEL_TEST_RESULT.txt").write_text(validation["checks"]["normalizationAndIntegration"] + "\n", encoding="utf-8")
@@ -175,16 +220,7 @@ def main():
         "sourceTextSha256": source_hashes, "verificationReport": report,
         "status": "unsigned evaluation prerelease",
     }, indent=2) + "\n", encoding="utf-8")
-    for path in release.glob("*.html"):
-        links = rendering.LocalLinks()
-        links.feed(path.read_text(encoding="utf-8"))
-        for href in links.links:
-            parsed = urlsplit(href)
-            if parsed.scheme or parsed.netloc or not parsed.path:
-                continue
-            target = (path.parent / unquote(parsed.path)).resolve()
-            if not target.is_relative_to(release) or not target.is_file():
-                raise SystemExit("Broken local HTML reference: " + path.name + " -> " + href)
+    validate_release_local_links(release)
     hashes = {p.name: sha256(p) for p in sorted(release.iterdir()) if p.is_file()}
     (release / "SHA256SUMS.txt").write_text("".join(d + "  " + n + "\n" for n, d in hashes.items()), encoding="ascii")
     install_zip = output / ("ExcelSmartListCompare-" + version + "-win-x64.zip")

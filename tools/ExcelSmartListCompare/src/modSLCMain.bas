@@ -1,6 +1,18 @@
 Attribute VB_Name = "modSLCMain"
 Option Explicit
 
+#If VBA7 Then
+Private Declare PtrSafe Function SLC_GetAsyncKeyState Lib "user32" Alias "GetAsyncKeyState" (ByVal virtualKey As Long) As Integer
+Private Declare PtrSafe Function SLC_GetForegroundWindow Lib "user32" Alias "GetForegroundWindow" () As LongPtr
+Private Declare PtrSafe Function SLC_GetWindowThreadProcessId Lib "user32" Alias "GetWindowThreadProcessId" (ByVal hwnd As LongPtr, ByRef processId As Long) As Long
+Private Declare PtrSafe Function SLC_GetCurrentProcessId Lib "kernel32" Alias "GetCurrentProcessId" () As Long
+#Else
+Private Declare Function SLC_GetAsyncKeyState Lib "user32" Alias "GetAsyncKeyState" (ByVal virtualKey As Long) As Integer
+Private Declare Function SLC_GetForegroundWindow Lib "user32" Alias "GetForegroundWindow" () As Long
+Private Declare Function SLC_GetWindowThreadProcessId Lib "user32" Alias "GetWindowThreadProcessId" (ByVal hwnd As Long, ByRef processId As Long) As Long
+Private Declare Function SLC_GetCurrentProcessId Lib "kernel32" Alias "GetCurrentProcessId" () As Long
+#End If
+
 Private Const VERSION_TEXT As String = "0.2.0"
 Private Const UI_TAG As String = "SLC_68A45C44_2026"
 Private Const BAR_NAME As String = "SLC_68A45C44_Toolbar"
@@ -13,6 +25,7 @@ Private Const WARN_AREAS As Long = 500
 Private Const MAX_ITEM_CHARS As Long = 4096
 Private Const MAX_RAW_CHARS As Long = 5000000
 Private Const CHUNK_CELLS As Long = 8192
+Private Const CANCEL_POLL_ITEMS As Long = 64
 Private Const MAX_ACTIVE_SECONDS As Double = 30#
 Private Const ERR_LIMIT As Long = vbObjectError + 2101
 Private Const ERR_DATA As Long = vbObjectError + 2102
@@ -556,6 +569,7 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
                         End If
                     End If
                     tick = tick + 1
+                    If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
                     If tick Mod 512 = 0 Then
                         SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020 C140 0020") & Format$(result.VisibleCellCount, "#,##0") & SLC_U("AC1C 0020 D655 C778 0020 C911")
                         Checkpoint
@@ -629,15 +643,55 @@ Private Sub Checkpoint()
     ' Excel may reset this setting while dispatching window/UI callbacks.
     ' Keep the running operation's handler armed on both sides of DoEvents.
     Application.EnableCancelKey = xlErrorHandler
+    PollCancellation
     DoEvents
     Application.EnableCancelKey = xlErrorHandler
-    If mCancelled Then Err.Raise ERR_CANCEL, , "Cancelled"
+    PollCancellation
     elapsed = Timer - mStarted
     If elapsed < 0 Then elapsed = elapsed + 86400#
     If elapsed > MAX_ACTIVE_SECONDS Then
         Err.Raise ERR_TIME, , SLC_U("C791 C5C5 0020 C2DC AC04 C774 0020 AE38 C5B4 C838 0020 C911 B2E8 D588 C2B5 B2C8 B2E4 002E 0020 C120 D0DD 0020 BC94 C704 B97C 0020 C904 C5EC 0020 B2E4 C2DC 0020 C2E4 D589 D574 0020 C8FC C138 C694 002E")
     End If
 End Sub
+
+Private Sub PollCancellation()
+    ' Sample only while this product is executing; never register a key/hook.
+    If mBusy Then
+        If OwnForegroundEscapeHeld() Then mCancelled = True
+    End If
+    If mCancelled Then Err.Raise ERR_CANCEL, , "Cancelled"
+End Sub
+
+Private Function OwnForegroundEscapeHeld() As Boolean
+#If VBA7 Then
+    Dim foreground As LongPtr
+#Else
+    Dim foreground As Long
+#End If
+    Dim foregroundPid As Long, ownPid As Long, keyState As Integer
+    If Not mBusy Then Exit Function
+    foreground = SLC_GetForegroundWindow()
+    If foreground = 0 Then Exit Function
+    ownPid = SLC_GetCurrentProcessId()
+    If ownPid = 0 Then Exit Function
+    If SLC_GetWindowThreadProcessId(foreground, foregroundPid) = 0 Then Exit Function
+    If foregroundPid <> ownPid Then Exit Function
+    ' SHORT's sign bit means currently down. The unreliable low history bit is
+    ' never used. No key is sampled while a different process is foreground.
+    keyState = SLC_GetAsyncKeyState(vbKeyEscape)
+    OwnForegroundEscapeHeld = HeldEscapeSampleCancels(mBusy, foregroundPid, ownPid, _
+        (SLC_GetForegroundWindow() = foreground), keyState)
+    ' No error suppression: API/policy failures and native error 18 propagate to
+    ' the operation's existing rollback/error handler.
+End Function
+
+Private Function HeldEscapeSampleCancels(ByVal busy As Boolean, ByVal foregroundPid As Long, _
+                                        ByVal ownPid As Long, ByVal foregroundStable As Boolean, _
+                                        ByVal keyState As Integer) As Boolean
+    If Not busy Or Not foregroundStable Then Exit Function
+    If ownPid = 0 Or foregroundPid = 0 Or foregroundPid <> ownPid Then Exit Function
+    HeldEscapeSampleCancels = (keyState < 0)
+End Function
 
 Private Sub SetStatus(ByVal text As String)
     If Not mOwnStatus Then
@@ -697,11 +751,13 @@ Private Sub ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList)
     For Each k In a.Counts.Keys
         keys.Add CStr(k), True
         tick = tick + 1
+        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
         If tick Mod 1024 = 0 Then Checkpoint
     Next k
     For Each k In b.Counts.Keys
         If Not keys.Exists(CStr(k)) Then keys.Add CStr(k), True
         tick = tick + 1
+        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
         If tick Mod 1024 = 0 Then Checkpoint
     Next k
     For Each k In keys.Keys
@@ -711,6 +767,7 @@ Private Sub ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList)
         If ca > cb Then excessA = excessA + ca - cb
         If cb > ca Then excessB = excessB + cb - ca
         tick = tick + 1
+        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
         If tick Mod 1024 = 0 Then Checkpoint
     Next k
     Checkpoint
@@ -820,6 +877,7 @@ Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As
             If fill = 4096 Then FlushOutput ws, buffer, fill, outRow
         End If
         tick = tick + 1
+        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
         If tick Mod 1024 = 0 Then Checkpoint
     Next k
     If fill > 0 Then FlushOutput ws, buffer, fill, outRow
@@ -915,12 +973,37 @@ Public Sub SLC_About()
 End Sub
 
 ' Integration tests must be executed in Windows desktop Excel, not a VBA emulator.
+Public Function SLC_CancellationDecisionTests() As Long
+    ' Pure decisions: no HWND/API calls, keyboard input or Excel state changes.
+    Dim cases As Variant, sample As Variant, actual As Boolean, passed As Long
+    cases = Array( _
+        Array("key up", True, 42&, 42&, True, 0, False), _
+        Array("low history bit only", True, 42&, 42&, True, 1, False), _
+        Array("reserved bits without high bit", True, 42&, 42&, True, 32767, False), _
+        Array("held high bit", True, 42&, 42&, True, -32768, True), _
+        Array("held plus history", True, 42&, 42&, True, -32767, True), _
+        Array("held with other bits", True, 42&, 42&, True, -1, True), _
+        Array("idle product", False, 42&, 42&, True, -32768, False), _
+        Array("foreground changed", True, 42&, 42&, False, -32768, False), _
+        Array("different foreground process", True, 43&, 42&, True, -32768, False), _
+        Array("missing foreground process", True, 0&, 42&, True, -32768, False), _
+        Array("missing own process", True, 42&, 0&, True, -32768, False), _
+        Array("both process identifiers absent", True, 0&, 0&, True, -32768, False))
+    For Each sample In cases
+        actual = HeldEscapeSampleCancels(CBool(sample(1)), CLng(sample(2)), CLng(sample(3)), _
+            CBool(sample(4)), CInt(sample(5)))
+        If actual <> CBool(sample(6)) Then Err.Raise ERR_DATA, , "Held Esc decision: " & CStr(sample(0))
+        passed = passed + 1
+    Next sample
+    SLC_CancellationDecisionTests = passed
+End Function
+
 Public Function SLC_TestAll() As String
     Dim wb As Workbook, other As Workbook, ws As Worksheet, lo As ListObject
     Dim a As CSLCList, b As CSLCList, parts As Collection, rects As Collection
     Dim arr(1 To 2, 1 To 2) As Variant, i As Long, n As Long
     Dim oldEvents As Boolean, oldCancel As XlEnableCancelKey, oldBook As Workbook
-    Dim errNo As Long, errText As String
+    Dim errNo As Long, errText As String, cancelChecks As Long
     On Error GoTo Failed
     oldEvents = Application.EnableEvents
     oldCancel = Application.EnableCancelKey
@@ -930,6 +1013,7 @@ Public Function SLC_TestAll() As String
     mStarted = Timer
     mCancelled = False
     SLC_NormalizeTests
+    cancelChecks = SLC_CancellationDecisionTests()
     Set wb = Application.Workbooks.Add(xlWBATWorksheet)
     Set ws = wb.Worksheets(1)
     ws.Range("B2:E2").NumberFormat = "@"
@@ -1037,7 +1121,8 @@ Public Function SLC_TestAll() As String
     Application.EnableEvents = oldEvents
     Application.EnableCancelKey = oldCancel
     If Not oldBook Is Nothing Then oldBook.Activate
-    SLC_TestAll = "PASS: normalization + " & CStr(n) & " Excel integration checks"
+    SLC_TestAll = "PASS: normalization + " & CStr(n) & " Excel integration checks + " & _
+        CStr(cancelChecks) & " cancellation decision checks"
     Exit Function
 Failed:
     errNo = Err.Number: errText = Err.Description

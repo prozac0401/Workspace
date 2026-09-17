@@ -1,5 +1,8 @@
 @echo off
 setlocal DisableDelayedExpansion
+rem Use built-in Windows modules, not a parent PS7/custom module search path.
+rem SETLOCAL restores the caller's environment; no user or machine setting changes.
+set "PSModulePath=%SystemRoot%\System32\WindowsPowerShell\v1.0\Modules"
 rem Resolve the Windows host explicitly; never search the package folder or PATH.
 set "slcPowerShell=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
 if exist "%SystemRoot%\Sysnative\WindowsPowerShell\v1.0\powershell.exe" set "slcPowerShell=%SystemRoot%\Sysnative\WindowsPowerShell\v1.0\powershell.exe"
