@@ -6,7 +6,7 @@
 
 결정 담당: 도구 개발 담당
 
-관련 요구사항: [원래 검증 지시](../../../CODEX_EXCEL_E2E_TEST_PROMPT.md), [인수 기준](ACCEPTANCE_TESTS.md) P07~P10, C03~C05, [추가 도구 개발 기준](../../../docs/policies/tools.md)
+관련 요구사항: [원래 검증 지시](../archive/CODEX_EXCEL_E2E_TEST_PROMPT.md), [인수 기준](ACCEPTANCE_TESTS.md) P07~P10, C03~C05, [추가 도구 개발 기준](../../../docs/policies/tools.md)
 
 관계: [ADR-0010](ADR-0010-Cancellation-and-removal.md)의 취소 보완을 확장한다. 과거 실패 기록을 대체하지 않는다.
 

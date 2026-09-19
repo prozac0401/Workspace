@@ -8,7 +8,7 @@
 
 적용 정책: [추가 도구 개발 기준](../../policies/tools.md), [정책 문서 작성 규칙](../../policies/documentation.md)
 
-원래 요구: [실제 Excel 검증 작업 지시](../../../CODEX_EXCEL_E2E_TEST_PROMPT.md), [인수 요구사항](../../../tools/ExcelSmartListCompare/docs/ACCEPTANCE_TESTS.md)
+원래 요구: [실제 Excel 검증 작업 지시](../../../tools/ExcelSmartListCompare/archive/CODEX_EXCEL_E2E_TEST_PROMPT.md), [인수 요구사항](../../../tools/ExcelSmartListCompare/docs/ACCEPTANCE_TESTS.md)
 
 관련 ADR: [처리 부하와 취소 확정 시점](../../../tools/ExcelSmartListCompare/docs/ADR-0011-Bounded-processing-and-cancellation.md), [Windows PowerShell 실행 경로와 설치 단계 기록](../../../tools/ExcelSmartListCompare/docs/ADR-0012-System-PowerShell-launcher.md), [설치 실행기의 모듈 검색 경로](../../../tools/ExcelSmartListCompare/docs/ADR-0013-Windows-module-path.md), [작업 중인 Excel에서 눌린 Esc 확인](../../../tools/ExcelSmartListCompare/docs/ADR-0014-Foreground-held-Esc.md), [비교 전 확인과 결과 근거](../../../tools/ExcelSmartListCompare/docs/ADR-0016-Comparison-usability.md)
 

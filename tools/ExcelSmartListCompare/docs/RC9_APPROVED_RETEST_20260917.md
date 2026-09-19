@@ -10,7 +10,7 @@
 
 후속 변경을 담은 `candidate-07`의 해시는 `61574c0f0acc68fb7b49507fa95c7201768515f4c5edfd563e3caf3915c19efc`다. 저장 전 코드 대조 5개와 저장된 파일의 직렬화 대조는 PASS지만 정상 Quit과 추가 15초 관찰 후에도 소유 Excel이 남아 빌드 전체 상태는 FAIL이다. 개발 접근은 복원됐고 수정 CMD로 설치한 파일의 해시도 일치했다. 이 파일의 실제 용량·선택·메뉴·보호 안내 결과는 아래에 따로 기록하며 candidate-05의 통과를 재사용하지 않는다.
 
-적용 근거는 [원래 Excel 검증 지시](../../../CODEX_EXCEL_E2E_TEST_PROMPT.md), [추가 도구 개발 기준](../../../docs/policies/tools.md), [문서 작성 규칙](../../../docs/policies/documentation.md), [제품 명세](../../../docs/tools/excel-list-compare/specification.md)와 [인수 요구사항](ACCEPTANCE_TESTS.md)이다. 이 기록은 개발·검증 자료이며 공개 사이트에 추가하지 않는다.
+적용 근거는 [원래 Excel 검증 지시](../archive/CODEX_EXCEL_E2E_TEST_PROMPT.md), [추가 도구 개발 기준](../../../docs/policies/tools.md), [문서 작성 규칙](../../../docs/policies/documentation.md), [제품 명세](../../../docs/tools/excel-list-compare/specification.md)와 [인수 요구사항](ACCEPTANCE_TESTS.md)이다. 이 기록은 개발·검증 자료이며 공개 사이트에 추가하지 않는다.
 
 ## 허용 범위와 원복 계약
 

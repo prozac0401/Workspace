@@ -1,5 +1,14 @@
 # 검증 기록
 
+## FolderState 릴리스·Excel RC10 안내·저장소 정리 · 2026-09-20
+
+[게시·정리 기록](releases-20260920.md)에 FolderState 소스 e4e457e의 Windows CI 47개 엔진·12개 WPF 시험, MSI 구성 검사, 공개 자산 3개의 다운로드 해시와 두 도구 문서·저장소 정리 결과를 기록합니다. Excel은 기존 RC10 배포를 유지하며 설치 EXE의 다운로드 해시를 다시 확인했습니다.
+
+## FolderState 사용성 개선 · 2026-09-19
+
+[0.1.3 사용성 검증 기록](folderstate-usability-20260919.md)에 대상 확인, 독립 아이콘 위치 변경, 엔진·UI·패키지·문서 검증 범위와 미검증 항목을 기록합니다. 공개 0.1.2 RC1과 새 로컬 후보를 구분합니다.
+
+
 ## 다운로드 페이지·Release 게시 완료 · 2026-09-17
 
 통합 커밋 `221d8df`를 GitHub main에 반영했습니다. [Pages 배포](https://github.com/prozac0401/Workspace/actions/runs/35115199256)와 [Windows 빌드](https://github.com/prozac0401/Workspace/actions/runs/35115199123)가 성공했습니다. [실제 게시 검증](tools-release-20260917.md#실제-게시-확인)에 Release·공개 다운로드·15페이지 응답·검색 범위·제외 주소 확인을 기록했습니다.

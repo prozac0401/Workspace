@@ -6,7 +6,7 @@
 
 결정 담당: 사용자 오류 재실험·개선 요청에 따른 도구 개발 담당
 
-관련 요구사항·정책: [원래 검증 지시](../../../CODEX_EXCEL_E2E_TEST_PROMPT.md), [인수 기준](ACCEPTANCE_TESTS.md) P07~P10·C03~C05, [추가 도구 개발 기준](../../../docs/policies/tools.md), [허용 후 재실험 기록](RC9_APPROVED_RETEST_20260917.md)
+관련 요구사항·정책: [원래 검증 지시](../archive/CODEX_EXCEL_E2E_TEST_PROMPT.md), [인수 기준](ACCEPTANCE_TESTS.md) P07~P10·C03~C05, [추가 도구 개발 기준](../../../docs/policies/tools.md), [허용 후 재실험 기록](RC9_APPROVED_RETEST_20260917.md)
 
 관계: [ADR-0010](ADR-0010-Cancellation-and-removal.md)·[ADR-0011](ADR-0011-Bounded-processing-and-cancellation.md)의 오류 전달과 확정 전 복구를 유지한다. 키 상태 확인을 사용하지 않던 결정은 이번 작업 중·현재 Excel 창에 한정해 확장한다. 전역 단축키 등록·후킹·상시 감시는 계속 사용하지 않는다.
 

@@ -2,10 +2,12 @@
 
 **Windows 11 x64 PC용 프로그램입니다.** 폴더 아이콘으로 업무 진행 상태를 표시합니다.
 
-[FolderState 0.1.2 RC1 설치 파일 받기](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.2-rc.1/FolderState-0.1.2-win-x64.msi){ .md-button .md-button--primary }
-[배포 내용 확인](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.2-rc.1){ .md-button }
+[FolderState 0.1.3 RC1 설치 파일 받기](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi){ .md-button .md-button--primary }
+[배포 내용 확인](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1){ .md-button }
 
-파일 이름: `FolderState-0.1.2-win-x64.msi` · 시험용 버전 · 코드 서명 없음
+파일 이름: `FolderState-0.1.3-win-x64.msi` · 시험용 버전 · 코드 서명 없음
+
+0.1.3 RC1에는 **폴더 확인**, 현재 상태 강조, 대상별 결과 안내와 별도의 **아이콘 저장 위치 적용**이 포함됩니다. [현재 화면의 사용 순서](index.md)를 확인하세요. [SHA-256 파일](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi.sha256)로 내려받은 파일을 확인할 수 있습니다.
 
 ## 설치 전에 확인하세요
 
@@ -13,13 +15,13 @@
 
 네트워크 공유 폴더, 동기화 폴더, 회사 보안 프로그램이 관리하는 폴더에서는 동작을 충분히 확인하지 못했습니다.
 
-0.1.2 RC1은 아직 상용 배포 승인을 받지 않은 **시험용 버전**입니다. 설치 파일에는 제작자를 확인할 수 있는 전자 서명이 없습니다. 제작자 표시와 지원 방법도 아직 정해지지 않았습니다. FolderState를 설치한 적 없는 다른 PC에서 설치부터 복구, 제거까지 확인하는 시험도 남아 있습니다.
+0.1.3 RC1은 아직 상용 배포 승인을 받지 않은 **시험용 버전**입니다. 설치 파일에는 제작자를 확인할 수 있는 전자 서명이 없습니다. 제작자 표시와 지원 방법도 아직 정해지지 않았습니다. FolderState를 설치한 적 없는 다른 PC에서 설치부터 복구, 제거까지 확인하는 시험도 남아 있습니다.
 
 회사 PC에서는 사용해도 되는지 확인한 뒤 시험용 폴더에서 시작하세요. 보안 경고가 나오면 회사 담당자에게 확인하세요. 보안 설정을 끄고 설치하지 마세요.
 
 ## 설치하기
 
-1. 위에서 설치 파일 `FolderState-0.1.2-win-x64.msi`를 받습니다.
+1. 위에서 설치 파일 `FolderState-0.1.3-win-x64.msi`를 받습니다.
 2. 파일을 열고 **설치**를 누릅니다. 지금 로그인한 Windows 계정에만 설치됩니다. 관리자 권한은 필요하지 않습니다.
 3. 시험용 폴더 하나를 마우스 오른쪽 버튼으로 클릭합니다.
 4. **더 많은 옵션 표시 → 업무 상태**에서 원하는 상태를 고릅니다. [상태별 뜻](index.md)을 참고하세요.
@@ -68,9 +70,9 @@
 설치 화면 대신 명령으로 처리할 때만 사용합니다. `/qn`은 화면을 표시하지 않는 옵션입니다.
 
 ```powershell
-msiexec /i "FolderState-0.1.2-win-x64.msi" /qn /norestart /l*v install.log
-msiexec /fa "FolderState-0.1.2-win-x64.msi" /qn /norestart /l*v repair.log
-msiexec /x "FolderState-0.1.2-win-x64.msi" /qn /norestart /l*v uninstall.log
+msiexec /i "FolderState-0.1.3-win-x64.msi" /qn /norestart /l*v install.log
+msiexec /fa "FolderState-0.1.3-win-x64.msi" /qn /norestart /l*v repair.log
+msiexec /x "FolderState-0.1.3-win-x64.msi" /qn /norestart /l*v uninstall.log
 ```
 
 위 명령은 순서대로 설치, 프로그램 복구, 프로그램 제거입니다. 필요한 명령 하나만 실행하세요. 종료 코드가 `0`이면 작업을 마친 것이고, `3010`이면 PC를 다시 시작해야 합니다. 다른 코드가 나오면 해당 설치 기록 파일을 확인하세요. 기록을 외부에 보낼 때는 사용자 이름이나 업무 폴더 경로가 들어 있는지 확인하고 가려 주세요.

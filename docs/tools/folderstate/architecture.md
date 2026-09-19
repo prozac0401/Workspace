@@ -26,7 +26,7 @@ CLI ───────────→ FolderState.Core
 
 ‘문제 해결 안내’는 동봉된 help.html 전체를 엽니다. 오류별 도움말 자동 분기는 구현하지 않습니다. ‘작업 기록 열기’도 기존처럼 기록 폴더를 열며 별도 로그 조회 화면은 제공하지 않습니다.
 
-이 화면과 작업은 2026-09-19의 0.1.3 소스 변경이며 공개 미배포입니다. 공개된 0.1.2 RC1 설치 파일에는 미반영입니다. [사용성 보완 명세](usability.md)와 [ADR-0007](../../design/0007-folderstate-usability.md)을 함께 참고합니다.
+이 화면과 작업은 FolderState 0.1.3 RC1에 포함됩니다. [사용성 보완 명세](usability.md)와 [ADR-0007](../../design/0007-folderstate-usability.md)을 함께 참고합니다.
 
 ## 소유 파일
 

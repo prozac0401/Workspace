@@ -44,10 +44,10 @@ hide:
 
 | 하고 싶은 일 | 프로그램과 설치 안내 |
 |---|---|
-| 폴더에 업무 진행 상태를 표시하고 싶어요 | **[FolderState 0.1.2 RC1 받기](tools/folderstate/installation.md)** — 폴더를 고르고 현재 상태를 누르세요. |
-| Excel의 두 목록에서 다른 값과 중복을 찾고 싶어요 | **[Excel 명단 비교 받기](tools/excel-list-compare/index.md)** — 첫 번째 목록을 담고 두 번째 목록을 선택해 비교하세요. |
+| 폴더에 업무 진행 상태를 표시하고 싶어요 | **[FolderState 0.1.3 RC1 받기](tools/folderstate/installation.md)** — 폴더를 고르고 현재 상태를 누르세요. |
+| Excel의 두 목록에서 다른 값과 중복을 찾고 싶어요 | **[Excel 명단 비교 RC10 받기](tools/excel-list-compare/index.md)** — 첫 번째 목록을 담고 두 번째 목록을 선택해 비교하세요. |
 
-두 프로그램 모두 시험용입니다. Excel 설치 파일은 이전 공개 RC7이며 이번 문구 교정은 아직 포함되지 않았습니다. 다운로드 전에 각 설치 안내에서 사용 환경과 알려진 문제를 확인하세요.
+FolderState 0.1.3 RC1은 폴더 확인과 아이콘 위치 적용을 분리합니다. Excel 명단 비교 RC10은 담은 목록 확인, 첫 목록 재사용과 네 가지 결과 시트를 제공합니다. 다운로드 전에 각 설치 안내에서 사용 환경과 제한을 확인하세요.
 
 </section>
 

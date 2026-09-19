@@ -17,25 +17,25 @@
 
 | 프로그램 | 설치 파일 | 확인할 내용 |
 |---|---|---|
-| FolderState 0.1.2 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.2-rc.1/FolderState-0.1.2-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.2-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
+| FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
 | Excel 명단 비교 0.2.0 RC10 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.10/ExcelSmartListCompare-0.2.0-rc.10-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.10) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
 
 Excel RC10은 담은 목록 확인, 첫 목록 재사용, 요약과 상세 결과 시트를 제공합니다. 설치 안내와 검증 자료는 분리해 제공합니다. 실제 확인 범위는 [RC10 검증 기록](tools/ExcelSmartListCompare/docs/USABILITY_RC10_REPORT.md)을 따릅니다. 두 프로그램의 설치 파일에는 코드 서명이 없습니다.
 
-이전 배포와 확인 자료: [FolderState 0.1.0 RC1](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.0-rc.1) · [FolderState 캡처 퀵가이드](docs/tools/folderstate/quick-guide.md) · [Excel RC7 단일 EXE 배포](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7-setup.1) · [Excel 퀵가이드](tools/ExcelSmartListCompare/docs/QUICK_GUIDE.md) · [RC7 검증과 제한](tools/ExcelSmartListCompare/docs/CONTEXT_MENU_REPORT.md) · [EXE 검증 기록](tools/ExcelSmartListCompare/docs/ONEFILE_REPORT.md)
+현재 배포·검증 결과와 과거 기록은 [배포·검증 안내](docs/delivery/index.md)에서 구분해 확인하세요.
 
 ## 개발자가 프로그램을 만드는 방법
 
-FolderState는 C# / .NET 10 / WPF로 만들었습니다. 아래 명령은 Windows 11 x64에서 실행합니다. .NET SDK 버전은 `global.json`을 따릅니다. 두 도구의 확인 범위는 [실제 검증·복구·지원 제한](docs/delivery/tools-release-20260914.md)을 참고하세요.
+FolderState는 C# / .NET 10 / WPF로 만들었습니다. 아래 명령은 Windows 11 x64에서 실행합니다. .NET SDK 버전은 `global.json`을 따릅니다. 두 도구의 현재 확인 범위는 [배포·검증 안내](docs/delivery/index.md)를 참고하세요.
 
 ```powershell
 dotnet run --project tests/FolderState.Tests -c Release
 powershell -NoProfile -File scripts/build.ps1
 ```
 
-설치 파일은 `artifacts/release/FolderState-0.1.2-win-x64.msi`에 만들어집니다. 파일이 바뀌었는지 확인하는 SHA-256 파일도 함께 생성합니다. 설치 파일에 실행에 필요한 .NET이 포함되어 있어 사용자 PC에 따로 설치할 필요가 없습니다. 현재 Windows 사용자 계정에 설치됩니다.
+설치 파일은 `artifacts/release/FolderState-0.1.3-win-x64.msi`에 만들어집니다. 파일이 바뀌었는지 확인하는 SHA-256 파일도 함께 생성합니다. 설치 파일에 실행에 필요한 .NET이 포함되어 있어 사용자 PC에 따로 설치할 필요가 없습니다. 현재 Windows 사용자 계정에 설치됩니다.
 
-Excel 추가 기능과 설치 프로그램의 제작 방법은 [별도 도구 안내](tools/ExcelSmartListCompare/README.md)와 [EXE 설치·제거 안내](tools/ExcelSmartListCompare/docs/ONEFILE_INSTALLATION.md)에 있습니다. 새 소스, 실제 검증한 XLAM, 공개된 설치 파일을 구분합니다.
+Excel 추가 기능과 설치 프로그램의 제작 방법은 [별도 도구 안내](tools/ExcelSmartListCompare/README.md)와 [RC10 설치·사용 안내](tools/ExcelSmartListCompare/docs/RC10_USER_GUIDE.md)에 있습니다. 새 소스, 실제 검증한 XLAM, 공개된 설치 파일을 구분합니다.
 
 문서 사이트를 확인하려면 다음 명령을 실행하세요.
 
@@ -54,8 +54,10 @@ tests/        실제 Windows 파일시스템 통합 테스트
 installer/    사용자별 MSI 정의
 tools/        Excel 명단 비교 등 별도 도구
 scripts/      빌드·검증 스크립트
-docs/         GitHub Pages 문서 원본
+docs/         공개 안내와 개발·배포 문서 원본
 assets/       다중 해상도 상태 아이콘
 ```
 
-현재 버전은 검증용입니다. 배포 단계와 확인 결과는 [품질 기준](docs/delivery/quality.md), [검증 기록](docs/delivery/verification.md)에서 확인하세요. 제작자를 확인하는 코드 서명과 새 PC에서의 설치·업데이트·제거 검증이 끝나기 전에는 상용 정식판으로 분류하지 않습니다.
+Excel 최초 입력 자료는 [원본 보존 폴더](tools/ExcelSmartListCompare/archive/README.md)에 있습니다. 생성물은 artifacts/, bin/, obj/, site/에 두고 Git에 포함하지 않습니다. 이전 로컬 ExcelE2E-* 시험 폴더도 추적하지 않습니다.
+
+배포 단계와 확인 결과는 [품질 기준](docs/delivery/quality.md), [검증 기록](docs/delivery/verification.md)에서 확인하세요. 제작자를 확인하는 코드 서명과 새 PC에서의 설치·업데이트·제거 검증이 끝나기 전에는 상용 정식판으로 분류하지 않습니다.

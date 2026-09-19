@@ -1,13 +1,21 @@
+# Local runtimes and dependencies
 .tools/
+node_modules/
+
+# Build, test and site output
 **/bin/
 **/obj/
 artifacts/
-node_modules/
-__pycache__/
 site/
+__pycache__/
+/ExcelE2E-*/
+
+# Editor state and local diagnostics
 .vs/
 *.user
+*.log
+
+# Local credentials
 *.pfx
 *.p12
-*.log
 .env
