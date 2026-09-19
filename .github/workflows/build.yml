@@ -19,6 +19,15 @@ jobs:
       - name: Test and build MSI
         shell: pwsh
         run: ./scripts/build.ps1
+      - name: Verify MSI package configuration
+        shell: pwsh
+        run: |
+          $packages = @(Get-ChildItem -LiteralPath artifacts/release -Filter *.msi)
+          if ($packages.Count -eq 0) { throw 'The build produced no MSI package.' }
+          foreach ($package in $packages) {
+            ./scripts/verify-msi.ps1 -MsiPath $package.FullName |
+              Tee-Object -FilePath ($package.FullName + '.validation.json')
+          }
       - uses: actions/upload-artifact@v4
         if: always()
         with:

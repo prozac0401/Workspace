@@ -1,5 +1,5 @@
 ﻿[CmdletBinding()]
-param([string]$Version = '0.1.2', [switch]$SkipTests)
+param([string]$Version = '0.1.3', [switch]$SkipTests)
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $repoRoot
@@ -13,7 +13,7 @@ function Invoke-Dotnet([string[]]$Arguments) {
 if (-not $SkipTests) {
     Invoke-Dotnet @('run','--project','tests/FolderState.Tests','-c','Release')
     Invoke-Dotnet @('build','tests/FolderState.UiSmoke','-c','Release')
-    Invoke-Dotnet @('tests/FolderState.UiSmoke/bin/Release/net10.0-windows/FolderState.UiSmoke.dll','artifacts/ui-preview.png')
+    Invoke-Dotnet @('tests/FolderState.UiSmoke/bin/Release/net10.0-windows/FolderState.UiSmoke.dll','artifacts/ui-preview.png','900','780','verify')
 }
 $publish = Join-Path $repoRoot 'artifacts/publish'
 $release = Join-Path $repoRoot 'artifacts/release'

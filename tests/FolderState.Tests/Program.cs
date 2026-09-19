@@ -6,11 +6,14 @@ using System.Security.Cryptography;
 using FolderState.Core;
 
 if (!OperatingSystem.IsWindows()) { Console.Error.WriteLine("Windows integration tests require Windows."); return 1; }
-if (args.Length == 3 && args[0] == "--interrupt")
+if (args.Length == 3 && args[0] == "--interrupt" || args.Length == 4 && args[0] == "--interrupt-mode")
 {
     var interrupted = new FolderStateEngine(Path.Combine(AppContext.BaseDirectory, "icons"))
     { TransactionCheckpoint = checkpoint => { if (checkpoint == args[2]) Environment.Exit(77); } };
-    return interrupted.Set(args[1], WorkStatus.Done).Success ? 0 : 1;
+    var result = args[0] == "--interrupt-mode"
+        ? interrupted.ChangeMode(args[1], Enum.Parse<IconMode>(args[3]))
+        : interrupted.Set(args[1], WorkStatus.Done);
+    return result.Success ? 0 : 1;
 }
 string suite = Path.Combine(Path.GetTempPath(), "FolderState-tests-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(suite);
@@ -269,6 +272,120 @@ Test("unknown snapshot format is rejected without losing fields", () => {
     string p=Folder();Ok(engine.Set(p,WorkStatus.Doing));EditBackup(p,b=>b["Desktop"]!["ExternalSnapshotField"]="preserve");
     string file=Path.Combine(p,FolderStateEngine.StateFile);byte[] before=File.ReadAllBytes(file);
     Assert(engine.Set(p,WorkStatus.Done).ErrorCode=="invalid_metadata");Assert(engine.Reset(p).ErrorCode=="invalid_metadata");Assert(File.ReadAllBytes(file).SequenceEqual(before));
+});
+
+Test("storage change requires a saved state", () => {
+    string p=Folder(); var result=engine.ChangeMode(p,IconMode.Portable);
+    Assert(!result.Success && result.ErrorCode=="state_missing"); Assert(engine.ReadState(p) is null);
+    Assert(Directory.GetFiles(p).Length==0); Assert(!File.GetAttributes(p).HasFlag(FileAttributes.ReadOnly));
+});
+Test("storage round trips preserve status and timestamp / exact reset", () => {
+    foreach(var status in Enum.GetValues<WorkStatus>()) {
+        string p=Folder(); var original=Utf16("[.ShellClassInfo]\nIconResource=original.ico,0\nInfoTip=keep\n");
+        Desktop(p,original); var attributes=FileAttributes.Hidden|FileAttributes.ReadOnly;
+        File.SetAttributes(Path.Combine(p,"desktop.ini"),attributes); Ok(engine.Set(p,status)); var before=engine.ReadState(p)!;
+        foreach(var mode in new[]{IconMode.Portable,IconMode.Portable,IconMode.Local,IconMode.Local}) {
+            var result=engine.ChangeMode(p,mode); Ok(result); Assert(result.Action=="change-mode");
+            Assert(result.PreviousStatus==status.Value() && result.NewStatus==status.Value());
+            Assert(engine.ReadState(p)==before with { Mode=mode });
+            Assert(Directory.GetFiles(p,"*.ico").Length==(mode==IconMode.Portable?1:0));
+        }
+        Ok(engine.Reset(p)); Assert(ReadDesktop(p).SequenceEqual(original));
+        Assert(File.GetAttributes(Path.Combine(p,"desktop.ini"))==attributes); Assert(engine.ReadState(p) is null);
+        Assert(!File.GetAttributes(p).HasFlag(FileAttributes.ReadOnly));
+    }
+});
+Test("storage change preserves unknown fields / reset stays conservative", () => {
+    string p=Folder(); Ok(engine.Set(p,WorkStatus.Doing)); var before=engine.ReadState(p)!;
+    EditBackup(p,b=>b["External"]="preserve");
+    File.AppendAllText(Path.Combine(p,FolderStateEngine.StateFile),"[External]\nNote=keep\n",Encoding.Unicode);
+    File.AppendAllText(Path.Combine(p,"desktop.ini"),"[External]\nCustom=keep\n",Encoding.Unicode);
+    foreach(var mode in new[]{IconMode.Portable,IconMode.Local}) {
+        Ok(engine.ChangeMode(p,mode)); Assert(engine.ReadState(p)==before with { Mode=mode });
+        Assert(File.ReadAllText(Path.Combine(p,FolderStateEngine.StateFile)).Contains("Note=keep"));
+        Assert(File.ReadAllText(Path.Combine(p,"desktop.ini")).Contains("Custom=keep"));
+        EditBackup(p,b=>Assert(b["External"]!.GetValue<string>()=="preserve"));
+    }
+    byte[] state=File.ReadAllBytes(Path.Combine(p,FolderStateEngine.StateFile));
+    Assert(engine.Reset(p).ErrorCode=="metadata_conflict");
+    Assert(File.ReadAllBytes(Path.Combine(p,FolderStateEngine.StateFile)).SequenceEqual(state));
+});
+Test("storage change protects external icon settings and resources", () => {
+    string p=Folder(); Ok(engine.Set(p,WorkStatus.Done)); var before=engine.ReadState(p)!;
+    var external=Utf16("[.ShellClassInfo]\nIconResource=external.ico,0\n"); Desktop(p,external);
+    Assert(engine.ChangeMode(p,IconMode.Portable).ErrorCode=="icon_conflict");
+    Assert(engine.ReadState(p)==before); Assert(ReadDesktop(p).SequenceEqual(external)); Assert(Directory.GetFiles(p,"*.ico").Length==0);
+    p=Folder(); Ok(engine.Set(p,WorkStatus.Done)); before=engine.ReadState(p)!;
+    string unowned=Path.Combine(p,IconName(WorkStatus.Done)); File.Copy(Path.Combine(icons,"done.ico"),unowned);
+    byte[] desktop=ReadDesktop(p); Assert(engine.ChangeMode(p,IconMode.Portable).ErrorCode=="portable_conflict");
+    Assert(engine.ReadState(p)==before); Assert(ReadDesktop(p).SequenceEqual(desktop)); Assert(File.Exists(unowned));
+    p=Folder(); Ok(engine.Set(p,WorkStatus.Done,IconMode.Portable)); before=engine.ReadState(p)!;
+    string owned=PortablePath(p); Overwrite(owned,Encoding.UTF8.GetBytes("external")); desktop=ReadDesktop(p);
+    Assert(engine.ChangeMode(p,IconMode.Local).ErrorCode=="portable_conflict");
+    Assert(engine.ReadState(p)==before); Assert(ReadDesktop(p).SequenceEqual(desktop)); Assert(File.ReadAllText(owned)=="external");
+});
+Test("storage change missing installed icon preserves saved state", () => {
+    string p=Folder(); Ok(engine.Set(p,WorkStatus.Doing)); var before=engine.ReadState(p)!; byte[] desktop=ReadDesktop(p);
+    Assert(new FolderStateEngine(suite).ChangeMode(p,IconMode.Portable).ErrorCode=="icon_missing");
+    Assert(engine.ReadState(p)==before); Assert(ReadDesktop(p).SequenceEqual(desktop)); Assert(Directory.GetFiles(p,"*.ico").Length==0);
+});
+Test("storage transition rollback restores bytes and attributes at every stage", () => {
+    foreach(var initial in Enum.GetValues<IconMode>())
+    foreach(var checkpoint in new[]{"journal",IconName(WorkStatus.Doing),"desktop.ini",FolderStateEngine.StateFile,"shell","attributes"}) {
+        string p=Folder(); Ok(engine.Set(p,WorkStatus.Doing,initial)); var before=engine.ReadState(p)!;
+        var files=Directory.GetFiles(p).ToDictionary(f=>Path.GetFileName(f)!,f=>(Bytes:File.ReadAllBytes(f),Attributes:File.GetAttributes(f)));
+        var folderAttributes=File.GetAttributes(p);
+        var faulty=new FolderStateEngine(icons){TransactionCheckpoint=s=>{if(s==checkpoint)throw new IOException("injected");}};
+        Assert(!faulty.ChangeMode(p,initial==IconMode.Local?IconMode.Portable:IconMode.Local).Success);
+        Assert(engine.ReadState(p)==before); Assert(Directory.GetFiles(p).Length==files.Count);
+        foreach(var file in files) {
+            string path=Path.Combine(p,file.Key); Assert(File.ReadAllBytes(path).SequenceEqual(file.Value.Bytes));
+            Assert(File.GetAttributes(path)==file.Value.Attributes);
+        }
+        Assert(File.GetAttributes(p)==folderAttributes); Ok(engine.Reset(p));
+    }
+});
+Test("storage process interruption recovers every persisted stage", () => {
+    foreach(var initial in Enum.GetValues<IconMode>())
+    foreach(var checkpoint in new[]{"journal",IconName(WorkStatus.Doing),"desktop.ini",FolderStateEngine.StateFile,"shell","attributes"}) {
+        string p=Folder(); Ok(engine.Set(p,WorkStatus.Doing,initial)); var before=engine.ReadState(p)!;
+        var launch=new ProcessStartInfo(Environment.ProcessPath!){UseShellExecute=false,CreateNoWindow=true};
+        if(string.Equals(Path.GetFileNameWithoutExtension(Environment.ProcessPath),"dotnet",StringComparison.OrdinalIgnoreCase)) launch.ArgumentList.Add(typeof(Program).Assembly.Location);
+        launch.ArgumentList.Add("--interrupt-mode"); launch.ArgumentList.Add(p); launch.ArgumentList.Add(checkpoint);
+        launch.ArgumentList.Add((initial==IconMode.Local?IconMode.Portable:IconMode.Local).ToString());
+        using var child=Process.Start(launch)!; Assert(child.WaitForExit(15000),"interrupt child timed out"); Assert(child.ExitCode==77);
+        Assert(File.Exists(Path.Combine(p,FolderStateEngine.JournalFile))); Ok(engine.Repair(p)); Assert(engine.ReadState(p)==before);
+        Assert(!File.Exists(Path.Combine(p,FolderStateEngine.JournalFile)));
+        Assert(Directory.GetFiles(p,"*.ico").Length==(initial==IconMode.Portable?1:0)); Ok(engine.Reset(p));
+    }
+});
+Test("concurrent storage changes preserve saved state and one owned resource", () => {
+    string p=Folder(); Ok(engine.Set(p,WorkStatus.Issue)); var before=engine.ReadState(p)!;
+    var jobs=Enumerable.Range(0,24).Select(i=>Task.Run(()=>engine.ChangeMode(p,(IconMode)(i%2)))).ToArray();
+    Task.WaitAll(jobs); foreach(var job in jobs) Ok(job.Result);
+    var after=engine.ReadState(p)!; Assert(after.Status==before.Status && after.Updated==before.Updated);
+    Assert(Directory.GetFiles(p,"*.ico").Length==(after.Mode==IconMode.Portable?1:0));
+    if(after.Mode==IconMode.Portable) Assert(Path.GetFileName(PortablePath(p))==IconName(after.Status));
+    Ok(engine.Reset(p)); Assert(Directory.GetFiles(p).Length==0);
+});
+Test("storage change reads latest status after a concurrent state change", () => {
+    string p=Folder(); Ok(engine.Set(p,WorkStatus.Todo));
+    using var entered=new ManualResetEventSlim(); using var release=new ManualResetEventSlim();
+    var waiting=new FolderStateEngine(icons){TransactionCheckpoint=s=>{if(s=="journal"){entered.Set();Assert(release.Wait(5000),"set release timed out");}}};
+    var set=Task.Run(()=>waiting.Set(p,WorkStatus.Done)); Assert(entered.Wait(5000),"set did not reach journal");
+    var change=Task.Run(()=>engine.ChangeMode(p,IconMode.Portable)); release.Set();
+    Task.WaitAll(set,change); Ok(set.Result); Ok(change.Result);
+    Assert(change.Result.PreviousStatus=="done" && change.Result.NewStatus=="done");
+    Assert(engine.ReadState(p)!.Status==WorkStatus.Done && engine.ReadState(p)!.Mode==IconMode.Portable); Ok(engine.Reset(p));
+});
+Test("legacy portable storage change preserves state and exact reset", () => {
+    foreach(var mode in Enum.GetValues<IconMode>()) {
+        string p=Folder(); var original=Utf16("[.ShellClassInfo]\nIconResource=original.ico,0\nInfoTip=keep\n"); Desktop(p,original);
+        LegacyPortable(p); var before=engine.ReadState(p)!; Ok(engine.ChangeMode(p,mode));
+        Assert(engine.ReadState(p)==before with { Mode=mode }); Assert(!File.Exists(Path.Combine(p,".folderstate.ico")));
+        Assert(Directory.GetFiles(p,"*.ico").Length==(mode==IconMode.Portable?1:0));
+        Ok(engine.Reset(p)); Assert(ReadDesktop(p).SequenceEqual(original)); Assert(Directory.GetFiles(p,"*.ico").Length==0);
+    }
 });
 
 int failed=0; var evidence=new List<object>();

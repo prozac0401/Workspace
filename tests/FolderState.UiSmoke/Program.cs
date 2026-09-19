@@ -12,20 +12,29 @@ internal static class Program
         string output = args.Length >= 1 ? Path.GetFullPath(args[0]) : Path.GetFullPath("artifacts/ui-preview.png");
         int width = args.Length >= 3 ? int.Parse(args[1]) : 960;
         int height = args.Length >= 3 ? int.Parse(args[2]) : 740;
-        if (width < 760 || height < 680) throw new ArgumentException("Use a supported window size (at least 760 x 680).");
-        var application = new FolderState.App.App(); application.InitializeComponent();
-        var window = new FolderState.App.MainWindow();
+        if (width < 760 || height < 560) throw new ArgumentException("Use a supported window size (at least 760 x 560).");
+        // Load the same compiled styles without running the product command-line startup.
+        var application = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+        application.Resources = new ResourceDictionary { Source = new Uri("/FolderState;component/Styles.xaml", UriKind.Relative) };
+        var window = args.Contains("verify") ? UiFlowChecks.CreateVerifiedWindow() : new FolderState.App.MainWindow();
         var content = (FrameworkElement)window.Content;
         content.Measure(new Size(width, height)); content.Arrange(new Rect(0, 0, width, height)); content.UpdateLayout();
         if (args.Contains("expanded"))
             foreach (var expander in Descendants(content).OfType<Expander>()) expander.IsExpanded = true;
         if (args.Contains("message") && window.FindName("ResultText") is TextBlock result)
+        {
+            if (window.FindName("ResultPanel") is FrameworkElement panel) panel.Visibility = Visibility.Visible;
+            if (window.FindName("ResultTitle") is TextBlock title) title.Text = "작업 실패 · 화면 확인용 예시";
             result.Text = "이 폴더의 상태를 바꾸지 못했습니다. 폴더를 사용하는 다른 프로그램을 닫고 다시 시도하세요.\n문제가 계속되면 작업 기록을 확인하세요. (화면 확인용 예시)";
+        }
         content.Measure(new Size(width, height)); content.Arrange(new Rect(0, 0, width, height)); content.UpdateLayout();
         if (args.Contains("bottom"))
         {
-            Descendants(content).OfType<ScrollViewer>().First().ScrollToEnd();
+            var scroll = content as ScrollViewer ?? Descendants(content).OfType<ScrollViewer>().First();
+            scroll.ScrollToEnd();
             content.UpdateLayout();
+            if (scroll.ScrollableHeight > 0 && scroll.VerticalOffset <= 0)
+                throw new Exception("Bottom preview did not scroll the main content.");
         }
         var images = Descendants(content).OfType<Image>().ToArray();
         if (images.Length != 4 || images.Any(i => i.Source is null || i.Source.Width < 16)) throw new Exception("Status icons failed to load.");

@@ -24,6 +24,7 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
         return metadata is null ? null : new(StateNames.Parse(metadata.Status), ParseMode(metadata.Mode), metadata.Updated);
     }
     public OperationResult Set(string folder, WorkStatus status, IconMode? mode = null) => Execute(folder, "set", status, mode);
+    public OperationResult ChangeMode(string folder, IconMode mode) => Execute(folder, "change-mode", null, mode);
     public OperationResult Repair(string folder) => Execute(folder, "repair", null, null);
     public OperationResult Reset(string folder) => Execute(folder, "reset", null, null);
 
@@ -37,8 +38,10 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
             Recover(target);
             var state = SafeFiles.Read(Path.Combine(target, StateFile));
             var metadata = ReadMetadata(state); previous = metadata?.Status;
-            if (action == "repair" && metadata is null)
-                throw new StateException("state_missing", "다시 표시할 상태가 없습니다. 먼저 ‘시작 전’, ‘진행 중’, ‘완료’, ‘확인 필요’ 중 하나를 선택해 주세요.");
+            if (action is "repair" or "change-mode" && metadata is null)
+                throw new StateException("state_missing", action == "change-mode"
+                    ? "아이콘 저장 위치를 바꿀 상태가 없습니다. 먼저 ‘시작 전’, ‘진행 중’, ‘완료’, ‘확인 필요’ 중 하나를 선택해 주세요."
+                    : "다시 표시할 상태가 없습니다. 먼저 ‘시작 전’, ‘진행 중’, ‘완료’, ‘확인 필요’ 중 하나를 선택해 주세요.");
             if (action == "reset" && metadata is null)
                 result = new(true, action, target, null, null, "지울 상태 표시가 없습니다. 폴더는 그대로 두었습니다.");
             else
@@ -127,7 +130,7 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
                     byte[] managedDesktop = document.Bytes();
                     backup = backup with { ManagedDesktop = managedDesktop, PortableHash = portableHash, PortableName = portableName };
                     metadata = new(2, "FolderState", status.Value.Value(), mode.Value.ToString().ToLowerInvariant(),
-                        action == "repair" ? metadata!.Updated : DateTimeOffset.Now, backup);
+                        action is "repair" or "change-mode" ? metadata!.Updated : DateTimeOffset.Now, backup);
                     var encodedState = WriteMetadata(metadata, state.Data);
                     if (encodedState.Length > SafeFiles.MaxBytes) throw new StateException("metadata_too_large", "기존 설정의 크기가 너무 커서 되돌릴 때 쓸 정보를 저장할 수 없습니다. 설정 파일을 지우지 말고 지원을 요청해 주세요.");
                     changes.Add(new(DesktopFile, desktop, new(managedDesktop, desktop.Attributes | HiddenSystem)));
@@ -140,7 +143,7 @@ public sealed class FolderStateEngine(string iconDirectory, string? logDirectory
                 warning = string.Join(" ", new[] { warning, customizationWarning, refreshWarning }.Where(s => s is not null));
                 if (warning.Length == 0) warning = null;
                 result = new(true, action, target, previous, status?.Value(), action switch
-                { "reset" => "상태 표시를 지웠습니다. 폴더 이름과 업무 파일은 그대로입니다.", "repair" => "저장된 상태의 아이콘을 다시 표시하도록 설정했습니다. 아직 안 보이면 탐색기에서 F5를 눌러 주세요.", _ => $"‘{status!.Value.Label()}’으로 저장했습니다. 폴더 아이콘이 아직 안 바뀌면 탐색기에서 F5를 눌러 주세요." }, Warning: warning);
+                { "reset" => "상태 표시를 지웠습니다. 폴더 이름과 업무 파일은 그대로입니다.", "change-mode" => $"아이콘을 {(mode == IconMode.Portable ? "폴더 안" : "이 PC")}에 저장하도록 변경했습니다. 저장된 상태와 상태 변경 시각은 그대로입니다.", "repair" => "저장된 상태의 아이콘을 다시 표시하도록 설정했습니다. 아직 안 보이면 탐색기에서 F5를 눌러 주세요.", _ => $"‘{status!.Value.Label()}’으로 저장했습니다. 폴더 아이콘이 아직 안 바뀌면 탐색기에서 F5를 눌러 주세요." }, Warning: warning);
             }
         }
         catch (Exception ex) when (ex is not OutOfMemoryException)
