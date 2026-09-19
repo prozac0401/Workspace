@@ -245,10 +245,11 @@ begin
     if not SetEnvironmentVariable('SLC_SETUP_DIAGNOSTICS', '1') then
       RaiseException('설치 기록을 준비하지 못했습니다. 설치 프로그램을 다시 실행해 주세요.');
     Log('SLC_ENGINE_ACTION=' + Action);
-    { No path is interpolated into shell code. The fixed launcher is resolved in
-      the explicit working directory, including paths with shell metacharacters. }
+    { The fixed launcher is resolved in the explicit working directory. Resolve
+      chcp.com from Windows itself: the caller may omit PATH or PATHEXT. Quote
+      its path inside CMD's outer /C quotes, including a Windows path with spaces. }
     Started := ExecAndLogOutput(ExpandConstant('{cmd}'),
-      '/D /V:OFF /C "chcp 65001>nul & ' + Action + '.cmd -ConfirmProduct SLC-68A45C44-2026"',
+      '/D /V:OFF /C ""' + ExpandConstant('{sys}\chcp.com') + '" 65001>nul & ' + Action + '.cmd -ConfirmProduct SLC-68A45C44-2026"',
       Directory, SW_HIDE, ewWaitUntilTerminated, Result, @CaptureEngineOutput);
     if not Started then begin
       Log('Engine process could not be started: ' + IntToStr(Result));

@@ -42,6 +42,8 @@ Private mRibbonLoaded As Boolean
 Private mOwnStatus As Boolean
 Private mPreviousStatus As Variant
 Private mLastStatus As String
+Private mPhase As String
+Private mLastOutcome As String
 
 Public Function SLC_Version() As String
     SLC_Version = VERSION_TEXT
@@ -60,7 +62,7 @@ Public Function SLC_RibbonReady() As Boolean
 End Function
 
 Public Function SLC_ReleaseVersion() As String
-    SLC_ReleaseVersion = "0.2.0-rc.9"
+    SLC_ReleaseVersion = "0.2.0-rc.10"
 End Function
 
 Public Sub SLC_GetContextMenu(ByVal control As Office.IRibbonControl, ByRef content)
@@ -75,20 +77,55 @@ Public Function SLC_MenuXml(Optional ByVal menuKind As String = "Cell") As Strin
         Case Else
             Err.Raise 5, "SLC_MenuXml", "Unknown product menu."
     End Select
-    ' Called on every drop, independent of workbook/window event delivery.
-    ' Only read the process snapshot; never inspect or change a selection here.
+    ' Menu creation reads only the stored snapshot, never the current selection.
     xml = "<menu xmlns=""http://schemas.microsoft.com/office/2009/07/customui"">"
-    If mPending Is Nothing Then
-        xml = xml & MenuButton(prefix & "Capture", "첫 번째 목록 담기", "SLC_CaptureClick")
+    If mBusy Then
+        xml = xml & MenuLabel(prefix & "Progress", mPhase)
+        xml = xml & MenuButton(prefix & "Cancel", "작업 취소", "SLC_CancelClick")
     Else
-        xml = xml & MenuButton(prefix & "Compare", "두 번째 목록 담아 비교", "SLC_CompareClick")
-        xml = xml & "<button id=""" & prefix & "Count"" enabled=""false"" label=""" & _
-              "첫 번째 목록: " & Format$(mPending.Total, "#,##0") & "개 항목" & """/>"
-        xml = xml & MenuButton(prefix & "Clear", "첫 번째 목록 비우기", "SLC_ClearClick")
-        xml = xml & MenuButton(prefix & "Replace", "첫 번째 목록 바꾸기", "SLC_ReplaceClick")
+        If mPending Is Nothing Then
+            xml = xml & MenuButton(prefix & "Capture", "첫 번째 목록 담기", "SLC_CaptureClick")
+        Else
+            xml = xml & MenuButton(prefix & "Compare", "두 번째 목록 담아 비교", "SLC_CompareClick")
+            xml = xml & MenuLabel(prefix & "Count", PendingLabel())
+            xml = xml & MenuLabel(prefix & "Source", PendingSource())
+            xml = xml & MenuButton(prefix & "Preview", "담은 목록 확인", "SLC_PreviewClick")
+            xml = xml & MenuButton(prefix & "Replace", "첫 번째 목록 바꾸기", "SLC_ReplaceClick")
+            xml = xml & MenuButton(prefix & "Clear", "첫 번째 목록 비우기", "SLC_ClearClick")
+        End If
+        If Len(mLastOutcome) > 0 Then xml = xml & MenuLabel(prefix & "Outcome", mLastOutcome)
+        xml = xml & MenuButton(prefix & "About", "사용 안내", "SLC_AboutClick")
     End If
-    xml = xml & MenuButton(prefix & "About", "사용 안내", "SLC_AboutClick")
     SLC_MenuXml = xml & "</menu>"
+End Function
+
+Private Function XmlLabel(ByVal value As String) As String
+    value = Replace(value, "&", "&amp;")
+    value = Replace(value, "<", "&lt;")
+    value = Replace(value, ">", "&gt;")
+    value = Replace(value, Chr$(34), "&quot;")
+    XmlLabel = Replace(value, "'", "&apos;")
+End Function
+
+Private Function MenuLabel(ByVal id As String, ByVal label As String) As String
+    MenuLabel = "<button id=""" & id & """ enabled=""false"" label=""" & XmlLabel(label) & """/>"
+End Function
+
+Private Function PendingLabel() As String
+    If mPending Is Nothing Then
+        PendingLabel = "담아 둔 첫 번째 목록이 없습니다."
+    Else
+        PendingLabel = "첫 번째 목록: " & Format$(mPending.Total, "#,##0") & "개 항목"
+    End If
+End Function
+
+Private Function PendingSource() As String
+    If Not mPending Is Nothing Then PendingSource = mPending.DisplaySource
+End Function
+
+Private Function PendingSummary() As String
+    PendingSummary = PendingLabel()
+    If Not mPending Is Nothing Then PendingSummary = PendingSummary & vbCrLf & mPending.DisplaySource
 End Function
 
 Private Function MenuButton(ByVal id As String, ByVal label As String, ByVal action As String) As String
@@ -108,20 +145,28 @@ End Sub
 Public Sub SLC_ReplaceClick(ByVal control As Office.IRibbonControl)
     SLC_Replace
 End Sub
+Public Sub SLC_PreviewClick(ByVal control As Office.IRibbonControl)
+    SLC_Preview
+End Sub
+Public Sub SLC_CancelClick(ByVal control As Office.IRibbonControl)
+    SLC_Cancel
+End Sub
 Public Sub SLC_AboutClick(ByVal control As Office.IRibbonControl)
     SLC_About
 End Sub
 
 Public Sub SLC_Capture()
-    RunSelection True
+    Dim completed As Workbook
+    RunSelection True, completed
 End Sub
 Public Sub SLC_Compare()
+    Dim completed As Workbook
     If mBusy Then Exit Sub
     If mPending Is Nothing Then
         MsgBox "먼저 첫 번째 목록을 선택하고 [첫 번째 목록 담기]를 누르세요.", vbInformation, "명단 비교"
         Exit Sub
     End If
-    RunSelection False
+    RunSelection False, completed
 End Sub
 
 Public Sub Auto_Open()
@@ -146,6 +191,9 @@ Public Sub SLC_AttachUI()
     Set bar = Application.CommandBars.Add(Name:=BAR_NAME, Position:=msoBarTop, Temporary:=True)
     AddButton bar.Controls, "명단 비교", "SLC_Run", "run"
     AddButton bar.Controls, "", "", "pending"
+    AddButton bar.Controls, "담은 목록 확인", "SLC_Preview", "preview"
+    AddButton bar.Controls, "작업 취소", "SLC_Cancel", "cancel"
+    AddButton bar.Controls, "", "", "progress"
     AddButton bar.Controls, "첫 번째 목록 비우기", "SLC_Clear", "clear"
     AddButton bar.Controls, "첫 번째 목록 바꾸기", "SLC_Replace", "replace"
     AddButton bar.Controls, "사용 안내", "SLC_About", "about"
@@ -211,61 +259,132 @@ Public Sub SLC_RefreshActiveUI()
 End Sub
 
 Private Sub RefreshUI()
-    Dim bar As CommandBar, ctl As CommandBarControl, child As CommandBarControl
-    Dim popup As CommandBarPopup
-    Dim title As String, pendingTitle As String
-    If mPending Is Nothing Then
-        title = "첫 번째 목록 담기"
-    Else
-        title = "두 번째 목록 담아 비교"
-        pendingTitle = "첫 번째 목록: " & Format$(mPending.Total, "#,##0") & "개 항목"
-    End If
+    Dim bar As CommandBar, ctl As CommandBarControl, title As String
+    If mPending Is Nothing Then title = "첫 번째 목록 담기" Else title = "두 번째 목록 담아 비교"
     On Error Resume Next
-    ' Resolve controls afresh in the active window, not a cached first-window bar.
-    For Each bar In Application.CommandBars
-        If bar.Name = BAR_NAME Or bar.Name = "Cell" Or bar.Name = "Row" Or bar.Name = "Column" Then
-            For Each ctl In bar.Controls
-                If ctl.Tag = UI_TAG & ".run" Then ctl.Caption = title
-                If ctl.Tag = UI_TAG & ".pending" Then
-                    ctl.Caption = pendingTitle
-                    ctl.Visible = (Len(pendingTitle) > 0)
-                End If
-                If ctl.Tag = UI_TAG Then
-                    Set popup = ctl
-                    For Each child In popup.Controls
-                        If child.Tag = UI_TAG & ".run" Then child.Caption = title
-                        If child.Tag = UI_TAG & ".pending" Then
-                            child.Caption = pendingTitle
-                            child.Visible = (Len(pendingTitle) > 0)
-                        End If
-                    Next child
-                End If
-            Next ctl
-        End If
-    Next bar
+    Set bar = Application.CommandBars(BAR_NAME)
+    For Each ctl In bar.Controls
+        Select Case ctl.Tag
+            Case UI_TAG & ".run"
+                ctl.Caption = title
+                ctl.Enabled = Not mBusy
+            Case UI_TAG & ".pending"
+                ctl.Caption = Replace(PendingLabel() & " · " & PendingSource(), "&", "&&")
+                ctl.Visible = Not (mPending Is Nothing)
+            Case UI_TAG & ".preview", UI_TAG & ".clear", UI_TAG & ".replace"
+                ctl.Enabled = Not mBusy And Not (mPending Is Nothing)
+            Case UI_TAG & ".cancel"
+                ctl.Visible = mBusy
+                ctl.Enabled = mBusy And Not mCancelled
+            Case UI_TAG & ".progress"
+                If mBusy Then ctl.Caption = mPhase Else ctl.Caption = mLastOutcome
+                ctl.Visible = (Len(ctl.Caption) > 0)
+            Case UI_TAG & ".about"
+                ctl.Enabled = Not mBusy
+        End Select
+    Next ctl
     On Error GoTo 0
 End Sub
 
 Public Sub SLC_Clear()
-    If mBusy Then
-        mCancelled = True
-        Exit Sub
-    End If
+    If mBusy Then Exit Sub
     Set mPending = Nothing
+    mLastOutcome = "첫 번째 목록을 비웠습니다. 원본 셀은 그대로입니다."
     ReleaseStatus
     RefreshUI
 End Sub
 
+Public Sub SLC_Cancel()
+    If Not mBusy Then Exit Sub
+    mCancelled = True
+    mPhase = "취소 요청됨 · 작업 종료를 기다려 주세요."
+    SetStatus "명단 비교: " & mPhase
+    RefreshUI
+End Sub
+
+Public Function SLC_CurrentState() As String
+    ' Read-only diagnostic and accessible status, containing no cell values.
+    If mBusy Then
+        SLC_CurrentState = mPhase & vbCrLf & PendingSummary()
+    Else
+        SLC_CurrentState = mLastOutcome & vbCrLf & PendingSummary()
+    End If
+End Function
+
+Private Sub SetPhase(ByVal text As String)
+    mPhase = text
+    SetStatus "명단 비교: " & text
+    RefreshUI
+End Sub
+
+Public Sub SLC_WorkCheckpoint()
+    Checkpoint
+End Sub
+
+Public Sub SLC_WorkStatus(ByVal text As String)
+    SetPhase text
+End Sub
+
+Public Sub SLC_Preview()
+    Dim completed As Workbook
+    PreviewSnapshot completed
+End Sub
+
+Private Sub PreviewSnapshot(ByRef completedResult As Workbook, Optional ByVal raiseTestError As Boolean = False)
+    Dim oldCancel As XlEnableCancelKey, errNo As Long, errText As String
+    Dim operationCommitted As Boolean
+    If mBusy Or mPending Is Nothing Then Exit Sub
+    oldCancel = Application.EnableCancelKey
+    On Error GoTo Failed
+    mBusy = True
+    mCancelled = False
+    mStarted = Timer
+    Application.EnableCancelKey = xlErrorHandler
+    SetPhase "담은 목록 확인 자료 작성 중"
+    Set completedResult = SLC_WriteSnapshotPreview(mPending)
+    operationCommitted = True
+    Application.EnableCancelKey = xlDisabled
+    mLastOutcome = "담은 목록 확인 자료를 만들었습니다. 첫 목록은 유지됩니다."
+Finished:
+    ReleaseStatus
+    mBusy = False
+    mPhase = ""
+    Application.EnableCancelKey = oldCancel
+    RefreshUI
+    Exit Sub
+Failed:
+    errNo = Err.Number: errText = Err.Description
+    On Error Resume Next
+    ReleaseStatus
+    mBusy = False
+    mPhase = ""
+    If operationCommitted Then
+        mLastOutcome = "확인 자료 생성 완료 · Excel 상태 복원 확인 필요"
+    ElseIf errNo = 18 Or errNo = ERR_CANCEL Then
+        mLastOutcome = "취소 완료 · 첫 번째 목록 유지"
+    Else
+        mLastOutcome = "확인 자료 작성 실패 · 첫 번째 목록 유지"
+    End If
+    Application.EnableCancelKey = oldCancel
+    RefreshUI
+    On Error GoTo 0
+    If raiseTestError Then Err.Raise errNo, "PreviewSnapshot", errText
+    MsgBox mLastOutcome & vbCrLf & PendingSummary() & vbCrLf & errText, vbInformation, "명단 비교"
+End Sub
+
 Public Sub SLC_Replace()
+    Dim completed As Workbook
     ' Transactional: a failed/cancelled replacement preserves the previous A.
-    RunSelection True
+    RunSelection True, completed
 End Sub
 
 Public Sub SLC_Run()
-    RunSelection False
+    Dim completed As Workbook
+    RunSelection False, completed
 End Sub
 
-Private Sub RunSelection(ByVal replaceOnly As Boolean)
+Private Sub RunSelection(ByVal replaceOnly As Boolean, ByRef completedResult As Workbook, _
+                         Optional ByVal raiseTestError As Boolean = False)
     Dim selected As Range, parts As Collection, exclusions As Collection
     Dim current As CSLCList, previousPending As CSLCList
     Dim oldCancel As XlEnableCancelKey
@@ -290,6 +409,7 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     End If
 
     mBusy = True
+    mLastOutcome = ""
     Set previousPending = mPending
     mCancelled = False
     mStarted = Timer
@@ -299,38 +419,46 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     setState = True
     combining = Not (mPending Is Nothing)
     If replaceOnly Then combining = False
+    SetPhase "선택 범위 확인 중"
     Set parts = PrepareParts(selected, True, combining)
-    If parts Is Nothing Then GoTo Finished
+    If parts Is Nothing Then
+        mLastOutcome = "작업을 시작하지 않았습니다. " & PendingLabel()
+        GoTo Finished
+    End If
     mStarted = Timer
     ' Keep keyboard input available so EnableCancelKey can handle Esc.
     ' The selected Range is already captured and mBusy rejects re-entry.
     Set exclusions = MetadataRects(selected.Worksheet)
+    SetPhase "선택한 값 읽는 중"
     Set current = ReadParts(selected, parts, exclusions)
     ' A cancellation queued during the last partial chunk must precede commit.
     Checkpoint
     If current.Total = 0 Then
+        mLastOutcome = "비교할 값 없음 · 이전 첫 목록 유지"
         ReleaseStatus
-        MsgBox "선택한 셀에 비교할 값이 없습니다." & vbCrLf & _
-               "숨긴 셀, 필터로 가려진 셀, 빈칸, 오류 셀, 표의 제목·합계 셀은 비교에서 뺍니다." & vbCrLf & _
-               "담아 둔 첫 번째 목록이 있다면 그대로 남아 있습니다.", _
+        MsgBox "선택한 셀에 비교할 값이 없습니다." & vbCrLf & NoValuesSummary(current) & vbCrLf & _
+               "숨긴 셀과 필터로 가려진 셀은 읽지 않습니다." & vbCrLf & PendingSummary(), _
                vbInformation, "명단 비교"
         GoTo Finished
     End If
     If Not combining Then
-        SetStatus "첫 번째 목록: " & Format$(current.Total, "#,##0") & "개 항목"
+        SetPhase "첫 번째 목록 담기 마무리 중"
         Checkpoint
         ' No event dispatch or dialogs between the final check and commit.
         Application.EnableCancelKey = xlDisabled
         Set mPending = current
         operationCommitted = True
+        mLastOutcome = "첫 목록 담기 완료 · [담은 목록 확인]에서 출처와 제외 셀을 확인하세요."
     Else
-        ShowComparison mPending, current
+        Set completedResult = ShowComparison(mPending, current)
         operationCommitted = True
         Application.EnableCancelKey = xlDisabled
-        Set mPending = Nothing
+        mLastOutcome = "비교 완료 · 같은 첫 목록으로 이어서 비교할 수 있습니다."
         ReleaseStatus
     End If
 Finished:
+    ReleaseStatus
+    mPhase = ""
     If setState Then
         Application.Interactive = oldInteractive
         Application.EnableCancelKey = oldCancel
@@ -352,15 +480,24 @@ Failed:
     RefreshUI
     If setState Then Application.EnableCancelKey = oldCancel
     On Error GoTo 0
+    mPhase = ""
+    If raiseTestError Then Err.Raise errNo, "RunSelection", errText
     If operationCommitted Then
+        mLastOutcome = "작업 완료 · Excel 상태 복원 확인 필요"
+        RefreshUI
         MsgBox "작업 결과는 만들어졌지만 Excel 상태를 복원하는 중 문제가 생겼습니다." & vbCrLf & _
                "결과를 확인하고 필요한 파일을 저장한 뒤 Excel을 다시 실행해 주세요." & vbCrLf & _
                "오류 코드: " & CStr(errNo), vbExclamation, "명단 비교"
     ElseIf errNo = 18 Or errNo = ERR_CANCEL Then
-        MsgBox "작업을 취소했습니다. 담아 둔 첫 번째 목록이 있다면 그대로 남아 있습니다.", vbInformation, "명단 비교"
+        mLastOutcome = "취소 완료 · 이전 첫 목록 유지"
+        RefreshUI
+        MsgBox "작업을 취소했습니다." & vbCrLf & PendingSummary() & vbCrLf & _
+               "이번 작업의 미완성 결과는 정리했습니다. 원본은 바뀌지 않았습니다.", vbInformation, "명단 비교"
     Else
-        MsgBox errText & vbCrLf & vbCrLf & "담아 둔 첫 번째 목록과 원본 내용은 바뀌지 않았습니다." & _
-               vbCrLf & "오류 코드: " & CStr(errNo), vbExclamation, "명단 비교"
+        mLastOutcome = "작업 실패 · 이전 첫 목록 유지"
+        RefreshUI
+        MsgBox errText & vbCrLf & vbCrLf & PendingSummary() & vbCrLf & _
+               "원본 내용은 바뀌지 않았습니다." & vbCrLf & "오류 코드: " & CStr(errNo), vbExclamation, "명단 비교"
     End If
 End Sub
 
@@ -532,6 +669,7 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
     ' A single rectangular part cannot visit the same cell twice.
     If parts.Count > 1 Then Set seen = CreateObject("Scripting.Dictionary")
     result.Source = SourceLabel(sel)
+    result.DisplaySource = DisplaySourceLabel(sel)
     result.CapturedAt = Now
     result.FragmentCount = parts.Count
     For Each ar In parts
@@ -571,7 +709,8 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
                     tick = tick + 1
                     If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
                     If tick Mod 512 = 0 Then
-                        SetStatus "명단 비교: 셀 " & Format$(result.VisibleCellCount, "#,##0") & "개 확인 중"
+                        SetStatus "명단 비교: 읽는 중 · " & Format$(result.VisibleCellCount, "#,##0") & "셀 확인 / " & _
+                            Format$(result.Total, "#,##0") & "개 항목 담음"
                         Checkpoint
                     End If
                 Next c
@@ -586,6 +725,7 @@ Private Sub AddValue(ByVal list As CSLCList, ByVal v As Variant, ByVal address A
     Dim raw As String, key As String
     If IsError(v) Then
         list.ErrorCount = list.ErrorCount + 1
+        list.AddError address, ErrorDescription(v)
         Exit Sub
     End If
     If IsEmpty(v) Or IsNull(v) Then
@@ -614,7 +754,46 @@ Private Sub AddValue(ByVal list As CSLCList, ByVal v As Variant, ByVal address A
         list.Examples.Add key, raw
         list.Addresses.Add key, address
     End If
+    list.AddOccurrence key, raw, address
 End Sub
+
+Private Function NoValuesSummary(ByVal list As CSLCList) As String
+    Dim sample As Variant, shown As Long, result As String
+    result = "제외: 빈칸 " & list.BlankCount & "개 / 오류 " & list.ErrorCount & _
+        "개 / 제목·합계 " & list.MetadataCount & "개"
+    For Each sample In list.ErrorSamples
+        shown = shown + 1
+        If shown > 5 Then Exit For
+        result = result & vbCrLf & CStr(sample(0)) & ": " & CStr(sample(1))
+    Next sample
+    If list.ErrorCount > 5 Then result = result & vbCrLf & "오류 위치는 처음 5개만 표시했습니다."
+    NoValuesSummary = result
+End Function
+
+Private Function ErrorDescription(ByVal value As Variant) As String
+    ' Convert the stored error variant locally, without reading the cell again.
+    Select Case Right$(CStr(value), 4)
+        Case "2000": ErrorDescription = "#NULL!"
+        Case "2007": ErrorDescription = "#DIV/0!"
+        Case "2015": ErrorDescription = "#VALUE!"
+        Case "2023": ErrorDescription = "#REF!"
+        Case "2029": ErrorDescription = "#NAME?"
+        Case "2036": ErrorDescription = "#NUM!"
+        Case "2042": ErrorDescription = "#N/A"
+        Case "2043": ErrorDescription = "#GETTING_DATA"
+        Case "2045": ErrorDescription = "#SPILL!"
+        Case "2050": ErrorDescription = "#CALC!"
+        Case Else: ErrorDescription = CStr(value)
+    End Select
+End Function
+
+Private Function DisplaySourceLabel(ByVal rng As Range) As String
+    Dim label As String
+    label = rng.Worksheet.Parent.Name & " / " & rng.Worksheet.Name & "!" & rng.Areas(1).Address(False, False)
+    If rng.Areas.Count > 1 Then label = label & " 외 " & CStr(rng.Areas.Count - 1) & "개 영역"
+    If Len(label) > 100 Then label = Left$(label, 97) & "..."
+    DisplaySourceLabel = label
+End Function
 
 Private Function CellAddress(ByVal rowNum As Long, ByVal colNum As Long) As String
     Dim letters As String
@@ -650,7 +829,9 @@ Private Sub Checkpoint()
     elapsed = Timer - mStarted
     If elapsed < 0 Then elapsed = elapsed + 86400#
     If elapsed > MAX_ACTIVE_SECONDS Then
-        Err.Raise ERR_TIME, , "작업 시간이 길어져 중단했습니다. 선택 범위를 줄여 다시 실행해 주세요."
+        Err.Raise ERR_TIME, , "작업 시간이 길어져 중단했습니다." & vbCrLf & _
+            "두 목록을 행 번호로 나누면 잘못된 차이가 나올 수 있습니다." & vbCrLf & _
+            "전체 비교가 필요하면 값을 빠뜨리지 않는 비교 방법을 사용해 주세요."
     End If
 End Sub
 
@@ -708,14 +889,8 @@ Private Sub SetStatus(ByVal text As String)
 End Sub
 
 Private Function PreviousStatus() As Variant
-    Dim value As Variant
-    value = Application.StatusBar
-    ' Some Excel builds expose their default False sentinel as text after a
-    ' custom status was shown. Do not restore that sentinel as visible text.
-    If VarType(value) = vbString Then
-        If StrComp(CStr(value), CStr(False), vbTextCompare) = 0 Then value = False
-    End If
-    PreviousStatus = value
+    ' Preserve the exact Variant, including an external literal string "FALSE".
+    PreviousStatus = Application.StatusBar
 End Function
 
 Private Sub ReleaseStatus()
@@ -733,6 +908,7 @@ Private Sub ReleaseStatus()
         End If
     End If
     mOwnStatus = False
+    mLastStatus = ""
     On Error GoTo 0
 End Sub
 
@@ -744,233 +920,43 @@ Private Function DictText(ByVal dict As Object, ByVal key As String) As String
     If dict.Exists(key) Then DictText = CStr(dict(key))
 End Function
 
-Private Sub ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList)
-    Dim keys As Object, k As Variant, ca As Long, cb As Long
-    Dim matched As Long, excessA As Long, excessB As Long, tick As Long
-    Set keys = CreateObject("Scripting.Dictionary")
+Private Function ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList) As Workbook
+    Dim k As Variant, ca As Long, cb As Long, matched As Long, tick As Long
+    SetPhase "값과 개수 비교 중"
+    ' One pass is sufficient: total minus matched gives each list's excess.
+    ' Do not partition by row or allocate a second union of all comparison keys.
     For Each k In a.Counts.Keys
-        keys.Add CStr(k), True
-        tick = tick + 1
-        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
-        If tick Mod 1024 = 0 Then Checkpoint
-    Next k
-    For Each k In b.Counts.Keys
-        If Not keys.Exists(CStr(k)) Then keys.Add CStr(k), True
-        tick = tick + 1
-        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
-        If tick Mod 1024 = 0 Then Checkpoint
-    Next k
-    For Each k In keys.Keys
-        ca = CountOf(a, CStr(k))
+        ca = CLng(a.Counts(CStr(k)))
         cb = CountOf(b, CStr(k))
         If ca < cb Then matched = matched + ca Else matched = matched + cb
-        If ca > cb Then excessA = excessA + ca - cb
-        If cb > ca Then excessB = excessB + cb - ca
         tick = tick + 1
         If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
-        If tick Mod 1024 = 0 Then Checkpoint
+        If tick Mod 1024 = 0 Then
+            SetStatus "명단 비교: 값과 개수 비교 중 · " & Format$(tick, "#,##0") & "종류 확인"
+            Checkpoint
+        End If
     Next k
     Checkpoint
-    If excessA = 0 And excessB = 0 And a.DuplicateExcess = 0 And b.DuplicateExcess = 0 _
-        And a.ErrorCount = 0 And b.ErrorCount = 0 Then
-        ReleaseStatus
-        MsgBox "비교 규칙을 적용한 결과, 두 목록의 값과 개수가 같습니다." & vbCrLf & _
-            "첫 번째 목록: " & Format$(a.Total, "#,##0") & "개 항목" & vbCrLf & _
-            "두 번째 목록: " & Format$(b.Total, "#,##0") & "개 항목" & vbCrLf & _
-            "이메일은 @ 앞부분만 비교합니다. 숫자 표기, 영문 대소문자, 일부 공백 차이는 무시합니다.", vbInformation, "명단 비교"
-    Else
-        WriteResults a, b, keys, matched, excessA, excessB
-    End If
-End Sub
-
-Private Function OutputText(ByVal text As String) As String
-    ' Defense in depth: no formula activation through raw values or filenames.
-    If Len(text) > 0 Then
-        Select Case Left$(text, 1)
-            Case "=", "+", "-", "@", "'"
-                text = "'" & text
-        End Select
-    End If
-    OutputText = text
+    SetPhase "결과 작성 중"
+    Set ShowComparison = SLC_WriteUsabilityResults(a, b, matched, a.Total - matched, b.Total - matched)
 End Function
 
-Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As Object, _
-                         ByVal matched As Long, ByVal excessA As Long, ByVal excessB As Long)
-    Dim wb As Workbook, ws As Worksheet, oldBook As Workbook
-    Dim oldScreen As Boolean, oldEvents As Boolean, setState As Boolean
-    Dim k As Variant, ca As Long, cb As Long, status As String
-    Dim buffer(1 To 4096, 1 To 10) As Variant, fill As Long, outRow As Long, tick As Long
-    Dim headers(1 To 1, 1 To 10) As Variant
-    Dim labels As Variant, i As Long, errNo As Long, errText As String
-    On Error GoTo Failed
-    oldScreen = Application.ScreenUpdating
-    oldEvents = Application.EnableEvents
-    Set oldBook = Application.ActiveWorkbook
-    setState = True
-    Application.EnableEvents = False
-    Application.ScreenUpdating = False
-    Set wb = Application.Workbooks.Add(xlWBATWorksheet)
-    Set ws = wb.Worksheets(1)
-    ws.Name = "명단비교_결과"
-    ws.Range("A1:J8").NumberFormat = "@"
-    ws.Range("A1:J1").Merge
-    ws.Range("A1").Value2 = "명단 비교 결과"
-    ws.Range("A2").Value2 = "첫 번째 목록 위치 / 담은 시각"
-    ws.Range("B2:J2").Merge
-    ws.Range("B2").Value2 = OutputText(a.Source & " / " & Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    ws.Range("A3").Value2 = "두 번째 목록 위치 / 담은 시각"
-    ws.Range("B3:J3").Merge
-    ws.Range("B3").Value2 = OutputText(b.Source & " / " & Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    ws.Range("A4").Value2 = "항목 수"
-    ws.Range("B4:J4").Merge
-    ws.Range("B4").Value2 = "첫 번째 목록: " & a.Total & "개 항목 / 두 번째 목록: " & b.Total & _
-        "개 항목 / 일치 " & matched & "개 / 첫 번째 목록 남은 항목 " & excessA & "개 / 두 번째 목록 남은 항목 " & excessB & "개"
-    ws.Range("A5").Value2 = "중복된 값 / 비교에서 뺀 셀"
-    ws.Range("B5:J5").Merge
-    ws.Range("B5").Value2 = "첫 번째 목록: 중복 " & a.DuplicateExcess & "개 / 비교에서 뺀 셀: 빈칸 " & a.BlankCount & _
-        "개, 오류 " & a.ErrorCount & "개, 표 제목·합계 " & a.MetadataCount & "개" & vbLf & _
-        "두 번째 목록: 중복 " & b.DuplicateExcess & "개 / 비교에서 뺀 셀: 빈칸 " & b.BlankCount & _
-        "개, 오류 " & b.ErrorCount & "개, 표 제목·합계 " & b.MetadataCount & "개" & vbLf & _
-        "중복은 같은 값이 두 번째로 나온 것부터 셉니다. 같은 값이 3개 있으면 중복은 2개입니다."
-    ws.Range("A6").Value2 = "비교 규칙"
-    ws.Range("B6:J6").Merge
-    ws.Range("B6").Value2 = "이메일은 @ 앞부분만 비교합니다. 숫자 표기·영문 대소문자·일부 공백 차이는 무시합니다. 문자로 입력한 00123과 숫자 123은 다르게 봅니다." & vbLf & _
-        "남은 개수: 같은 값이 첫 번째에 2개, 두 번째에 1개면 첫 번째에 1개가 남습니다."
-    ws.Range("A7:J7").Merge
-    If a.ErrorCount + b.ErrorCount > 0 Then
-        ws.Range("A7").Value2 = "오류 셀을 뺀 결과이므로 원본 전체가 같다고 볼 수는 없습니다. 원래 값 (예)와 셀 주소는 해당 항목이 각 목록에서 처음 나온 셀을 보여줍니다."
-    Else
-        ws.Range("A7").Value2 = "표에는 차이·중복만 보여줍니다. 원래 값 (예)와 셀 주소는 해당 항목이 각 목록에서 처음 나온 셀을 보여줍니다."
-    End If
-    labels = Array("상태", "비교에 쓴 값", "첫 번째 목록 원래 값 (예)", "첫 번째 목록 개수", _
-        "두 번째 목록 원래 값 (예)", "두 번째 목록 개수", "첫 번째 목록 남은 개수", "두 번째 목록 남은 개수", _
-        "첫 번째 목록 셀 주소", "두 번째 목록 셀 주소")
-    For i = 0 To 9
-        headers(1, i + 1) = labels(i)
-    Next i
-    ws.Range("A8:J8").Value2 = headers
-    outRow = 9
-    For Each k In keys.Keys
-        ca = CountOf(a, CStr(k))
-        cb = CountOf(b, CStr(k))
-        If ca <> cb Or ca > 1 Or cb > 1 Then
-            If ca = 0 Then
-                status = "두 번째 목록에만 있음"
-            ElseIf cb = 0 Then
-                status = "첫 번째 목록에만 있음"
-            ElseIf ca <> cb Then
-                status = "개수가 다름"
-            Else
-                status = "중복"
-            End If
-            fill = fill + 1
-            buffer(fill, 1) = status
-            buffer(fill, 2) = OutputText(Mid$(CStr(k), 4))
-            buffer(fill, 3) = OutputText(DictText(a.Examples, CStr(k)))
-            buffer(fill, 4) = ca
-            buffer(fill, 5) = OutputText(DictText(b.Examples, CStr(k)))
-            buffer(fill, 6) = cb
-            If ca > cb Then buffer(fill, 7) = ca - cb Else buffer(fill, 7) = 0
-            If cb > ca Then buffer(fill, 8) = cb - ca Else buffer(fill, 8) = 0
-            buffer(fill, 9) = DictText(a.Addresses, CStr(k))
-            buffer(fill, 10) = DictText(b.Addresses, CStr(k))
-            If fill = 4096 Then FlushOutput ws, buffer, fill, outRow
-        End If
-        tick = tick + 1
-        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
-        If tick Mod 1024 = 0 Then Checkpoint
-    Next k
-    If fill > 0 Then FlushOutput ws, buffer, fill, outRow
-    If outRow = 9 Then
-        ws.Range("A9").Value2 = "비교한 값과 개수는 같습니다. 비교에서 뺀 오류 셀은 원본에서 확인해 주세요."
-        outRow = 10
-    End If
-    With ws
-        .Columns("A").ColumnWidth = 26
-        .Columns("B").ColumnWidth = 25
-        .Columns("C").ColumnWidth = 32
-        .Columns("D").ColumnWidth = 16
-        .Columns("E").ColumnWidth = 32
-        .Columns("F:H").ColumnWidth = 16
-        .Columns("I:J").ColumnWidth = 16
-        .Range("A1:J1").Font.Size = 17
-        .Range("A1:J1").Font.Bold = True
-        .Range("A1:J1").RowHeight = 32
-        .Range("A1:J1").Interior.Color = RGB(30, 65, 92)
-        .Range("A1:J1").Font.Color = RGB(255, 255, 255)
-        .Range("A2:A6").Font.Bold = True
-        .Range("A8:J8").Font.Bold = True
-        .Range("A8:J8").Interior.Color = RGB(225, 234, 242)
-        .Range("A2:J8").WrapText = True
-        .Range("A2:J7").RowHeight = 36
-        .Range("A5:J5").RowHeight = 60
-        .Range("A6:J6").RowHeight = 48
-        .Range("A8:J8").RowHeight = 48
-        .Range("A8:J" & CStr(outRow - 1)).AutoFilter
-    End With
-    wb.Activate
-    ws.Range("A9").Select
-    wb.Windows(1).FreezePanes = True
-    ws.Range("A1").Select
-    ' Until this checkpoint, the new workbook is provisional and the failure
-    ' handler closes only that workbook, preserving all older results.
-    Checkpoint
-    ' Deliberately leave Saved=False: never discard the user's result edits.
-    Application.ScreenUpdating = oldScreen
-    Application.EnableEvents = oldEvents
-    Exit Sub
-Failed:
-    errNo = Err.Number
-    errText = Err.Description
-    On Error Resume Next
-    If Not wb Is Nothing Then wb.Close SaveChanges:=False
-    If Not oldBook Is Nothing Then oldBook.Activate
-    If setState Then
-        Application.ScreenUpdating = oldScreen
-        Application.EnableEvents = oldEvents
-    End If
-    On Error GoTo 0
-    Err.Raise errNo, "WriteResults", errText
-End Sub
-
-Private Sub FlushOutput(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, ByRef outRow As Long)
-    Dim target As Range, small() As Variant, r As Long, c As Long
-    Set target = ws.Cells(outRow, 1).Resize(fill, 10)
-    target.NumberFormat = "@"
-    If fill = 4096 Then
-        target.Value2 = buffer
-    Else
-        ReDim small(1 To fill, 1 To 10)
-        For r = 1 To fill
-            For c = 1 To 10
-                small(r, c) = buffer(r, c)
-            Next c
-        Next r
-        target.Value2 = small
-    End If
-    target.Columns(4).NumberFormat = "0"
-    target.Columns(6).Resize(fill, 3).NumberFormat = "0"
-    outRow = outRow + fill
-    fill = 0
-    Checkpoint
-End Sub
-
 Public Sub SLC_About()
-    MsgBox "Excel Smart List Compare " & SLC_ReleaseVersion() & vbCrLf & vbCrLf & _
-        "1. 첫 번째 목록을 선택하고 [첫 번째 목록 담기]를 누르세요." & vbCrLf & _
-        "2. 두 번째 목록을 선택하고 [두 번째 목록 담아 비교]를 누르세요." & vbCrLf & vbCrLf & _
-        "선택한 셀 전체가 목록 하나이며, 셀의 값 하나를 항목이라고 합니다." & vbCrLf & _
-        "가로, 세로, 여러 영역을 선택해도 목록 하나로 비교합니다." & vbCrLf & _
-        "다른 파일로 이동한 뒤에도 첫 번째 목록의 개수 표시가 보이면 이어서 비교할 수 있습니다." & vbCrLf & _
-        "숨긴 셀, 필터로 가려진 셀, 빈칸, 오류 셀, 표의 제목·합계 셀은 비교에서 뺍니다." & vbCrLf & _
-        "같은 값이 몇 번 나오는지도 비교합니다. 이메일은 @ 앞부분만 비교합니다." & vbCrLf & _
-        "원본은 바꾸지 않습니다. 차이·중복·오류는 새 파일에 표시하며, 필요하면 직접 저장해 주세요." & vbCrLf & _
-        "한 목록은 숨기지 않은 셀을 빈칸까지 합쳐 100,000개로 제한합니다." & vbCrLf & _
-        "수동 계산을 쓰고 있다면 먼저 수식을 계산해 주세요." & vbCrLf & _
-        "긴 사번이나 ID는 처음 입력할 때부터 텍스트 형식으로 저장해 주세요." & vbCrLf & _
-        "이 시험 버전에서는 Esc를 눌러도 작업이 취소되지 않을 수 있습니다.", _
+    If mBusy Then Exit Sub
+    MsgBox "Excel 명단 비교 " & SLC_ReleaseVersion() & vbCrLf & vbCrLf & _
+        "1. 첫 목록의 셀을 선택하고 [첫 번째 목록 담기]를 누르세요." & vbCrLf & _
+        "2. 출처를 확인하세요. [담은 목록 확인]에서 표본과 제외 셀을 볼 수 있습니다." & vbCrLf & _
+        "3. 두 번째 목록을 선택하고 [두 번째 목록 담아 비교]를 누르세요." & vbCrLf & vbCrLf & _
+        "선택한 셀 전체가 목록 하나입니다. 순서와 방향은 무시하고 값별 개수를 비교합니다." & vbCrLf & _
+        "메일은 @ 앞부분만 비교합니다. 숨긴 셀·빈칸·오류·표 제목과 합계는 뺍니다." & vbCrLf & _
+        "같아도 요약 파일을 만듭니다. 원본은 바꾸지 않으며 결과는 직접 저장하세요." & vbCrLf & _
+        "비교 후 첫 목록은 유지됩니다. 다른 기준은 [바꾸기], 끝났으면 [비우기]를 누르세요." & vbCrLf & _
+        "담은 뒤 원본을 고쳐도 이미 담긴 값은 바뀌지 않습니다. Excel 종료 시 사라집니다." & vbCrLf & _
+        "[작업 취소] 또는 Esc로 취소를 요청한 뒤 완료 안내를 확인하세요." & vbCrLf & _
+        "100,000셀은 입력 한도이며 완료 보장량이 아닙니다. 행 번호로 임의 분할하지 마세요.", _
         vbInformation, "명단 비교 - 사용 안내"
 End Sub
+
 
 ' Integration tests must be executed in Windows desktop Excel, not a VBA emulator.
 Public Function SLC_CancellationDecisionTests() As Long
@@ -1135,6 +1121,136 @@ Failed:
     If Not oldBook Is Nothing Then oldBook.Activate
     On Error GoTo 0
     Err.Raise errNo, "SLC_TestAll", errText
+End Function
+
+Public Function SLC_UsabilityTests() As String
+    ' Explicit developer entry point: synthetic data and owned workbooks only.
+    Dim source As Workbook, result As Workbook, preview As Workbook, firstResult As Workbook
+    Dim oldBook As Workbook, ws As Worksheet, oldPending As CSLCList
+    Dim oldCancel As XlEnableCancelKey, oldEvents As Boolean, oldStatus As Variant
+    Dim oldOutcome As String, oldPhase As String, oldCancelled As Boolean
+    Dim original As String, reportResult As String, n As Long, errNo As Long, errText As String
+    If mBusy Then Err.Raise ERR_DATA, , "Cannot test during an active comparison"
+    Set oldBook = Application.ActiveWorkbook
+    Set oldPending = mPending
+    oldCancel = Application.EnableCancelKey
+    oldEvents = Application.EnableEvents
+    oldStatus = Application.StatusBar
+    oldOutcome = mLastOutcome
+    oldPhase = mPhase
+    oldCancelled = mCancelled
+    On Error GoTo Failed
+    original = SLC_TestAll()
+    mStarted = Timer
+    mCancelled = False
+    reportResult = SLC_ReportTests()
+    Application.EnableEvents = False
+    Set source = Application.Workbooks.Add(xlWBATWorksheet)
+    Set ws = source.Worksheets(1)
+    ws.Name = "Snapshot & source"
+    ws.Range("A1:B4").NumberFormat = "@"
+    ws.Range("A1").Value2 = "KIM@A.COM"
+    ws.Range("A2").Value2 = "00123"
+    ws.Range("A3").Value2 = "same"
+    ws.Range("B1").Value2 = "kim@b.com"
+    ws.Range("B2").Value2 = "00123"
+    ws.Range("B3").Value2 = "same"
+    source.Saved = True
+    ws.Range("A1:A4").Select
+    SLC_Capture
+    If mPending Is Nothing Then Err.Raise ERR_DATA, , "First list capture missing"
+    If mPending.Total <> 3 Or mPending.BlankCount <> 1 Then Err.Raise ERR_DATA, , "Capture/exclusion counts"
+    If InStr(mPending.DisplaySource, ws.Name) = 0 Then Err.Raise ERR_DATA, , "Snapshot source missing"
+    If InStr(SLC_MenuXml(), "&amp;") = 0 Then Err.Raise ERR_DATA, , "Source XML was not escaped"
+    n = n + 1
+    Application.StatusBar = "FALSE"
+    ws.Range("B1:B3").Select
+    RunSelection False, firstResult, True
+    If firstResult Is source Then Err.Raise ERR_DATA, , "Equal inputs did not produce evidence"
+    If firstResult.Worksheets.Count <> 4 Then Err.Raise ERR_DATA, , "Report worksheet contract"
+    If mPending Is Nothing Then Err.Raise ERR_DATA, , "Successful compare discarded first list"
+    If mPending.Total <> 3 Then Err.Raise ERR_DATA, , "Repeat comparison changed first list"
+    If VarType(Application.StatusBar) <> vbString Then Err.Raise ERR_DATA, , "Literal FALSE status type changed"
+    If CStr(Application.StatusBar) <> "FALSE" Then Err.Raise ERR_DATA, , "External status text lost"
+    If Not source.Saved Then Err.Raise ERR_DATA, , "Source workbook changed during comparison"
+    n = n + 1
+    firstResult.Worksheets(1).Range("B1").Value2 = "User result edit sentinel"
+    PreviewSnapshot preview, True
+    If preview Is firstResult Then Err.Raise ERR_DATA, , "Preview did not create its own workbook"
+    If preview.Worksheets.Count <> 3 Then Err.Raise ERR_DATA, , "Preview worksheet contract"
+    If firstResult.Worksheets(1).Range("B1").Value2 <> "User result edit sentinel" Then Err.Raise ERR_DATA, , "Previous result edited"
+    preview.Close SaveChanges:=False
+    Set preview = Nothing
+    n = n + 1
+    source.Activate
+    ws.Range("A1").Value2 = "changed after capture"
+    ws.Range("B1:B3").Select
+    RunSelection False, result, True
+    If result Is source Or result Is firstResult Then Err.Raise ERR_DATA, , "Repeat result ownership"
+    If result.Worksheets(1).Range("B2").Value2 <> "비교 대상 값·개수 일치" Then Err.Raise ERR_DATA, , "Snapshot changed with source"
+    If Not mPending.Counts.Exists(SLC_Normalize("KIM@A.COM")) Then Err.Raise ERR_DATA, , "Snapshot key missing"
+    result.Close SaveChanges:=False
+    Set result = Nothing
+    n = n + 1
+    ' Deterministic cancellation tests do not claim physical Esc coverage.
+    mBusy = True
+    mCancelled = False
+    SLC_Cancel
+    If Not mCancelled Then Err.Raise ERR_DATA, , "Cancel command did not request cancellation"
+    If InStr(mPhase, "취소 요청됨") = 0 Then Err.Raise ERR_DATA, , "Cancel request state missing"
+    On Error Resume Next
+    PollCancellation
+    errNo = Err.Number
+    Err.Clear
+    On Error GoTo Failed
+    If errNo <> ERR_CANCEL Then Err.Raise ERR_DATA, , "Cancel request did not reach checkpoint"
+    If mPending.Total <> 3 Then Err.Raise ERR_DATA, , "Cancel request lost first list"
+    mBusy = False
+    mCancelled = False
+    n = n + 1
+    SLC_Clear
+    If Not mPending Is Nothing Then Err.Raise ERR_DATA, , "Clear did not release snapshot"
+    If ws.Range("A1").Value2 <> "changed after capture" Then Err.Raise ERR_DATA, , "Clear changed source"
+    If firstResult.Worksheets(1).Range("B1").Value2 <> "User result edit sentinel" Then Err.Raise ERR_DATA, , "Clear changed older result"
+    n = n + 1
+    firstResult.Close SaveChanges:=False
+    Set firstResult = Nothing
+    source.Close SaveChanges:=False
+    Set source = Nothing
+    ReleaseStatus
+    Set mPending = oldPending
+    mBusy = False
+    mCancelled = oldCancelled
+    mPhase = oldPhase
+    mLastOutcome = oldOutcome
+    Application.StatusBar = oldStatus
+    Application.EnableEvents = oldEvents
+    Application.EnableCancelKey = oldCancel
+    If Not oldBook Is Nothing Then oldBook.Activate
+    RefreshUI
+    SLC_UsabilityTests = "PASS: " & CStr(n) & " usability integration checks; " & reportResult & "; " & original
+    Exit Function
+Failed:
+    errNo = Err.Number: errText = Err.Description
+    On Error Resume Next
+    Application.EnableCancelKey = xlDisabled
+    If Not result Is Nothing Then result.Close SaveChanges:=False
+    If Not preview Is Nothing Then preview.Close SaveChanges:=False
+    If Not firstResult Is Nothing Then firstResult.Close SaveChanges:=False
+    If Not source Is Nothing Then source.Close SaveChanges:=False
+    ReleaseStatus
+    Set mPending = oldPending
+    mBusy = False
+    mCancelled = oldCancelled
+    mPhase = oldPhase
+    mLastOutcome = oldOutcome
+    Application.StatusBar = oldStatus
+    Application.EnableEvents = oldEvents
+    Application.EnableCancelKey = oldCancel
+    If Not oldBook Is Nothing Then oldBook.Activate
+    RefreshUI
+    On Error GoTo 0
+    Err.Raise errNo, "SLC_UsabilityTests", errText
 End Function
 
 Private Function TestSnapshot(ByVal rng As Range) As CSLCList

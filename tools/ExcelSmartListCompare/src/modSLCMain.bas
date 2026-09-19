@@ -42,6 +42,8 @@ Private mRibbonLoaded As Boolean
 Private mOwnStatus As Boolean
 Private mPreviousStatus As Variant
 Private mLastStatus As String
+Private mPhase As String
+Private mLastOutcome As String
 
 Public Function SLC_Version() As String
     SLC_Version = VERSION_TEXT
@@ -60,7 +62,7 @@ Public Function SLC_RibbonReady() As Boolean
 End Function
 
 Public Function SLC_ReleaseVersion() As String
-    SLC_ReleaseVersion = "0.2.0-rc.9"
+    SLC_ReleaseVersion = "0.2.0-rc.10"
 End Function
 
 Public Sub SLC_GetContextMenu(ByVal control As Office.IRibbonControl, ByRef content)
@@ -75,20 +77,55 @@ Public Function SLC_MenuXml(Optional ByVal menuKind As String = "Cell") As Strin
         Case Else
             Err.Raise 5, "SLC_MenuXml", "Unknown product menu."
     End Select
-    ' Called on every drop, independent of workbook/window event delivery.
-    ' Only read the process snapshot; never inspect or change a selection here.
+    ' Menu creation reads only the stored snapshot, never the current selection.
     xml = "<menu xmlns=""http://schemas.microsoft.com/office/2009/07/customui"">"
-    If mPending Is Nothing Then
-        xml = xml & MenuButton(prefix & "Capture", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30"), "SLC_CaptureClick")
+    If mBusy Then
+        xml = xml & MenuLabel(prefix & "Progress", mPhase)
+        xml = xml & MenuButton(prefix & "Cancel", SLC_U("C791 C5C5 0020 CDE8 C18C"), "SLC_CancelClick")
     Else
-        xml = xml & MenuButton(prefix & "Compare", SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50"), "SLC_CompareClick")
-        xml = xml & "<button id=""" & prefix & "Count"" enabled=""false"" label=""" & _
-              SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(mPending.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9") & """/>"
-        xml = xml & MenuButton(prefix & "Clear", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BE44 C6B0 AE30"), "SLC_ClearClick")
-        xml = xml & MenuButton(prefix & "Replace", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BC14 AFB8 AE30"), "SLC_ReplaceClick")
+        If mPending Is Nothing Then
+            xml = xml & MenuButton(prefix & "Capture", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30"), "SLC_CaptureClick")
+        Else
+            xml = xml & MenuButton(prefix & "Compare", SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50"), "SLC_CompareClick")
+            xml = xml & MenuLabel(prefix & "Count", PendingLabel())
+            xml = xml & MenuLabel(prefix & "Source", PendingSource())
+            xml = xml & MenuButton(prefix & "Preview", SLC_U("B2F4 C740 0020 BAA9 B85D 0020 D655 C778"), "SLC_PreviewClick")
+            xml = xml & MenuButton(prefix & "Replace", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BC14 AFB8 AE30"), "SLC_ReplaceClick")
+            xml = xml & MenuButton(prefix & "Clear", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BE44 C6B0 AE30"), "SLC_ClearClick")
+        End If
+        If Len(mLastOutcome) > 0 Then xml = xml & MenuLabel(prefix & "Outcome", mLastOutcome)
+        xml = xml & MenuButton(prefix & "About", SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_AboutClick")
     End If
-    xml = xml & MenuButton(prefix & "About", SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_AboutClick")
     SLC_MenuXml = xml & "</menu>"
+End Function
+
+Private Function XmlLabel(ByVal value As String) As String
+    value = Replace(value, "&", "&amp;")
+    value = Replace(value, "<", "&lt;")
+    value = Replace(value, ">", "&gt;")
+    value = Replace(value, Chr$(34), "&quot;")
+    XmlLabel = Replace(value, "'", "&apos;")
+End Function
+
+Private Function MenuLabel(ByVal id As String, ByVal label As String) As String
+    MenuLabel = "<button id=""" & id & """ enabled=""false"" label=""" & XmlLabel(label) & """/>"
+End Function
+
+Private Function PendingLabel() As String
+    If mPending Is Nothing Then
+        PendingLabel = SLC_U("B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C774 0020 C5C6 C2B5 B2C8 B2E4 002E")
+    Else
+        PendingLabel = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(mPending.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9")
+    End If
+End Function
+
+Private Function PendingSource() As String
+    If Not mPending Is Nothing Then PendingSource = mPending.DisplaySource
+End Function
+
+Private Function PendingSummary() As String
+    PendingSummary = PendingLabel()
+    If Not mPending Is Nothing Then PendingSummary = PendingSummary & vbCrLf & mPending.DisplaySource
 End Function
 
 Private Function MenuButton(ByVal id As String, ByVal label As String, ByVal action As String) As String
@@ -108,20 +145,28 @@ End Sub
 Public Sub SLC_ReplaceClick(ByVal control As Office.IRibbonControl)
     SLC_Replace
 End Sub
+Public Sub SLC_PreviewClick(ByVal control As Office.IRibbonControl)
+    SLC_Preview
+End Sub
+Public Sub SLC_CancelClick(ByVal control As Office.IRibbonControl)
+    SLC_Cancel
+End Sub
 Public Sub SLC_AboutClick(ByVal control As Office.IRibbonControl)
     SLC_About
 End Sub
 
 Public Sub SLC_Capture()
-    RunSelection True
+    Dim completed As Workbook
+    RunSelection True, completed
 End Sub
 Public Sub SLC_Compare()
+    Dim completed As Workbook
     If mBusy Then Exit Sub
     If mPending Is Nothing Then
         MsgBox SLC_U("BA3C C800 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30 005D B97C 0020 B204 B974 C138 C694 002E"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
         Exit Sub
     End If
-    RunSelection False
+    RunSelection False, completed
 End Sub
 
 Public Sub Auto_Open()
@@ -146,6 +191,9 @@ Public Sub SLC_AttachUI()
     Set bar = Application.CommandBars.Add(Name:=BAR_NAME, Position:=msoBarTop, Temporary:=True)
     AddButton bar.Controls, SLC_U("BA85 B2E8 0020 BE44 AD50"), "SLC_Run", "run"
     AddButton bar.Controls, "", "", "pending"
+    AddButton bar.Controls, SLC_U("B2F4 C740 0020 BAA9 B85D 0020 D655 C778"), "SLC_Preview", "preview"
+    AddButton bar.Controls, SLC_U("C791 C5C5 0020 CDE8 C18C"), "SLC_Cancel", "cancel"
+    AddButton bar.Controls, "", "", "progress"
     AddButton bar.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BE44 C6B0 AE30"), "SLC_Clear", "clear"
     AddButton bar.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BC14 AFB8 AE30"), "SLC_Replace", "replace"
     AddButton bar.Controls, SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_About", "about"
@@ -211,61 +259,132 @@ Public Sub SLC_RefreshActiveUI()
 End Sub
 
 Private Sub RefreshUI()
-    Dim bar As CommandBar, ctl As CommandBarControl, child As CommandBarControl
-    Dim popup As CommandBarPopup
-    Dim title As String, pendingTitle As String
-    If mPending Is Nothing Then
-        title = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30")
-    Else
-        title = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50")
-        pendingTitle = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(mPending.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9")
-    End If
+    Dim bar As CommandBar, ctl As CommandBarControl, title As String
+    If mPending Is Nothing Then title = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30") Else title = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50")
     On Error Resume Next
-    ' Resolve controls afresh in the active window, not a cached first-window bar.
-    For Each bar In Application.CommandBars
-        If bar.Name = BAR_NAME Or bar.Name = "Cell" Or bar.Name = "Row" Or bar.Name = "Column" Then
-            For Each ctl In bar.Controls
-                If ctl.Tag = UI_TAG & ".run" Then ctl.Caption = title
-                If ctl.Tag = UI_TAG & ".pending" Then
-                    ctl.Caption = pendingTitle
-                    ctl.Visible = (Len(pendingTitle) > 0)
-                End If
-                If ctl.Tag = UI_TAG Then
-                    Set popup = ctl
-                    For Each child In popup.Controls
-                        If child.Tag = UI_TAG & ".run" Then child.Caption = title
-                        If child.Tag = UI_TAG & ".pending" Then
-                            child.Caption = pendingTitle
-                            child.Visible = (Len(pendingTitle) > 0)
-                        End If
-                    Next child
-                End If
-            Next ctl
-        End If
-    Next bar
+    Set bar = Application.CommandBars(BAR_NAME)
+    For Each ctl In bar.Controls
+        Select Case ctl.Tag
+            Case UI_TAG & ".run"
+                ctl.Caption = title
+                ctl.Enabled = Not mBusy
+            Case UI_TAG & ".pending"
+                ctl.Caption = Replace(PendingLabel() & SLC_U("0020 00B7 0020") & PendingSource(), "&", "&&")
+                ctl.Visible = Not (mPending Is Nothing)
+            Case UI_TAG & ".preview", UI_TAG & ".clear", UI_TAG & ".replace"
+                ctl.Enabled = Not mBusy And Not (mPending Is Nothing)
+            Case UI_TAG & ".cancel"
+                ctl.Visible = mBusy
+                ctl.Enabled = mBusy And Not mCancelled
+            Case UI_TAG & ".progress"
+                If mBusy Then ctl.Caption = mPhase Else ctl.Caption = mLastOutcome
+                ctl.Visible = (Len(ctl.Caption) > 0)
+            Case UI_TAG & ".about"
+                ctl.Enabled = Not mBusy
+        End Select
+    Next ctl
     On Error GoTo 0
 End Sub
 
 Public Sub SLC_Clear()
-    If mBusy Then
-        mCancelled = True
-        Exit Sub
-    End If
+    If mBusy Then Exit Sub
     Set mPending = Nothing
+    mLastOutcome = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 BE44 C6E0 C2B5 B2C8 B2E4 002E 0020 C6D0 BCF8 0020 C140 C740 0020 ADF8 B300 B85C C785 B2C8 B2E4 002E")
     ReleaseStatus
     RefreshUI
 End Sub
 
+Public Sub SLC_Cancel()
+    If Not mBusy Then Exit Sub
+    mCancelled = True
+    mPhase = SLC_U("CDE8 C18C 0020 C694 CCAD B428 0020 00B7 0020 C791 C5C5 0020 C885 B8CC B97C 0020 AE30 B2E4 B824 0020 C8FC C138 C694 002E")
+    SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020") & mPhase
+    RefreshUI
+End Sub
+
+Public Function SLC_CurrentState() As String
+    ' Read-only diagnostic and accessible status, containing no cell values.
+    If mBusy Then
+        SLC_CurrentState = mPhase & vbCrLf & PendingSummary()
+    Else
+        SLC_CurrentState = mLastOutcome & vbCrLf & PendingSummary()
+    End If
+End Function
+
+Private Sub SetPhase(ByVal text As String)
+    mPhase = text
+    SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020") & text
+    RefreshUI
+End Sub
+
+Public Sub SLC_WorkCheckpoint()
+    Checkpoint
+End Sub
+
+Public Sub SLC_WorkStatus(ByVal text As String)
+    SetPhase text
+End Sub
+
+Public Sub SLC_Preview()
+    Dim completed As Workbook
+    PreviewSnapshot completed
+End Sub
+
+Private Sub PreviewSnapshot(ByRef completedResult As Workbook, Optional ByVal raiseTestError As Boolean = False)
+    Dim oldCancel As XlEnableCancelKey, errNo As Long, errText As String
+    Dim operationCommitted As Boolean
+    If mBusy Or mPending Is Nothing Then Exit Sub
+    oldCancel = Application.EnableCancelKey
+    On Error GoTo Failed
+    mBusy = True
+    mCancelled = False
+    mStarted = Timer
+    Application.EnableCancelKey = xlErrorHandler
+    SetPhase SLC_U("B2F4 C740 0020 BAA9 B85D 0020 D655 C778 0020 C790 B8CC 0020 C791 C131 0020 C911")
+    Set completedResult = SLC_WriteSnapshotPreview(mPending)
+    operationCommitted = True
+    Application.EnableCancelKey = xlDisabled
+    mLastOutcome = SLC_U("B2F4 C740 0020 BAA9 B85D 0020 D655 C778 0020 C790 B8CC B97C 0020 B9CC B4E4 C5C8 C2B5 B2C8 B2E4 002E 0020 CCAB 0020 BAA9 B85D C740 0020 C720 C9C0 B429 B2C8 B2E4 002E")
+Finished:
+    ReleaseStatus
+    mBusy = False
+    mPhase = ""
+    Application.EnableCancelKey = oldCancel
+    RefreshUI
+    Exit Sub
+Failed:
+    errNo = Err.Number: errText = Err.Description
+    On Error Resume Next
+    ReleaseStatus
+    mBusy = False
+    mPhase = ""
+    If operationCommitted Then
+        mLastOutcome = SLC_U("D655 C778 0020 C790 B8CC 0020 C0DD C131 0020 C644 B8CC 0020 00B7 0020 0045 0078 0063 0065 006C 0020 C0C1 D0DC 0020 BCF5 C6D0 0020 D655 C778 0020 D544 C694")
+    ElseIf errNo = 18 Or errNo = ERR_CANCEL Then
+        mLastOutcome = SLC_U("CDE8 C18C 0020 C644 B8CC 0020 00B7 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C720 C9C0")
+    Else
+        mLastOutcome = SLC_U("D655 C778 0020 C790 B8CC 0020 C791 C131 0020 C2E4 D328 0020 00B7 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C720 C9C0")
+    End If
+    Application.EnableCancelKey = oldCancel
+    RefreshUI
+    On Error GoTo 0
+    If raiseTestError Then Err.Raise errNo, "PreviewSnapshot", errText
+    MsgBox mLastOutcome & vbCrLf & PendingSummary() & vbCrLf & errText, vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
+End Sub
+
 Public Sub SLC_Replace()
+    Dim completed As Workbook
     ' Transactional: a failed/cancelled replacement preserves the previous A.
-    RunSelection True
+    RunSelection True, completed
 End Sub
 
 Public Sub SLC_Run()
-    RunSelection False
+    Dim completed As Workbook
+    RunSelection False, completed
 End Sub
 
-Private Sub RunSelection(ByVal replaceOnly As Boolean)
+Private Sub RunSelection(ByVal replaceOnly As Boolean, ByRef completedResult As Workbook, _
+                         Optional ByVal raiseTestError As Boolean = False)
     Dim selected As Range, parts As Collection, exclusions As Collection
     Dim current As CSLCList, previousPending As CSLCList
     Dim oldCancel As XlEnableCancelKey
@@ -290,6 +409,7 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     End If
 
     mBusy = True
+    mLastOutcome = ""
     Set previousPending = mPending
     mCancelled = False
     mStarted = Timer
@@ -299,38 +419,46 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean)
     setState = True
     combining = Not (mPending Is Nothing)
     If replaceOnly Then combining = False
+    SetPhase SLC_U("C120 D0DD 0020 BC94 C704 0020 D655 C778 0020 C911")
     Set parts = PrepareParts(selected, True, combining)
-    If parts Is Nothing Then GoTo Finished
+    If parts Is Nothing Then
+        mLastOutcome = SLC_U("C791 C5C5 C744 0020 C2DC C791 D558 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E 0020") & PendingLabel()
+        GoTo Finished
+    End If
     mStarted = Timer
     ' Keep keyboard input available so EnableCancelKey can handle Esc.
     ' The selected Range is already captured and mBusy rejects re-entry.
     Set exclusions = MetadataRects(selected.Worksheet)
+    SetPhase SLC_U("C120 D0DD D55C 0020 AC12 0020 C77D B294 0020 C911")
     Set current = ReadParts(selected, parts, exclusions)
     ' A cancellation queued during the last partial chunk must precede commit.
     Checkpoint
     If current.Total = 0 Then
+        mLastOutcome = SLC_U("BE44 AD50 D560 0020 AC12 0020 C5C6 C74C 0020 00B7 0020 C774 C804 0020 CCAB 0020 BAA9 B85D 0020 C720 C9C0")
         ReleaseStatus
-        MsgBox SLC_U("C120 D0DD D55C 0020 C140 C5D0 0020 BE44 AD50 D560 0020 AC12 C774 0020 C5C6 C2B5 B2C8 B2E4 002E") & vbCrLf & _
-               SLC_U("C228 AE34 0020 C140 002C 0020 D544 D130 B85C 0020 AC00 B824 C9C4 0020 C140 002C 0020 BE48 CE78 002C 0020 C624 B958 0020 C140 002C 0020 D45C C758 0020 C81C BAA9 00B7 D569 ACC4 0020 C140 C740 0020 BE44 AD50 C5D0 C11C 0020 BE8D B2C8 B2E4 002E") & vbCrLf & _
-               SLC_U("B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C774 0020 C788 B2E4 BA74 0020 ADF8 B300 B85C 0020 B0A8 C544 0020 C788 C2B5 B2C8 B2E4 002E"), _
+        MsgBox SLC_U("C120 D0DD D55C 0020 C140 C5D0 0020 BE44 AD50 D560 0020 AC12 C774 0020 C5C6 C2B5 B2C8 B2E4 002E") & vbCrLf & NoValuesSummary(current) & vbCrLf & _
+               SLC_U("C228 AE34 0020 C140 ACFC 0020 D544 D130 B85C 0020 AC00 B824 C9C4 0020 C140 C740 0020 C77D C9C0 0020 C54A C2B5 B2C8 B2E4 002E") & vbCrLf & PendingSummary(), _
                vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
         GoTo Finished
     End If
     If Not combining Then
-        SetStatus SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(current.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9")
+        SetPhase SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30 0020 B9C8 BB34 B9AC 0020 C911")
         Checkpoint
         ' No event dispatch or dialogs between the final check and commit.
         Application.EnableCancelKey = xlDisabled
         Set mPending = current
         operationCommitted = True
+        mLastOutcome = SLC_U("CCAB 0020 BAA9 B85D 0020 B2F4 AE30 0020 C644 B8CC 0020 00B7 0020 005B B2F4 C740 0020 BAA9 B85D 0020 D655 C778 005D C5D0 C11C 0020 CD9C CC98 C640 0020 C81C C678 0020 C140 C744 0020 D655 C778 D558 C138 C694 002E")
     Else
-        ShowComparison mPending, current
+        Set completedResult = ShowComparison(mPending, current)
         operationCommitted = True
         Application.EnableCancelKey = xlDisabled
-        Set mPending = Nothing
+        mLastOutcome = SLC_U("BE44 AD50 0020 C644 B8CC 0020 00B7 0020 AC19 C740 0020 CCAB 0020 BAA9 B85D C73C B85C 0020 C774 C5B4 C11C 0020 BE44 AD50 D560 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E")
         ReleaseStatus
     End If
 Finished:
+    ReleaseStatus
+    mPhase = ""
     If setState Then
         Application.Interactive = oldInteractive
         Application.EnableCancelKey = oldCancel
@@ -352,15 +480,24 @@ Failed:
     RefreshUI
     If setState Then Application.EnableCancelKey = oldCancel
     On Error GoTo 0
+    mPhase = ""
+    If raiseTestError Then Err.Raise errNo, "RunSelection", errText
     If operationCommitted Then
+        mLastOutcome = SLC_U("C791 C5C5 0020 C644 B8CC 0020 00B7 0020 0045 0078 0063 0065 006C 0020 C0C1 D0DC 0020 BCF5 C6D0 0020 D655 C778 0020 D544 C694")
+        RefreshUI
         MsgBox SLC_U("C791 C5C5 0020 ACB0 ACFC B294 0020 B9CC B4E4 C5B4 C84C C9C0 B9CC 0020 0045 0078 0063 0065 006C 0020 C0C1 D0DC B97C 0020 BCF5 C6D0 D558 B294 0020 C911 0020 BB38 C81C AC00 0020 C0DD ACBC C2B5 B2C8 B2E4 002E") & vbCrLf & _
                SLC_U("ACB0 ACFC B97C 0020 D655 C778 D558 ACE0 0020 D544 C694 D55C 0020 D30C C77C C744 0020 C800 C7A5 D55C 0020 B4A4 0020 0045 0078 0063 0065 006C C744 0020 B2E4 C2DC 0020 C2E4 D589 D574 0020 C8FC C138 C694 002E") & vbCrLf & _
                SLC_U("C624 B958 0020 CF54 B4DC 003A 0020") & CStr(errNo), vbExclamation, SLC_U("BA85 B2E8 0020 BE44 AD50")
     ElseIf errNo = 18 Or errNo = ERR_CANCEL Then
-        MsgBox SLC_U("C791 C5C5 C744 0020 CDE8 C18C D588 C2B5 B2C8 B2E4 002E 0020 B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C774 0020 C788 B2E4 BA74 0020 ADF8 B300 B85C 0020 B0A8 C544 0020 C788 C2B5 B2C8 B2E4 002E"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
+        mLastOutcome = SLC_U("CDE8 C18C 0020 C644 B8CC 0020 00B7 0020 C774 C804 0020 CCAB 0020 BAA9 B85D 0020 C720 C9C0")
+        RefreshUI
+        MsgBox SLC_U("C791 C5C5 C744 0020 CDE8 C18C D588 C2B5 B2C8 B2E4 002E") & vbCrLf & PendingSummary() & vbCrLf & _
+               SLC_U("C774 BC88 0020 C791 C5C5 C758 0020 BBF8 C644 C131 0020 ACB0 ACFC B294 0020 C815 B9AC D588 C2B5 B2C8 B2E4 002E 0020 C6D0 BCF8 C740 0020 BC14 B00C C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
     Else
-        MsgBox errText & vbCrLf & vbCrLf & SLC_U("B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D ACFC 0020 C6D0 BCF8 0020 B0B4 C6A9 C740 0020 BC14 B00C C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E") & _
-               vbCrLf & SLC_U("C624 B958 0020 CF54 B4DC 003A 0020") & CStr(errNo), vbExclamation, SLC_U("BA85 B2E8 0020 BE44 AD50")
+        mLastOutcome = SLC_U("C791 C5C5 0020 C2E4 D328 0020 00B7 0020 C774 C804 0020 CCAB 0020 BAA9 B85D 0020 C720 C9C0")
+        RefreshUI
+        MsgBox errText & vbCrLf & vbCrLf & PendingSummary() & vbCrLf & _
+               SLC_U("C6D0 BCF8 0020 B0B4 C6A9 C740 0020 BC14 B00C C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E") & vbCrLf & SLC_U("C624 B958 0020 CF54 B4DC 003A 0020") & CStr(errNo), vbExclamation, SLC_U("BA85 B2E8 0020 BE44 AD50")
     End If
 End Sub
 
@@ -532,6 +669,7 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
     ' A single rectangular part cannot visit the same cell twice.
     If parts.Count > 1 Then Set seen = CreateObject("Scripting.Dictionary")
     result.Source = SourceLabel(sel)
+    result.DisplaySource = DisplaySourceLabel(sel)
     result.CapturedAt = Now
     result.FragmentCount = parts.Count
     For Each ar In parts
@@ -571,7 +709,8 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
                     tick = tick + 1
                     If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
                     If tick Mod 512 = 0 Then
-                        SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020 C140 0020") & Format$(result.VisibleCellCount, "#,##0") & SLC_U("AC1C 0020 D655 C778 0020 C911")
+                        SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020 C77D B294 0020 C911 0020 00B7 0020") & Format$(result.VisibleCellCount, "#,##0") & SLC_U("C140 0020 D655 C778 0020 002F 0020") & _
+                            Format$(result.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9 0020 B2F4 C74C")
                         Checkpoint
                     End If
                 Next c
@@ -586,6 +725,7 @@ Private Sub AddValue(ByVal list As CSLCList, ByVal v As Variant, ByVal address A
     Dim raw As String, key As String
     If IsError(v) Then
         list.ErrorCount = list.ErrorCount + 1
+        list.AddError address, ErrorDescription(v)
         Exit Sub
     End If
     If IsEmpty(v) Or IsNull(v) Then
@@ -614,7 +754,46 @@ Private Sub AddValue(ByVal list As CSLCList, ByVal v As Variant, ByVal address A
         list.Examples.Add key, raw
         list.Addresses.Add key, address
     End If
+    list.AddOccurrence key, raw, address
 End Sub
+
+Private Function NoValuesSummary(ByVal list As CSLCList) As String
+    Dim sample As Variant, shown As Long, result As String
+    result = SLC_U("C81C C678 003A 0020 BE48 CE78 0020") & list.BlankCount & SLC_U("AC1C 0020 002F 0020 C624 B958 0020") & list.ErrorCount & _
+        SLC_U("AC1C 0020 002F 0020 C81C BAA9 00B7 D569 ACC4 0020") & list.MetadataCount & SLC_U("AC1C")
+    For Each sample In list.ErrorSamples
+        shown = shown + 1
+        If shown > 5 Then Exit For
+        result = result & vbCrLf & CStr(sample(0)) & ": " & CStr(sample(1))
+    Next sample
+    If list.ErrorCount > 5 Then result = result & vbCrLf & SLC_U("C624 B958 0020 C704 CE58 B294 0020 CC98 C74C 0020 0035 AC1C B9CC 0020 D45C C2DC D588 C2B5 B2C8 B2E4 002E")
+    NoValuesSummary = result
+End Function
+
+Private Function ErrorDescription(ByVal value As Variant) As String
+    ' Convert the stored error variant locally, without reading the cell again.
+    Select Case Right$(CStr(value), 4)
+        Case "2000": ErrorDescription = "#NULL!"
+        Case "2007": ErrorDescription = "#DIV/0!"
+        Case "2015": ErrorDescription = "#VALUE!"
+        Case "2023": ErrorDescription = "#REF!"
+        Case "2029": ErrorDescription = "#NAME?"
+        Case "2036": ErrorDescription = "#NUM!"
+        Case "2042": ErrorDescription = "#N/A"
+        Case "2043": ErrorDescription = "#GETTING_DATA"
+        Case "2045": ErrorDescription = "#SPILL!"
+        Case "2050": ErrorDescription = "#CALC!"
+        Case Else: ErrorDescription = CStr(value)
+    End Select
+End Function
+
+Private Function DisplaySourceLabel(ByVal rng As Range) As String
+    Dim label As String
+    label = rng.Worksheet.Parent.Name & " / " & rng.Worksheet.Name & "!" & rng.Areas(1).Address(False, False)
+    If rng.Areas.Count > 1 Then label = label & SLC_U("0020 C678 0020") & CStr(rng.Areas.Count - 1) & SLC_U("AC1C 0020 C601 C5ED")
+    If Len(label) > 100 Then label = Left$(label, 97) & "..."
+    DisplaySourceLabel = label
+End Function
 
 Private Function CellAddress(ByVal rowNum As Long, ByVal colNum As Long) As String
     Dim letters As String
@@ -650,7 +829,9 @@ Private Sub Checkpoint()
     elapsed = Timer - mStarted
     If elapsed < 0 Then elapsed = elapsed + 86400#
     If elapsed > MAX_ACTIVE_SECONDS Then
-        Err.Raise ERR_TIME, , SLC_U("C791 C5C5 0020 C2DC AC04 C774 0020 AE38 C5B4 C838 0020 C911 B2E8 D588 C2B5 B2C8 B2E4 002E 0020 C120 D0DD 0020 BC94 C704 B97C 0020 C904 C5EC 0020 B2E4 C2DC 0020 C2E4 D589 D574 0020 C8FC C138 C694 002E")
+        Err.Raise ERR_TIME, , SLC_U("C791 C5C5 0020 C2DC AC04 C774 0020 AE38 C5B4 C838 0020 C911 B2E8 D588 C2B5 B2C8 B2E4 002E") & vbCrLf & _
+            SLC_U("B450 0020 BAA9 B85D C744 0020 D589 0020 BC88 D638 B85C 0020 B098 B204 BA74 0020 C798 BABB B41C 0020 CC28 C774 AC00 0020 B098 C62C 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E") & vbCrLf & _
+            SLC_U("C804 CCB4 0020 BE44 AD50 AC00 0020 D544 C694 D558 BA74 0020 AC12 C744 0020 BE60 B728 B9AC C9C0 0020 C54A B294 0020 BE44 AD50 0020 BC29 BC95 C744 0020 C0AC C6A9 D574 0020 C8FC C138 C694 002E")
     End If
 End Sub
 
@@ -708,14 +889,8 @@ Private Sub SetStatus(ByVal text As String)
 End Sub
 
 Private Function PreviousStatus() As Variant
-    Dim value As Variant
-    value = Application.StatusBar
-    ' Some Excel builds expose their default False sentinel as text after a
-    ' custom status was shown. Do not restore that sentinel as visible text.
-    If VarType(value) = vbString Then
-        If StrComp(CStr(value), CStr(False), vbTextCompare) = 0 Then value = False
-    End If
-    PreviousStatus = value
+    ' Preserve the exact Variant, including an external literal string "FALSE".
+    PreviousStatus = Application.StatusBar
 End Function
 
 Private Sub ReleaseStatus()
@@ -733,6 +908,7 @@ Private Sub ReleaseStatus()
         End If
     End If
     mOwnStatus = False
+    mLastStatus = ""
     On Error GoTo 0
 End Sub
 
@@ -744,233 +920,43 @@ Private Function DictText(ByVal dict As Object, ByVal key As String) As String
     If dict.Exists(key) Then DictText = CStr(dict(key))
 End Function
 
-Private Sub ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList)
-    Dim keys As Object, k As Variant, ca As Long, cb As Long
-    Dim matched As Long, excessA As Long, excessB As Long, tick As Long
-    Set keys = CreateObject("Scripting.Dictionary")
+Private Function ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList) As Workbook
+    Dim k As Variant, ca As Long, cb As Long, matched As Long, tick As Long
+    SetPhase SLC_U("AC12 ACFC 0020 AC1C C218 0020 BE44 AD50 0020 C911")
+    ' One pass is sufficient: total minus matched gives each list's excess.
+    ' Do not partition by row or allocate a second union of all comparison keys.
     For Each k In a.Counts.Keys
-        keys.Add CStr(k), True
-        tick = tick + 1
-        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
-        If tick Mod 1024 = 0 Then Checkpoint
-    Next k
-    For Each k In b.Counts.Keys
-        If Not keys.Exists(CStr(k)) Then keys.Add CStr(k), True
-        tick = tick + 1
-        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
-        If tick Mod 1024 = 0 Then Checkpoint
-    Next k
-    For Each k In keys.Keys
-        ca = CountOf(a, CStr(k))
+        ca = CLng(a.Counts(CStr(k)))
         cb = CountOf(b, CStr(k))
         If ca < cb Then matched = matched + ca Else matched = matched + cb
-        If ca > cb Then excessA = excessA + ca - cb
-        If cb > ca Then excessB = excessB + cb - ca
         tick = tick + 1
         If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
-        If tick Mod 1024 = 0 Then Checkpoint
+        If tick Mod 1024 = 0 Then
+            SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020 AC12 ACFC 0020 AC1C C218 0020 BE44 AD50 0020 C911 0020 00B7 0020") & Format$(tick, "#,##0") & SLC_U("C885 B958 0020 D655 C778")
+            Checkpoint
+        End If
     Next k
     Checkpoint
-    If excessA = 0 And excessB = 0 And a.DuplicateExcess = 0 And b.DuplicateExcess = 0 _
-        And a.ErrorCount = 0 And b.ErrorCount = 0 Then
-        ReleaseStatus
-        MsgBox SLC_U("BE44 AD50 0020 ADDC CE59 C744 0020 C801 C6A9 D55C 0020 ACB0 ACFC 002C 0020 B450 0020 BAA9 B85D C758 0020 AC12 ACFC 0020 AC1C C218 AC00 0020 AC19 C2B5 B2C8 B2E4 002E") & vbCrLf & _
-            SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(a.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9") & vbCrLf & _
-            SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & Format$(b.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9") & vbCrLf & _
-            SLC_U("C774 BA54 C77C C740 0020 0040 0020 C55E BD80 BD84 B9CC 0020 BE44 AD50 D569 B2C8 B2E4 002E 0020 C22B C790 0020 D45C AE30 002C 0020 C601 BB38 0020 B300 C18C BB38 C790 002C 0020 C77C BD80 0020 ACF5 BC31 0020 CC28 C774 B294 0020 BB34 C2DC D569 B2C8 B2E4 002E"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
-    Else
-        WriteResults a, b, keys, matched, excessA, excessB
-    End If
-End Sub
-
-Private Function OutputText(ByVal text As String) As String
-    ' Defense in depth: no formula activation through raw values or filenames.
-    If Len(text) > 0 Then
-        Select Case Left$(text, 1)
-            Case "=", "+", "-", "@", "'"
-                text = "'" & text
-        End Select
-    End If
-    OutputText = text
+    SetPhase SLC_U("ACB0 ACFC 0020 C791 C131 0020 C911")
+    Set ShowComparison = SLC_WriteUsabilityResults(a, b, matched, a.Total - matched, b.Total - matched)
 End Function
 
-Private Sub WriteResults(ByVal a As CSLCList, ByVal b As CSLCList, ByVal keys As Object, _
-                         ByVal matched As Long, ByVal excessA As Long, ByVal excessB As Long)
-    Dim wb As Workbook, ws As Worksheet, oldBook As Workbook
-    Dim oldScreen As Boolean, oldEvents As Boolean, setState As Boolean
-    Dim k As Variant, ca As Long, cb As Long, status As String
-    Dim buffer(1 To 4096, 1 To 10) As Variant, fill As Long, outRow As Long, tick As Long
-    Dim headers(1 To 1, 1 To 10) As Variant
-    Dim labels As Variant, i As Long, errNo As Long, errText As String
-    On Error GoTo Failed
-    oldScreen = Application.ScreenUpdating
-    oldEvents = Application.EnableEvents
-    Set oldBook = Application.ActiveWorkbook
-    setState = True
-    Application.EnableEvents = False
-    Application.ScreenUpdating = False
-    Set wb = Application.Workbooks.Add(xlWBATWorksheet)
-    Set ws = wb.Worksheets(1)
-    ws.Name = SLC_U("BA85 B2E8 BE44 AD50 005F ACB0 ACFC")
-    ws.Range("A1:J8").NumberFormat = "@"
-    ws.Range("A1:J1").Merge
-    ws.Range("A1").Value2 = SLC_U("BA85 B2E8 0020 BE44 AD50 0020 ACB0 ACFC")
-    ws.Range("A2").Value2 = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C704 CE58 0020 002F 0020 B2F4 C740 0020 C2DC AC01")
-    ws.Range("B2:J2").Merge
-    ws.Range("B2").Value2 = OutputText(a.Source & " / " & Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    ws.Range("A3").Value2 = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 C704 CE58 0020 002F 0020 B2F4 C740 0020 C2DC AC01")
-    ws.Range("B3:J3").Merge
-    ws.Range("B3").Value2 = OutputText(b.Source & " / " & Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    ws.Range("A4").Value2 = SLC_U("D56D BAA9 0020 C218")
-    ws.Range("B4:J4").Merge
-    ws.Range("B4").Value2 = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & a.Total & SLC_U("AC1C 0020 D56D BAA9 0020 002F 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020") & b.Total & _
-        SLC_U("AC1C 0020 D56D BAA9 0020 002F 0020 C77C CE58 0020") & matched & SLC_U("AC1C 0020 002F 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B0A8 C740 0020 D56D BAA9 0020") & excessA & SLC_U("AC1C 0020 002F 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B0A8 C740 0020 D56D BAA9 0020") & excessB & SLC_U("AC1C")
-    ws.Range("A5").Value2 = SLC_U("C911 BCF5 B41C 0020 AC12 0020 002F 0020 BE44 AD50 C5D0 C11C 0020 BE80 0020 C140")
-    ws.Range("B5:J5").Merge
-    ws.Range("B5").Value2 = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020 C911 BCF5 0020") & a.DuplicateExcess & SLC_U("AC1C 0020 002F 0020 BE44 AD50 C5D0 C11C 0020 BE80 0020 C140 003A 0020 BE48 CE78 0020") & a.BlankCount & _
-        SLC_U("AC1C 002C 0020 C624 B958 0020") & a.ErrorCount & SLC_U("AC1C 002C 0020 D45C 0020 C81C BAA9 00B7 D569 ACC4 0020") & a.MetadataCount & SLC_U("AC1C") & vbLf & _
-        SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 003A 0020 C911 BCF5 0020") & b.DuplicateExcess & SLC_U("AC1C 0020 002F 0020 BE44 AD50 C5D0 C11C 0020 BE80 0020 C140 003A 0020 BE48 CE78 0020") & b.BlankCount & _
-        SLC_U("AC1C 002C 0020 C624 B958 0020") & b.ErrorCount & SLC_U("AC1C 002C 0020 D45C 0020 C81C BAA9 00B7 D569 ACC4 0020") & b.MetadataCount & SLC_U("AC1C") & vbLf & _
-        SLC_U("C911 BCF5 C740 0020 AC19 C740 0020 AC12 C774 0020 B450 0020 BC88 C9F8 B85C 0020 B098 C628 0020 AC83 BD80 D130 0020 C149 B2C8 B2E4 002E 0020 AC19 C740 0020 AC12 C774 0020 0033 AC1C 0020 C788 C73C BA74 0020 C911 BCF5 C740 0020 0032 AC1C C785 B2C8 B2E4 002E")
-    ws.Range("A6").Value2 = SLC_U("BE44 AD50 0020 ADDC CE59")
-    ws.Range("B6:J6").Merge
-    ws.Range("B6").Value2 = SLC_U("C774 BA54 C77C C740 0020 0040 0020 C55E BD80 BD84 B9CC 0020 BE44 AD50 D569 B2C8 B2E4 002E 0020 C22B C790 0020 D45C AE30 00B7 C601 BB38 0020 B300 C18C BB38 C790 00B7 C77C BD80 0020 ACF5 BC31 0020 CC28 C774 B294 0020 BB34 C2DC D569 B2C8 B2E4 002E 0020 BB38 C790 B85C 0020 C785 B825 D55C 0020 0030 0030 0031 0032 0033 ACFC 0020 C22B C790 0020 0031 0032 0033 C740 0020 B2E4 B974 AC8C 0020 BD05 B2C8 B2E4 002E") & vbLf & _
-        SLC_U("B0A8 C740 0020 AC1C C218 003A 0020 AC19 C740 0020 AC12 C774 0020 CCAB 0020 BC88 C9F8 C5D0 0020 0032 AC1C 002C 0020 B450 0020 BC88 C9F8 C5D0 0020 0031 AC1C BA74 0020 CCAB 0020 BC88 C9F8 C5D0 0020 0031 AC1C AC00 0020 B0A8 C2B5 B2C8 B2E4 002E")
-    ws.Range("A7:J7").Merge
-    If a.ErrorCount + b.ErrorCount > 0 Then
-        ws.Range("A7").Value2 = SLC_U("C624 B958 0020 C140 C744 0020 BE80 0020 ACB0 ACFC C774 BBC0 B85C 0020 C6D0 BCF8 0020 C804 CCB4 AC00 0020 AC19 B2E4 ACE0 0020 BCFC 0020 C218 B294 0020 C5C6 C2B5 B2C8 B2E4 002E 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029 C640 0020 C140 0020 C8FC C18C B294 0020 D574 B2F9 0020 D56D BAA9 C774 0020 AC01 0020 BAA9 B85D C5D0 C11C 0020 CC98 C74C 0020 B098 C628 0020 C140 C744 0020 BCF4 C5EC C90D B2C8 B2E4 002E")
-    Else
-        ws.Range("A7").Value2 = SLC_U("D45C C5D0 B294 0020 CC28 C774 00B7 C911 BCF5 B9CC 0020 BCF4 C5EC C90D B2C8 B2E4 002E 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029 C640 0020 C140 0020 C8FC C18C B294 0020 D574 B2F9 0020 D56D BAA9 C774 0020 AC01 0020 BAA9 B85D C5D0 C11C 0020 CC98 C74C 0020 B098 C628 0020 C140 C744 0020 BCF4 C5EC C90D B2C8 B2E4 002E")
-    End If
-    labels = Array(SLC_U("C0C1 D0DC"), SLC_U("BE44 AD50 C5D0 0020 C4F4 0020 AC12"), SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 AC1C C218"), _
-        SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 AC1C C218"), SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B0A8 C740 0020 AC1C C218"), SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B0A8 C740 0020 AC1C C218"), _
-        SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C140 0020 C8FC C18C"), SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 C140 0020 C8FC C18C"))
-    For i = 0 To 9
-        headers(1, i + 1) = labels(i)
-    Next i
-    ws.Range("A8:J8").Value2 = headers
-    outRow = 9
-    For Each k In keys.Keys
-        ca = CountOf(a, CStr(k))
-        cb = CountOf(b, CStr(k))
-        If ca <> cb Or ca > 1 Or cb > 1 Then
-            If ca = 0 Then
-                status = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D C5D0 B9CC 0020 C788 C74C")
-            ElseIf cb = 0 Then
-                status = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D C5D0 B9CC 0020 C788 C74C")
-            ElseIf ca <> cb Then
-                status = SLC_U("AC1C C218 AC00 0020 B2E4 B984")
-            Else
-                status = SLC_U("C911 BCF5")
-            End If
-            fill = fill + 1
-            buffer(fill, 1) = status
-            buffer(fill, 2) = OutputText(Mid$(CStr(k), 4))
-            buffer(fill, 3) = OutputText(DictText(a.Examples, CStr(k)))
-            buffer(fill, 4) = ca
-            buffer(fill, 5) = OutputText(DictText(b.Examples, CStr(k)))
-            buffer(fill, 6) = cb
-            If ca > cb Then buffer(fill, 7) = ca - cb Else buffer(fill, 7) = 0
-            If cb > ca Then buffer(fill, 8) = cb - ca Else buffer(fill, 8) = 0
-            buffer(fill, 9) = DictText(a.Addresses, CStr(k))
-            buffer(fill, 10) = DictText(b.Addresses, CStr(k))
-            If fill = 4096 Then FlushOutput ws, buffer, fill, outRow
-        End If
-        tick = tick + 1
-        If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
-        If tick Mod 1024 = 0 Then Checkpoint
-    Next k
-    If fill > 0 Then FlushOutput ws, buffer, fill, outRow
-    If outRow = 9 Then
-        ws.Range("A9").Value2 = SLC_U("BE44 AD50 D55C 0020 AC12 ACFC 0020 AC1C C218 B294 0020 AC19 C2B5 B2C8 B2E4 002E 0020 BE44 AD50 C5D0 C11C 0020 BE80 0020 C624 B958 0020 C140 C740 0020 C6D0 BCF8 C5D0 C11C 0020 D655 C778 D574 0020 C8FC C138 C694 002E")
-        outRow = 10
-    End If
-    With ws
-        .Columns("A").ColumnWidth = 26
-        .Columns("B").ColumnWidth = 25
-        .Columns("C").ColumnWidth = 32
-        .Columns("D").ColumnWidth = 16
-        .Columns("E").ColumnWidth = 32
-        .Columns("F:H").ColumnWidth = 16
-        .Columns("I:J").ColumnWidth = 16
-        .Range("A1:J1").Font.Size = 17
-        .Range("A1:J1").Font.Bold = True
-        .Range("A1:J1").RowHeight = 32
-        .Range("A1:J1").Interior.Color = RGB(30, 65, 92)
-        .Range("A1:J1").Font.Color = RGB(255, 255, 255)
-        .Range("A2:A6").Font.Bold = True
-        .Range("A8:J8").Font.Bold = True
-        .Range("A8:J8").Interior.Color = RGB(225, 234, 242)
-        .Range("A2:J8").WrapText = True
-        .Range("A2:J7").RowHeight = 36
-        .Range("A5:J5").RowHeight = 60
-        .Range("A6:J6").RowHeight = 48
-        .Range("A8:J8").RowHeight = 48
-        .Range("A8:J" & CStr(outRow - 1)).AutoFilter
-    End With
-    wb.Activate
-    ws.Range("A9").Select
-    wb.Windows(1).FreezePanes = True
-    ws.Range("A1").Select
-    ' Until this checkpoint, the new workbook is provisional and the failure
-    ' handler closes only that workbook, preserving all older results.
-    Checkpoint
-    ' Deliberately leave Saved=False: never discard the user's result edits.
-    Application.ScreenUpdating = oldScreen
-    Application.EnableEvents = oldEvents
-    Exit Sub
-Failed:
-    errNo = Err.Number
-    errText = Err.Description
-    On Error Resume Next
-    If Not wb Is Nothing Then wb.Close SaveChanges:=False
-    If Not oldBook Is Nothing Then oldBook.Activate
-    If setState Then
-        Application.ScreenUpdating = oldScreen
-        Application.EnableEvents = oldEvents
-    End If
-    On Error GoTo 0
-    Err.Raise errNo, "WriteResults", errText
-End Sub
-
-Private Sub FlushOutput(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, ByRef outRow As Long)
-    Dim target As Range, small() As Variant, r As Long, c As Long
-    Set target = ws.Cells(outRow, 1).Resize(fill, 10)
-    target.NumberFormat = "@"
-    If fill = 4096 Then
-        target.Value2 = buffer
-    Else
-        ReDim small(1 To fill, 1 To 10)
-        For r = 1 To fill
-            For c = 1 To 10
-                small(r, c) = buffer(r, c)
-            Next c
-        Next r
-        target.Value2 = small
-    End If
-    target.Columns(4).NumberFormat = "0"
-    target.Columns(6).Resize(fill, 3).NumberFormat = "0"
-    outRow = outRow + fill
-    fill = 0
-    Checkpoint
-End Sub
-
 Public Sub SLC_About()
-    MsgBox "Excel Smart List Compare " & SLC_ReleaseVersion() & vbCrLf & vbCrLf & _
-        SLC_U("0031 002E 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & _
-        SLC_U("0032 002E 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & vbCrLf & _
-        SLC_U("C120 D0DD D55C 0020 C140 0020 C804 CCB4 AC00 0020 BAA9 B85D 0020 D558 B098 C774 BA70 002C 0020 C140 C758 0020 AC12 0020 D558 B098 B97C 0020 D56D BAA9 C774 B77C ACE0 0020 D569 B2C8 B2E4 002E") & vbCrLf & _
-        SLC_U("AC00 B85C 002C 0020 C138 B85C 002C 0020 C5EC B7EC 0020 C601 C5ED C744 0020 C120 D0DD D574 B3C4 0020 BAA9 B85D 0020 D558 B098 B85C 0020 BE44 AD50 D569 B2C8 B2E4 002E") & vbCrLf & _
-        SLC_U("B2E4 B978 0020 D30C C77C B85C 0020 C774 B3D9 D55C 0020 B4A4 C5D0 B3C4 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C758 0020 AC1C C218 0020 D45C C2DC AC00 0020 BCF4 C774 BA74 0020 C774 C5B4 C11C 0020 BE44 AD50 D560 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E") & vbCrLf & _
-        SLC_U("C228 AE34 0020 C140 002C 0020 D544 D130 B85C 0020 AC00 B824 C9C4 0020 C140 002C 0020 BE48 CE78 002C 0020 C624 B958 0020 C140 002C 0020 D45C C758 0020 C81C BAA9 00B7 D569 ACC4 0020 C140 C740 0020 BE44 AD50 C5D0 C11C 0020 BE8D B2C8 B2E4 002E") & vbCrLf & _
-        SLC_U("AC19 C740 0020 AC12 C774 0020 BA87 0020 BC88 0020 B098 C624 B294 C9C0 B3C4 0020 BE44 AD50 D569 B2C8 B2E4 002E 0020 C774 BA54 C77C C740 0020 0040 0020 C55E BD80 BD84 B9CC 0020 BE44 AD50 D569 B2C8 B2E4 002E") & vbCrLf & _
-        SLC_U("C6D0 BCF8 C740 0020 BC14 AFB8 C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 CC28 C774 00B7 C911 BCF5 00B7 C624 B958 B294 0020 C0C8 0020 D30C C77C C5D0 0020 D45C C2DC D558 BA70 002C 0020 D544 C694 D558 BA74 0020 C9C1 C811 0020 C800 C7A5 D574 0020 C8FC C138 C694 002E") & vbCrLf & _
-        SLC_U("D55C 0020 BAA9 B85D C740 0020 C228 AE30 C9C0 0020 C54A C740 0020 C140 C744 0020 BE48 CE78 AE4C C9C0 0020 D569 CCD0 0020 0031 0030 0030 002C 0030 0030 0030 AC1C B85C 0020 C81C D55C D569 B2C8 B2E4 002E") & vbCrLf & _
-        SLC_U("C218 B3D9 0020 ACC4 C0B0 C744 0020 C4F0 ACE0 0020 C788 B2E4 BA74 0020 BA3C C800 0020 C218 C2DD C744 0020 ACC4 C0B0 D574 0020 C8FC C138 C694 002E") & vbCrLf & _
-        SLC_U("AE34 0020 C0AC BC88 C774 B098 0020 0049 0044 B294 0020 CC98 C74C 0020 C785 B825 D560 0020 B54C BD80 D130 0020 D14D C2A4 D2B8 0020 D615 C2DD C73C B85C 0020 C800 C7A5 D574 0020 C8FC C138 C694 002E") & vbCrLf & _
-        SLC_U("C774 0020 C2DC D5D8 0020 BC84 C804 C5D0 C11C B294 0020 0045 0073 0063 B97C 0020 B20C B7EC B3C4 0020 C791 C5C5 C774 0020 CDE8 C18C B418 C9C0 0020 C54A C744 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E"), _
+    If mBusy Then Exit Sub
+    MsgBox SLC_U("0045 0078 0063 0065 006C 0020 BA85 B2E8 0020 BE44 AD50 0020") & SLC_ReleaseVersion() & vbCrLf & vbCrLf & _
+        SLC_U("0031 002E 0020 CCAB 0020 BAA9 B85D C758 0020 C140 C744 0020 C120 D0DD D558 ACE0 0020 005B CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & _
+        SLC_U("0032 002E 0020 CD9C CC98 B97C 0020 D655 C778 D558 C138 C694 002E 0020 005B B2F4 C740 0020 BAA9 B85D 0020 D655 C778 005D C5D0 C11C 0020 D45C BCF8 ACFC 0020 C81C C678 0020 C140 C744 0020 BCFC 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E") & vbCrLf & _
+        SLC_U("0033 002E 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & vbCrLf & _
+        SLC_U("C120 D0DD D55C 0020 C140 0020 C804 CCB4 AC00 0020 BAA9 B85D 0020 D558 B098 C785 B2C8 B2E4 002E 0020 C21C C11C C640 0020 BC29 D5A5 C740 0020 BB34 C2DC D558 ACE0 0020 AC12 BCC4 0020 AC1C C218 B97C 0020 BE44 AD50 D569 B2C8 B2E4 002E") & vbCrLf & _
+        SLC_U("BA54 C77C C740 0020 0040 0020 C55E BD80 BD84 B9CC 0020 BE44 AD50 D569 B2C8 B2E4 002E 0020 C228 AE34 0020 C140 00B7 BE48 CE78 00B7 C624 B958 00B7 D45C 0020 C81C BAA9 ACFC 0020 D569 ACC4 B294 0020 BE8D B2C8 B2E4 002E") & vbCrLf & _
+        SLC_U("AC19 C544 B3C4 0020 C694 C57D 0020 D30C C77C C744 0020 B9CC B4ED B2C8 B2E4 002E 0020 C6D0 BCF8 C740 0020 BC14 AFB8 C9C0 0020 C54A C73C BA70 0020 ACB0 ACFC B294 0020 C9C1 C811 0020 C800 C7A5 D558 C138 C694 002E") & vbCrLf & _
+        SLC_U("BE44 AD50 0020 D6C4 0020 CCAB 0020 BAA9 B85D C740 0020 C720 C9C0 B429 B2C8 B2E4 002E 0020 B2E4 B978 0020 AE30 C900 C740 0020 005B BC14 AFB8 AE30 005D 002C 0020 B05D B0AC C73C BA74 0020 005B BE44 C6B0 AE30 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & _
+        SLC_U("B2F4 C740 0020 B4A4 0020 C6D0 BCF8 C744 0020 ACE0 CCD0 B3C4 0020 C774 BBF8 0020 B2F4 AE34 0020 AC12 C740 0020 BC14 B00C C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 0045 0078 0063 0065 006C 0020 C885 B8CC 0020 C2DC 0020 C0AC B77C C9D1 B2C8 B2E4 002E") & vbCrLf & _
+        SLC_U("005B C791 C5C5 0020 CDE8 C18C 005D 0020 B610 B294 0020 0045 0073 0063 B85C 0020 CDE8 C18C B97C 0020 C694 CCAD D55C 0020 B4A4 0020 C644 B8CC 0020 C548 B0B4 B97C 0020 D655 C778 D558 C138 C694 002E") & vbCrLf & _
+        SLC_U("0031 0030 0030 002C 0030 0030 0030 C140 C740 0020 C785 B825 0020 D55C B3C4 C774 BA70 0020 C644 B8CC 0020 BCF4 C7A5 B7C9 C774 0020 C544 B2D9 B2C8 B2E4 002E 0020 D589 0020 BC88 D638 B85C 0020 C784 C758 0020 BD84 D560 D558 C9C0 0020 B9C8 C138 C694 002E"), _
         vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50 0020 002D 0020 C0AC C6A9 0020 C548 B0B4")
 End Sub
+
 
 ' Integration tests must be executed in Windows desktop Excel, not a VBA emulator.
 Public Function SLC_CancellationDecisionTests() As Long
@@ -1135,6 +1121,136 @@ Failed:
     If Not oldBook Is Nothing Then oldBook.Activate
     On Error GoTo 0
     Err.Raise errNo, "SLC_TestAll", errText
+End Function
+
+Public Function SLC_UsabilityTests() As String
+    ' Explicit developer entry point: synthetic data and owned workbooks only.
+    Dim source As Workbook, result As Workbook, preview As Workbook, firstResult As Workbook
+    Dim oldBook As Workbook, ws As Worksheet, oldPending As CSLCList
+    Dim oldCancel As XlEnableCancelKey, oldEvents As Boolean, oldStatus As Variant
+    Dim oldOutcome As String, oldPhase As String, oldCancelled As Boolean
+    Dim original As String, reportResult As String, n As Long, errNo As Long, errText As String
+    If mBusy Then Err.Raise ERR_DATA, , "Cannot test during an active comparison"
+    Set oldBook = Application.ActiveWorkbook
+    Set oldPending = mPending
+    oldCancel = Application.EnableCancelKey
+    oldEvents = Application.EnableEvents
+    oldStatus = Application.StatusBar
+    oldOutcome = mLastOutcome
+    oldPhase = mPhase
+    oldCancelled = mCancelled
+    On Error GoTo Failed
+    original = SLC_TestAll()
+    mStarted = Timer
+    mCancelled = False
+    reportResult = SLC_ReportTests()
+    Application.EnableEvents = False
+    Set source = Application.Workbooks.Add(xlWBATWorksheet)
+    Set ws = source.Worksheets(1)
+    ws.Name = "Snapshot & source"
+    ws.Range("A1:B4").NumberFormat = "@"
+    ws.Range("A1").Value2 = "KIM@A.COM"
+    ws.Range("A2").Value2 = "00123"
+    ws.Range("A3").Value2 = "same"
+    ws.Range("B1").Value2 = "kim@b.com"
+    ws.Range("B2").Value2 = "00123"
+    ws.Range("B3").Value2 = "same"
+    source.Saved = True
+    ws.Range("A1:A4").Select
+    SLC_Capture
+    If mPending Is Nothing Then Err.Raise ERR_DATA, , "First list capture missing"
+    If mPending.Total <> 3 Or mPending.BlankCount <> 1 Then Err.Raise ERR_DATA, , "Capture/exclusion counts"
+    If InStr(mPending.DisplaySource, ws.Name) = 0 Then Err.Raise ERR_DATA, , "Snapshot source missing"
+    If InStr(SLC_MenuXml(), "&amp;") = 0 Then Err.Raise ERR_DATA, , "Source XML was not escaped"
+    n = n + 1
+    Application.StatusBar = "FALSE"
+    ws.Range("B1:B3").Select
+    RunSelection False, firstResult, True
+    If firstResult Is source Then Err.Raise ERR_DATA, , "Equal inputs did not produce evidence"
+    If firstResult.Worksheets.Count <> 4 Then Err.Raise ERR_DATA, , "Report worksheet contract"
+    If mPending Is Nothing Then Err.Raise ERR_DATA, , "Successful compare discarded first list"
+    If mPending.Total <> 3 Then Err.Raise ERR_DATA, , "Repeat comparison changed first list"
+    If VarType(Application.StatusBar) <> vbString Then Err.Raise ERR_DATA, , "Literal FALSE status type changed"
+    If CStr(Application.StatusBar) <> "FALSE" Then Err.Raise ERR_DATA, , "External status text lost"
+    If Not source.Saved Then Err.Raise ERR_DATA, , "Source workbook changed during comparison"
+    n = n + 1
+    firstResult.Worksheets(1).Range("B1").Value2 = "User result edit sentinel"
+    PreviewSnapshot preview, True
+    If preview Is firstResult Then Err.Raise ERR_DATA, , "Preview did not create its own workbook"
+    If preview.Worksheets.Count <> 3 Then Err.Raise ERR_DATA, , "Preview worksheet contract"
+    If firstResult.Worksheets(1).Range("B1").Value2 <> "User result edit sentinel" Then Err.Raise ERR_DATA, , "Previous result edited"
+    preview.Close SaveChanges:=False
+    Set preview = Nothing
+    n = n + 1
+    source.Activate
+    ws.Range("A1").Value2 = "changed after capture"
+    ws.Range("B1:B3").Select
+    RunSelection False, result, True
+    If result Is source Or result Is firstResult Then Err.Raise ERR_DATA, , "Repeat result ownership"
+    If result.Worksheets(1).Range("B2").Value2 <> SLC_U("BE44 AD50 0020 B300 C0C1 0020 AC12 00B7 AC1C C218 0020 C77C CE58") Then Err.Raise ERR_DATA, , "Snapshot changed with source"
+    If Not mPending.Counts.Exists(SLC_Normalize("KIM@A.COM")) Then Err.Raise ERR_DATA, , "Snapshot key missing"
+    result.Close SaveChanges:=False
+    Set result = Nothing
+    n = n + 1
+    ' Deterministic cancellation tests do not claim physical Esc coverage.
+    mBusy = True
+    mCancelled = False
+    SLC_Cancel
+    If Not mCancelled Then Err.Raise ERR_DATA, , "Cancel command did not request cancellation"
+    If InStr(mPhase, SLC_U("CDE8 C18C 0020 C694 CCAD B428")) = 0 Then Err.Raise ERR_DATA, , "Cancel request state missing"
+    On Error Resume Next
+    PollCancellation
+    errNo = Err.Number
+    Err.Clear
+    On Error GoTo Failed
+    If errNo <> ERR_CANCEL Then Err.Raise ERR_DATA, , "Cancel request did not reach checkpoint"
+    If mPending.Total <> 3 Then Err.Raise ERR_DATA, , "Cancel request lost first list"
+    mBusy = False
+    mCancelled = False
+    n = n + 1
+    SLC_Clear
+    If Not mPending Is Nothing Then Err.Raise ERR_DATA, , "Clear did not release snapshot"
+    If ws.Range("A1").Value2 <> "changed after capture" Then Err.Raise ERR_DATA, , "Clear changed source"
+    If firstResult.Worksheets(1).Range("B1").Value2 <> "User result edit sentinel" Then Err.Raise ERR_DATA, , "Clear changed older result"
+    n = n + 1
+    firstResult.Close SaveChanges:=False
+    Set firstResult = Nothing
+    source.Close SaveChanges:=False
+    Set source = Nothing
+    ReleaseStatus
+    Set mPending = oldPending
+    mBusy = False
+    mCancelled = oldCancelled
+    mPhase = oldPhase
+    mLastOutcome = oldOutcome
+    Application.StatusBar = oldStatus
+    Application.EnableEvents = oldEvents
+    Application.EnableCancelKey = oldCancel
+    If Not oldBook Is Nothing Then oldBook.Activate
+    RefreshUI
+    SLC_UsabilityTests = "PASS: " & CStr(n) & " usability integration checks; " & reportResult & "; " & original
+    Exit Function
+Failed:
+    errNo = Err.Number: errText = Err.Description
+    On Error Resume Next
+    Application.EnableCancelKey = xlDisabled
+    If Not result Is Nothing Then result.Close SaveChanges:=False
+    If Not preview Is Nothing Then preview.Close SaveChanges:=False
+    If Not firstResult Is Nothing Then firstResult.Close SaveChanges:=False
+    If Not source Is Nothing Then source.Close SaveChanges:=False
+    ReleaseStatus
+    Set mPending = oldPending
+    mBusy = False
+    mCancelled = oldCancelled
+    mPhase = oldPhase
+    mLastOutcome = oldOutcome
+    Application.StatusBar = oldStatus
+    Application.EnableEvents = oldEvents
+    Application.EnableCancelKey = oldCancel
+    If Not oldBook Is Nothing Then oldBook.Activate
+    RefreshUI
+    On Error GoTo 0
+    Err.Raise errNo, "SLC_UsabilityTests", errText
 End Function
 
 Private Function TestSnapshot(ByVal rng As Range) As CSLCList

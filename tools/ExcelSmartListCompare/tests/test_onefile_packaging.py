@@ -4,6 +4,7 @@ from contextlib import redirect_stderr, redirect_stdout
 import importlib.util
 import io
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -15,6 +16,9 @@ SCRIPT = REPO / "scripts/build-excel-onefile.py"
 SPEC = importlib.util.spec_from_file_location("slc_onefile_build", SCRIPT)
 builder = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(builder)
+LAUNCHER_SPEC = importlib.util.spec_from_file_location("slc_launcher_tests", Path(__file__).with_name("test_launchers.py"))
+launchers = importlib.util.module_from_spec(LAUNCHER_SPEC)
+LAUNCHER_SPEC.loader.exec_module(launchers)
 
 
 class OneFilePackagingTests(unittest.TestCase):
@@ -56,6 +60,57 @@ class OneFilePackagingTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("fresh output directory", result.stderr)
         self.assertEqual(marker.read_text(encoding="ascii"), "preserve")
+
+    def test_system_chcp_command_has_inner_path_and_outer_cmd_quotes(self):
+        source = builder.INSTALLER.read_text(encoding="utf-8-sig")
+        match = re.search(r"Started := ExecAndLogOutput\(ExpandConstant\('\{cmd\}'\),\s*(.*?)\s*,\s*Directory,", source, re.S)
+        self.assertIsNotNone(match)
+        expression = match.group(1)
+        self.assertIn("ExpandConstant('{sys}\\chcp.com')", expression)
+        # Evaluate only the three permitted Pascal concatenation operand kinds;
+        # do not run Inno, CMD, a launcher, or PowerShell.
+        operands = re.findall(r"ExpandConstant\('(?:[^']|'')*'\)|'(?:[^']|'')*'|\bAction\b", expression)
+        self.assertEqual(re.sub(r"ExpandConstant\('(?:[^']|'')*'\)|'(?:[^']|'')*'|\bAction\b|\s|\+", "", expression), "")
+        for system in (r"C:\Windows\System32", r"C:\Windows With Spaces & (1)\System32"):
+            for action in ("Install", "Uninstall"):
+                with self.subTest(system=system, action=action):
+                    rendered = "".join(action if operand == "Action" else
+                                       operand[len("ExpandConstant('"):-2].replace("{sys}", system) if operand.startswith("ExpandConstant(") else
+                                       operand[1:-1].replace("''", "'") for operand in operands)
+                    self.assertTrue(rendered.startswith('/D /V:OFF /C "'))
+                    self.assertTrue(rendered.endswith('"'))
+                    inner = rendered[len('/D /V:OFF /C "'):-1]
+                    self.assertEqual(inner, '"' + system + '\\chcp.com" 65001>nul & ' + action + '.cmd -ConfirmProduct SLC-68A45C44-2026')
+
+    def test_launcher_host_selection_ignores_path_and_preserves_sysnative(self):
+        environment = {"SystemRoot": str(self.root), "PATH": str(self.root / "fake-powershell")}
+        suffix = Path("WindowsPowerShell/v1.0/powershell.exe")
+        native = self.root / "Sysnative" / suffix
+        system = self.root / "System32" / suffix
+        self.assertEqual(launchers.system_powershell(environment, lambda candidate: candidate in {native, system}), str(native))
+        self.assertEqual(launchers.system_powershell(environment, lambda candidate: candidate == system), str(system))
+        self.assertIsNone(launchers.system_powershell(environment, lambda candidate: False))
+        self.assertIsNone(launchers.system_powershell({"PATH": str(self.root)}, lambda candidate: True))
+        self.assertIsNone(launchers.system_powershell({"SystemRoot": "relative"}, lambda candidate: True))
+
+    def test_launcher_start_error_records_private_evidence_and_reraises(self):
+        error = PermissionError(13, "Synthetic process creation denied")
+        error.winerror = 5
+        command = [str(self.root / "powershell.exe"), "-NoProfile", "-Command", "Write-Output 'ENTERED'; exit 0"]
+        environment = {"SystemRoot": str(self.root), "Path": "synthetic path", "UNRELATED_SECRET": "never recorded"}
+        with patch.object(launchers.subprocess, "run", side_effect=error) as runner:
+            with self.assertRaises(PermissionError) as observed:
+                launchers.run_recorded_process(command, self.root, cwd=self.root, env=environment, capture_output=True)
+        self.assertIs(observed.exception, error)
+        runner.assert_called_once()
+        record = json.loads((self.root / "host-start-failure.private.json").read_text(encoding="utf-8"))
+        self.assertEqual((record["status"], record["winerror"]), ("HOST_START_FAILED", 5))
+        self.assertEqual(record["argv"], command)
+        self.assertTrue(record["environmentPresent"]["PATH"])
+        self.assertFalse(record["environmentPresent"]["PATHEXT"])
+        self.assertNotIn("UNRELATED_SECRET", json.dumps(record))
+        self.assertNotIn("never recorded", json.dumps(record))
+        self.assertFalse((self.root / "process.log").exists())
 
 
 class OneFileReleaseProfileTests(unittest.TestCase):

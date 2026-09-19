@@ -18,9 +18,9 @@
 | 프로그램 | 설치 파일 | 확인할 내용 |
 |---|---|---|
 | FolderState 0.1.2 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.2-rc.1/FolderState-0.1.2-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.2-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
-| Excel 명단 비교 0.2.0 RC7 | [이전 공개 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.7-setup.1/ExcelSmartListCompare-0.2.0-rc.7-Setup.exe) · [기존 ZIP 배포](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7) | [사용법과 알려진 문제](docs/tools/excel-list-compare/index.md) |
+| Excel 명단 비교 0.2.0 RC10 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.10/ExcelSmartListCompare-0.2.0-rc.10-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.10) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
 
-두 프로그램 모두 코드 서명이 없는 시험용 버전입니다. Excel 다운로드는 **이전에 공개한 RC7 파일**이며, 이번 한국어 문구 교정은 아직 포함되지 않았습니다. RC7에서는 Esc 취소와 첫 제거 실패를 확인했습니다. 후속 RC8도 취소·첫 설치 문제로 배포를 보류했습니다. 새 Excel 소스를 고쳤다는 사실만으로 이 문제가 해결된 것은 아닙니다.
+Excel RC10은 담은 목록 확인, 첫 목록 재사용, 요약과 상세 결과 시트를 제공합니다. 설치 안내와 검증 자료는 분리해 제공합니다. 실제 확인 범위는 [RC10 검증 기록](tools/ExcelSmartListCompare/docs/USABILITY_RC10_REPORT.md)을 따릅니다. 두 프로그램의 설치 파일에는 코드 서명이 없습니다.
 
 이전 배포와 확인 자료: [FolderState 0.1.0 RC1](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.0-rc.1) · [FolderState 캡처 퀵가이드](docs/tools/folderstate/quick-guide.md) · [Excel RC7 단일 EXE 배포](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.7-setup.1) · [Excel 퀵가이드](tools/ExcelSmartListCompare/docs/QUICK_GUIDE.md) · [RC7 검증과 제한](tools/ExcelSmartListCompare/docs/CONTEXT_MENU_REPORT.md) · [EXE 검증 기록](tools/ExcelSmartListCompare/docs/ONEFILE_REPORT.md)
 

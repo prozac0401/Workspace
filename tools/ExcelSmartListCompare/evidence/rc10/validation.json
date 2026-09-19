@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "product": "ExcelSmartListCompare",
+  "installerVersion": "0.2.0-rc.10",
+  "packageRevision": 1,
+  "date": "2026-09-20",
+  "status": "NOT_MET",
+  "releaseProfile": "documented-exceptions",
+  "releaseDecision": "PUBLISH_WITH_RECORDED_RESULTS",
+  "fullAcceptancePassed": false,
+  "xlamSha256": "2386375cbe0aec6e62fdfa2129cfbc18d358451666504be8bab2fab3c33f719b",
+  "installerSha256": "8825a0e36b08cdc9375a0bc4d87b91391cc64570fb34706bafa1dab48e707386",
+  "sourceTextSha256": {
+    "src/CSLCList.cls": "5d1904d97fa18b0b7b6c3971fda6b55e4e89b84ffbacaab2e4e8749caa95a80f",
+    "src/CSLCAppEvents.cls": "1422aec4fb85ae03241362502982018afea128e2fee6a623b9fffca0fe977247",
+    "src/modSLCNormalize.bas": "4b8750adb6dc5115b379450af15d1ffde998157a7df03a7cef9575c74dcc4c45",
+    "src/modSLCMain.bas": "a95de526ceddb060f821043e0379404b47af2509522f2411f4266916b7371a92",
+    "src/modSLCReport.bas": "7f9dd12677ba69c8ab541f873c5f170d84a45c4dd1e33f17f46dbd8de43ed59c",
+    "src/ThisWorkbook_events.txt": "8e3dd984a00a569f6c46bc998a2f0f8f68138435f8d934e9dc86ae23c6c7f5ec",
+    "src/customUI14.xml": "3f1ca3b18affc986f4c9c66430598927333cc39a79d381a2b8ba37fa60b184cb"
+  },
+  "checks": {
+    "sourceMatchesBinary": "PASS: fresh read-only audit matched all seven serialized VBA modules and RibbonX to the unchanged exact RC10 XLAM.",
+    "normalizationAndIntegration": "PASS: original saved-and-reopened exact RC10 XLAM passed SLC_TestAll and SLC_UsabilityTests; owned Excel exited normally. Evidence rechecked for publication; no new Excel run.",
+    "wordingAndState": "FAIL: default status restoration changed Boolean false to string FALSE. A separate blank COM Excel control reproduced setter behavior; cause and correction remain unresolved.",
+    "selectionMatrix": "PARTIAL: built-in synthetic cases and basic native selections passed; the complete final-file native selection and context matrix is not established.",
+    "cancellation": "FAIL: actual Escape and cancel-button input ended in timeout, not successful user cancellation. Prior snapshot remained; injected tests do not replace native acceptance.",
+    "autoLoad": "PASS: visible normal-start UiFixture confirmed the installed exact XLAM path, hash, version and eight menus. This is not acceptance of the rebuilt EXE.",
+    "reinstall": "PARTIAL: direct-engine restart and same-version repair observations passed; normal Quit failed in lifecycle runs. Rebuilt publication EXE is untested.",
+    "uninstall": "PARTIAL: direct-engine removal, no-addin startup and repeated removal passed; normal Quit failed. Rebuilt publication EXE removal is untested.",
+    "python": "PASS: 152 regression tests passed across normalization/reference, usability, serialized source audit, local packaging, release gates, document links, wrapper packaging and RC10 publication; no Excel or installer run.",
+    "docs": "PASS: strict MkDocs build and generated-link/privacy checks passed for 15 public pages plus 404, search, sitemap and assets.",
+    "windowState": "PARTIAL: basic list reuse, replacement, clearing and earlier-result preservation passed; complete window and separate-process matrix is pending.",
+    "upgrade": "NOT_RUN: rebuilt publication EXE has not been installed. Earlier EXE attempts failed before the engine; direct-engine upgrade passed separately.",
+    "contextMenuContent": "PARTIAL: visible eight-menu and basic content observations passed; complete native context matrix is pending.",
+    "nativeContextMenu": "PARTIAL: real capture, preview, equal/different comparison, reuse, replacement and clearing succeeded; all supported native contexts were not covered."
+  },
+  "releaseExceptions": {
+    "userAuthorized": true,
+    "fullAcceptancePassed": false,
+    "decisionRecord": "tools/ExcelSmartListCompare/docs/ADR-0017-RC10-publication.md",
+    "acceptedIncompleteChecks": [
+      "wordingAndState",
+      "selectionMatrix",
+      "cancellation",
+      "reinstall",
+      "uninstall",
+      "windowState",
+      "upgrade",
+      "contextMenuContent",
+      "nativeContextMenu"
+    ]
+  },
+  "evidence": {
+    "sourceAuditStatus": "PASS",
+    "serializedModuleCount": 7,
+    "sourceAuditSha256": "913a7ba6759486a8c20d97e1dc43ddb2a39f37f0cb367e052d002519aa6cefaa",
+    "runtimeEvidenceSha256": "a2fa5a32586fed690ea611430d3c87b0a0ead437e57d5c1a58bfef5a46ca30ae",
+    "runtimeTests": [
+      {
+        "name": "SLC_TestAll",
+        "status": "PASS",
+        "result": "PASS: normalization + 19 Excel integration checks + 12 cancellation decision checks"
+      },
+      {
+        "name": "SLC_UsabilityTests",
+        "status": "PASS",
+        "result": "PASS: 6 usability integration checks; PASS: injected cancellation/failure output rollback (not physical Esc); bounded samples, error locations, normalization evidence, 4-sheet comparison, identical report, 3-sheet preview, formula safety, header freeze; PASS: normalization + 19 Excel integration checks + 12 cancellation decision checks"
+      }
+    ],
+    "ownedRuntimeExcelExited": true,
+    "e2eSummary": "tools/ExcelSmartListCompare/evidence/rc10/e2e-summary.json",
+    "originalFilesRestored": 5,
+    "originalRegistrationPreserved": true,
+    "publicationScope": "Repackage and publish unchanged tested XLAM and setup engine with updated user documentation. No Excel, installation or security change during publication."
+  }
+}

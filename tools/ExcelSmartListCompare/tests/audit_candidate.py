@@ -19,6 +19,7 @@ SOURCE_FILES = {
     "CSLCAppEvents": "CSLCAppEvents.cls",
     "modSLCNormalize": "modSLCNormalize.bas",
     "modSLCMain": "modSLCMain.bas",
+    "modSLCReport": "modSLCReport.bas",
     "ThisWorkbook": "ThisWorkbook_events.txt",
 }
 UI_NS = "http://schemas.microsoft.com/office/2009/07/customui"

@@ -1,13 +1,6 @@
-# Excel 명단 비교 설치·사용
+# Excel 명단 비교 0.2.0 RC10
 
-**Excel 명단 비교 0.2.0 RC10** · 두 목록의 값과 개수를 비교하고 결과를 새 Excel 파일로 확인합니다.
-
-## 설치 파일 받기
-
-[RC10 받기 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.10/ExcelSmartListCompare-0.2.0-rc.10-Setup.exe){ .md-button .md-button--primary }
-[ZIP으로 받기](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.10/ExcelSmartListCompare-0.2.0-rc.10-win-x64.zip){ .md-button }
-
-수정일: 2026-09-20 · [파일 확인용 SHA-256](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.10/ExcelSmartListCompare-0.2.0-rc.10-Setup.exe.sha256) · [배포 내용](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.10) · [별도 검증 자료](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.10/ExcelSmartListCompare-0.2.0-rc.10-Verification.zip)
+두 목록의 값과 개수를 비교하고, 결과를 새 Excel 파일로 확인합니다. 원본과 이전 결과 파일은 그대로 유지합니다.
 
 ## 설치하기
 

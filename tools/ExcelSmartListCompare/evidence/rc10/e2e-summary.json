@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "product": "ExcelSmartListCompare",
+  "version": "0.2.0-rc.10",
+  "status": "PARTIAL",
+  "fullAcceptancePassed": false,
+  "scope": "Historical observations before the separately authorized RC10 publication; file-specific failures and untested behavior remain unchanged.",
+  "checks": [
+    {
+      "name": "Candidate source and functional regression",
+      "status": "PASS",
+      "detail": "Saved and reopened XLAM audited; normalization, integration, usability and injected cancellation regression passed."
+    },
+    {
+      "name": "Native basic UI",
+      "status": "PASS",
+      "detail": "Capture, 3-sheet preview, 4-sheet equal/different results, first-list reuse, replacement, clearing and earlier-result preservation verified."
+    },
+    {
+      "name": "Synthetic source preservation",
+      "status": "PASS",
+      "detail": "Source file hashes unchanged after UI work; the UI test Excel instance exited normally."
+    },
+    {
+      "name": "Large-selection warning",
+      "status": "PASS",
+      "detail": "Declining the 50000-item warning kept the first three captured items."
+    },
+    {
+      "name": "Native cancellation",
+      "status": "NOT_MET",
+      "detail": "Escape and visible cancel input attempted while busy; final result was timeout -2147219401. Prior snapshot remained intact."
+    },
+    {
+      "name": "Default status bar restoration",
+      "status": "FAIL",
+      "detail": "Engine05 reproduced Boolean false becoming string FALSE after capture. Resumed diagnostic and a separate blank COM Excel control also returned string FALSE immediately after setting Boolean false, before product capture. Root cause and correction remain unconfirmed."
+    },
+    {
+      "name": "EXE installation lifecycle",
+      "status": "FAIL",
+      "detail": "Two attempts failed with access denied before entering the preparation script body or installation engine."
+    },
+    {
+      "name": "Direct installation engine upgrade",
+      "status": "PASS",
+      "detail": "Exact candidate payload, install record and product-owned registration verified. This does not establish EXE acceptance."
+    },
+    {
+      "name": "Original installation restoration",
+      "status": "PASS",
+      "detail": "After the earlier Engine06 cache-path failure, the native Windows recovery GUI physically restored all five missing pinned RC9 files at 2026-09-19T22:10:20Z. Its pinned implementation verified each final physical path, SHA-256, original last-write time and attributes. Product registration matched exactly before and after; registry and security changes were zero. Native normal startup remains separately untested."
+    },
+    {
+      "name": "Post-restoration normal exit",
+      "status": "FAIL",
+      "detail": "During the earlier automation-view tests, an empty owned process remained after Quit and required separate ownership-proven cleanup. This historical failure is retained; normal startup after the later native physical recovery has not been tested."
+    },
+    {
+      "name": "Remaining engine lifecycle",
+      "status": "PARTIAL",
+      "detail": "Engine06 InstallationOnly exercised restart, same-version repair, removal, no-addin startup and repeated removal successfully. Normal process exit remained failed. Functional checks were explicitly not rerun and prior functional failure remains."
+    },
+    {
+      "name": "Documentation validation",
+      "status": "PASS",
+      "detail": "Three document-link tests, strict documentation build, public-page and local-link validation passed."
+    },
+    {
+      "name": "Supplement packager self-checks",
+      "status": "PASS",
+      "detail": "Ten self-checks covered allowed-source privacy, archive integrity, deterministic bytes, explicit hash pins and refusal of approval flags."
+    },
+    {
+      "name": "Post-restoration no-addin verification",
+      "status": "PASS",
+      "detail": "Earlier automation-view verification confirmed no product workbook and corroborated toolbar absence with complete enumeration and named-lookup controls. Normal exit failed separately. This is not the state of native RC9 following the later physical recovery."
+    },
+    {
+      "name": "Status type diagnostic",
+      "status": "FAIL",
+      "detail": "Saved candidate reopened and serialized source and release version checks passed. The diagnostic call failed before returning a trace. Its owned Excel exited normally; temporary development access and the original installation were preserved. Cause and fix remain unconfirmed."
+    },
+    {
+      "name": "Flow observation regression",
+      "status": "PASS",
+      "detail": "Four synthetic scripts passed, including visible ownership contexts and ten corroboration scenarios plus two integrated lookup cases."
+    },
+    {
+      "name": "Clean installation",
+      "status": "FAIL",
+      "detail": "The direct engine stopped with code 6 because a written file resolved outside the intended installation directory. The physical-path protection was retained."
+    },
+    {
+      "name": "Updated installer packaging",
+      "status": "PASS",
+      "detail": "A separate local package was compiled with an explicit system chcp path. EXE SHA-256 is 91d0223bf1a786b08fc981bb2779de67407688be504ea76167b84fddcb4a6725; XLAM bytes were unchanged. Fourteen packaging tests passed."
+    },
+    {
+      "name": "Updated EXE runtime",
+      "status": "NOT_RUN",
+      "detail": "Native original files and registration are restored. Further EXE runtime tests still require an unredirected Windows context and working native observation; current Computer Use remains unavailable and the automation view is redirected. Compilation is not installation acceptance."
+    },
+    {
+      "name": "Lifecycle safety regression",
+      "status": "PASS",
+      "detail": "Forty-eight checks passed, including installation-only scope isolation and rejection of redirected physical paths."
+    },
+    {
+      "name": "Physical recovery preflight",
+      "status": "OBSERVED",
+      "detail": "Automation recovery preflight refused redirected destination files with zero product, registry or security changes. Ordinary Windows recovery subsequently stopped on existing registration before product changes. Its registration view differs from the automation baseline; those existing entries were preserved."
+    },
+    {
+      "name": "Native original-state inspection",
+      "status": "OBSERVED",
+      "detail": "Ordinary File Explorer launched the read-only GUI. All five original files were absent from the native destination. The trust ownership token, product, path and OPEN value matched the pinned RC9 manifest. The OneFile uninstall registration and product Add-in Manager value were absent. No product, registry or security changes were made."
+    },
+    {
+      "name": "Read-only inspection tool execution",
+      "status": "PASS",
+      "detail": "The inspection script completed with exit zero in the automation environment, reported all five original hashes and redirected physical paths, and made no product, registry or security changes. This is not native installation verification."
+    },
+    {
+      "name": "Native recovery GUI execution",
+      "status": "PASS",
+      "detail": "The user ran the prepared GUI in ordinary Windows. It reported ORIGINAL_FILES_PHYSICALLY_RESTORED, exactly five created and verified files, identical before/after registration, and no registry or security changes. Helper source and EXE pins and report invariants were independently checked; no duplicate recovery was run."
+    },
+    {
+      "name": "Status type diagnostic revision 2",
+      "status": "PARTIAL",
+      "detail": "The user enabled macros in a newly created Excel instance reopening the exact saved v2 diagnostic. Three primitive getters returned Boolean initially; setting False returned String, so capture preconditions failed with a recorded trace. Diagnostic file hash, checked security and OPEN values were preserved; owned Excel exited normally. Independent serialized source audit passed for seven modules after installing audit dependencies under local artifacts. Product acceptance remains failed."
+    },
+    {
+      "name": "Independent status setter control",
+      "status": "OBSERVED",
+      "detail": "Eleven observations in a separate blank COM Excel, without explicitly opening diagnostic or product XLAM or running macros, reproduced string FALSE after Boolean false assignment, including hidden/visible, direct/reflection and events-disabled conditions. Other hidden add-ins were not independently excluded. Its owned Excel exited normally; no security settings were changed."
+    }
+  ]
+}

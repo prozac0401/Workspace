@@ -9,9 +9,10 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
-from urllib.parse import unquote, urlsplit
+from urllib.parse import quote, unquote, urlsplit
 import zipfile
 import xml.etree.ElementTree as ET
 
@@ -24,6 +25,7 @@ CHECKS = ("sourceMatchesBinary", "normalizationAndIntegration", "wordingAndState
           "cancellation", "autoLoad", "reinstall", "uninstall", "python", "docs")
 EXCEPTION_CORE_CHECKS = frozenset(("sourceMatchesBinary", "normalizationAndIntegration", "selectionMatrix",
                                "nativeContextMenu", "python", "docs"))
+RC10_EXCEPTION_CORE_CHECKS = frozenset(("sourceMatchesBinary", "normalizationAndIntegration", "python", "docs"))
 USER_PACKAGE_FILES = frozenset(("ExcelSmartListCompare.xlam", "Setup.ps1", "Install.cmd",
                                 "Uninstall.cmd", "README.md", "QuickGuide.html", "SHA256SUMS.txt"))
 HTML_NAMES = {
@@ -34,6 +36,12 @@ HTML_NAMES = {
 PUBLIC_EVIDENCE_JSON = (
     "tools/ExcelSmartListCompare/evidence/rc8/validation.json",
     "tools/ExcelSmartListCompare/evidence/rc9/validation.json",
+)
+RC10_PUBLIC_REFERENCES = (
+    "tools/ExcelSmartListCompare/evidence/rc10/validation.json",
+    "tools/ExcelSmartListCompare/evidence/rc10/e2e-summary.json",
+    "tools/ExcelSmartListCompare/tests/Invoke-IsolatedExcelCandidate.ps1",
+    "scripts/package-excel-local-candidate.py",
 )
 
 spec = importlib.util.spec_from_file_location("excel_release_render", REPO / "scripts/package-excel-launcher-release.py")
@@ -61,7 +69,10 @@ def public_report_link_map(source, commit, html_names):
     existing package-local link validation.
     """
     links = dict(html_names)
-    for relative in PUBLIC_EVIDENCE_JSON:
+    references = PUBLIC_EVIDENCE_JSON
+    if "RC10_USER_GUIDE.md" in html_names:
+        references += RC10_PUBLIC_REFERENCES
+    for relative in references:
         try:
             git("cat-file", "-e", commit + ":" + relative)
         except subprocess.CalledProcessError as error:
@@ -172,17 +183,51 @@ def release_report_layout(rc):
         html_names["RC8_COMPLETION_REPORT.md"] = "RC8-Previous-Report.html"
         html_names["RC9_STABILITY_REPORT.md"] = "RC9-Initial-Report.html"
         html_names["RC9_APPROVED_RETEST_20260917.md"] = "Completion-Report.html"
+    if rc >= 10:
+        html_names["QUICK_GUIDE.md"] = "RC9-QuickGuide.html"
+        html_names["RELEASE_README.md"] = "RC9-Installation-Guide.html"
+        html_names["USABILITY_CANDIDATE_GUIDE.md"] = "RC10-Development-Guide.html"
+        html_names["RC10_USER_GUIDE.md"] = "QuickGuide.html"
+        html_names["RC9_APPROVED_RETEST_20260917.md"] = "RC9-Previous-Report.html"
+        html_names["USABILITY_RC10_REPORT.md"] = "Completion-Report.html"
+        html_names["RC10_END_TO_END_REPORT.md"] = "End-to-End-Report.html"
+        html_names["ADR-0017-RC10-publication.md"] = "Publication-Decision.html"
     return html_names, report
 
 
+def release_user_guide(rc):
+    return "RC10_USER_GUIDE.md" if rc >= 10 else "RELEASE_README.md"
+
+
+def candidate_readme_text(source, commit):
+    """Keep repository-only Markdown references usable in the seven-file ZIP."""
+    content = source.read_text(encoding="utf-8-sig")
+
+    def link(match):
+        href = match[1]
+        parsed = urlsplit(href)
+        if parsed.scheme or parsed.netloc or not parsed.path.endswith(".md"):
+            return match[0]
+        target = (source.parent / unquote(parsed.path)).resolve()
+        if not target.is_relative_to(REPO) or not target.is_file():
+            raise SystemExit("Missing candidate guide reference: " + href)
+        pinned = ("https://github.com/prozac0401/Workspace/blob/" + commit + "/"
+                  + quote(target.relative_to(REPO).as_posix()))
+        if parsed.fragment:
+            pinned += "#" + parsed.fragment
+        return "](" + pinned + ")"
+
+    return re.sub(r"\]\(([^)]+)\)", link, content)
+
+
 def validate_acceptance_profile(validation, checks, rc, profile):
-    """Separately authorized RC9 publication never relabels incomplete checks."""
+    """Explicit RC9/RC10 publication decisions preserve incomplete results."""
     results = validation["checks"]
     if set(results) != set(checks):
         raise SystemExit("Required validation is incomplete or failed.")
     if profile == "documented-exceptions":
-        if rc != 9:
-            raise SystemExit("Documented exceptions are defined only for RC9.")
+        if rc not in (9, 10):
+            raise SystemExit("Documented exceptions are defined only for RC9 and RC10.")
         decision = validation.get("releaseExceptions", {})
         if (validation.get("releaseProfile") != profile
                 or validation.get("releaseDecision") != "PUBLISH_WITH_RECORDED_RESULTS"
@@ -190,7 +235,12 @@ def validate_acceptance_profile(validation, checks, rc, profile):
                 or decision.get("userAuthorized") is not True
                 or decision.get("fullAcceptancePassed") is not False):
             raise SystemExit("Documented exceptions require explicit matching user-authorized decision metadata.")
-        for name in EXCEPTION_CORE_CHECKS:
+        if rc == 10 and (validation.get("installerVersion") != "0.2.0-rc.10"
+                or decision.get("decisionRecord") != "tools/ExcelSmartListCompare/docs/ADR-0017-RC10-publication.md"
+                or validation.get("fullAcceptancePassed") is not False):
+            raise SystemExit("RC10 exceptions require their own publication decision and incomplete acceptance.")
+        core_checks = RC10_EXCEPTION_CORE_CHECKS if rc == 10 else EXCEPTION_CORE_CHECKS
+        for name in core_checks:
             result = results[name]
             if not isinstance(result, str) or not (result == "PASS" or result.startswith("PASS:")):
                 raise SystemExit("Documented exceptions require PASS for " + name + ".")
@@ -231,9 +281,9 @@ def main():
     parser.add_argument("--xlam", type=Path, required=True)
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
-    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9"), default=VERSION)
+    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9", "0.2.0-rc.10"), default=VERSION)
     parser.add_argument("--release-profile", choices=("full", "documented-exceptions"), default="full",
-                        help="Full acceptance by default; RC9 documented exceptions require explicit reviewed authorization metadata.")
+                        help="Full acceptance by default; RC9/RC10 exceptions require their own explicit authorization metadata.")
     args = parser.parse_args()
     version = args.installer_version
     rc = int(version.rsplit(".", 1)[1])
@@ -242,6 +292,8 @@ def main():
     if rc >= 7:
         sources += ("src/customUI14.xml",)
         checks += ("contextMenuContent", "nativeContextMenu")
+    if rc >= 10:
+        sources += ("src/modSLCReport.bas",)
     html_names, report = release_report_layout(rc)
     output = args.output_directory.resolve()
     if not output.is_relative_to(REPO / "artifacts") or output == REPO / "artifacts" or output.exists():
@@ -278,10 +330,15 @@ def main():
     shutil.copyfile(args.xlam, release / "ExcelSmartListCompare.xlam")
     for name in ("Setup.ps1", "Install.cmd", "Uninstall.cmd"):
         shutil.copyfile(TOOL / name, release / name)
-    shutil.copyfile(TOOL / "docs/RELEASE_README.md", release / "README.md")
-    rendering.render(TOOL / "docs/RELEASE_README.md", release / "QuickGuide.html", commit,
+    guide_name = release_user_guide(rc)
+    guide_source = TOOL / "docs" / guide_name
+    if rc >= 10:
+        (release / "README.md").write_text(candidate_readme_text(guide_source, commit), encoding="utf-8")
+    else:
+        shutil.copyfile(guide_source, release / "README.md")
+    rendering.render(guide_source, release / "QuickGuide.html", commit,
                      title="Excel 명단 비교 · 설치와 사용",
-                     html_names={"RELEASE_README.md": "QuickGuide.html"})
+                     html_names={guide_name: "QuickGuide.html"})
     shutil.copyfile(release / "QuickGuide.html", verification / "QuickGuide.html")
     if documented_exceptions:
         notice = ("Validation results\n"
@@ -297,6 +354,8 @@ def main():
                          html_names=public_report_link_map(report_source, commit, html_names))
     # This input is a reviewed, public summary; raw installer diagnostics stay local.
     (verification / "Validation.json").write_text(json.dumps(validation, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if rc >= 10:
+        shutil.copyfile(TOOL / "evidence/rc10/e2e-summary.json", verification / "End-to-End-Summary.json")
     (verification / "EXCEL_TEST_RESULT.txt").write_text(validation["checks"]["normalizationAndIntegration"] + "\n", encoding="utf-8")
     (verification / "SOURCE_COMMIT.txt").write_text(commit + "\n", encoding="ascii")
     (verification / "BUILD_INFO.json").write_text(json.dumps({

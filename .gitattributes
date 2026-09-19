@@ -7,3 +7,5 @@
 *.ps1 text eol=crlf
 *.cmd text eol=crlf
 *.ico binary
+tools/ExcelSmartListCompare/evidence/rc10/*.json text eol=lf
+tools/ExcelSmartListCompare/installer/RC10-Payload.json text eol=lf

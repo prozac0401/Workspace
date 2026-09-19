@@ -5,6 +5,7 @@ import hashlib
 import io
 import importlib.util
 import json
+import re
 from pathlib import Path
 import sys
 import tempfile
@@ -178,6 +179,11 @@ class RC9ReleaseGateTests(unittest.TestCase):
         sources = gate.SOURCES + ("src/CSLCAppEvents.cls", "src/customUI14.xml")
         for name in sources + ("Install.cmd", "Uninstall.cmd", "Test_Excel.cmd", "Setup.ps1"):
             (tool / name).write_bytes((gate.TOOL / name).read_bytes())
+        # This fixture intentionally exercises the historical RC9 package contract.
+        # Do not let the current source candidate's installer version relabel it.
+        setup = tool / "Setup.ps1"
+        setup.write_text(re.sub(r"(?m)^\$InstallerVersion = '[^']+'", "$InstallerVersion = '0.2.0-rc.9'",
+                               setup.read_text(encoding="utf-8-sig")), encoding="utf-8-sig")
         readme = "Synthetic package regression fixture.\n"
         (tool / "docs/RELEASE_README.md").write_bytes(readme.encode("utf-8"))
         for name in gate.release_report_layout(9)[0]:

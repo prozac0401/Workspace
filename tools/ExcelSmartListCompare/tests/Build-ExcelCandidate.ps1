@@ -226,7 +226,7 @@ try{
     }
     if(-not $audit.accessBefore.keyPresent){throw (Candidate-Failure 'The existing Excel security key is absent; this helper does not create security keys.' 'BLOCKED_POLICY' 5)}
     # Snapshot the exact build inputs; never export over or edit repository sources.
-    $imports=@('CSLCList.cls','CSLCAppEvents.cls','modSLCNormalize.bas','modSLCMain.bas')
+    $imports=@('CSLCList.cls','CSLCAppEvents.cls','modSLCNormalize.bas','modSLCMain.bas','modSLCReport.bas')
     foreach($name in ($imports+@('ThisWorkbook_events.txt','customUI14.xml'))){
         Copy-Item -LiteralPath (Join-Path $toolRoot ('src/'+$name)) -Destination (Join-Path $sourceSnapshot $name)
     }

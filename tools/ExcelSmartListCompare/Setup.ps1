@@ -13,7 +13,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProductId = 'SLC-68A45C44-2026'
 $Version = '0.2.0'
-$InstallerVersion = '0.2.0-rc.9'
+$InstallerVersion = '0.2.0-rc.10'
 $Root = $PSScriptRoot
 $InstallDir = Join-Path $env:LOCALAPPDATA 'ExcelSmartListCompare'
 $Target = Join-Path $InstallDir 'ExcelSmartListCompare.xlam'
@@ -282,7 +282,7 @@ function Build-Addin {
                 '이 프로그램은 해당 권한이나 보안 센터 설정을 바꾸지 않습니다. 회사에서 권한을 승인받은 개발자에게 Build_Release.cmd를 실행해 ' +
                 'XLAM 파일이 들어 있는 Release 폴더를 만들어 달라고 요청하세요. 완성된 파일을 설치할 때는 이 권한이 필요하지 않습니다. Excel 오류 내용: ' + $detail) 5)
         }
-        foreach ($file in @('CSLCList.cls','CSLCAppEvents.cls','modSLCNormalize.bas','modSLCMain.bas')) {
+        foreach ($file in @('CSLCList.cls','CSLCAppEvents.cls','modSLCNormalize.bas','modSLCMain.bas','modSLCReport.bas')) {
             $component = $project.VBComponents.Import((Join-Path $src $file))
             Release-Com $component
             $component = $null

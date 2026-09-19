@@ -188,7 +188,12 @@ class StaticSafetyTests(unittest.TestCase):
                     self.assertEqual(stack.pop(), end[1].lower())
             self.assertEqual(stack, [], str(src))
     def test_no_global_hotkey_or_find_or_clipboard(self):
-        code = '\n'.join(l for l in (ROOT/'src/modSLCMain_utf8.bas').read_text(encoding='utf-8').splitlines() if not l.lstrip().startswith("'"))
+        code = '\n'.join(
+            line
+            for source in (ROOT/'src').glob('*_utf8.*')
+            for line in source.read_text(encoding='utf-8').splitlines()
+            if not line.lstrip().startswith("'")
+        )
         for forbidden in [r'Application\.OnKey', r'CommandBars\.Reset', r'\.Find\(', r'SendKeys', r'CutCopyMode\s*=', r'Application\.Calculation\s*=']:
             self.assertIsNone(re.search(forbidden, code, re.I), forbidden)
     def test_safe_security_and_setup(self):

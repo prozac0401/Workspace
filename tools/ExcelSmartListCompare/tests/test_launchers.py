@@ -16,7 +16,50 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parents[1]
 LAUNCHERS = {"Install.cmd": "Install", "Uninstall.cmd": "Uninstall", "Test_Excel.cmd": "Test"}
-POWERSHELL = shutil.which("powershell.exe")
+def system_powershell(environ=None, is_file=None):
+    """Choose Windows PowerShell without consulting caller-controlled PATH."""
+    environment = os.environ if environ is None else environ
+    windows = next((value for key, value in environment.items()
+                    if key.upper() == "SYSTEMROOT" and value), None)
+    if not windows:
+        return None
+    root = Path(windows)
+    if not root.is_absolute():
+        return None
+    exists = Path.is_file if is_file is None else is_file
+    for directory in ("Sysnative", "System32"):
+        candidate = root / directory / "WindowsPowerShell/v1.0/powershell.exe"
+        if exists(candidate):
+            return str(candidate)
+    return None
+
+
+POWERSHELL = system_powershell()
+
+
+def run_recorded_process(command, folder, **kwargs):
+    """Preserve pre-host failures without substituting a synthetic exit code."""
+    try:
+        return subprocess.run(command, **kwargs)
+    except OSError as error:
+        environment = kwargs.get("env", os.environ)
+        present = {key.upper(): bool(value) for key, value in environment.items()}
+        evidence = {
+            "status": "HOST_START_FAILED",
+            "exceptionType": type(error).__name__,
+            "winerror": getattr(error, "winerror", None),
+            "errno": error.errno,
+            "executable": str(command[0]),
+            "argv": [str(item) for item in command],
+            "cwd": str(kwargs.get("cwd", Path.cwd())),
+            "environmentPresent": {key: present.get(key, False) for key in
+                                   ("SYSTEMROOT", "WINDIR", "COMSPEC", "PATH", "PATHEXT", "PSMODULEPATH", "TEMP", "TMP")},
+        }
+        (folder / "host-start-failure.private.json").write_text(
+            json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        raise
+
+
 STUB = r'''param([string]$Action, [string]$ConfirmProduct)
 $ErrorActionPreference = 'Stop'
 [ordered]@{
@@ -111,9 +154,10 @@ class WindowsLaunchers(unittest.TestCase):
             "SLC_TEST_EXIT": "0",
         })
         env.update(extra)
-        result = subprocess.run(
+        result = run_recorded_process(
             [POWERSHELL, "-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", policy,
              "-Command", "$ErrorActionPreference = 'Stop'; [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false); " + command],
+            folder=folder,
             env=env, cwd=REPO, capture_output=True, encoding="utf-8", errors="replace", timeout=40,
         )
         (folder / "process.log").write_text(result.stdout + result.stderr, encoding="utf-8")
@@ -211,9 +255,9 @@ class WindowsLaunchers(unittest.TestCase):
                 env.update({"PSModulePath": str(modules), "PSExecutionPolicyPreference": "Restricted",
                             "SLC_SETUP_NO_PAUSE": "1", "SLC_SETUP_DIAGNOSTICS": "1",
                             "SLC_TEST_RESULT": str(folder / "result.json"), "SLC_TEST_EXIT": "37"})
-                result = subprocess.run(
+                result = run_recorded_process(
                     [os.environ["ComSpec"], "/d", "/v:off", "/c", launcher,
-                     "-ConfirmProduct", "SLC-68A45C44-2026"], cwd=folder, env=env,
+                     "-ConfirmProduct", "SLC-68A45C44-2026"], folder=folder, cwd=folder, env=env,
                     capture_output=True, timeout=40)
                 (folder / "inherited-modules.private.log").write_bytes(result.stdout + result.stderr)
                 self.assertEqual(result.returncode, 37, result.stdout + result.stderr)

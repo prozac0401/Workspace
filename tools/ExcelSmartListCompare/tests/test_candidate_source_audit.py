@@ -81,10 +81,10 @@ class CandidateModuleContractTests(unittest.TestCase):
     def compare(self, modules):
         return audit.compare_modules(modules, self.expected, "현재_통합_문서", {"Sheet1"})
 
-    def test_five_expected_components_and_empty_real_sheet_pass(self):
+    def test_six_expected_components_and_empty_real_sheet_pass(self):
         result = self.compare(self.modules)
         self.assertEqual(result["status"], "PASS", result)
-        self.assertEqual(len(result["modules"]), 6)
+        self.assertEqual(len(result["modules"]), 7)
 
     def test_missing_product_component_is_rejected(self):
         result = self.compare(self.modules[1:])
