@@ -4,6 +4,8 @@
 
 대상: 0.2.0-rc.10. 개발 단계의 실제 결과를 보존하며, 2026-09-20 사용자가 현재 상태의 RC10 게시를 요청했습니다. [ADR-0017](ADR-0017-RC10-publication.md)에 따라 설치 안내와 검증 자료를 분리해 게시합니다. 전체 인수·회사 도입 승인은 하지 않았습니다.
 
+[RC10 게시와 다운로드 검증](RC10_PUBLICATION_20260920.md)을 완료했습니다. 이 보고서의 과거 파일별 결과는 그대로 유지합니다.
+
 ## 변경 목적과 동작
 
 [ADR-0016](ADR-0016-Comparison-usability.md)과 [제품 명세](../../../docs/tools/excel-list-compare/specification.md)의 REQ-EXCEL-018~024를 구현했습니다.

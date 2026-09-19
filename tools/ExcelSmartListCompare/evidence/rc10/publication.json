@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "product": "ExcelSmartListCompare",
+  "version": "0.2.0-rc.10",
+  "releaseTag": "excel-smart-list-compare-v0.2.0-rc.10",
+  "releaseUrl": "https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.10",
+  "publishedAt": "2026-09-19T22:38:12Z",
+  "sourceCommit": "ac0c08f7608fe5f928bc4336d4e4724fa3a4831e",
+  "publicationStatus": "PUBLISHED",
+  "releaseProfile": "documented-exceptions",
+  "releaseDecision": "PUBLISH_WITH_RECORDED_RESULTS",
+  "fullAcceptancePassed": false,
+  "xlamSha256": "2386375cbe0aec6e62fdfa2129cfbc18d358451666504be8bab2fab3c33f719b",
+  "assets": {
+    "ExcelSmartListCompare-0.2.0-rc.10-Setup.exe": {
+      "sha256": "d14334fc5c5ad5c4cdf9cc602e953defa70252ba00d09dad32313c55be4ef3a8",
+      "bytes": 2230652
+    },
+    "ExcelSmartListCompare-0.2.0-rc.10-Setup.exe.sha256": {
+      "sha256": "1c4fca83538b5f55f53a19a5b7e608a44467e6e06da18a81eddd8b2ef39a360e",
+      "bytes": 110
+    },
+    "ExcelSmartListCompare-0.2.0-rc.10-Source.zip": {
+      "sha256": "a4ce74f8d91b2e9f97a260515652d56df84aecceb81a2195a3beaa6e5761cf53",
+      "bytes": 9546503
+    },
+    "ExcelSmartListCompare-0.2.0-rc.10-Source.zip.sha256": {
+      "sha256": "cbc7e293ef2afbc00451c333fca8871aec6af5a863fe90a4049fbb7f80e8e696",
+      "bytes": 111
+    },
+    "ExcelSmartListCompare-0.2.0-rc.10-Verification.zip": {
+      "sha256": "7179aad797ed1c4ebf0657ecab3a7720ea8ffb7f888bf0e2a8c9273566782c8c",
+      "bytes": 179142
+    },
+    "ExcelSmartListCompare-0.2.0-rc.10-Verification.zip.sha256": {
+      "sha256": "725225985a20c9b7b97cf1d538806e489ab7c704b1af1ae90143b2d89e83d692",
+      "bytes": 117
+    },
+    "ExcelSmartListCompare-0.2.0-rc.10-win-x64.zip": {
+      "sha256": "7da6e663da56876de2e4cdf992d2bed8d01aa0a9c6f2bcc17b6d5b2ac7d52eaa",
+      "bytes": 139280
+    },
+    "ExcelSmartListCompare-0.2.0-rc.10-win-x64.zip.sha256": {
+      "sha256": "c9bdaa07fb390c9616f37c239a84456117c1a7edf48c04a662c842841b7eba1a",
+      "bytes": 112
+    }
+  },
+  "packageChecks": {
+    "archiveIntegrity": "PASS",
+    "sevenFileInstallPackage": "PASS",
+    "userGuideWording": "PASS",
+    "payloadHashes": "PASS",
+    "privacy": "PASS",
+    "localDocumentLinks": "PASS"
+  },
+  "publishedDownloadVerification": {
+    "status": "PASS",
+    "assetCount": 8,
+    "hashesAndSizesMatch": true,
+    "publicInstallerChecksumHttpStatus": 200
+  },
+  "regressionTests": {
+    "status": "PASS",
+    "count": 152
+  },
+  "documentationLocal": {
+    "status": "PASS",
+    "strictBuild": true,
+    "publicPages": 15,
+    "localLinks": "PASS"
+  },
+  "pagesDeployment": {
+    "status": "PASS",
+    "runUrl": "https://github.com/prozac0401/Workspace/actions/runs/35473900503",
+    "build": "success",
+    "deploy": "success",
+    "siteHttpStatus": 200,
+    "rc10InstallerAndZipLinks": true
+  },
+  "runtimeScope": "Reused the exact previously tested XLAM. No Excel or installation run during publication; rebuilt EXE runtime acceptance remains NOT_RUN."
+}
