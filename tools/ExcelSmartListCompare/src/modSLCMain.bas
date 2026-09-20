@@ -37,6 +37,7 @@ Private mBusy As Boolean
 Private mStarted As Double
 Private mCancelled As Boolean
 Private mUiAttached As Boolean
+Private mUiFailure As String
 Private mAppEvents As CSLCAppEvents
 Private mRibbonLoaded As Boolean
 Private mOwnStatus As Boolean
@@ -44,6 +45,15 @@ Private mPreviousStatus As Variant
 Private mLastStatus As String
 Private mPhase As String
 Private mLastOutcome As String
+Private Const SETTINGS_APP As String = "ExcelSmartListCompare"
+Private Const SETTINGS_SECTION As String = "Preferences"
+Private Const SETTINGS_KEY As String = "OptionsV1"
+Private mSettingsLoaded As Boolean
+Private mFullEmail As Boolean
+Private mIgnoreCase As Boolean
+Private mKeepFirst As Boolean
+Private mSettingsTestSection As String
+Private mTestOutputFailure As Boolean
 
 Public Function SLC_Version() As String
     SLC_Version = VERSION_TEXT
@@ -62,7 +72,7 @@ Public Function SLC_RibbonReady() As Boolean
 End Function
 
 Public Function SLC_ReleaseVersion() As String
-    SLC_ReleaseVersion = "0.2.0-rc.10"
+    SLC_ReleaseVersion = "0.2.0-rc.11"
 End Function
 
 Public Sub SLC_GetContextMenu(ByVal control As Office.IRibbonControl, ByRef content)
@@ -78,6 +88,7 @@ Public Function SLC_MenuXml(Optional ByVal menuKind As String = "Cell") As Strin
             Err.Raise 5, "SLC_MenuXml", "Unknown product menu."
     End Select
     ' Menu creation reads only the stored snapshot, never the current selection.
+    LoadSettings
     xml = "<menu xmlns=""http://schemas.microsoft.com/office/2009/07/customui"">"
     If mBusy Then
         xml = xml & MenuLabel(prefix & "Progress", mPhase)
@@ -94,6 +105,7 @@ Public Function SLC_MenuXml(Optional ByVal menuKind As String = "Cell") As Strin
             xml = xml & MenuButton(prefix & "Clear", SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BE44 C6B0 AE30"), "SLC_ClearClick")
         End If
         If Len(mLastOutcome) > 0 Then xml = xml & MenuLabel(prefix & "Outcome", mLastOutcome)
+        xml = xml & SettingsMenuXml(prefix)
         xml = xml & MenuButton(prefix & "About", SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_AboutClick")
     End If
     SLC_MenuXml = xml & "</menu>"
@@ -184,11 +196,18 @@ End Sub
 
 ' Never calls OnKey, CommandBars.Reset, SendKeys, or changes the clipboard.
 Public Sub SLC_AttachUI()
-    Dim bar As CommandBar
+    Dim bar As CommandBar, settings As CommandBarPopup
+    Dim uiStage As String
     On Error GoTo Failed
     If mUiAttached Then Exit Sub
+    mUiFailure = ""
+    uiStage = "load settings"
+    LoadSettings
+    uiStage = "remove own UI"
     RemoveOwnUI
+    uiStage = "create toolbar"
     Set bar = Application.CommandBars.Add(Name:=BAR_NAME, Position:=msoBarTop, Temporary:=True)
+    uiStage = "add standard buttons"
     AddButton bar.Controls, SLC_U("BA85 B2E8 0020 BE44 AD50"), "SLC_Run", "run"
     AddButton bar.Controls, "", "", "pending"
     AddButton bar.Controls, SLC_U("B2F4 C740 0020 BAA9 B85D 0020 D655 C778"), "SLC_Preview", "preview"
@@ -196,15 +215,28 @@ Public Sub SLC_AttachUI()
     AddButton bar.Controls, "", "", "progress"
     AddButton bar.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BE44 C6B0 AE30"), "SLC_Clear", "clear"
     AddButton bar.Controls, SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 BC14 AFB8 AE30"), "SLC_Replace", "replace"
+    uiStage = "add settings popup"
+    Set settings = bar.Controls.Add(Type:=msoControlPopup, Temporary:=True)
+    settings.Caption = SLC_U("BE44 AD50 0020 C124 C815")
+    settings.Tag = UI_TAG & ".settings"
+    uiStage = "add settings buttons"
+    AddButton settings.Controls, SLC_U("BA54 C77C 0020 C804 CCB4 0020 C8FC C18C 0020 BE44 AD50 0020 0028 0040 0020 B4A4 0020 D3EC D568 0029"), "SLC_ToggleFullEmail", "fullEmail"
+    AddButton settings.Controls, SLC_U("B300 C18C BB38 C790 0020 BB34 C2DC"), "SLC_ToggleIgnoreCase", "ignoreCase"
+    AddButton settings.Controls, SLC_U("BE44 AD50 0020 D6C4 0020 CCAB 0020 BAA9 B85D 0020 C720 C9C0"), "SLC_ToggleKeepFirst", "keepFirst"
+    AddButton settings.Controls, SLC_U("AE30 BCF8 AC12 C73C B85C 0020 B418 B3CC B9AC AE30"), "SLC_ResetSettings", "resetSettings"
+    AddButton settings.Controls, "", "", "settingsNote"
     AddButton bar.Controls, SLC_U("C0AC C6A9 0020 C548 B0B4"), "SLC_About", "about"
+    uiStage = "show toolbar"
     bar.Visible = True
     ' Context menus are registered by customUI14.xml, never by legacy controls.
+    uiStage = "attach events"
     Set mAppEvents = New CSLCAppEvents
     Set mAppEvents.ExcelApp = Application
     mUiAttached = True
     RefreshUI
     Exit Sub
 Failed:
+    mUiFailure = uiStage & " / " & CStr(Err.Number) & " / " & Err.Description
     Set mAppEvents = Nothing
     RemoveOwnUI
     mUiAttached = False
@@ -260,9 +292,11 @@ End Sub
 
 Private Sub RefreshUI()
     Dim bar As CommandBar, ctl As CommandBarControl, title As String
+    If Not mUiAttached Then Exit Sub
     If mPending Is Nothing Then title = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 AE30") Else title = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50")
     On Error Resume Next
     Set bar = Application.CommandBars(BAR_NAME)
+    If bar Is Nothing Then Exit Sub
     For Each ctl In bar.Controls
         Select Case ctl.Tag
             Case UI_TAG & ".run"
@@ -279,6 +313,9 @@ Private Sub RefreshUI()
             Case UI_TAG & ".progress"
                 If mBusy Then ctl.Caption = mPhase Else ctl.Caption = mLastOutcome
                 ctl.Visible = (Len(ctl.Caption) > 0)
+            Case UI_TAG & ".settings"
+                ctl.Enabled = Not mBusy
+                RefreshSettingsControls ctl
             Case UI_TAG & ".about"
                 ctl.Enabled = Not mBusy
         End Select
@@ -391,9 +428,12 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean, ByRef completedResult As 
     Dim errNo As Long, errText As String
     Dim setState As Boolean, combining As Boolean, oldInteractive As Boolean
     Dim operationCommitted As Boolean
+    Dim keepFirst As Boolean
 
     If mBusy Then Exit Sub
     On Error GoTo Failed
+    LoadSettings
+    keepFirst = mKeepFirst
     If TypeName(Application.Selection) <> "Range" Then
         MsgBox SLC_U("BE44 AD50 D560 0020 C140 0020 BC94 C704 B97C 0020 C120 D0DD D574 0020 C8FC C138 C694 002E"), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
         Exit Sub
@@ -436,7 +476,7 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean, ByRef completedResult As 
     If current.Total = 0 Then
         mLastOutcome = SLC_U("BE44 AD50 D560 0020 AC12 0020 C5C6 C74C 0020 00B7 0020 C774 C804 0020 CCAB 0020 BAA9 B85D 0020 C720 C9C0")
         ReleaseStatus
-        MsgBox SLC_U("C120 D0DD D55C 0020 C140 C5D0 0020 BE44 AD50 D560 0020 AC12 C774 0020 C5C6 C2B5 B2C8 B2E4 002E") & vbCrLf & NoValuesSummary(current) & vbCrLf & _
+        If Not raiseTestError Then MsgBox SLC_U("C120 D0DD D55C 0020 C140 C5D0 0020 BE44 AD50 D560 0020 AC12 C774 0020 C5C6 C2B5 B2C8 B2E4 002E") & vbCrLf & NoValuesSummary(current) & vbCrLf & _
                SLC_U("C228 AE34 0020 C140 ACFC 0020 D544 D130 B85C 0020 AC00 B824 C9C4 0020 C140 C740 0020 C77D C9C0 0020 C54A C2B5 B2C8 B2E4 002E") & vbCrLf & PendingSummary(), _
                vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
         GoTo Finished
@@ -451,10 +491,19 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean, ByRef completedResult As 
         mLastOutcome = SLC_U("CCAB 0020 BAA9 B85D 0020 B2F4 AE30 0020 C644 B8CC 0020 00B7 0020 005B B2F4 C740 0020 BAA9 B85D 0020 D655 C778 005D C5D0 C11C 0020 CD9C CC98 C640 0020 C81C C678 0020 C140 C744 0020 D655 C778 D558 C138 C694 002E")
     Else
         Set completedResult = ShowComparison(mPending, current)
-        operationCommitted = True
+        ' Output completion or the last equality checkpoint precedes this commit.
         Application.EnableCancelKey = xlDisabled
-        mLastOutcome = SLC_U("BE44 AD50 0020 C644 B8CC 0020 00B7 0020 AC19 C740 0020 CCAB 0020 BAA9 B85D C73C B85C 0020 C774 C5B4 C11C 0020 BE44 AD50 D560 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E")
+        If Not keepFirst Then Set mPending = Nothing
+        operationCommitted = True
+        If keepFirst Then
+            mLastOutcome = SLC_U("BE44 AD50 0020 C644 B8CC 0020 00B7 0020 AC19 C740 0020 CCAB 0020 BAA9 B85D C73C B85C 0020 C774 C5B4 C11C 0020 BE44 AD50 D560 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E")
+        Else
+            mLastOutcome = SLC_U("BE44 AD50 0020 C644 B8CC 0020 00B7 0020 CCAB 0020 BAA9 B85D C744 0020 BE44 C6E0 C2B5 B2C8 B2E4 002E 0020 C0C8 0020 CCAB 0020 BAA9 B85D C744 0020 B2F4 C73C C138 C694 002E")
+        End If
         ReleaseStatus
+        If completedResult Is Nothing And Not raiseTestError Then
+            MsgBox EqualityMessage(previousPending, current), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
+        End If
     End If
 Finished:
     ReleaseStatus
@@ -671,6 +720,14 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
     result.Source = SourceLabel(sel)
     result.DisplaySource = DisplaySourceLabel(sel)
     result.CapturedAt = Now
+    LoadSettings
+    If mPending Is Nothing Then
+        result.CompareFullEmail = mFullEmail
+        result.IgnoreCase = mIgnoreCase
+    Else
+        result.CompareFullEmail = mPending.CompareFullEmail
+        result.IgnoreCase = mPending.IgnoreCase
+    End If
     result.FragmentCount = parts.Count
     For Each ar In parts
         Checkpoint
@@ -740,7 +797,7 @@ Private Sub AddValue(ByVal list As CSLCList, ByVal v As Variant, ByVal address A
     If list.RawCharCount > MAX_RAW_CHARS Then
         Err.Raise ERR_LIMIT, , SLC_U("C120 D0DD D55C 0020 C140 C758 0020 B0B4 C6A9 C744 0020 BAA8 B450 0020 D569 CE58 BA74 0020 0035 002C 0030 0030 0030 002C 0030 0030 0030 C790 B97C 0020 B118 C2B5 B2C8 B2E4 002E 0020 C120 D0DD 0020 BC94 C704 B97C 0020 C904 C5EC 0020 C8FC C138 C694 002E")
     End If
-    key = SLC_Normalize(v)
+    key = SLC_Normalize(v, list.CompareFullEmail, list.IgnoreCase)
     If Len(key) = 0 Then
         list.BlankCount = list.BlankCount + 1
         Exit Sub
@@ -937,8 +994,205 @@ Private Function ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList) As Wor
         End If
     Next k
     Checkpoint
+    If matched = a.Total And matched = b.Total Then Exit Function
     SetPhase SLC_U("ACB0 ACFC 0020 C791 C131 0020 C911")
+    If mTestOutputFailure Then Err.Raise ERR_DATA, , "Injected result creation failure"
     Set ShowComparison = SLC_WriteUsabilityResults(a, b, matched, a.Total - matched, b.Total - matched)
+End Function
+
+Private Function SettingsSection() As String
+    SettingsSection = SETTINGS_SECTION
+    If Len(mSettingsTestSection) > 0 Then SettingsSection = mSettingsTestSection
+End Function
+
+Private Function EncodeSettings(ByVal fullEmail As Boolean, ByVal ignoreCase As Boolean, ByVal keepFirst As Boolean) As String
+    EncodeSettings = "1|" & CStr(Abs(CInt(fullEmail))) & "|" & CStr(Abs(CInt(ignoreCase))) & "|" & CStr(Abs(CInt(keepFirst)))
+End Function
+
+Private Function DecodeSettings(ByVal value As String, ByRef fullEmail As Boolean, _
+                                ByRef ignoreCase As Boolean, ByRef keepFirst As Boolean) As Boolean
+    Dim parts As Variant, i As Long
+    fullEmail = False: ignoreCase = False: keepFirst = False
+    parts = Split(value, "|")
+    If UBound(parts) <> 3 Then Exit Function
+    If parts(0) <> "1" Then Exit Function
+    For i = 1 To 3
+        If parts(i) <> "0" And parts(i) <> "1" Then Exit Function
+    Next i
+    fullEmail = (parts(1) = "1")
+    ignoreCase = (parts(2) = "1")
+    keepFirst = (parts(3) = "1")
+    DecodeSettings = True
+End Function
+
+Private Sub LoadSettings()
+    Dim stored As String
+    If mSettingsLoaded Then Exit Sub
+    mFullEmail = False: mIgnoreCase = False: mKeepFirst = False
+    ' Read failure or an invalid value uses defaults without overwriting the stored value.
+    On Error GoTo Defaults
+    stored = GetSetting(SETTINGS_APP, SettingsSection(), SETTINGS_KEY, "")
+    DecodeSettings stored, mFullEmail, mIgnoreCase, mKeepFirst
+Defaults:
+    mSettingsLoaded = True
+End Sub
+
+Private Function ApplySettings(ByVal fullEmail As Boolean, ByVal ignoreCase As Boolean, _
+                               ByVal keepFirst As Boolean, ByRef reason As String) As Boolean
+    LoadSettings
+    If mBusy Then
+        reason = SLC_U("C791 C5C5 C774 0020 B05D B09C 0020 B4A4 0020 C124 C815 C744 0020 BC14 AFD4 0020 C8FC C138 C694 002E")
+        Exit Function
+    End If
+    If Not mPending Is Nothing Then
+        If fullEmail <> mPending.CompareFullEmail Or ignoreCase <> mPending.IgnoreCase Then
+            reason = SLC_U("BE44 AD50 0020 AE30 C900 C744 0020 BC14 AFB8 B824 BA74 0020 CCAB 0020 BAA9 B85D C744 0020 BE44 C6CC 0020 C8FC C138 C694 002E")
+            Exit Function
+        End If
+    End If
+    On Error GoTo Failed
+    ' One versioned registry value commits all three flags together, never list data.
+    SaveSetting SETTINGS_APP, SettingsSection(), SETTINGS_KEY, EncodeSettings(fullEmail, ignoreCase, keepFirst)
+    mFullEmail = fullEmail: mIgnoreCase = ignoreCase: mKeepFirst = keepFirst
+    ApplySettings = True
+    RefreshUI
+    Exit Function
+Failed:
+    reason = SLC_U("C124 C815 C744 0020 C800 C7A5 D558 C9C0 0020 BABB D588 C2B5 B2C8 B2E4 002E 0020 AE30 C874 0020 C124 C815 C740 0020 C720 C9C0 B429 B2C8 B2E4 002E")
+    If Len(mSettingsTestSection) > 0 Then reason = reason & " / " & CStr(Err.Number) & " / " & Err.Description
+End Function
+
+Private Sub ChangeSettings(ByVal fullEmail As Boolean, ByVal ignoreCase As Boolean, ByVal keepFirst As Boolean)
+    Dim reason As String
+    If Not ApplySettings(fullEmail, ignoreCase, keepFirst, reason) Then
+        If Len(mSettingsTestSection) > 0 Then Err.Raise ERR_DATA, "R11 setting action", reason
+        MsgBox reason, vbInformation, SLC_U("BE44 AD50 0020 C124 C815")
+    End If
+End Sub
+
+Public Sub SLC_ToggleFullEmail()
+    LoadSettings
+    ChangeSettings Not mFullEmail, mIgnoreCase, mKeepFirst
+End Sub
+
+Public Sub SLC_ToggleIgnoreCase()
+    LoadSettings
+    ChangeSettings mFullEmail, Not mIgnoreCase, mKeepFirst
+End Sub
+
+Public Sub SLC_ToggleKeepFirst()
+    LoadSettings
+    ChangeSettings mFullEmail, mIgnoreCase, Not mKeepFirst
+End Sub
+
+Public Sub SLC_ResetSettings()
+    If mBusy Then Exit Sub
+    If Not mPending Is Nothing Then
+        MsgBox SLC_U("AE30 BCF8 AC12 C73C B85C 0020 B418 B3CC B9AC B824 BA74 0020 CCAB 0020 BAA9 B85D C744 0020 BE44 C6CC 0020 C8FC C138 C694 002E"), vbInformation, SLC_U("BE44 AD50 0020 C124 C815")
+        Exit Sub
+    End If
+    ChangeSettings False, False, False
+End Sub
+
+Public Sub SLC_ResetSettingsClick(ByVal control As Office.IRibbonControl)
+    SLC_ResetSettings
+End Sub
+
+Public Sub SLC_SettingPressed(ByVal control As Office.IRibbonControl, ByRef returnedVal)
+    LoadSettings
+    Select Case control.Tag
+        Case "fullEmail": returnedVal = mFullEmail
+        Case "ignoreCase": returnedVal = mIgnoreCase
+        Case "keepFirst": returnedVal = mKeepFirst
+    End Select
+End Sub
+
+Public Sub SLC_SettingClick(ByVal control As Office.IRibbonControl, ByVal pressed As Boolean)
+    LoadSettings
+    Select Case control.Tag
+        Case "fullEmail": ChangeSettings pressed, mIgnoreCase, mKeepFirst
+        Case "ignoreCase": ChangeSettings mFullEmail, pressed, mKeepFirst
+        Case "keepFirst": ChangeSettings mFullEmail, mIgnoreCase, pressed
+    End Select
+End Sub
+
+Private Function XmlBoolean(ByVal value As Boolean) As String
+    If value Then XmlBoolean = "true" Else XmlBoolean = "false"
+End Function
+
+Private Function SettingsCheck(ByVal prefix As String, ByVal tag As String, ByVal label As String, ByVal enabled As Boolean) As String
+    SettingsCheck = "<checkBox id=""" & prefix & tag & """ tag=""" & tag & """ label=""" & XmlLabel(label) & _
+        """ enabled=""" & XmlBoolean(enabled) & """ getPressed=""SLC_SettingPressed"" onAction=""SLC_SettingClick""/>"
+End Function
+
+Private Function SettingsMenuXml(ByVal prefix As String) As String
+    Dim xml As String, rulesEnabled As Boolean
+    rulesEnabled = Not mBusy And (mPending Is Nothing)
+    xml = "<menu id=""" & prefix & SLC_U("0053 0065 0074 0074 0069 006E 0067 0073 0022 0020 006C 0061 0062 0065 006C 003D 0022 BE44 AD50 0020 C124 C815 0022 003E")
+    xml = xml & SettingsCheck(prefix, "fullEmail", SLC_U("BA54 C77C 0020 C804 CCB4 0020 C8FC C18C 0020 BE44 AD50 0020 0028 0040 0020 B4A4 0020 D3EC D568 0029"), rulesEnabled)
+    xml = xml & SettingsCheck(prefix, "ignoreCase", SLC_U("B300 C18C BB38 C790 0020 BB34 C2DC"), rulesEnabled)
+    xml = xml & SettingsCheck(prefix, "keepFirst", SLC_U("BE44 AD50 0020 D6C4 0020 CCAB 0020 BAA9 B85D 0020 C720 C9C0"), Not mBusy)
+    xml = xml & "<button id=""" & prefix & SLC_U("0052 0065 0073 0065 0074 0053 0065 0074 0074 0069 006E 0067 0073 0022 0020 006C 0061 0062 0065 006C 003D 0022 AE30 BCF8 AC12 C73C B85C 0020 B418 B3CC B9AC AE30 0022 0020 0065 006E 0061 0062 006C 0065 0064 003D 0022") & _
+        XmlBoolean(rulesEnabled) & """ onAction=""SLC_ResetSettingsClick""/>"
+    If mPending Is Nothing Then
+        xml = xml & MenuLabel(prefix & "SettingsNote", SLC_U("C124 C815 C740 0020 B2E4 C74C 0020 0045 0078 0063 0065 006C 0020 C2E4 D589 C5D0 B3C4 0020 AE30 C5B5 D569 B2C8 B2E4 002E"))
+    Else
+        xml = xml & MenuLabel(prefix & "SettingsNote", SLC_U("BE44 AD50 0020 AE30 C900 C744 0020 BC14 AFB8 B824 BA74 0020 CCAB 0020 BAA9 B85D C744 0020 BE44 C6CC 0020 C8FC C138 C694 002E"))
+    End If
+    SettingsMenuXml = xml & "</menu>"
+End Function
+
+Private Sub RefreshSettingsControls(ByVal control As CommandBarControl)
+    Dim popup As CommandBarPopup, button As CommandBarButton, checked As Boolean
+    Set popup = control
+    For Each button In popup.Controls
+        checked = False
+        button.Enabled = Not mBusy
+        Select Case button.Tag
+            Case UI_TAG & ".fullEmail"
+                checked = mFullEmail
+                button.Enabled = Not mBusy And (mPending Is Nothing)
+            Case UI_TAG & ".ignoreCase"
+                checked = mIgnoreCase
+                button.Enabled = Not mBusy And (mPending Is Nothing)
+            Case UI_TAG & ".keepFirst"
+                checked = mKeepFirst
+            Case UI_TAG & ".resetSettings"
+                button.Enabled = Not mBusy And (mPending Is Nothing)
+            Case UI_TAG & ".settingsNote"
+                button.Visible = True
+                button.Enabled = False
+                If mPending Is Nothing Then
+                    button.Caption = SLC_U("C124 C815 C740 0020 B2E4 C74C 0020 0045 0078 0063 0065 006C 0020 C2E4 D589 C5D0 B3C4 0020 AE30 C5B5 D569 B2C8 B2E4 002E")
+                Else
+                    button.Caption = SLC_U("BE44 AD50 0020 AE30 C900 C744 0020 BC14 AFB8 B824 BA74 0020 CCAB 0020 BAA9 B85D C744 0020 BE44 C6CC 0020 C8FC C138 C694 002E")
+                End If
+        End Select
+        If checked Then button.State = msoButtonDown Else button.State = msoButtonUp
+    Next button
+End Sub
+
+Public Function SLC_RulesText(ByVal fullEmail As Boolean, ByVal ignoreCase As Boolean) As String
+    If fullEmail Then SLC_RulesText = SLC_U("BA54 C77C 0020 C804 CCB4 0020 C8FC C18C 0020 BE44 AD50") Else SLC_RulesText = SLC_U("BA54 C77C 0020 0040 0020 C55E BD80 BD84 B9CC 0020 BE44 AD50")
+    If ignoreCase Then SLC_RulesText = SLC_RulesText & SLC_U("0020 002F 0020 B300 C18C BB38 C790 0020 BB34 C2DC") Else SLC_RulesText = SLC_RulesText & SLC_U("0020 002F 0020 B300 C18C BB38 C790 0020 AD6C BD84")
+End Function
+
+Public Function SLC_CompletionPolicyText() As String
+    If mKeepFirst Then
+        SLC_CompletionPolicyText = SLC_U("BE44 AD50 0020 C131 ACF5 0020 D6C4 0020 CCAB 0020 BAA9 B85D 0020 C720 C9C0")
+    Else
+        SLC_CompletionPolicyText = SLC_U("BE44 AD50 0020 C131 ACF5 0020 D6C4 0020 CCAB 0020 BAA9 B85D 0020 BE44 C6B0 AE30")
+    End If
+End Function
+
+Private Function EqualityMessage(ByVal a As CSLCList, ByVal b As CSLCList) As String
+    If a.ErrorCount + b.ErrorCount > 0 Then
+        EqualityMessage = SLC_U("C624 B958 B97C 0020 C81C C678 D55C 0020 BE44 AD50 0020 B300 C0C1 C774 0020 AC19 C2B5 B2C8 B2E4 002E") & vbCrLf & _
+            SLC_U("C81C C678 D55C 0020 C624 B958 003A 0020 CCAB 0020 BAA9 B85D 0020") & CStr(a.ErrorCount) & SLC_U("AC1C 0020 002F 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D 0020") & CStr(b.ErrorCount) & SLC_U("AC1C")
+    Else
+        EqualityMessage = SLC_U("C120 D0DD D55C 0020 BE44 AD50 0020 AE30 C900 C73C B85C 0020 B450 0020 BAA9 B85D C758 0020 AC12 ACFC 0020 AC1C C218 AC00 0020 AC19 C2B5 B2C8 B2E4 002E")
+    End If
+    EqualityMessage = EqualityMessage & vbCrLf & SLC_U("ACB0 ACFC 0020 D30C C77C C740 0020 B9CC B4E4 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E")
 End Function
 
 Public Sub SLC_About()
@@ -948,9 +1202,10 @@ Public Sub SLC_About()
         SLC_U("0032 002E 0020 CD9C CC98 B97C 0020 D655 C778 D558 C138 C694 002E 0020 005B B2F4 C740 0020 BAA9 B85D 0020 D655 C778 005D C5D0 C11C 0020 D45C BCF8 ACFC 0020 C81C C678 0020 C140 C744 0020 BCFC 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E") & vbCrLf & _
         SLC_U("0033 002E 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 C120 D0DD D558 ACE0 0020 005B B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 B2F4 C544 0020 BE44 AD50 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & vbCrLf & _
         SLC_U("C120 D0DD D55C 0020 C140 0020 C804 CCB4 AC00 0020 BAA9 B85D 0020 D558 B098 C785 B2C8 B2E4 002E 0020 C21C C11C C640 0020 BC29 D5A5 C740 0020 BB34 C2DC D558 ACE0 0020 AC12 BCC4 0020 AC1C C218 B97C 0020 BE44 AD50 D569 B2C8 B2E4 002E") & vbCrLf & _
-        SLC_U("BA54 C77C C740 0020 0040 0020 C55E BD80 BD84 B9CC 0020 BE44 AD50 D569 B2C8 B2E4 002E 0020 C228 AE34 0020 C140 00B7 BE48 CE78 00B7 C624 B958 00B7 D45C 0020 C81C BAA9 ACFC 0020 D569 ACC4 B294 0020 BE8D B2C8 B2E4 002E") & vbCrLf & _
-        SLC_U("AC19 C544 B3C4 0020 C694 C57D 0020 D30C C77C C744 0020 B9CC B4ED B2C8 B2E4 002E 0020 C6D0 BCF8 C740 0020 BC14 AFB8 C9C0 0020 C54A C73C BA70 0020 ACB0 ACFC B294 0020 C9C1 C811 0020 C800 C7A5 D558 C138 C694 002E") & vbCrLf & _
-        SLC_U("BE44 AD50 0020 D6C4 0020 CCAB 0020 BAA9 B85D C740 0020 C720 C9C0 B429 B2C8 B2E4 002E 0020 B2E4 B978 0020 AE30 C900 C740 0020 005B BC14 AFB8 AE30 005D 002C 0020 B05D B0AC C73C BA74 0020 005B BE44 C6B0 AE30 005D B97C 0020 B204 B974 C138 C694 002E") & vbCrLf & _
+        SLC_U("005B BE44 AD50 0020 C124 C815 005D C5D0 C11C 0020 BA54 C77C 0020 C804 CCB4 0020 C8FC C18C 00B7 B300 C18C BB38 C790 0020 BB34 C2DC 00B7 CCAB 0020 BAA9 B85D 0020 C720 C9C0 B97C 0020 C120 D0DD D558 C138 C694 002E") & vbCrLf & _
+        SLC_U("AE30 BCF8 AC12 C740 0020 0040 0020 C55E BD80 BD84 0020 BE44 AD50 002C 0020 B300 C18C BB38 C790 0020 AD6C BD84 002C 0020 BE44 AD50 0020 D6C4 0020 CCAB 0020 BAA9 B85D 0020 BE44 C6B0 AE30 C785 B2C8 B2E4 002E") & vbCrLf & _
+        SLC_U("AC19 C73C BA74 0020 ACB0 ACFC 0020 D30C C77C C744 0020 B9CC B4E4 C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 CC28 C774 AC00 0020 C788 C73C BA74 0020 ACB0 ACFC B97C 0020 C9C1 C811 0020 C800 C7A5 D558 C138 C694 002E") & vbCrLf & _
+        SLC_U("C124 C815 C740 0020 C790 B3D9 C73C B85C 0020 AE30 C5B5 D569 B2C8 B2E4 002E 0020 005B AE30 BCF8 AC12 C73C B85C 0020 B418 B3CC B9AC AE30 005D B85C 0020 CD08 AE30 D654 D560 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E") & vbCrLf & _
         SLC_U("B2F4 C740 0020 B4A4 0020 C6D0 BCF8 C744 0020 ACE0 CCD0 B3C4 0020 C774 BBF8 0020 B2F4 AE34 0020 AC12 C740 0020 BC14 B00C C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 0045 0078 0063 0065 006C 0020 C885 B8CC 0020 C2DC 0020 C0AC B77C C9D1 B2C8 B2E4 002E") & vbCrLf & _
         SLC_U("005B C791 C5C5 0020 CDE8 C18C 005D 0020 B610 B294 0020 0045 0073 0063 B85C 0020 CDE8 C18C B97C 0020 C694 CCAD D55C 0020 B4A4 0020 C644 B8CC 0020 C548 B0B4 B97C 0020 D655 C778 D558 C138 C694 002E") & vbCrLf & _
         SLC_U("0031 0030 0030 002C 0030 0030 0030 C140 C740 0020 C785 B825 0020 D55C B3C4 C774 BA70 0020 C644 B8CC 0020 BCF4 C7A5 B7C9 C774 0020 C544 B2D9 B2C8 B2E4 002E 0020 D589 0020 BC88 D638 B85C 0020 C784 C758 0020 BD84 D560 D558 C9C0 0020 B9C8 C138 C694 002E"), _
@@ -990,6 +1245,11 @@ Public Function SLC_TestAll() As String
     Dim arr(1 To 2, 1 To 2) As Variant, i As Long, n As Long
     Dim oldEvents As Boolean, oldCancel As XlEnableCancelKey, oldBook As Workbook
     Dim errNo As Long, errText As String, cancelChecks As Long
+    Dim savedPending As CSLCList, savedLoaded As Boolean, savedFull As Boolean, savedIgnore As Boolean, savedKeep As Boolean
+    Set savedPending = mPending
+    savedLoaded = mSettingsLoaded: savedFull = mFullEmail: savedIgnore = mIgnoreCase: savedKeep = mKeepFirst
+    Set mPending = Nothing
+    mSettingsLoaded = True: mFullEmail = False: mIgnoreCase = False: mKeepFirst = False
     On Error GoTo Failed
     oldEvents = Application.EnableEvents
     oldCancel = Application.EnableCancelKey
@@ -1010,7 +1270,7 @@ Public Function SLC_TestAll() As String
     ws.Range("H3:H6").NumberFormat = "@"
     ws.Range("H3").Value2 = "00123"
     ws.Range("H4").Value2 = SLC_U("D64D AE38 B3D9")
-    ws.Range("H5").Value2 = "user@b.com"
+    ws.Range("H5").Value2 = "USER@b.com"
     ws.Range("H6").Value2 = "123"
     Set a = TestSnapshot(ws.Range("B2:E2"))
     Set b = TestSnapshot(ws.Range("H3:H6"))
@@ -1018,7 +1278,7 @@ Public Function SLC_TestAll() As String
     AssertSame b, a, "vertical -> horizontal"
     n = n + 2
     arr(1, 1) = "00123": arr(1, 2) = SLC_U("D64D AE38 B3D9")
-    arr(2, 1) = "123": arr(2, 2) = "user"
+    arr(2, 1) = "123": arr(2, 2) = "USER"
     ws.Range("J3:K4").NumberFormat = "@"
     ws.Range("J3:K4").Value2 = arr
     Set b = TestSnapshot(ws.Range("J3:K4"))
@@ -1106,6 +1366,8 @@ Public Function SLC_TestAll() As String
     ReleaseStatus
     Application.EnableEvents = oldEvents
     Application.EnableCancelKey = oldCancel
+    Set mPending = savedPending
+    mSettingsLoaded = savedLoaded: mFullEmail = savedFull: mIgnoreCase = savedIgnore: mKeepFirst = savedKeep
     If Not oldBook Is Nothing Then oldBook.Activate
     SLC_TestAll = "PASS: normalization + " & CStr(n) & " Excel integration checks + " & _
         CStr(cancelChecks) & " cancellation decision checks"
@@ -1118,139 +1380,307 @@ Failed:
     Application.EnableEvents = oldEvents
     Application.EnableCancelKey = oldCancel
     ReleaseStatus
+    Set mPending = savedPending
+    mSettingsLoaded = savedLoaded: mFullEmail = savedFull: mIgnoreCase = savedIgnore: mKeepFirst = savedKeep
     If Not oldBook Is Nothing Then oldBook.Activate
     On Error GoTo 0
     Err.Raise errNo, "SLC_TestAll", errText
 End Function
 
 Public Function SLC_UsabilityTests() As String
-    ' Explicit developer entry point: synthetic data and owned workbooks only.
+    ' Fast essential R11 checks: synthetic documents; a unique, removed settings key.
     Dim source As Workbook, result As Workbook, preview As Workbook, firstResult As Workbook
-    Dim oldBook As Workbook, ws As Worksheet, oldPending As CSLCList
+    Dim oldBook As Workbook, ws As Worksheet, oldPending As CSLCList, captured As CSLCList
     Dim oldCancel As XlEnableCancelKey, oldEvents As Boolean, oldStatus As Variant
     Dim oldOutcome As String, oldPhase As String, oldCancelled As Boolean
-    Dim original As String, reportResult As String, n As Long, errNo As Long, errText As String
-    If mBusy Then Err.Raise ERR_DATA, , "Cannot test during an active comparison"
+    Dim savedFull As Boolean, savedIgnore As Boolean, savedKeep As Boolean, savedLoaded As Boolean
+    Dim reportResult As String, n As Long, errNo As Long, errText As String, reason As String
+    Dim i As Long, books As Long, full As Boolean, ignore As Boolean, scope As String
+    Dim popup As CommandBarPopup, menuDocument As Object, kind As Variant, testStage As String
+    Dim savedTestTrace As Variant
+    If mBusy Then SLC_UsabilityTests = "FAIL: an active comparison prevents testing": Exit Function
+    If Len(mSettingsTestSection) > 0 Then SLC_UsabilityTests = "FAIL: settings test already active": Exit Function
+    On Error GoTo InitialStateFailed
+    savedTestTrace = ThisWorkbook.Worksheets(1).Range("A1").Formula
+    TraceR11 "initial application state"
     Set oldBook = Application.ActiveWorkbook
     Set oldPending = mPending
     oldCancel = Application.EnableCancelKey
     oldEvents = Application.EnableEvents
     oldStatus = Application.StatusBar
-    oldOutcome = mLastOutcome
-    oldPhase = mPhase
-    oldCancelled = mCancelled
+    oldOutcome = mLastOutcome: oldPhase = mPhase: oldCancelled = mCancelled
+    savedFull = mFullEmail: savedIgnore = mIgnoreCase: savedKeep = mKeepFirst: savedLoaded = mSettingsLoaded
     On Error GoTo Failed
-    original = SLC_TestAll()
-    mStarted = Timer
-    mCancelled = False
-    reportResult = SLC_ReportTests()
+    testStage = "isolated settings defaults"
+    TraceR11 testStage
+    scope = "R11Test-" & CStr(Application.Hwnd) & "-" & Format$(Now, "yyyymmddhhnnss")
+    If Len(GetSetting(SETTINGS_APP, scope, SETTINGS_KEY, "")) > 0 Then Err.Raise ERR_DATA, , "Test settings key already exists"
+    mSettingsTestSection = scope
+    mSettingsLoaded = False
+    Set mPending = Nothing
+    LoadSettings
+    Call AssertR11(Not mFullEmail And Not mIgnoreCase And Not mKeepFirst, "Initial defaults")
+    n = n + 1
+    testStage = "settings menu binding and shared action"
+    TraceR11 testStage
     Application.EnableEvents = False
     Set source = Application.Workbooks.Add(xlWBATWorksheet)
     Set ws = source.Worksheets(1)
-    ws.Name = "Snapshot & source"
-    ws.Range("A1:B4").NumberFormat = "@"
-    ws.Range("A1").Value2 = "KIM@A.COM"
-    ws.Range("A2").Value2 = "00123"
-    ws.Range("A3").Value2 = "same"
-    ws.Range("B1").Value2 = "kim@b.com"
-    ws.Range("B2").Value2 = "00123"
-    ws.Range("B3").Value2 = "same"
-    source.Saved = True
-    ws.Range("A1:A4").Select
-    SLC_Capture
-    If mPending Is Nothing Then Err.Raise ERR_DATA, , "First list capture missing"
-    If mPending.Total <> 3 Or mPending.BlankCount <> 1 Then Err.Raise ERR_DATA, , "Capture/exclusion counts"
-    If InStr(mPending.DisplaySource, ws.Name) = 0 Then Err.Raise ERR_DATA, , "Snapshot source missing"
-    If InStr(SLC_MenuXml(), "&amp;") = 0 Then Err.Raise ERR_DATA, , "Source XML was not escaped"
+    ws.Name = "R11 & source"
+    TraceR11 "attach toolbar"
+    SLC_AttachUI
+    TraceR11 "verify toolbar initialization"
+    Call AssertR11(SLC_UiReady(), "Toolbar initialization with an active workbook: " & mUiFailure)
+    Set popup = Application.CommandBars(BAR_NAME).FindControl(Type:=msoControlPopup, Tag:=UI_TAG & ".settings")
+    Call AssertR11(Not popup Is Nothing, "Toolbar settings menu exists")
+    ' Check the binding and invoke its shared action directly. Dispatching a
+    ' CommandBar action from inside an Application.Run macro can wait on UI;
+    ' physical menu interaction belongs to the separate user validation.
+    Call AssertR11(IsOwnMacroBinding(popup.Controls(1).OnAction, "SLC_ToggleFullEmail"), _
+        "Toolbar setting binding: " & popup.Controls(1).OnAction)
+    TraceR11 "invoke email setting action"
+    SLC_ToggleFullEmail
+    TraceR11 "verify email setting action"
+    Call AssertR11(mFullEmail, "Shared setting action toggles email scope")
+    Call AssertR11(ApplySettings(False, False, False, reason), "Restore defaults after menu action")
+    Set menuDocument = CreateObject("MSXML2.DOMDocument.6.0")
+    menuDocument.setProperty "SelectionNamespaces", "xmlns:slc='http://schemas.microsoft.com/office/2009/07/customui'"
+    TraceR11 "validate context menu XML"
+    For Each kind In Array("Cell", "Row", "Column", "Table", "CellLayout", "RowLayout", "ColumnLayout", "TableLayout")
+        Call AssertR11(menuDocument.LoadXML(SLC_MenuXml(CStr(kind))), "Generated context XML parses")
+        Call AssertR11(menuDocument.selectNodes("//slc:checkBox").Length = 3, "Every context has three shared settings: " & CStr(kind))
+    Next kind
     n = n + 1
-    Application.StatusBar = "FALSE"
-    ws.Range("B1:B3").Select
-    RunSelection False, firstResult, True
-    If firstResult Is source Then Err.Raise ERR_DATA, , "Equal inputs did not produce evidence"
-    If firstResult.Worksheets.Count <> 4 Then Err.Raise ERR_DATA, , "Report worksheet contract"
-    If mPending Is Nothing Then Err.Raise ERR_DATA, , "Successful compare discarded first list"
-    If mPending.Total <> 3 Then Err.Raise ERR_DATA, , "Repeat comparison changed first list"
-    If VarType(Application.StatusBar) <> vbString Then Err.Raise ERR_DATA, , "Literal FALSE status type changed"
-    If CStr(Application.StatusBar) <> "FALSE" Then Err.Raise ERR_DATA, , "External status text lost"
-    If Not source.Saved Then Err.Raise ERR_DATA, , "Source workbook changed during comparison"
+    mStarted = Timer: mCancelled = False
+    testStage = "report output and rollback"
+    TraceR11 testStage
+    reportResult = SLC_ReportTests()
+    ws.Range("A1:D4").NumberFormat = "@"
+    ws.Range("A1").Value2 = "User@a.test"
+    ws.Range("B1").Value2 = "User@b.test"
+    For i = 0 To 3
+        testStage = "comparison rules " & CStr(i)
+    TraceR11 testStage
+        full = ((i And 1) <> 0): ignore = ((i And 2) <> 0)
+        Call AssertR11(ApplySettings(full, ignore, False, reason), "Apply each rule combination")
+        mSettingsLoaded = False: mFullEmail = Not full: mIgnoreCase = Not ignore: mKeepFirst = True
+        LoadSettings
+        Call AssertR11(mFullEmail = full And mIgnoreCase = ignore And Not mKeepFirst, "Persisted settings reload")
+        Call AssertR11((SLC_Normalize("User@a.test", full, ignore) = SLC_Normalize("User@b.test", full, ignore)) = (Not full), "Email range matrix")
+        Call AssertR11((SLC_Normalize("User@a.test", full, ignore) = SLC_Normalize("user@a.test", full, ignore)) = ignore, "Case matrix")
+        ws.Activate: ws.Range("A1").Select
+        RunSelection True, result, True
+        Call AssertR11(mPending.CompareFullEmail = full And mPending.IgnoreCase = ignore, "Snapshot carries rules")
+        books = Application.Workbooks.Count
+        ws.Range("B1").Select
+        RunSelection False, result, True
+        If full Then
+            Call AssertR11(Not result Is Nothing, "Domain difference has output")
+            Call AssertR11(result.Worksheets.Count = 1, "Single sheet result")
+            result.Close SaveChanges:=False
+            Set result = Nothing
+        Else
+            Call AssertR11(result Is Nothing, "Matching domains need no output")
+            Call AssertR11(Application.Workbooks.Count = books, "No workbook on equality")
+        End If
+        Call AssertR11(mPending Is Nothing, "Default success clears first list")
+        n = n + 1
+    Next i
+    testStage = "invalid stored settings"
+    TraceR11 testStage
+    SaveSetting SETTINGS_APP, scope, SETTINGS_KEY, "2|1|1|1"
+    mSettingsLoaded = False
+    LoadSettings
+    Call AssertR11(Not mFullEmail And Not mIgnoreCase And Not mKeepFirst, "Unknown settings use defaults")
+    Call AssertR11(GetSetting(SETTINGS_APP, scope, SETTINGS_KEY, "") = "2|1|1|1", "Invalid stored value not overwritten by read")
     n = n + 1
-    firstResult.Worksheets(1).Range("B1").Value2 = "User result edit sentinel"
-    PreviewSnapshot preview, True
-    If preview Is firstResult Then Err.Raise ERR_DATA, , "Preview did not create its own workbook"
-    If preview.Worksheets.Count <> 3 Then Err.Raise ERR_DATA, , "Preview worksheet contract"
-    If firstResult.Worksheets(1).Range("B1").Value2 <> "User result edit sentinel" Then Err.Raise ERR_DATA, , "Previous result edited"
-    preview.Close SaveChanges:=False
-    Set preview = Nothing
-    n = n + 1
+    Call AssertR11(ApplySettings(False, False, False, reason), "Reset test defaults")
+    testStage = "equal counts and exclusions"
+    TraceR11 testStage
     source.Activate
-    ws.Range("A1").Value2 = "changed after capture"
+    ws.Range("A1:B3").ClearContents
+    ws.Range("A1:A2").Value2 = "same"
+    ws.Range("B1:B2").Value2 = "same"
+    ws.Range("A3").Value2 = CVErr(xlErrNA)
+    source.Saved = True
+    ws.Range("A1:A3").Select
+    RunSelection True, result, True
+    Set captured = mPending
+    books = Application.Workbooks.Count
     ws.Range("B1:B3").Select
     RunSelection False, result, True
-    If result Is source Or result Is firstResult Then Err.Raise ERR_DATA, , "Repeat result ownership"
-    If result.Worksheets(1).Range("B2").Value2 <> SLC_U("BE44 AD50 0020 B300 C0C1 0020 AC12 00B7 AC1C C218 0020 C77C CE58") Then Err.Raise ERR_DATA, , "Snapshot changed with source"
-    If Not mPending.Counts.Exists(SLC_Normalize("KIM@A.COM")) Then Err.Raise ERR_DATA, , "Snapshot key missing"
-    result.Close SaveChanges:=False
-    Set result = Nothing
+    Call AssertR11(result Is Nothing And mPending Is Nothing, "Same duplicates and excluded error: no output, clear")
+    Call AssertR11(Application.Workbooks.Count = books And source.Saved, "Equal comparison preserves source and documents")
+    Call AssertR11(InStr(EqualityMessage(captured, TestSnapshot(ws.Range("B1:B3"))), SLC_U("CCAB 0020 BAA9 B85D 0020 0031 AC1C")) > 0, "Error exclusion notice")
     n = n + 1
-    ' Deterministic cancellation tests do not claim physical Esc coverage.
+    testStage = "different counts and default clearing"
+    TraceR11 testStage
+    ws.Range("B2").Value2 = "other"
+    ws.Range("A1:A2").Select
+    RunSelection True, firstResult, True
+    ws.Range("B1:B2").Select
+    RunSelection False, firstResult, True
+    Call AssertR11(Not firstResult Is Nothing, "Different values need output")
+    Call AssertR11(mPending Is Nothing, "Difference success clears first list")
+    firstResult.Worksheets(1).Range("B1").Value2 = "User result edit sentinel"
+    n = n + 1
+    testStage = "settings locking and snapshot reuse"
+    TraceR11 testStage
+    Call AssertR11(ApplySettings(False, False, True, reason), "Enable reuse")
+    source.Activate: ws.Range("A1:A2").Select
+    RunSelection True, result, True
+    Set captured = mPending
+    Call AssertR11(Not ApplySettings(True, False, True, reason), "Email rules locked with first list")
+    Call AssertR11(Not ApplySettings(False, True, True, reason), "Case rules locked with first list")
+    Call AssertR11(ApplySettings(False, False, False, reason), "Keep option remains editable")
+    Call AssertR11(ApplySettings(False, False, True, reason), "Keep option can be re-enabled")
     mBusy = True
-    mCancelled = False
+    Call AssertR11(Not ApplySettings(False, False, False, reason), "All settings locked while busy")
+    mBusy = False
+    Call AssertR11(InStr(SLC_MenuXml(), "Settings") > 0 And InStr(SLC_MenuXml(), "&amp;") > 0, "Settings and escaped source in context menu")
+    n = n + 1
+    ws.Range("B2").Value2 = "same"
+    ws.Range("A1").Value2 = "source changed after capture"
+    ws.Range("B1:B2").Select
+    RunSelection False, result, True
+    Call AssertR11(result Is Nothing, "Stored snapshot still matches")
+    Call AssertR11(mPending Is captured, "Reuse preserves snapshot identity")
+    PreviewSnapshot preview, True
+    Call AssertR11(preview.Worksheets.Count = 2, "Explicit preview remains available")
+    preview.Close SaveChanges:=False: Set preview = Nothing
+    n = n + 1
+    testStage = "no comparable values"
+    TraceR11 testStage
+    source.Activate: ws.Range("D1:D3").Select
+    RunSelection False, result, True
+    Call AssertR11(mPending Is captured And result Is Nothing, "No comparable values preserves first list")
+    n = n + 1
+    For i = 0 To 1
+        testStage = "output failure " & CStr(i)
+    TraceR11 testStage
+        Call AssertR11(ApplySettings(False, False, CBool(i), reason), "Both completion policies on failure")
+        source.Activate: ws.Range("A1").Select
+        books = Application.Workbooks.Count
+        mTestOutputFailure = True
+        On Error Resume Next
+        RunSelection False, result, True
+        errNo = Err.Number: Err.Clear
+        On Error GoTo Failed
+        mTestOutputFailure = False
+        Call AssertR11(errNo = ERR_DATA, "Injected output failure observed")
+        Call AssertR11(mPending Is captured, "Output failure preserves first snapshot")
+        Call AssertR11(Application.Workbooks.Count = books, "Failed operation leaked no workbook")
+        Call AssertR11(firstResult.Worksheets(1).Range("B1").Value2 = "User result edit sentinel", "Previous result preserved")
+        n = n + 1
+    Next i
+    testStage = "cancel checkpoint"
+    TraceR11 testStage
+    mBusy = True: mCancelled = False
     SLC_Cancel
-    If Not mCancelled Then Err.Raise ERR_DATA, , "Cancel command did not request cancellation"
-    If InStr(mPhase, SLC_U("CDE8 C18C 0020 C694 CCAD B428")) = 0 Then Err.Raise ERR_DATA, , "Cancel request state missing"
     On Error Resume Next
     PollCancellation
-    errNo = Err.Number
-    Err.Clear
+    errNo = Err.Number: Err.Clear
     On Error GoTo Failed
-    If errNo <> ERR_CANCEL Then Err.Raise ERR_DATA, , "Cancel request did not reach checkpoint"
-    If mPending.Total <> 3 Then Err.Raise ERR_DATA, , "Cancel request lost first list"
-    mBusy = False
-    mCancelled = False
+    Call AssertR11(errNo = ERR_CANCEL And mCancelled, "Cancel request reaches checkpoint")
+    Call AssertR11(mPending Is captured, "Cancel checkpoint preserves snapshot")
+    mBusy = False: mCancelled = False
     n = n + 1
+    testStage = "clear and reset"
+    TraceR11 testStage
     SLC_Clear
-    If Not mPending Is Nothing Then Err.Raise ERR_DATA, , "Clear did not release snapshot"
-    If ws.Range("A1").Value2 <> "changed after capture" Then Err.Raise ERR_DATA, , "Clear changed source"
-    If firstResult.Worksheets(1).Range("B1").Value2 <> "User result edit sentinel" Then Err.Raise ERR_DATA, , "Clear changed older result"
+    SLC_ResetSettings
+    Call AssertR11(mPending Is Nothing, "Explicit clear")
+    Call AssertR11(GetSetting(SETTINGS_APP, scope, SETTINGS_KEY, "") = "1|0|0|0", "Reset saves defaults")
+    Call AssertR11(ws.Range("A1").Value2 = "source changed after capture", "Clear preserves source")
     n = n + 1
-    firstResult.Close SaveChanges:=False
-    Set firstResult = Nothing
-    source.Close SaveChanges:=False
-    Set source = Nothing
+    firstResult.Close SaveChanges:=False: Set firstResult = Nothing
+    source.Close SaveChanges:=False: Set source = Nothing
+    DeleteSetting SETTINGS_APP, scope
+    mSettingsTestSection = ""
     ReleaseStatus
     Set mPending = oldPending
-    mBusy = False
-    mCancelled = oldCancelled
-    mPhase = oldPhase
-    mLastOutcome = oldOutcome
+    mSettingsLoaded = savedLoaded: mFullEmail = savedFull: mIgnoreCase = savedIgnore: mKeepFirst = savedKeep
+    mBusy = False: mCancelled = oldCancelled: mPhase = oldPhase: mLastOutcome = oldOutcome
     Application.StatusBar = oldStatus
     Application.EnableEvents = oldEvents
     Application.EnableCancelKey = oldCancel
     If Not oldBook Is Nothing Then oldBook.Activate
     RefreshUI
-    SLC_UsabilityTests = "PASS: " & CStr(n) & " usability integration checks; " & reportResult & "; " & original
+    ThisWorkbook.Worksheets(1).Range("A1").Formula = savedTestTrace
+    SLC_UsabilityTests = "PASS: " & CStr(n) & " R11 settings/comparison/state checks; " & reportResult
     Exit Function
 Failed:
     errNo = Err.Number: errText = Err.Description
     On Error Resume Next
+    TraceR11 "failed: " & testStage & " / " & CStr(errNo) & " / " & errText
     Application.EnableCancelKey = xlDisabled
+    mTestOutputFailure = False
     If Not result Is Nothing Then result.Close SaveChanges:=False
     If Not preview Is Nothing Then preview.Close SaveChanges:=False
     If Not firstResult Is Nothing Then firstResult.Close SaveChanges:=False
     If Not source Is Nothing Then source.Close SaveChanges:=False
+    TraceR11 "cleanup settings: " & testStage & " / " & CStr(errNo) & " / " & errText
+    If Len(mSettingsTestSection) > 0 Then
+        If Len(GetSetting(SETTINGS_APP, mSettingsTestSection, SETTINGS_KEY, "")) > 0 Then
+            DeleteSetting SETTINGS_APP, mSettingsTestSection
+        End If
+    End If
+    mSettingsTestSection = ""
     ReleaseStatus
     Set mPending = oldPending
-    mBusy = False
-    mCancelled = oldCancelled
-    mPhase = oldPhase
-    mLastOutcome = oldOutcome
+    mSettingsLoaded = savedLoaded: mFullEmail = savedFull: mIgnoreCase = savedIgnore: mKeepFirst = savedKeep
+    mBusy = False: mCancelled = oldCancelled: mPhase = oldPhase: mLastOutcome = oldOutcome
+    TraceR11 "cleanup application state: " & testStage & " / " & CStr(errNo) & " / " & errText
     Application.StatusBar = oldStatus
     Application.EnableEvents = oldEvents
     Application.EnableCancelKey = oldCancel
     If Not oldBook Is Nothing Then oldBook.Activate
     RefreshUI
+    TraceR11 "cleanup complete: " & testStage & " / " & CStr(errNo) & " / " & errText
+    ThisWorkbook.Worksheets(1).Range("A1").Formula = savedTestTrace
     On Error GoTo 0
-    Err.Raise errNo, "SLC_UsabilityTests", errText
+    ' Return a failure to the automation owner instead of opening a VBA error UI.
+    SLC_UsabilityTests = "FAIL: " & testStage & " / " & CStr(errNo) & " / " & errText
+    Exit Function
+InitialStateFailed:
+    SLC_UsabilityTests = "FAIL: initial application state / " & CStr(Err.Number) & " / " & Err.Description
+    On Error Resume Next
+    ThisWorkbook.Worksheets(1).Range("A1").Formula = savedTestTrace
+End Function
+
+Private Sub TraceR11(ByVal stage As String)
+    ' Test-only progress in the add-in's own scratch sheet, never business data.
+    ' The original value is restored before returning; the runtime file is read-only.
+    ThisWorkbook.Worksheets(1).Range("A1").Value2 = stage
+End Sub
+
+Public Function SLC_UiProbe() As String
+    ' Developer check: return a diagnostic without raising a modal test failure.
+    SLC_AttachUI
+    If mUiAttached Then
+        SLC_UiProbe = "PASS: toolbar and settings controls initialized"
+    Else
+        SLC_UiProbe = "FAIL: " & mUiFailure
+    End If
+End Function
+
+Private Sub AssertR11(ByVal condition As Boolean, ByVal label As String)
+    If Not condition Then Err.Raise ERR_DATA, "R11 essential checks", label
+End Sub
+
+Private Function IsOwnMacroBinding(ByVal action As String, ByVal procedureName As String) As Boolean
+    ' Excel may canonicalize a binding to a full path or omit unnecessary quotes.
+    ' The workbook identity and procedure must still match this exact add-in.
+    Dim separator As Long, bookName As String
+    separator = InStrRev(action, "!")
+    If separator = 0 Then Exit Function
+    If StrComp(Mid$(action, separator + 1), procedureName, vbTextCompare) <> 0 Then Exit Function
+    bookName = Left$(action, separator - 1)
+    If Left$(bookName, 1) = "'" And Right$(bookName, 1) = "'" Then
+        bookName = Replace(Mid$(bookName, 2, Len(bookName) - 2), "''", "'")
+    End If
+    IsOwnMacroBinding = (StrComp(bookName, ThisWorkbook.Name, vbTextCompare) = 0 Or _
+        StrComp(bookName, ThisWorkbook.FullName, vbTextCompare) = 0)
 End Function
 
 Private Function TestSnapshot(ByVal rng As Range) As CSLCList

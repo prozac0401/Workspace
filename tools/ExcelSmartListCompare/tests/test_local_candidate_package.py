@@ -33,6 +33,9 @@ class LocalCandidatePackageTests(unittest.TestCase):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes((REPO / name).read_bytes())
+        # This is explicitly an RC10 synthetic fixture, independent of the current release.
+        setup = self.root / pack.TOOL_PATH / "Setup.ps1"
+        setup.write_bytes(setup.read_bytes().replace(b"$InstallerVersion = '0.2.0-rc.11'", b"$InstallerVersion = '0.2.0-rc.10'"))
         (self.root / "artifacts").mkdir()
         self.repo_patch = patch.object(pack, "REPO", self.root)
         self.repo_patch.start()

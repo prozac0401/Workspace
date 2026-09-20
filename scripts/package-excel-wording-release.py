@@ -25,7 +25,9 @@ CHECKS = ("sourceMatchesBinary", "normalizationAndIntegration", "wordingAndState
           "cancellation", "autoLoad", "reinstall", "uninstall", "python", "docs")
 EXCEPTION_CORE_CHECKS = frozenset(("sourceMatchesBinary", "normalizationAndIntegration", "selectionMatrix",
                                "nativeContextMenu", "python", "docs"))
+R11_EXTRA_CHECKS = ("settingsAndState", "outputRollback")
 RC10_EXCEPTION_CORE_CHECKS = frozenset(("sourceMatchesBinary", "normalizationAndIntegration", "python", "docs"))
+R11_EXCEPTION_CORE_CHECKS = RC10_EXCEPTION_CORE_CHECKS | frozenset(R11_EXTRA_CHECKS)
 USER_PACKAGE_FILES = frozenset(("ExcelSmartListCompare.xlam", "Setup.ps1", "Install.cmd",
                                 "Uninstall.cmd", "README.md", "QuickGuide.html", "SHA256SUMS.txt"))
 HTML_NAMES = {
@@ -166,6 +168,9 @@ def validate_ribbon_package(path):
 
 def release_report_layout(rc):
     """Keep current completion evidence and earlier reports in separate files."""
+    if rc >= 11:
+        return {"RC11_USER_GUIDE.md": "QuickGuide.html", "RC11_TEST_REPORT.md": "Completion-Report.html",
+                "RC11_USER_VALIDATION.md": "User-Validation.html", "ADR-0019-R11-release-scope.md": "Publication-Decision.html"}, "Completion-Report.html"
     html_names = dict(HTML_NAMES)
     report = "Wording-Report.html"
     if rc >= 6:
@@ -196,6 +201,8 @@ def release_report_layout(rc):
 
 
 def release_user_guide(rc):
+    if rc >= 11:
+        return "RC11_USER_GUIDE.md"
     return "RC10_USER_GUIDE.md" if rc >= 10 else "RELEASE_README.md"
 
 
@@ -221,13 +228,13 @@ def candidate_readme_text(source, commit):
 
 
 def validate_acceptance_profile(validation, checks, rc, profile):
-    """Explicit RC9/RC10 publication decisions preserve incomplete results."""
+    """Explicit RC9/RC10/R11 publication decisions preserve incomplete results."""
     results = validation["checks"]
     if set(results) != set(checks):
         raise SystemExit("Required validation is incomplete or failed.")
     if profile == "documented-exceptions":
-        if rc not in (9, 10):
-            raise SystemExit("Documented exceptions are defined only for RC9 and RC10.")
+        if rc not in (9, 10, 11):
+            raise SystemExit("Documented exceptions are defined only for RC9, RC10 and R11.")
         decision = validation.get("releaseExceptions", {})
         if (validation.get("releaseProfile") != profile
                 or validation.get("releaseDecision") != "PUBLISH_WITH_RECORDED_RESULTS"
@@ -239,7 +246,11 @@ def validate_acceptance_profile(validation, checks, rc, profile):
                 or decision.get("decisionRecord") != "tools/ExcelSmartListCompare/docs/ADR-0017-RC10-publication.md"
                 or validation.get("fullAcceptancePassed") is not False):
             raise SystemExit("RC10 exceptions require their own publication decision and incomplete acceptance.")
-        core_checks = RC10_EXCEPTION_CORE_CHECKS if rc == 10 else EXCEPTION_CORE_CHECKS
+        if rc == 11 and (validation.get("installerVersion") != "0.2.0-rc.11"
+                or decision.get("decisionRecord") != "tools/ExcelSmartListCompare/docs/ADR-0019-R11-release-scope.md"
+                or validation.get("fullAcceptancePassed") is not False):
+            raise SystemExit("R11 exceptions require their own publication decision and incomplete acceptance.")
+        core_checks = R11_EXCEPTION_CORE_CHECKS if rc == 11 else RC10_EXCEPTION_CORE_CHECKS if rc == 10 else EXCEPTION_CORE_CHECKS
         for name in core_checks:
             result = results[name]
             if not isinstance(result, str) or not (result == "PASS" or result.startswith("PASS:")):
@@ -281,9 +292,9 @@ def main():
     parser.add_argument("--xlam", type=Path, required=True)
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
-    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9", "0.2.0-rc.10"), default=VERSION)
+    parser.add_argument("--installer-version", choices=(VERSION, "0.2.0-rc.6", "0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9", "0.2.0-rc.10", "0.2.0-rc.11"), default=VERSION)
     parser.add_argument("--release-profile", choices=("full", "documented-exceptions"), default="full",
-                        help="Full acceptance by default; RC9/RC10 exceptions require their own explicit authorization metadata.")
+                        help="Full acceptance by default; RC9/RC10/R11 exceptions require their own explicit authorization metadata.")
     args = parser.parse_args()
     version = args.installer_version
     rc = int(version.rsplit(".", 1)[1])
@@ -314,6 +325,8 @@ def main():
         raise SystemExit("Validation does not describe this version and exact XLAM.")
     if rc >= 6 and validation.get("installerSha256") != sha256(TOOL / "Setup.ps1"):
         raise SystemExit("Installer changed after upgrade validation.")
+    if rc >= 11:
+        checks += R11_EXTRA_CHECKS
     incomplete = validate_acceptance_profile(validation, checks, rc, args.release_profile)
     documented_exceptions = args.release_profile == "documented-exceptions"
     source_hashes = {name: text_hash((TOOL / name).read_bytes()) for name in sources}
@@ -354,7 +367,7 @@ def main():
                          html_names=public_report_link_map(report_source, commit, html_names))
     # This input is a reviewed, public summary; raw installer diagnostics stay local.
     (verification / "Validation.json").write_text(json.dumps(validation, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    if rc >= 10:
+    if rc == 10:
         shutil.copyfile(TOOL / "evidence/rc10/e2e-summary.json", verification / "End-to-End-Summary.json")
     (verification / "EXCEL_TEST_RESULT.txt").write_text(validation["checks"]["normalizationAndIntegration"] + "\n", encoding="utf-8")
     (verification / "SOURCE_COMMIT.txt").write_text(commit + "\n", encoding="ascii")
@@ -362,11 +375,11 @@ def main():
         "product": "Excel Smart List Compare", "installerVersion": version,
         "packageRevision": validation.get("packageRevision", 1),
         "sourceCommit": commit, "xlamSha256": digest,
-        "xlamRebuiltThisRun": False, "xlamReused": True,
+        "xlamRebuiltThisRun": rc >= 11, "xlamReused": rc < 11,
         "installerSha256": sha256(TOOL / "Setup.ps1"),
         "sourceTextSha256": source_hashes, "verificationReport": report,
         "userPackageFileSha256": {path.name: sha256(path) for path in sorted(release.iterdir())},
-        "status": "unsigned prerelease",
+        "status": "unsigned package" if rc >= 11 else "unsigned prerelease",
         "releaseProfile": args.release_profile,
         "releaseDecision": validation.get("releaseDecision"), "validationStatus": validation.get("status"),
         "fullAcceptancePassed": not documented_exceptions and all(str(validation["checks"][name]).startswith("PASS") for name in checks),

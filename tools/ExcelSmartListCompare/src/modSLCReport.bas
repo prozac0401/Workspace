@@ -24,6 +24,10 @@ Private Function WriteReport(ByVal a As CSLCList, ByVal b As CSLCList, _
     Dim wb As Workbook, oldBook As Workbook, summary As Worksheet, ws As Worksheet
     Dim oldScreen As Boolean, oldEvents As Boolean, setState As Boolean
     Dim errNo As Long, errText As String
+    ' Equality returns before creating any workbook or changing Excel state.
+    If Not b Is Nothing Then
+        If excessA = 0 And excessB = 0 Then Exit Function
+    End If
     On Error GoTo Failed
     oldScreen = Application.ScreenUpdating
     oldEvents = Application.EnableEvents
@@ -35,19 +39,16 @@ Private Function WriteReport(ByVal a As CSLCList, ByVal b As CSLCList, _
     SLC_WorkCheckpoint
     Set wb = Application.Workbooks.Add(xlWBATWorksheet)
     Set summary = wb.Worksheets(1)
-    summary.Name = SLC_U("C694 C57D")
-    WriteSummary summary, a, b, matched, excessA, excessB
-    If Not b Is Nothing Then
-        SLC_WorkStatus SLC_U("CC28 C774 00B7 C911 BCF5 0020 C791 C131 0020 C911")
-        Set ws = AddSheet(wb, SLC_U("CC28 C774 00B7 C911 BCF5"))
-        WriteDifferences ws, a, b
+    If b Is Nothing Then
+        summary.Name = SLC_U("C694 C57D")
+        WriteSummary summary, a, b, matched, excessA, excessB
+        SLC_WorkStatus SLC_U("C81C C678 00B7 BC1C C0DD C704 CE58 0020 C791 C131 0020 C911")
+        Set ws = AddSheet(wb, SLC_U("C81C C678 00B7 BC1C C0DD C704 CE58"))
+        WriteLocations ws, a, b
+    Else
+        summary.Name = SLC_U("BA85 B2E8 BE44 AD50 005F ACB0 ACFC")
+        WriteDifferences summary, a, b
     End If
-    SLC_WorkStatus SLC_U("C81C C678 00B7 BC1C C0DD C704 CE58 0020 C791 C131 0020 C911")
-    Set ws = AddSheet(wb, SLC_U("C81C C678 00B7 BC1C C0DD C704 CE58"))
-    WriteLocations ws, a, b
-    SLC_WorkStatus SLC_U("ADDC CE59 C73C B85C 0020 AC19 C544 C9C4 0020 AC12 0020 C791 C131 0020 C911")
-    Set ws = AddSheet(wb, SLC_U("ADDC CE59 C73C B85C 0020 AC19 C544 C9C4 0020 AC12"))
-    WriteVariants ws, a, b
     summary.Activate
     summary.Range("A1").Select
     SLC_WorkCheckpoint
@@ -113,11 +114,10 @@ Private Sub WriteSummary(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As 
     rows.Add Array(SLC_U("C624 B958 AC00 0020 C788 B294 0020 ACBD C6B0"), SLC_U("C624 B958 0020 C140 C744 0020 BE80 0020 ACB0 ACFC C774 BBC0 B85C 0020 C6D0 BCF8 0020 C804 CCB4 AC00 0020 AC19 B2E4 ACE0 0020 BCFC 0020 C218 0020 C5C6 C2B5 B2C8 B2E4 002E"), SLC_U("C81C C678 00B7 BC1C C0DD C704 CE58 0020 C2DC D2B8 C5D0 C11C 0020 C624 B958 0020 C885 B958 C640 0020 C704 CE58 0020 D45C BCF8 C744 0020 D655 C778 D558 C138 C694 002E"))
     rows.Add Array(SLC_U("BC1C C0DD C704 CE58 0020 D45C BCF8 0020 002F 0020 C0DD B7B5"), LocationSummary(a), LocationSummary(b))
     rows.Add Array(SLC_U("C624 B958 0020 D45C BCF8 0020 002F 0020 C0DD B7B5"), ErrorSummary(a), ErrorSummary(b))
-    rows.Add Array(SLC_U("C6D0 BB38 0020 BCC0 D615 0020 D45C BCF8 0020 002F 0020 C0DD B7B5"), VariantSummary(a), VariantSummary(b))
-    rows.Add Array(SLC_U("D45C BCF8 0020 D55C B3C4 0020 0028 AC01 0020 BAA9 B85D 0029"), SLC_U("BC1C C0DD C704 CE58 0020 0031 002C 0032 0030 0030 AC1C 0020 002F 0020 C6D0 BB38 0020 BCC0 D615 0020 0036 0030 0030 AC1C 0020 002F 0020 C624 B958 0020 0032 0030 0030 AC1C 002E 0020 BC1C C0DD 00B7 BCC0 D615 C740 0020 BE44 AD50 AC12 B2F9 0020 0035 AC1C AE4C C9C0 002E"), SLC_U("C0DD B7B5 B41C 0020 C6D0 BB38 0020 BCC0 D615 0020 D6C4 BCF4 B294 0020 BBF8 C800 C7A5 0020 BC1C C0DD 0020 C218 C774 BA70 0020 C11C B85C 0020 B2E4 B978 0020 C6D0 BB38 C758 0020 C815 D655 D55C 0020 C218 AC00 0020 C544 B2D9 B2C8 B2E4 002E"))
-    rows.Add Array(SLC_U("BE44 AD50 0020 ADDC CE59"), SLC_U("C21C C11C B97C 0020 BB34 C2DC D558 ACE0 0020 AC19 C740 0020 AC12 C758 0020 AC1C C218 B97C 0020 BE44 AD50 D569 B2C8 B2E4 002E 0020 C774 BA54 C77C C740 0020 0040 0020 C55E BD80 BD84 B9CC 0020 BE44 AD50 D569 B2C8 B2E4 002E"), SLC_U("C22B C790 0020 D45C AE30 00B7 C601 BB38 0020 B300 C18C BB38 C790 00B7 C804 AC01 0020 C601 C22B C790 00B7 C77C BD80 0020 ACF5 BC31 0020 CC28 C774 B294 0020 BB34 C2DC D569 B2C8 B2E4 002E 0020 D14D C2A4 D2B8 0020 0030 0030 0031 0032 0033 ACFC 0020 C22B C790 0020 0031 0032 0033 C740 0020 B2E4 B985 B2C8 B2E4 002E"))
+    rows.Add Array(SLC_U("D45C BCF8 0020 D55C B3C4 0020 0028 AC01 0020 BAA9 B85D 0029"), SLC_U("BC1C C0DD C704 CE58 0020 0031 002C 0032 0030 0030 AC1C 0020 002F 0020 C624 B958 0020 0032 0030 0030 AC1C 002E 0020 BC1C C0DD C704 CE58 B294 0020 BE44 AD50 AC12 B2F9 0020 0035 AC1C AE4C C9C0 002E"), SLC_U("C704 CE58 0020 D45C BCF8 C740 0020 C804 CCB4 0020 BAA9 B85D C774 0020 C544 B2D9 B2C8 B2E4 002E"))
+    rows.Add Array(SLC_U("BE44 AD50 0020 ADDC CE59"), SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), SLC_U("C21C C11C 00B7 C22B C790 0020 D45C AE30 00B7 C804 AC01 0020 C601 C22B C790 00B7 C77C BD80 0020 ACF5 BC31 0020 CC28 C774 B294 0020 BB34 C2DC D569 B2C8 B2E4 002E 0020 D14D C2A4 D2B8 0020 0030 0030 0031 0032 0033 ACFC 0020 C22B C790 0020 0031 0032 0033 C740 0020 B2E4 B985 B2C8 B2E4 002E"))
     rows.Add Array(SLC_U("C6D0 BB38 00B7 C704 CE58 0020 C77D AE30"), SLC_U("B300 D45C 0020 AC12 ACFC 0020 B300 D45C 0020 C8FC C18C B294 0020 CC98 C74C 0020 BC1C ACAC D55C 0020 C140 C785 B2C8 B2E4 002E 0020 C704 CE58 0020 D45C BCF8 C740 0020 D2B9 C815 0020 C140 C774 0020 C798 BABB B410 B2E4 B294 0020 B73B C774 0020 C544 B2D9 B2C8 B2E4 002E"), SLC_U("AE34 0020 C6D0 BB38 C740 0020 C140 C744 0020 C120 D0DD D55C 0020 B4A4 0020 C218 C2DD 0020 C785 B825 C904 C5D0 C11C 0020 D655 C778 D558 C138 C694 002E 0020 C140 C740 0020 C218 C2DD C774 0020 C544 B2CC 0020 D14D C2A4 D2B8 B85C 0020 AE30 B85D D569 B2C8 B2E4 002E"))
-    rows.Add Array(SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C0C1 D0DC"), SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D C740 0020 ACC4 C18D 0020 BCF4 AD00 0020 C911 C785 B2C8 B2E4 002E 0020 BC14 AFB8 AE30 002F BE44 C6B0 AE30 B85C 0020 C0C8 0020 BE44 AD50 B97C 0020 C2DC C791 D558 C138 C694 002E"), SLC_U("C6D0 BCF8 C744 0020 ACE0 CCD0 B3C4 0020 B2F4 C740 0020 AC12 C740 0020 BC14 B00C C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 C218 C815 D55C 0020 C6D0 BCF8 C740 0020 B2E4 C2DC 0020 B2F4 C73C C138 C694 002E"))
+    rows.Add Array(SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C0C1 D0DC"), SLC_CompletionPolicyText(), SLC_U("C6D0 BCF8 C744 0020 ACE0 CCD0 B3C4 0020 B2F4 C740 0020 AC12 C740 0020 BC14 B00C C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 C218 C815 D55C 0020 C6D0 BCF8 C740 0020 B2E4 C2DC 0020 B2F4 C73C C138 C694 002E"))
     rows.Add Array(SLC_U("BCF4 AD00 ACFC 0020 C800 C7A5"), SLC_U("C6D0 BCF8 ACFC 0020 C774 C804 0020 ACB0 ACFC B294 0020 BC14 AFB8 C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 C774 0020 ACB0 ACFC B294 0020 C6D0 D558 B294 0020 C704 CE58 C5D0 0020 C9C1 C811 0020 C800 C7A5 D558 C138 C694 002E"), SLC_U("ACB0 ACFC B294 0020 B2F4 C740 0020 C2DC C810 C758 0020 AE30 B85D C785 B2C8 B2E4 002E 0020 0045 0078 0063 0065 006C C744 0020 C885 B8CC D558 BA74 0020 AE30 C5B5 D55C 0020 BAA9 B85D C740 0020 C0AC B77C C9D1 B2C8 B2E4 002E"))
     InitBuffer buffer, 3
     outRow = 2
@@ -166,17 +166,21 @@ Private Function ErrorSummary(ByVal list As CSLCList) As String
     ErrorSummary = SLC_U("C800 C7A5 0020") & list.ErrorSamples.Count & SLC_U("AC1C 0020 002F 0020 C0DD B7B5 0020") & list.OmittedErrors & SLC_U("AC1C")
 End Function
 
-Private Function VariantSummary(ByVal list As CSLCList) As String
-    If list Is Nothing Then VariantSummary = SLC_U("BE44 AD50 0020 C804"): Exit Function
-    VariantSummary = SLC_U("C800 C7A5 0020") & list.VariantSamples.Count & SLC_U("AC1C 0020 002F 0020 BBF8 C800 C7A5 0020 BCC0 D615 0020 BC1C C0DD 0020") & list.OmittedVariantCandidates & SLC_U("AC1C")
-End Function
-
 Private Sub WriteDifferences(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
     Dim keys As Variant, k As Variant, buffer() As Variant, fill As Long, outRow As Long, tick As Long
-    WriteHeaders ws, Array(SLC_U("C0C1 D0DC"), SLC_U("BE44 AD50 C5D0 0020 C4F4 0020 AC12"), SLC_U("CCAB 0020 BAA9 B85D 0020 B0A8 C740 0020 C218"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 B0A8 C740 0020 C218"), _
-        SLC_U("CCAB 0020 BAA9 B85D 0020 AC1C C218"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 AC1C C218"), SLC_U("CCAB 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), SLC_U("CCAB 0020 BAA9 B85D 0020 B300 D45C 0020 C8FC C18C"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 B300 D45C 0020 C8FC C18C"))
     InitBuffer buffer, 10
-    outRow = 2
+    outRow = 1
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("BA85 B2E8 0020 BE44 AD50 0020 ACB0 ACFC"), SLC_U("AC12 0020 B610 B294 0020 AC1C C218 AC00 0020 B2E4 B978 0020 D56D BAA9"))
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D"), a.Source)
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D"), b.Source)
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("B2F4 C740 0020 C2DC AC01"), Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"), Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("BE44 AD50 0020 B300 C0C1 0020 D56D BAA9"), a.Total, b.Total, SLC_U("C6D0 BCF8 ACFC 0020 C774 C804 0020 ACB0 ACFC B294 0020 BC14 AFB8 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E"))
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("C81C C678 0020 C9D1 ACC4"), ExclusionText(a), ExclusionText(b), SLC_U("C228 AE34 0020 C140 00B7 D544 D130 0020 C81C C678 B294 0020 C77D C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 C624 B958 B97C 0020 BE80 0020 ACB0 ACFC B294 0020 C6D0 BCF8 0020 C804 CCB4 0020 C77C CE58 AC00 0020 C544 B2D9 B2C8 B2E4 002E"))
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("BE44 AD50 0020 AE30 C900"), SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), SLC_CompletionPolicyText())
+    FlushRows ws, buffer, fill, outRow
+    WriteHeaders ws, Array(SLC_U("C0C1 D0DC"), SLC_U("BE44 AD50 C5D0 0020 C4F4 0020 AC12"), SLC_U("CCAB 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), SLC_U("CCAB 0020 BAA9 B85D 0020 AC1C C218"), _
+        SLC_U("B458 C9F8 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 AC1C C218"), SLC_U("CCAB 0020 BAA9 B85D 0020 B0A8 C740 0020 C218"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 B0A8 C740 0020 C218"), SLC_U("CCAB 0020 BAA9 B85D 0020 B300 D45C 0020 C8FC C18C"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 B300 D45C 0020 C8FC C18C")), 8
+    outRow = 9
     keys = a.Counts.Keys
     For Each k In keys
         AddDifference ws, buffer, fill, outRow, a, b, CStr(k)
@@ -189,25 +193,37 @@ Private Sub WriteDifferences(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b
         tick = tick + 1
         If tick Mod 128 = 0 Then SLC_WorkCheckpoint
     Next k
-    If outRow = 2 And fill = 0 Then
-        PutRow ws, buffer, fill, outRow, Array(SLC_U("CC28 C774 00B7 C911 BCF5 0020 C5C6 C74C"), SLC_U("BE44 AD50 0020 B300 C0C1 0020 AC12 00B7 AC1C C218 B294 0020 AC19 C2B5 B2C8 B2E4 002E 0020 C81C C678 0020 C9D1 ACC4 B294 0020 C694 C57D C5D0 C11C 0020 D655 C778 D558 C138 C694 002E"))
-    End If
     FlushRows ws, buffer, fill, outRow
-    FormatTable ws, outRow - 1, 10, True
+    FormatTable ws, outRow - 1, 10, True, 8
     ws.Columns("A").ColumnWidth = 24
-    ws.Columns("B").ColumnWidth = 25
-    ws.Columns("C:F").ColumnWidth = 13
-    ws.Columns("G:H").ColumnWidth = 32
+    ws.Columns("B:C").ColumnWidth = 28
+    ws.Columns("E").ColumnWidth = 28
+    ws.Columns("D").ColumnWidth = 13
+    ws.Columns("F:H").ColumnWidth = 13
     ws.Columns("I:J").ColumnWidth = 18
-    ws.Range("C2:F" & CStr(outRow - 1)).NumberFormat = "0"
+    ws.Range("D9:D" & CStr(outRow - 1)).NumberFormat = "0"
+    ws.Range("F9:H" & CStr(outRow - 1)).NumberFormat = "0"
+    ws.Range("B2:J2").Merge
+    ws.Range("B3:J3").Merge
+    ws.Range("D5:J5").Merge
+    ws.Range("D6:J6").Merge
+    ws.Range("C7:J7").Merge
+    ws.Rows(6).RowHeight = 64
+    ws.Rows(7).RowHeight = 48
+    ws.Range("A1:J1").Font.Bold = True
 End Sub
+
+Private Function ExclusionText(ByVal list As CSLCList) As String
+    ExclusionText = SLC_U("BE48 CE78 0020") & CStr(list.BlankCount) & SLC_U("0020 002F 0020 C624 B958 0020") & CStr(list.ErrorCount) & SLC_U("0020 002F 0020 C81C BAA9 00B7 D569 ACC4 0020") & CStr(list.MetadataCount)
+End Function
+
 
 Private Sub AddDifference(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, _
                           ByRef outRow As Long, ByVal a As CSLCList, ByVal b As CSLCList, ByVal key As String)
     Dim ca As Long, cb As Long, leftA As Long, leftB As Long, status As String
     ca = CountOf(a, key)
     cb = CountOf(b, key)
-    If ca = cb And ca < 2 Then Exit Sub
+    If ca = cb Then Exit Sub
     If ca = 0 Then
         status = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D C5D0 B9CC 0020 C788 C74C")
     ElseIf cb = 0 Then
@@ -218,8 +234,8 @@ Private Sub AddDifference(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRe
         status = SLC_U("C911 BCF5 0020 0028 AC1C C218 0020 C77C CE58 0029")
     End If
     If ca > cb Then leftA = ca - cb Else leftB = cb - ca
-    PutRow ws, buffer, fill, outRow, Array(status, Mid$(key, 4), leftA, leftB, ca, cb, _
-        DictText(a.Examples, key), DictText(b.Examples, key), DictText(a.Addresses, key), DictText(b.Addresses, key))
+    PutRow ws, buffer, fill, outRow, Array(status, Mid$(key, 4), DictText(a.Examples, key), ca, DictText(b.Examples, key), cb, _
+        leftA, leftB, DictText(a.Addresses, key), DictText(b.Addresses, key))
 End Sub
 
 Private Sub WriteLocations(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
@@ -262,52 +278,6 @@ Private Sub AddLocationRows(ByVal ws As Worksheet, ByRef buffer() As Variant, By
     PutRow ws, buffer, fill, outRow, Array(SLC_U("BC1C C0DD C704 CE58 0020 C548 B0B4"), label, "", "", "", LocationSummary(list) & SLC_U("003B 0020 D2B9 C815 0020 C140 C774 0020 C798 BABB B418 C5C8 B2E4 B294 0020 B73B C774 0020 C544 B2D9 B2C8 B2E4 002E"))
     For Each sample In list.OccurrenceSamples
         PutRow ws, buffer, fill, outRow, Array(SLC_U("BC1C C0DD C704 CE58 0020 D45C BCF8"), label, Mid$(CStr(sample(0)), 4), sample(1), sample(2), SLC_U("BAA9 B85D C758 0020 C6D0 BCF8 0020 C704 CE58 B294 0020 C694 C57D C744 0020 D655 C778 D558 C138 C694 002E"))
-    Next sample
-End Sub
-
-Private Sub WriteVariants(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
-    Dim keys As Variant, k As Variant, rawA As String, rawB As String, tick As Long
-    Dim buffer() As Variant, fill As Long, outRow As Long
-    WriteHeaders ws, Array(SLC_U("AD6C BD84"), SLC_U("BE44 AD50 C5D0 0020 C4F4 0020 AC12"), SLC_U("AE30 C900 0020 C6D0 BB38"), SLC_U("AC19 C740 0020 AC12 C73C B85C 0020 BB36 C778 0020 C6D0 BB38"), SLC_U("BAA9 B85D"), SLC_U("AE30 C900 0020 C8FC C18C"), SLC_U("B2E4 B978 0020 C6D0 BB38 0020 C8FC C18C"))
-    InitBuffer buffer, 7
-    outRow = 2
-    If Not b Is Nothing Then
-        keys = a.Counts.Keys
-        For Each k In keys
-            If b.Counts.Exists(CStr(k)) Then
-                rawA = DictText(a.Examples, CStr(k))
-                rawB = DictText(b.Examples, CStr(k))
-                If StrComp(rawA, rawB, vbBinaryCompare) <> 0 Then
-                    PutRow ws, buffer, fill, outRow, Array(SLC_U("B450 0020 BAA9 B85D 0020 B300 D45C 0020 C6D0 BB38 0020 CC28 C774"), Mid$(CStr(k), 4), rawA, rawB, _
-                        SLC_U("CCAB 0020 BC88 C9F8 0020 002F 0020 B450 0020 BC88 C9F8"), DictText(a.Addresses, CStr(k)), DictText(b.Addresses, CStr(k)))
-                End If
-            End If
-            tick = tick + 1
-            If tick Mod 128 = 0 Then SLC_WorkCheckpoint
-        Next k
-    End If
-    AddVariantRows ws, buffer, fill, outRow, a, SLC_U("CCAB 0020 BC88 C9F8")
-    If Not b Is Nothing Then AddVariantRows ws, buffer, fill, outRow, b, SLC_U("B450 0020 BC88 C9F8")
-    If outRow = 2 And fill = 0 Then
-        PutRow ws, buffer, fill, outRow, Array(SLC_U("C800 C7A5 B41C 0020 C6D0 BB38 0020 CC28 C774 0020 C5C6 C74C"), SLC_U("D45C BCF8 C5D0 0020 C5C6 B294 0020 C6D0 BB38 0020 CC28 C774 B294 0020 D655 C778 D560 0020 C218 0020 C5C6 C2B5 B2C8 B2E4 002E 0020 C694 C57D C758 0020 D45C BCF8 0020 D55C B3C4 00B7 C0DD B7B5 0020 C218 B97C 0020 D655 C778 D558 C138 C694 002E"))
-    End If
-    PutRow ws, buffer, fill, outRow, Array(SLC_U("C77D B294 0020 BC29 BC95"), SLC_U("C774 0020 C2DC D2B8 B294 0020 AC19 C740 0020 BE44 AD50 AC12 C73C B85C 0020 BB36 C778 0020 C6D0 BB38 C744 0020 BCF4 C5EC C90D B2C8 B2E4 002E 0020 BAA9 B85D 0020 C804 CCB4 C758 0020 AC12 00B7 AC1C C218 0020 C77C CE58 0020 D310 C815 C740 0020 C694 C57D C744 0020 D655 C778 D558 C138 C694 002E"))
-    FlushRows ws, buffer, fill, outRow
-    FormatTable ws, outRow - 1, 7, True
-    ws.Columns("A").ColumnWidth = 25
-    ws.Columns("B").ColumnWidth = 28
-    ws.Columns("C:D").ColumnWidth = 38
-    ws.Columns("E").ColumnWidth = 22
-    ws.Columns("F:G").ColumnWidth = 18
-End Sub
-
-Private Sub AddVariantRows(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, _
-                           ByRef outRow As Long, ByVal list As CSLCList, ByVal label As String)
-    Dim sample As Variant, key As String
-    For Each sample In list.VariantSamples
-        key = CStr(sample(0))
-        PutRow ws, buffer, fill, outRow, Array(SLC_U("BAA9 B85D 0020 C548 C758 0020 C6D0 BB38 0020 BCC0 D615"), Mid$(key, 4), DictText(list.Examples, key), _
-            sample(1), label, DictText(list.Addresses, key), sample(2))
     Next sample
 End Sub
 
@@ -371,17 +341,17 @@ Private Sub FlushRows(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fi
     SLC_WorkCheckpoint
 End Sub
 
-Private Sub WriteHeaders(ByVal ws As Worksheet, ByVal labels As Variant)
+Private Sub WriteHeaders(ByVal ws As Worksheet, ByVal labels As Variant, Optional ByVal headerRow As Long = 1)
     Dim values() As Variant, i As Long
     ReDim values(1 To 1, 1 To UBound(labels) + 1)
     For i = 0 To UBound(labels)
         values(1, i + 1) = labels(i)
     Next i
-    ws.Cells(1, 1).Resize(1, UBound(labels) + 1).NumberFormat = "@"
-    ws.Cells(1, 1).Resize(1, UBound(labels) + 1).Value2 = values
+    ws.Cells(headerRow, 1).Resize(1, UBound(labels) + 1).NumberFormat = "@"
+    ws.Cells(headerRow, 1).Resize(1, UBound(labels) + 1).Value2 = values
 End Sub
 
-Private Sub FormatTable(ByVal ws As Worksheet, ByVal lastRow As Long, ByVal columns As Long, ByVal filter As Boolean)
+Private Sub FormatTable(ByVal ws As Worksheet, ByVal lastRow As Long, ByVal columns As Long, ByVal filter As Boolean, Optional ByVal headerRow As Long = 1)
     Dim used As Range
     SLC_WorkCheckpoint
     Set used = ws.Cells(1, 1).Resize(lastRow, columns)
@@ -390,18 +360,18 @@ Private Sub FormatTable(ByVal ws As Worksheet, ByVal lastRow As Long, ByVal colu
     used.VerticalAlignment = xlTop
     used.WrapText = True
     used.RowHeight = 32
-    With ws.Cells(1, 1).Resize(1, columns)
+    With ws.Cells(headerRow, 1).Resize(1, columns)
         .Interior.Color = RGB(30, 65, 92)
         .Font.Color = RGB(255, 255, 255)
         .Font.Bold = True
         .RowHeight = 36
     End With
-    If filter Then used.AutoFilter
+    If filter Then ws.Cells(headerRow, 1).Resize(lastRow - headerRow + 1, columns).AutoFilter
     ws.Activate
     With ws.Parent.Windows(1)
         .FreezePanes = False
         .SplitColumn = 0
-        .SplitRow = 1
+        .SplitRow = headerRow
         .FreezePanes = True
     End With
     ws.Range("A1").Select
@@ -420,28 +390,19 @@ Public Function SLC_ReportTests() As String
     Set oldBook = Application.ActiveWorkbook
     oldCancel = Application.EnableCancelKey
     Set sample = New CSLCList
+    sample.IgnoreCase = True
     AddTestValue sample, "case", "A1"
     For i = 1 To 7
         AddTestValue sample, String$(i, " ") & "CASE", "A" & CStr(i + 1)
     Next i
     AssertReport sample.Total = 8 And sample.Counts.Count = 1, "Samples changed comparison counts"
     AssertReport sample.OccurrenceSamples.Count = 5 And sample.OmittedOccurrences = 3, "Per-key occurrence bound"
-    AssertReport sample.VariantSamples.Count = 5 And sample.OmittedVariantCandidates = 2, "Per-key variant bound"
-    AddTestValue sample, " CASE", "A9"
-    AssertReport sample.VariantSamples.Count = 5 And sample.OmittedVariantCandidates = 2, "Known variants should not count as omitted"
     Set sample = New CSLCList
     For i = 1 To 1300
         AddTestValue sample, "item-" & CStr(i), "A" & CStr(i)
     Next i
     AssertReport sample.OccurrenceSamples.Count = 1200 And sample.OmittedOccurrences = 100, "Global occurrence bound"
     AssertReport sample.Total = 1300 And sample.Counts.Count = 1300, "Occurrence truncation changed counts"
-    Set sample = New CSLCList
-    For i = 1 To 605
-        AddTestValue sample, "key-" & CStr(i), "A" & CStr(i)
-        AddTestValue sample, " KEY-" & CStr(i) & " ", "B" & CStr(i)
-    Next i
-    AssertReport sample.VariantSamples.Count = 600 And sample.OmittedVariantCandidates = 5, "Global variant bound"
-    AssertReport sample.Total = 1210 And sample.Counts.Count = 605, "Variant truncation changed counts"
     For i = 1 To 201
         sample.ErrorCount = sample.ErrorCount + 1
         sample.AddError "C" & CStr(i), "#N/A"
@@ -449,6 +410,7 @@ Public Function SLC_ReportTests() As String
     AssertReport sample.ErrorSamples.Count = 200 And sample.OmittedErrors = 1, "Error bound"
     Set a = New CSLCList
     Set b = New CSLCList
+    a.IgnoreCase = True: b.IgnoreCase = True
     a.Source = "=1+1"
     b.Source = "+1+1"
     a.CapturedAt = Now
@@ -467,21 +429,16 @@ Public Function SLC_ReportTests() As String
     AddTestValue b, "abc", "B2"
     AddTestValue b, "=1+1", "B3"
     Set testBook = WriteReport(a, b, 3, 5, 0)
-    AssertReport testBook.Worksheets.Count = 4, "Comparison sheet count"
-    AssertReport testBook.Worksheets(1).Name = SLC_U("C694 C57D"), "Summary sheet"
-    AssertReport testBook.Worksheets(2).Name = SLC_U("CC28 C774 00B7 C911 BCF5"), "Differences sheet"
-    AssertReport testBook.Worksheets(3).Name = SLC_U("C81C C678 00B7 BC1C C0DD C704 CE58"), "Locations sheet"
-    AssertReport testBook.Worksheets(4).Name = SLC_U("ADDC CE59 C73C B85C 0020 AC19 C544 C9C4 0020 AC12"), "Variants sheet"
-    AssertReport CStr(testBook.Worksheets(3).Cells(2, 4).Value2) = "#N/A", "Error label"
-    AssertReport CStr(testBook.Worksheets(3).Cells(2, 5).Value2) = "A9", "Error address"
-    AssertReport CStr(testBook.Worksheets(4).Cells(2, 1).Value2) = SLC_U("B450 0020 BAA9 B85D 0020 B300 D45C 0020 C6D0 BB38 0020 CC28 C774"), "Cross-list normalization evidence"
-    AssertReport CStr(testBook.Worksheets(4).Cells(3, 1).Value2) = SLC_U("BAA9 B85D 0020 C548 C758 0020 C6D0 BB38 0020 BCC0 D615"), "Within-list normalization evidence"
+    AssertReport testBook.Worksheets.Count = 1, "Comparison sheet count"
+    AssertReport testBook.Worksheets(1).Name = SLC_U("BA85 B2E8 BE44 AD50 005F ACB0 ACFC"), "RC9 compatible sheet name"
+    AssertReport testBook.Worksheets(1).Cells(8, 3).Value2 = SLC_U("CCAB 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), "RC9 compatible columns"
+    AssertReport InStr(CStr(testBook.Worksheets(1).Cells(6, 2).Value2), SLC_U("C624 B958 0020 0031")) > 0, "Excluded errors disclosed"
     For Each ws In testBook.Worksheets
         formulaState = ws.UsedRange.HasFormula
         AssertReport Not IsNull(formulaState), "Mixed formulas in report"
         AssertReport Not CBool(formulaState), "Formula activated in report"
         ws.Activate
-        AssertReport testBook.Windows(1).FreezePanes And testBook.Windows(1).SplitRow = 1, "Only header row must be frozen"
+        AssertReport testBook.Windows(1).FreezePanes And testBook.Windows(1).SplitRow = 8, "Comparison header must be frozen at row 8"
     Next ws
     AssertReport Not testBook.Saved, "Result should remain unsaved"
     testBook.Worksheets(1).Range("B1").Value2 = "report rollback sentinel"
@@ -504,13 +461,9 @@ Public Function SLC_ReportTests() As String
     AddTestValue b, "same", "B1"
     a.BlankCount = 1
     Set testBook = WriteReport(a, b, 1, 0, 0)
-    AssertReport testBook.Worksheets.Count = 4, "Identical inputs must have a report"
-    AssertReport CStr(testBook.Worksheets(2).Cells(2, 1).Value2) = SLC_U("CC28 C774 00B7 C911 BCF5 0020 C5C6 C74C"), "Empty differences explanation"
-    AssertReport CLng(testBook.Worksheets(1).Cells(10, 2).Value2) = 1, "Identical result must preserve exclusions"
-    testBook.Close SaveChanges:=False
-    Set testBook = Nothing
+    AssertReport testBook Is Nothing, "Equal values must not create a result"
     Set testBook = WriteReport(a, absent, 0, 0, 0)
-    AssertReport testBook.Worksheets.Count = 3, "Preview sheet count"
+    AssertReport testBook.Worksheets.Count = 2, "Preview sheet count"
     AssertReport CStr(testBook.Worksheets(1).Cells(2, 2).Value2) = SLC_U("B2F4 C740 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 D655 C778 0020 0028 BE44 AD50 0020 C804 0029"), "Preview heading"
     testBook.Close SaveChanges:=False
     Set testBook = Nothing
@@ -518,7 +471,7 @@ Public Function SLC_ReportTests() As String
     Application.EnableCancelKey = oldCancel
     DisarmTestAbort
     mTestAbortFired = False
-    SLC_ReportTests = "PASS: injected cancellation/failure output rollback (not physical Esc); bounded samples, error locations, normalization evidence, 4-sheet comparison, identical report, 3-sheet preview, formula safety, header freeze"
+    SLC_ReportTests = "PASS: injected cancellation/failure output rollback (not physical Esc); bounded samples, error locations, single-sheet differences, no identical report, 2-sheet preview, formula safety, header freeze"
     Exit Function
 Failed:
     errNo = Err.Number
@@ -535,7 +488,7 @@ End Function
 
 Private Sub AddTestValue(ByVal list As CSLCList, ByVal raw As String, ByVal address As String)
     Dim key As String
-    key = SLC_Normalize(raw)
+    key = SLC_Normalize(raw, list.CompareFullEmail, list.IgnoreCase)
     list.Total = list.Total + 1
     list.VisibleCellCount = list.VisibleCellCount + 1
     If list.Counts.Exists(key) Then

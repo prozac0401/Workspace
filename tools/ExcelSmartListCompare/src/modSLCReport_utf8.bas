@@ -24,6 +24,10 @@ Private Function WriteReport(ByVal a As CSLCList, ByVal b As CSLCList, _
     Dim wb As Workbook, oldBook As Workbook, summary As Worksheet, ws As Worksheet
     Dim oldScreen As Boolean, oldEvents As Boolean, setState As Boolean
     Dim errNo As Long, errText As String
+    ' Equality returns before creating any workbook or changing Excel state.
+    If Not b Is Nothing Then
+        If excessA = 0 And excessB = 0 Then Exit Function
+    End If
     On Error GoTo Failed
     oldScreen = Application.ScreenUpdating
     oldEvents = Application.EnableEvents
@@ -35,19 +39,16 @@ Private Function WriteReport(ByVal a As CSLCList, ByVal b As CSLCList, _
     SLC_WorkCheckpoint
     Set wb = Application.Workbooks.Add(xlWBATWorksheet)
     Set summary = wb.Worksheets(1)
-    summary.Name = "요약"
-    WriteSummary summary, a, b, matched, excessA, excessB
-    If Not b Is Nothing Then
-        SLC_WorkStatus "차이·중복 작성 중"
-        Set ws = AddSheet(wb, "차이·중복")
-        WriteDifferences ws, a, b
+    If b Is Nothing Then
+        summary.Name = "요약"
+        WriteSummary summary, a, b, matched, excessA, excessB
+        SLC_WorkStatus "제외·발생위치 작성 중"
+        Set ws = AddSheet(wb, "제외·발생위치")
+        WriteLocations ws, a, b
+    Else
+        summary.Name = "명단비교_결과"
+        WriteDifferences summary, a, b
     End If
-    SLC_WorkStatus "제외·발생위치 작성 중"
-    Set ws = AddSheet(wb, "제외·발생위치")
-    WriteLocations ws, a, b
-    SLC_WorkStatus "규칙으로 같아진 값 작성 중"
-    Set ws = AddSheet(wb, "규칙으로 같아진 값")
-    WriteVariants ws, a, b
     summary.Activate
     summary.Range("A1").Select
     SLC_WorkCheckpoint
@@ -113,11 +114,10 @@ Private Sub WriteSummary(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As 
     rows.Add Array("오류가 있는 경우", "오류 셀을 뺀 결과이므로 원본 전체가 같다고 볼 수 없습니다.", "제외·발생위치 시트에서 오류 종류와 위치 표본을 확인하세요.")
     rows.Add Array("발생위치 표본 / 생략", LocationSummary(a), LocationSummary(b))
     rows.Add Array("오류 표본 / 생략", ErrorSummary(a), ErrorSummary(b))
-    rows.Add Array("원문 변형 표본 / 생략", VariantSummary(a), VariantSummary(b))
-    rows.Add Array("표본 한도 (각 목록)", "발생위치 1,200개 / 원문 변형 600개 / 오류 200개. 발생·변형은 비교값당 5개까지.", "생략된 원문 변형 후보는 미저장 발생 수이며 서로 다른 원문의 정확한 수가 아닙니다.")
-    rows.Add Array("비교 규칙", "순서를 무시하고 같은 값의 개수를 비교합니다. 이메일은 @ 앞부분만 비교합니다.", "숫자 표기·영문 대소문자·전각 영숫자·일부 공백 차이는 무시합니다. 텍스트 00123과 숫자 123은 다릅니다.")
+    rows.Add Array("표본 한도 (각 목록)", "발생위치 1,200개 / 오류 200개. 발생위치는 비교값당 5개까지.", "위치 표본은 전체 목록이 아닙니다.")
+    rows.Add Array("비교 규칙", SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), "순서·숫자 표기·전각 영숫자·일부 공백 차이는 무시합니다. 텍스트 00123과 숫자 123은 다릅니다.")
     rows.Add Array("원문·위치 읽기", "대표 값과 대표 주소는 처음 발견한 셀입니다. 위치 표본은 특정 셀이 잘못됐다는 뜻이 아닙니다.", "긴 원문은 셀을 선택한 뒤 수식 입력줄에서 확인하세요. 셀은 수식이 아닌 텍스트로 기록합니다.")
-    rows.Add Array("첫 번째 목록 상태", "첫 번째 목록은 계속 보관 중입니다. 바꾸기/비우기로 새 비교를 시작하세요.", "원본을 고쳐도 담은 값은 바뀌지 않습니다. 수정한 원본은 다시 담으세요.")
+    rows.Add Array("첫 번째 목록 상태", SLC_CompletionPolicyText(), "원본을 고쳐도 담은 값은 바뀌지 않습니다. 수정한 원본은 다시 담으세요.")
     rows.Add Array("보관과 저장", "원본과 이전 결과는 바꾸지 않습니다. 이 결과는 원하는 위치에 직접 저장하세요.", "결과는 담은 시점의 기록입니다. Excel을 종료하면 기억한 목록은 사라집니다.")
     InitBuffer buffer, 3
     outRow = 2
@@ -166,17 +166,21 @@ Private Function ErrorSummary(ByVal list As CSLCList) As String
     ErrorSummary = "저장 " & list.ErrorSamples.Count & "개 / 생략 " & list.OmittedErrors & "개"
 End Function
 
-Private Function VariantSummary(ByVal list As CSLCList) As String
-    If list Is Nothing Then VariantSummary = "비교 전": Exit Function
-    VariantSummary = "저장 " & list.VariantSamples.Count & "개 / 미저장 변형 발생 " & list.OmittedVariantCandidates & "개"
-End Function
-
 Private Sub WriteDifferences(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
     Dim keys As Variant, k As Variant, buffer() As Variant, fill As Long, outRow As Long, tick As Long
-    WriteHeaders ws, Array("상태", "비교에 쓴 값", "첫 목록 남은 수", "둘째 목록 남은 수", _
-        "첫 목록 개수", "둘째 목록 개수", "첫 목록 원래 값 (예)", "둘째 목록 원래 값 (예)", "첫 목록 대표 주소", "둘째 목록 대표 주소")
     InitBuffer buffer, 10
-    outRow = 2
+    outRow = 1
+    PutRow ws, buffer, fill, outRow, Array("명단 비교 결과", "값 또는 개수가 다른 항목")
+    PutRow ws, buffer, fill, outRow, Array("첫 번째 목록", a.Source)
+    PutRow ws, buffer, fill, outRow, Array("두 번째 목록", b.Source)
+    PutRow ws, buffer, fill, outRow, Array("담은 시각", Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"), Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
+    PutRow ws, buffer, fill, outRow, Array("비교 대상 항목", a.Total, b.Total, "원본과 이전 결과는 바꾸지 않았습니다.")
+    PutRow ws, buffer, fill, outRow, Array("제외 집계", ExclusionText(a), ExclusionText(b), "숨긴 셀·필터 제외는 읽지 않습니다. 오류를 뺀 결과는 원본 전체 일치가 아닙니다.")
+    PutRow ws, buffer, fill, outRow, Array("비교 기준", SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), SLC_CompletionPolicyText())
+    FlushRows ws, buffer, fill, outRow
+    WriteHeaders ws, Array("상태", "비교에 쓴 값", "첫 목록 원래 값 (예)", "첫 목록 개수", _
+        "둘째 목록 원래 값 (예)", "둘째 목록 개수", "첫 목록 남은 수", "둘째 목록 남은 수", "첫 목록 대표 주소", "둘째 목록 대표 주소"), 8
+    outRow = 9
     keys = a.Counts.Keys
     For Each k In keys
         AddDifference ws, buffer, fill, outRow, a, b, CStr(k)
@@ -189,25 +193,37 @@ Private Sub WriteDifferences(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b
         tick = tick + 1
         If tick Mod 128 = 0 Then SLC_WorkCheckpoint
     Next k
-    If outRow = 2 And fill = 0 Then
-        PutRow ws, buffer, fill, outRow, Array("차이·중복 없음", "비교 대상 값·개수는 같습니다. 제외 집계는 요약에서 확인하세요.")
-    End If
     FlushRows ws, buffer, fill, outRow
-    FormatTable ws, outRow - 1, 10, True
+    FormatTable ws, outRow - 1, 10, True, 8
     ws.Columns("A").ColumnWidth = 24
-    ws.Columns("B").ColumnWidth = 25
-    ws.Columns("C:F").ColumnWidth = 13
-    ws.Columns("G:H").ColumnWidth = 32
+    ws.Columns("B:C").ColumnWidth = 28
+    ws.Columns("E").ColumnWidth = 28
+    ws.Columns("D").ColumnWidth = 13
+    ws.Columns("F:H").ColumnWidth = 13
     ws.Columns("I:J").ColumnWidth = 18
-    ws.Range("C2:F" & CStr(outRow - 1)).NumberFormat = "0"
+    ws.Range("D9:D" & CStr(outRow - 1)).NumberFormat = "0"
+    ws.Range("F9:H" & CStr(outRow - 1)).NumberFormat = "0"
+    ws.Range("B2:J2").Merge
+    ws.Range("B3:J3").Merge
+    ws.Range("D5:J5").Merge
+    ws.Range("D6:J6").Merge
+    ws.Range("C7:J7").Merge
+    ws.Rows(6).RowHeight = 64
+    ws.Rows(7).RowHeight = 48
+    ws.Range("A1:J1").Font.Bold = True
 End Sub
+
+Private Function ExclusionText(ByVal list As CSLCList) As String
+    ExclusionText = "빈칸 " & CStr(list.BlankCount) & " / 오류 " & CStr(list.ErrorCount) & " / 제목·합계 " & CStr(list.MetadataCount)
+End Function
+
 
 Private Sub AddDifference(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, _
                           ByRef outRow As Long, ByVal a As CSLCList, ByVal b As CSLCList, ByVal key As String)
     Dim ca As Long, cb As Long, leftA As Long, leftB As Long, status As String
     ca = CountOf(a, key)
     cb = CountOf(b, key)
-    If ca = cb And ca < 2 Then Exit Sub
+    If ca = cb Then Exit Sub
     If ca = 0 Then
         status = "두 번째 목록에만 있음"
     ElseIf cb = 0 Then
@@ -218,8 +234,8 @@ Private Sub AddDifference(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRe
         status = "중복 (개수 일치)"
     End If
     If ca > cb Then leftA = ca - cb Else leftB = cb - ca
-    PutRow ws, buffer, fill, outRow, Array(status, Mid$(key, 4), leftA, leftB, ca, cb, _
-        DictText(a.Examples, key), DictText(b.Examples, key), DictText(a.Addresses, key), DictText(b.Addresses, key))
+    PutRow ws, buffer, fill, outRow, Array(status, Mid$(key, 4), DictText(a.Examples, key), ca, DictText(b.Examples, key), cb, _
+        leftA, leftB, DictText(a.Addresses, key), DictText(b.Addresses, key))
 End Sub
 
 Private Sub WriteLocations(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
@@ -262,52 +278,6 @@ Private Sub AddLocationRows(ByVal ws As Worksheet, ByRef buffer() As Variant, By
     PutRow ws, buffer, fill, outRow, Array("발생위치 안내", label, "", "", "", LocationSummary(list) & "; 특정 셀이 잘못되었다는 뜻이 아닙니다.")
     For Each sample In list.OccurrenceSamples
         PutRow ws, buffer, fill, outRow, Array("발생위치 표본", label, Mid$(CStr(sample(0)), 4), sample(1), sample(2), "목록의 원본 위치는 요약을 확인하세요.")
-    Next sample
-End Sub
-
-Private Sub WriteVariants(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
-    Dim keys As Variant, k As Variant, rawA As String, rawB As String, tick As Long
-    Dim buffer() As Variant, fill As Long, outRow As Long
-    WriteHeaders ws, Array("구분", "비교에 쓴 값", "기준 원문", "같은 값으로 묶인 원문", "목록", "기준 주소", "다른 원문 주소")
-    InitBuffer buffer, 7
-    outRow = 2
-    If Not b Is Nothing Then
-        keys = a.Counts.Keys
-        For Each k In keys
-            If b.Counts.Exists(CStr(k)) Then
-                rawA = DictText(a.Examples, CStr(k))
-                rawB = DictText(b.Examples, CStr(k))
-                If StrComp(rawA, rawB, vbBinaryCompare) <> 0 Then
-                    PutRow ws, buffer, fill, outRow, Array("두 목록 대표 원문 차이", Mid$(CStr(k), 4), rawA, rawB, _
-                        "첫 번째 / 두 번째", DictText(a.Addresses, CStr(k)), DictText(b.Addresses, CStr(k)))
-                End If
-            End If
-            tick = tick + 1
-            If tick Mod 128 = 0 Then SLC_WorkCheckpoint
-        Next k
-    End If
-    AddVariantRows ws, buffer, fill, outRow, a, "첫 번째"
-    If Not b Is Nothing Then AddVariantRows ws, buffer, fill, outRow, b, "두 번째"
-    If outRow = 2 And fill = 0 Then
-        PutRow ws, buffer, fill, outRow, Array("저장된 원문 차이 없음", "표본에 없는 원문 차이는 확인할 수 없습니다. 요약의 표본 한도·생략 수를 확인하세요.")
-    End If
-    PutRow ws, buffer, fill, outRow, Array("읽는 방법", "이 시트는 같은 비교값으로 묶인 원문을 보여줍니다. 목록 전체의 값·개수 일치 판정은 요약을 확인하세요.")
-    FlushRows ws, buffer, fill, outRow
-    FormatTable ws, outRow - 1, 7, True
-    ws.Columns("A").ColumnWidth = 25
-    ws.Columns("B").ColumnWidth = 28
-    ws.Columns("C:D").ColumnWidth = 38
-    ws.Columns("E").ColumnWidth = 22
-    ws.Columns("F:G").ColumnWidth = 18
-End Sub
-
-Private Sub AddVariantRows(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, _
-                           ByRef outRow As Long, ByVal list As CSLCList, ByVal label As String)
-    Dim sample As Variant, key As String
-    For Each sample In list.VariantSamples
-        key = CStr(sample(0))
-        PutRow ws, buffer, fill, outRow, Array("목록 안의 원문 변형", Mid$(key, 4), DictText(list.Examples, key), _
-            sample(1), label, DictText(list.Addresses, key), sample(2))
     Next sample
 End Sub
 
@@ -371,17 +341,17 @@ Private Sub FlushRows(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fi
     SLC_WorkCheckpoint
 End Sub
 
-Private Sub WriteHeaders(ByVal ws As Worksheet, ByVal labels As Variant)
+Private Sub WriteHeaders(ByVal ws As Worksheet, ByVal labels As Variant, Optional ByVal headerRow As Long = 1)
     Dim values() As Variant, i As Long
     ReDim values(1 To 1, 1 To UBound(labels) + 1)
     For i = 0 To UBound(labels)
         values(1, i + 1) = labels(i)
     Next i
-    ws.Cells(1, 1).Resize(1, UBound(labels) + 1).NumberFormat = "@"
-    ws.Cells(1, 1).Resize(1, UBound(labels) + 1).Value2 = values
+    ws.Cells(headerRow, 1).Resize(1, UBound(labels) + 1).NumberFormat = "@"
+    ws.Cells(headerRow, 1).Resize(1, UBound(labels) + 1).Value2 = values
 End Sub
 
-Private Sub FormatTable(ByVal ws As Worksheet, ByVal lastRow As Long, ByVal columns As Long, ByVal filter As Boolean)
+Private Sub FormatTable(ByVal ws As Worksheet, ByVal lastRow As Long, ByVal columns As Long, ByVal filter As Boolean, Optional ByVal headerRow As Long = 1)
     Dim used As Range
     SLC_WorkCheckpoint
     Set used = ws.Cells(1, 1).Resize(lastRow, columns)
@@ -390,18 +360,18 @@ Private Sub FormatTable(ByVal ws As Worksheet, ByVal lastRow As Long, ByVal colu
     used.VerticalAlignment = xlTop
     used.WrapText = True
     used.RowHeight = 32
-    With ws.Cells(1, 1).Resize(1, columns)
+    With ws.Cells(headerRow, 1).Resize(1, columns)
         .Interior.Color = RGB(30, 65, 92)
         .Font.Color = RGB(255, 255, 255)
         .Font.Bold = True
         .RowHeight = 36
     End With
-    If filter Then used.AutoFilter
+    If filter Then ws.Cells(headerRow, 1).Resize(lastRow - headerRow + 1, columns).AutoFilter
     ws.Activate
     With ws.Parent.Windows(1)
         .FreezePanes = False
         .SplitColumn = 0
-        .SplitRow = 1
+        .SplitRow = headerRow
         .FreezePanes = True
     End With
     ws.Range("A1").Select
@@ -420,28 +390,19 @@ Public Function SLC_ReportTests() As String
     Set oldBook = Application.ActiveWorkbook
     oldCancel = Application.EnableCancelKey
     Set sample = New CSLCList
+    sample.IgnoreCase = True
     AddTestValue sample, "case", "A1"
     For i = 1 To 7
         AddTestValue sample, String$(i, " ") & "CASE", "A" & CStr(i + 1)
     Next i
     AssertReport sample.Total = 8 And sample.Counts.Count = 1, "Samples changed comparison counts"
     AssertReport sample.OccurrenceSamples.Count = 5 And sample.OmittedOccurrences = 3, "Per-key occurrence bound"
-    AssertReport sample.VariantSamples.Count = 5 And sample.OmittedVariantCandidates = 2, "Per-key variant bound"
-    AddTestValue sample, " CASE", "A9"
-    AssertReport sample.VariantSamples.Count = 5 And sample.OmittedVariantCandidates = 2, "Known variants should not count as omitted"
     Set sample = New CSLCList
     For i = 1 To 1300
         AddTestValue sample, "item-" & CStr(i), "A" & CStr(i)
     Next i
     AssertReport sample.OccurrenceSamples.Count = 1200 And sample.OmittedOccurrences = 100, "Global occurrence bound"
     AssertReport sample.Total = 1300 And sample.Counts.Count = 1300, "Occurrence truncation changed counts"
-    Set sample = New CSLCList
-    For i = 1 To 605
-        AddTestValue sample, "key-" & CStr(i), "A" & CStr(i)
-        AddTestValue sample, " KEY-" & CStr(i) & " ", "B" & CStr(i)
-    Next i
-    AssertReport sample.VariantSamples.Count = 600 And sample.OmittedVariantCandidates = 5, "Global variant bound"
-    AssertReport sample.Total = 1210 And sample.Counts.Count = 605, "Variant truncation changed counts"
     For i = 1 To 201
         sample.ErrorCount = sample.ErrorCount + 1
         sample.AddError "C" & CStr(i), "#N/A"
@@ -449,6 +410,7 @@ Public Function SLC_ReportTests() As String
     AssertReport sample.ErrorSamples.Count = 200 And sample.OmittedErrors = 1, "Error bound"
     Set a = New CSLCList
     Set b = New CSLCList
+    a.IgnoreCase = True: b.IgnoreCase = True
     a.Source = "=1+1"
     b.Source = "+1+1"
     a.CapturedAt = Now
@@ -467,21 +429,16 @@ Public Function SLC_ReportTests() As String
     AddTestValue b, "abc", "B2"
     AddTestValue b, "=1+1", "B3"
     Set testBook = WriteReport(a, b, 3, 5, 0)
-    AssertReport testBook.Worksheets.Count = 4, "Comparison sheet count"
-    AssertReport testBook.Worksheets(1).Name = "요약", "Summary sheet"
-    AssertReport testBook.Worksheets(2).Name = "차이·중복", "Differences sheet"
-    AssertReport testBook.Worksheets(3).Name = "제외·발생위치", "Locations sheet"
-    AssertReport testBook.Worksheets(4).Name = "규칙으로 같아진 값", "Variants sheet"
-    AssertReport CStr(testBook.Worksheets(3).Cells(2, 4).Value2) = "#N/A", "Error label"
-    AssertReport CStr(testBook.Worksheets(3).Cells(2, 5).Value2) = "A9", "Error address"
-    AssertReport CStr(testBook.Worksheets(4).Cells(2, 1).Value2) = "두 목록 대표 원문 차이", "Cross-list normalization evidence"
-    AssertReport CStr(testBook.Worksheets(4).Cells(3, 1).Value2) = "목록 안의 원문 변형", "Within-list normalization evidence"
+    AssertReport testBook.Worksheets.Count = 1, "Comparison sheet count"
+    AssertReport testBook.Worksheets(1).Name = "명단비교_결과", "RC9 compatible sheet name"
+    AssertReport testBook.Worksheets(1).Cells(8, 3).Value2 = "첫 목록 원래 값 (예)", "RC9 compatible columns"
+    AssertReport InStr(CStr(testBook.Worksheets(1).Cells(6, 2).Value2), "오류 1") > 0, "Excluded errors disclosed"
     For Each ws In testBook.Worksheets
         formulaState = ws.UsedRange.HasFormula
         AssertReport Not IsNull(formulaState), "Mixed formulas in report"
         AssertReport Not CBool(formulaState), "Formula activated in report"
         ws.Activate
-        AssertReport testBook.Windows(1).FreezePanes And testBook.Windows(1).SplitRow = 1, "Only header row must be frozen"
+        AssertReport testBook.Windows(1).FreezePanes And testBook.Windows(1).SplitRow = 8, "Comparison header must be frozen at row 8"
     Next ws
     AssertReport Not testBook.Saved, "Result should remain unsaved"
     testBook.Worksheets(1).Range("B1").Value2 = "report rollback sentinel"
@@ -504,13 +461,9 @@ Public Function SLC_ReportTests() As String
     AddTestValue b, "same", "B1"
     a.BlankCount = 1
     Set testBook = WriteReport(a, b, 1, 0, 0)
-    AssertReport testBook.Worksheets.Count = 4, "Identical inputs must have a report"
-    AssertReport CStr(testBook.Worksheets(2).Cells(2, 1).Value2) = "차이·중복 없음", "Empty differences explanation"
-    AssertReport CLng(testBook.Worksheets(1).Cells(10, 2).Value2) = 1, "Identical result must preserve exclusions"
-    testBook.Close SaveChanges:=False
-    Set testBook = Nothing
+    AssertReport testBook Is Nothing, "Equal values must not create a result"
     Set testBook = WriteReport(a, absent, 0, 0, 0)
-    AssertReport testBook.Worksheets.Count = 3, "Preview sheet count"
+    AssertReport testBook.Worksheets.Count = 2, "Preview sheet count"
     AssertReport CStr(testBook.Worksheets(1).Cells(2, 2).Value2) = "담은 첫 번째 목록 확인 (비교 전)", "Preview heading"
     testBook.Close SaveChanges:=False
     Set testBook = Nothing
@@ -518,7 +471,7 @@ Public Function SLC_ReportTests() As String
     Application.EnableCancelKey = oldCancel
     DisarmTestAbort
     mTestAbortFired = False
-    SLC_ReportTests = "PASS: injected cancellation/failure output rollback (not physical Esc); bounded samples, error locations, normalization evidence, 4-sheet comparison, identical report, 3-sheet preview, formula safety, header freeze"
+    SLC_ReportTests = "PASS: injected cancellation/failure output rollback (not physical Esc); bounded samples, error locations, single-sheet differences, no identical report, 2-sheet preview, formula safety, header freeze"
     Exit Function
 Failed:
     errNo = Err.Number
@@ -535,7 +488,7 @@ End Function
 
 Private Sub AddTestValue(ByVal list As CSLCList, ByVal raw As String, ByVal address As String)
     Dim key As String
-    key = SLC_Normalize(raw)
+    key = SLC_Normalize(raw, list.CompareFullEmail, list.IgnoreCase)
     list.Total = list.Total + 1
     list.VisibleCellCount = list.VisibleCellCount + 1
     If list.Counts.Exists(key) Then

@@ -12,6 +12,7 @@ import subprocess
 
 REPO = Path(__file__).resolve().parents[1]
 INSTALLER = REPO / "tools/ExcelSmartListCompare/installer/SingleFile.iss"
+RC11_VALIDATION = REPO / "tools/ExcelSmartListCompare/evidence/rc11/validation.json"
 RC10_VALIDATION = REPO / "tools/ExcelSmartListCompare/evidence/rc10/validation.json"
 PAYLOAD = {
     "Install.cmd": ("InstallHash", "951b1f054f193c27b9e6acced6c3148c1026356514689b37a5428efad14b9275"),
@@ -52,6 +53,25 @@ def validate_rc10_publication(pins):
     if (validation.get("xlamSha256") != pins["sha256"]["ExcelSmartListCompare.xlam"]
             or validation.get("installerSha256") != pins["sha256"]["Setup.ps1"]):
         raise SystemExit("RC10 publication evidence does not match the selected payload.")
+
+
+def validate_rc11_publication(pins):
+    """Bind RC11 publication to the reviewed public evidence, not local-only metadata."""
+    path = RC11_VALIDATION
+    if (pins.get("releaseDecision") != "PUBLISH_WITH_RECORDED_RESULTS"
+            or pins.get("fullAcceptancePassed") is not False
+            or not path.is_file() or sha256(path) != pins.get("validationSha256")):
+        raise SystemExit("RC11 publication requires pinned matching decision evidence.")
+    validation = json.loads(path.read_text(encoding="utf-8"))
+    spec = importlib.util.spec_from_file_location("slc_publication_gate", REPO / "scripts/package-excel-wording-release.py")
+    gate = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gate)
+    checks = gate.CHECKS + ("windowState", "upgrade", "contextMenuContent", "nativeContextMenu")
+    checks += gate.R11_EXTRA_CHECKS
+    gate.validate_acceptance_profile(validation, checks, 11, "documented-exceptions")
+    if (validation.get("xlamSha256") != pins["sha256"]["ExcelSmartListCompare.xlam"]
+            or validation.get("installerSha256") != pins["sha256"]["Setup.ps1"]):
+        raise SystemExit("RC11 publication evidence does not match the selected payload.")
 
 
 def validate_local_manifest(manifest, pins, source_audit=None, runtime=None, xlam=None):
@@ -113,7 +133,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--release-directory", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
-    parser.add_argument("--engine-version", choices=("0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9", "0.2.0-rc.10"), default="0.2.0-rc.8")
+    parser.add_argument("--engine-version", choices=("0.2.0-rc.7", "0.2.0-rc.8", "0.2.0-rc.9", "0.2.0-rc.10", "0.2.0-rc.11"), default="0.2.0-rc.8")
     parser.add_argument("--release-profile", choices=("full", "documented-exceptions", "local-candidate"), default="full")
     parser.add_argument("--payload-manifest", type=Path, help="Explicit artifacts manifest; only for an RC10 local-candidate wrapper")
     parser.add_argument("--source-audit", type=Path, help="Original exact-file audit; required for local-candidate only")
@@ -123,8 +143,8 @@ def main():
     args = parser.parse_args()
     version = args.engine_version
     profile = args.release_profile
-    if profile == "documented-exceptions" and version not in ("0.2.0-rc.9", "0.2.0-rc.10"):
-        raise SystemExit("The documented-exceptions profile is supported only for RC9 and RC10.")
+    if profile == "documented-exceptions" and version not in ("0.2.0-rc.9", "0.2.0-rc.10", "0.2.0-rc.11"):
+        raise SystemExit("The documented-exceptions profile is supported only for RC9, RC10 and R11.")
     local_candidate = profile == "local-candidate"
     if local_candidate and (version != "0.2.0-rc.10" or args.payload_manifest is None or args.source_audit is None or args.runtime is None):
         raise SystemExit("Local candidate wrapping requires RC10, an explicit payload manifest and original audit/runtime evidence.")
@@ -150,6 +170,8 @@ def main():
             validate_local_manifest(manifest, pins, args.source_audit, args.runtime, args.release_directory / "ExcelSmartListCompare.xlam")
         elif version == "0.2.0-rc.10" and profile == "documented-exceptions":
             validate_rc10_publication(pins)
+        elif version == "0.2.0-rc.11" and profile == "documented-exceptions":
+            validate_rc11_publication(pins)
         payload_hashes = {name: (macro, pins["sha256"][name]) for name, (macro, _) in PAYLOAD.items()}
     output = args.output_directory.resolve()
     if not output.is_relative_to(REPO / "artifacts") or output == REPO / "artifacts" or output.exists():
@@ -205,9 +227,11 @@ def main():
         metadata.update(status="unsigned local test candidate", localOnly=True, fullAcceptancePassed=False,
                         releaseApproved=False, releaseDecision="LOCAL_PACKAGE_ONLY",
                         validationSha256=pins["validationSha256"])
-    elif version == "0.2.0-rc.10" and profile == "documented-exceptions":
+    elif version in ("0.2.0-rc.10", "0.2.0-rc.11") and profile == "documented-exceptions":
         metadata.update(fullAcceptancePassed=False, releaseDecision="PUBLISH_WITH_RECORDED_RESULTS",
                         validationSha256=pins["validationSha256"])
+        if version == "0.2.0-rc.11":
+            metadata["status"] = "unsigned package"
     (output / "OneFile-Build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"exe": str(exe), "bytes": exe.stat().st_size, "sha256": digest,
                       "payloadByteIdenticalToRC7": version.endswith(".7")}, indent=2))

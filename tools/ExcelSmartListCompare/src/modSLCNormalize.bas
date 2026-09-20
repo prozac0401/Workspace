@@ -1,7 +1,8 @@
 Attribute VB_Name = "modSLCNormalize"
 Option Explicit
 
-Public Function SLC_Normalize(ByVal v As Variant) As String
+Public Function SLC_Normalize(ByVal v As Variant, Optional ByVal fullEmail As Boolean = False, _
+                              Optional ByVal ignoreCase As Boolean = False) As String
     Dim s As String
     Dim p As Long
     Dim ok As Boolean
@@ -32,14 +33,12 @@ Public Function SLC_Normalize(ByVal v As Variant) As String
         s = NormalizeWhitespace(s)
     End If
 
-    ' E-mail comparison rule: compare only the local part before @.
+    ' The same explicit rules are frozen with both snapshots.
     p = InStr(1, s, "@", vbBinaryCompare)
-    If p > 1 And p < Len(s) Then
+    If Not fullEmail And p > 1 And p < Len(s) Then
         s = Left$(s, p - 1)
         s = NormalizeWhitespace(s)
     End If
-
-    s = LCase$(s)
 
     ' Numeric text is normalized unless it contains an explicit significant leading zero.
     If Not HasSignificantLeadingZero(s) Then
@@ -50,6 +49,7 @@ Public Function SLC_Normalize(ByVal v As Variant) As String
         End If
     End If
 
+    If ignoreCase Then s = LCase$(s)
     SLC_Normalize = "#t:" & s
 End Function
 
@@ -252,21 +252,25 @@ Public Sub SLC_NormalizeTests()
     CheckEqual SLC_Normalize(123), SLC_Normalize("123"), "number/text"
     CheckEqual SLC_Normalize(123), SLC_Normalize("123.0"), "decimal zero"
     CheckDifferent SLC_Normalize(123), SLC_Normalize("00123"), "leading zero"
-    CheckEqual SLC_Normalize("USER@A.COM"), SLC_Normalize("user@b.com"), "email ID"
+    CheckEqual SLC_Normalize("USER@A.COM"), SLC_Normalize("USER@b.com"), "email ID"
+    CheckDifferent SLC_Normalize("USER@A.COM"), SLC_Normalize("user@b.com"), "case default"
+    CheckEqual SLC_Normalize("USER@A.COM", False, True), SLC_Normalize("user@b.com", False, True), "ignore case option"
+    CheckDifferent SLC_Normalize("user@a.com", True), SLC_Normalize("user@b.com", True), "whole email option"
+    CheckEqual SLC_Normalize("1E3"), SLC_Normalize("1e3"), "numeric exponent case"
     CheckEqual SLC_Normalize("user"), SLC_Normalize("mailto: user@a.com"), "mailto"
     CheckEqual SLC_Normalize(SLC_U("0020 D64D AE38 B3D9 0020")), SLC_Normalize(SLC_U("D64D AE38 B3D9")), "trim"
     CheckDifferent SLC_Normalize(SLC_U("D64D 0020 AE38 B3D9")), SLC_Normalize(SLC_U("D64D AE38 B3D9")), "internal space"
-    CheckEqual SLC_Normalize(SLC_U("FF21 FF22 FF23 FF11 FF12 FF13")), SLC_Normalize("abc123"), "fullwidth ASCII"
+    CheckEqual SLC_Normalize(SLC_U("FF21 FF22 FF23 FF11 FF12 FF13")), SLC_Normalize("ABC123"), "fullwidth ASCII"
     CheckEqual SLC_Normalize("1.23e2"), SLC_Normalize(123), "exponent"
     CheckEqual SLC_Normalize("-0.00"), SLC_Normalize(0), "negative zero"
     CheckDifferent SLC_Normalize("1,234"), SLC_Normalize(1234), "comma literal"
     CheckDifferent SLC_Normalize(True), SLC_Normalize(-1), "boolean"
     CheckEqual SLC_Normalize(" " & ChrW(160)), "", "empty normalized"
     CheckEqual SLC_Normalize("9007199254740993"), "#n:9007199254740993", "long text precision"
-    CheckEqual SLC_Normalize(SLC_U("D64D AE38 B3D9 FF21 FF01 FF5E")), SLC_U("0023 0074 003A D64D AE38 B3D9 0061 0021 007E"), "mixed Unicode narrowing"
-    CheckEqual SLC_Normalize(String$(4096, SLC_U("FF21"))), "#t:" & String$(4096, "a"), "maximum-length narrowing"
+    CheckEqual SLC_Normalize(SLC_U("D64D AE38 B3D9 FF21 FF01 FF5E")), SLC_U("0023 0074 003A D64D AE38 B3D9 0041 0021 007E"), "mixed Unicode narrowing"
+    CheckEqual SLC_Normalize(String$(4096, SLC_U("FF21"))), "#t:" & String$(4096, "A"), "maximum-length narrowing"
     CheckEqual SLC_Normalize(ChrW(&HFF00) & SLC_U("FF21") & ChrW(&HFF5F)), _
-        "#t:" & ChrW(&HFF00) & "a" & ChrW(&HFF5F), "narrowing boundaries"
+        "#t:" & ChrW(&HFF00) & "A" & ChrW(&HFF5F), "narrowing boundaries"
 End Sub
 
 Private Sub CheckEqual(ByVal a As String, ByVal b As String, ByVal label As String)

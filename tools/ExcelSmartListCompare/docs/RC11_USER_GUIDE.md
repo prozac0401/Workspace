@@ -1,6 +1,4 @@
-# Excel 명단 비교
-
-**Excel 명단 비교 0.2.0 R11** · [설치 파일](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.11) · [설치·사용 안내](docs/RC11_USER_GUIDE.md)
+# Excel 명단 비교 0.2.0 R11
 
 두 목록의 값과 개수가 같은지 확인합니다. 같으면 짧게 알려주고, 차이가 있을 때만 새 Excel 결과 파일을 만듭니다.
 
