@@ -2,7 +2,7 @@
 
 도구 ID: ExcelSmartListCompare / EXCEL-LIST-COMPARE
 
-명세 버전·상태: 0.3 · 2026-09-20 · **R11 구현·필수 검사·패키지 제작 완료. 게시와 전체 인수 상태는 검증 기록 참조**
+명세 버전·상태: 0.3 · 2026-09-20 · **R11 구현·필수 검사·GitHub 배포 완료. 전체 인수 상태는 검증 기록 참조**
 
 제품 책임: 도구 개발·검증 담당
 
@@ -143,6 +143,6 @@ Excel 설정과 상태표시줄의 값·형식을 복원하는 기존 요구를 
 | 요구사항·설정 경로·기본값·복구 조건·인수 기준 | 이 명세에 반영 |
 | R11 제품 코드·XLAM·설치 패키지 | 구현, 최종 XLAM의 실제 필수 검사, EXE·ZIP 제작 및 구성 검사 완료 |
 | R11 자동 기능 검사·실제 Excel·성능·설치 검증 | 빠른 검사 166개와 실제 Excel 필수 기능 PASS. 성능·실제 입력·설치 수명주기 등 분리한 항목은 [검증 기록](../../../tools/ExcelSmartListCompare/docs/RC11_TEST_REPORT.md) 참조 |
-| R11 배포 | GitHub 게시 진행 중. 게시 후 배포 파일·다운로드 해시·Pages 기록으로 확인 |
+| R11 배포 | GitHub 자산 8개 게시, 공개 다운로드 해시 일치, Pages R11 안내 확인. [배포 기록](../../../tools/ExcelSmartListCompare/evidence/rc11/publication.json) 참조 |
 
 문서 빌드나 링크 검사는 R11 기능 검증을 대신하지 않는다. RC9·RC10의 당시 PASS·FAIL·PARTIAL·NOT_RUN과 전체 인수 판정은 해당 버전 기록으로 유지한다.

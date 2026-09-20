@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "product": "ExcelSmartListCompare",
+  "version": "0.2.0-rc.11",
+  "status": "PUBLISHED",
+  "releaseUrl": "https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.11",
+  "publishedAtUtc": "2026-09-20T01:58:25Z",
+  "tag": "excel-smart-list-compare-v0.2.0-rc.11",
+  "artifactSourceCommit": "4c2036239bd909265201fabea2afdf90f11dfbd3",
+  "implementationMergeCommit": "05ef00bdc74e8a6d0c2b57e5bb321ebd52962428",
+  "pullRequest": "https://github.com/prozac0401/Workspace/pull/1",
+  "pullRequestState": "MERGED",
+  "preMergeDocumentationCi": "PASS",
+  "preMergeWindowsBuildCi": "PASS",
+  "documentationCiUrl": "https://github.com/prozac0401/Workspace/actions/runs/35482694966",
+  "windowsCiUrl": "https://github.com/prozac0401/Workspace/actions/runs/35482694931",
+  "gitHubPrereleaseFlag": true,
+  "fullAcceptancePassed": false,
+  "validationSha256": "a94206cfbb0ef770343c431d5ff3d77ffb2f2fc2053b5669852c0f2dcbdc0fc4",
+  "xlamSha256": "9b37c2f05318ef4500784978f62c0ea948bd2e703ef3e5590874c0ef89988176",
+  "fileVersion": "0.2.0.11001",
+  "installerExecutedOnUserPc": false,
+  "assets": [
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.11-Setup.exe",
+      "sha256": "c1d0539240f3ae0b0b07d9ffb884836e12829e0db14777d65cdb90524452423e",
+      "bytes": 2247166,
+      "url": "https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.11/ExcelSmartListCompare-0.2.0-rc.11-Setup.exe",
+      "downloadVerification": "PASS"
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.11-Setup.exe.sha256",
+      "sha256": "7caf1d57feac8b54455952720e1861007b0f13d50461208c190f24ae5fe05060",
+      "bytes": 111,
+      "url": "https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.11/ExcelSmartListCompare-0.2.0-rc.11-Setup.exe.sha256",
+      "downloadVerification": "PASS"
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.11-Source.zip",
+      "sha256": "bc6669a87ead3a98e5603ddaf499aecb610fd8ff1e730dd380b61498e38770d6",
+      "bytes": 9628351,
+      "url": "https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.11/ExcelSmartListCompare-0.2.0-rc.11-Source.zip",
+      "downloadVerification": "PASS"
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.11-Source.zip.sha256",
+      "sha256": "d1b630c951a0f2e5872c0a1c70ea1345333aaa763c4e168c6e1b4ae06cbc9c0c",
+      "bytes": 112,
+      "url": "https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.11/ExcelSmartListCompare-0.2.0-rc.11-Source.zip.sha256",
+      "downloadVerification": "PASS"
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.11-Verification.zip",
+      "sha256": "4049ba8c6d431faa16264e5f0ec7161eefe8eaac9d5970951df7c94a6f72ab97",
+      "bytes": 25546,
+      "url": "https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.11/ExcelSmartListCompare-0.2.0-rc.11-Verification.zip",
+      "downloadVerification": "PASS"
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.11-Verification.zip.sha256",
+      "sha256": "2805b4a74c3b555c6ecaec4c33ae17822aedd5c02e2573e1c549fa8cda2f3d8e",
+      "bytes": 118,
+      "url": "https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.11/ExcelSmartListCompare-0.2.0-rc.11-Verification.zip.sha256",
+      "downloadVerification": "PASS"
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.11-win-x64.zip",
+      "sha256": "d6d245baaf5a34d46e661dade0ee8b62c33a39488160c043cd6979d186bbd199",
+      "bytes": 156475,
+      "url": "https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.11/ExcelSmartListCompare-0.2.0-rc.11-win-x64.zip",
+      "downloadVerification": "PASS"
+    },
+    {
+      "name": "ExcelSmartListCompare-0.2.0-rc.11-win-x64.zip.sha256",
+      "sha256": "f68674582789f3fbada43ff0d94b0185cd25dc329d5c7e39d129a65db79b339f",
+      "bytes": 113,
+      "url": "https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.11/ExcelSmartListCompare-0.2.0-rc.11-win-x64.zip.sha256",
+      "downloadVerification": "PASS"
+    }
+  ],
+  "publicDownloadVerification": {
+    "status": "PASS",
+    "assetCount": 8,
+    "authentication": "none",
+    "verifiedAtUtc": "2026-09-20T01:59:37.220972+00:00"
+  },
+  "pages": {
+    "status": "PASS",
+    "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/",
+    "httpStatus": 200,
+    "dateUtc": "2026-09-20T02:01:47.945883+00:00",
+    "sha256": "9bf79e0b21b14120872b8dc8dbd7959b6ba5229fb3b0d894a4af08d4d81bab0c",
+    "r11GuideAndDownloadLinks": true,
+    "workflowUrl": "https://github.com/prozac0401/Workspace/actions/runs/35482843759",
+    "workflowStatus": "PASS",
+    "deploymentCommit": "05ef00bdc74e8a6d0c2b57e5bb321ebd52962428"
+  },
+  "userValidation": "tools/ExcelSmartListCompare/docs/RC11_USER_VALIDATION.md",
+  "deferredOrPartialChecks": [
+    "wordingAndState",
+    "selectionMatrix",
+    "cancellation",
+    "autoLoad",
+    "reinstall",
+    "uninstall",
+    "windowState",
+    "upgrade",
+    "contextMenuContent",
+    "nativeContextMenu"
+  ],
+  "notes": "Artifacts remain pinned to their build commit. Later repository-only publication records do not change the released XLAM, installer or archives."
+}

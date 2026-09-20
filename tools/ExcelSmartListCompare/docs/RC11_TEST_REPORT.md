@@ -1,6 +1,6 @@
 # Excel 명단 비교 R11 검증 기록
 
-버전: 0.2.0-rc.11 · 날짜: 2026-09-20 · 상태: 필수 검사·패키지 제작 완료, GitHub 게시 진행 중
+버전: 0.2.0-rc.11 · 날짜: 2026-09-20 · 상태: 필수 검사·패키지 제작·GitHub 배포 완료, 전체 인수는 미완료
 
 [배포 범위 결정](ADR-0019-R11-release-scope.md)에 따라 빠른 필수 검사 후 게시하고, 오래 걸리는 실제 환경 검증은 [사용자 검증 안내](RC11_USER_VALIDATION.md)로 분리한다. 아직 실행하지 않은 항목을 PASS로 표시하지 않는다.
 
@@ -18,9 +18,12 @@
 | 정상 종료·설정 복원·기존 설치 보존 | PASS | 최종 제작용 Excel 정상 종료, 임시 VBA 접근 원상 복원, 기존 RC9 파일 5개와 등록 상태 보존 |
 | EXE·ZIP 제작 및 구성·해시 확인 | PASS | Inno Setup EXE 컴파일, 7개 파일 설치 ZIP, 소스·검증 ZIP, 압축 무결성·파일 해시·로컬 안내 링크 확인. 사용자 설치 실행은 하지 않음 |
 | R11 문서 빌드·공개 범위·로컬 링크 | PASS | strict 빌드와 공개 15페이지·404·검색·사이트맵·자산 검사. 최종 갱신 후 다시 확인 |
-| GitHub 게시·다운로드 검증 | 게시 후 기록 | 이 문서는 패키지 제작 시점의 검사 결과다. 게시 주소와 최종 배포 파일 해시는 저장소의 배포 기록 및 각 자산의 `.sha256` 파일로 확인 |
+| GitHub 게시·다운로드 검증 | PASS | EXE·설치 ZIP·소스 ZIP·검증 ZIP과 각각의 SHA-256 파일, 총 8개 자산 게시. 인증 없이 다시 내려받은 모든 바이트가 제작본과 일치 |
+| main 반영·웹 안내 배포 | PASS | PR #1 병합. GitHub 문서·Windows 빌드 CI 통과. Pages 배포 성공과 실제 R11 안내·다운로드 링크 HTTP 200 확인 |
 
 실행 환경은 Windows 11 빌드 22631, Excel 16.0 빌드 20326 64비트, Windows PowerShell 5.1이다. 공개 요약은 별도 Verification.zip의 `Validation.json`에 포함하며 원시 사용자 경로·프로세스·설치 로그는 게시하지 않는다.
+
+[R11 배포](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.11) · [파일 해시·다운로드·웹 배포 기록](https://github.com/prozac0401/Workspace/blob/main/tools/ExcelSmartListCompare/evidence/rc11/publication.json). 배포 파일은 제작 커밋 `4c2036239bd909265201fabea2afdf90f11dfbd3`에 고정했다. 이 저장소 문서의 게시 후 기록 추가는 이미 배포한 파일을 바꾸지 않는다.
 
 ## 수정 과정에서 관찰한 결과
 
