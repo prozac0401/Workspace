@@ -101,7 +101,7 @@ try{
     Assert-OnlyCandidate
     $q="'"+([string]$book.Name).Replace("'","''")+"'!"
     $audit.releaseVersion=[string]$script:Excel.Run($q+'SLC_ReleaseVersion')
-    if($audit.releaseVersion -cne '0.2.0-rc.10'){throw 'This usability harness expects the RC10 candidate.'}
+    if($audit.releaseVersion -notin @('0.2.0-rc.10','0.2.0-rc.11')){throw 'This usability harness expects an RC10 or R11 candidate.'}
     foreach($name in @('SLC_TestAll','SLC_UsabilityTests')){
         Assert-OnlyCandidate
         $timer=[Diagnostics.Stopwatch]::StartNew()

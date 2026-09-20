@@ -3,7 +3,8 @@
 param(
     [Parameter(Mandatory=$true)][string]$OutputDirectory,
     [switch]$ApprovedTemporaryVbaAccess,
-    [switch]$ProbeOnly
+    [switch]$ProbeOnly,
+    [ValidateSet('0.2.0-rc.10','0.2.0-rc.11')][string]$ExpectedReleaseVersion='0.2.0-rc.11'
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
@@ -33,7 +34,7 @@ $audit=[ordered]@{
     accessAfter=$null;accessRestored=$null;externalSecurityChangeDetected=$false
     installedBaseline=$null;installedPreserved=$null;installedTests='NOT_RUN';nativeInputTests='NOT_RUN';releaseApproved=$false
 }
-$excel=$null;$process=$null;$bootstrap=$null;$bootstrapBook=$null;$candidateBook=$null;$probeBook=$null
+$excel=$null;$process=$null;$bootstrap=$null;$bootstrapBook=$null;$candidateBook=$null;$probeBook=$null;$harnessBook=$null
 $installedPath=$null;$installedManifest=$null;$installedSnapshot=$null;$securityPath=$null
 $accessSnapshotTaken=$false;$securityWritten=$false;$unknownBooks=$false;$ownedBooks=New-Object Collections.ArrayList
 $mutex=$null;$locked=$false;$exitCode=1
@@ -319,7 +320,7 @@ public static class SlcIsolatedBinding {
             $codeModule.AddFromString($events);Record-SourceAudit 'ThisWorkbook' $events ([string]$codeModule.Lines(1,$codeModule.CountOfLines))
             $project.Name='SLC2026';$audit.inMemoryImportAudit='PASS'
         }finally{Release-Com $codeModule;Release-Com $component;Release-Com $components;Release-Com $project}
-        $candidate=Join-Path $output ('ExcelSmartListCompare-RC10-'+[Guid]::NewGuid().ToString('N')+'.xlam')
+        $candidate=Join-Path $output ('ExcelSmartListCompare-'+$ExpectedReleaseVersion+'-'+[Guid]::NewGuid().ToString('N')+'.xlam')
         $candidateBook.IsAddin=$true;$candidateBook.SaveAs($candidate,55)
         Close-OwnedBook $candidateBook;$candidateBook=$null
         Write-PackageMetadata $candidate (Join-Path $sourceSnapshot 'customUI14.xml')
@@ -327,13 +328,19 @@ public static class SlcIsolatedBinding {
         $audit.expectedSha256=Hash-File $candidate;$audit.actualSha256=$audit.expectedSha256
         $audit.phase='candidate-saved';Save-Audit
         Assert-OwnedWorkspace
+        Set-Phase 'before-saved-candidate-reopen'
         $candidateBook=$excel.Workbooks.Open($candidate,0,$true);[void]$ownedBooks.Add($candidateBook)
+        Set-Phase 'after-saved-candidate-reopen'
         if([IO.Path]::GetFullPath([string]$candidateBook.FullName) -ine $candidate -or -not [bool]$candidateBook.IsAddin){throw 'Exact saved candidate was not reopened.'}
         $audit.sourceStage='serialized';Assert-SerializedSource $candidateBook;$audit.serializedSourceAudit='PASS'
         $q="'"+([string]$candidateBook.Name).Replace("'","''")+"'!"
         $audit.releaseVersion=[string]$excel.Run($q+'SLC_ReleaseVersion')
-        if($audit.releaseVersion -cne '0.2.0-rc.10'){throw 'Saved candidate release version mismatch.'}
-        foreach($name in @('SLC_TestAll','SLC_UsabilityTests')){
+        if($audit.releaseVersion -cne $ExpectedReleaseVersion){throw 'Saved candidate release version mismatch.'}
+        # A normal workbook provides the same active-window context as use of
+        # the add-in. Keep ownership explicit and close it with the other books.
+        $harnessBook=$excel.Workbooks.Add(-4167);[void]$ownedBooks.Add($harnessBook)
+        $audit.harnessWorkbookName=[string]$harnessBook.Name;Save-Audit
+        foreach($name in @('SLC_UiProbe','SLC_TestAll','SLC_UsabilityTests')){
             Assert-OwnedWorkspace
             $audit.phase=$name;Save-Audit
             $watch=[Diagnostics.Stopwatch]::StartNew();$result=[string]$excel.Run($q+$name);$watch.Stop()
@@ -342,6 +349,8 @@ public static class SlcIsolatedBinding {
             Save-Audit;Assert-OwnedWorkspace
             if(-not $passed){throw ('Candidate test failed: '+$name)}
         }
+        $audit.phase='detach-candidate-ui';Save-Audit
+        [void]$excel.Run($q+'SLC_DetachUI')
         Close-OwnedBook $candidateBook;$candidateBook=$null
         $audit.finalSha256=Hash-File $candidate
         if($audit.finalSha256 -cne $audit.expectedSha256){throw 'Candidate bytes changed during read-only testing.'}
@@ -358,7 +367,7 @@ public static class SlcIsolatedBinding {
         if(-not $unknownBooks){try{Assert-OwnedApplication;Set-Phase 'before-owned-excel-quit';$excel.Quit();Set-Phase 'after-owned-excel-quit'}catch{$audit.cleanupErrors+=@($_.Exception.Message)}}
         Release-Com $excel;$excel=$null
     }
-    $candidateBook=$null;$probeBook=$null;$bootstrapBook=$null
+    $candidateBook=$null;$probeBook=$null;$bootstrapBook=$null;$harnessBook=$null
     $project=$null;$components=$null;$component=$null;$codeModule=$null;$native=$null
     $observed=$null;$owned=$null
     [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect();[GC]::WaitForPendingFinalizers()

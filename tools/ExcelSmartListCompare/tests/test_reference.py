@@ -39,7 +39,7 @@ def canonical(s):
     return out
 
 
-def normalize(v):
+def normalize(v, full_email=False, ignore_case=False):
     if v is None or v is ERROR:
         return ''
     if isinstance(v, (int, float)) and not isinstance(v, bool):
@@ -54,13 +54,12 @@ def normalize(v):
     if s[:7].lower() == 'mailto:':
         s = whitespace(s[7:])
     p = s.find('@')
-    if 0 < p < len(s)-1:
+    if not full_email and 0 < p < len(s)-1:
         s = whitespace(s[:p])
-    s = s.lower()
-    integer = re.split('[.e]', s.lstrip('+-'))[0]
+    integer = re.split('[.eE]', s.lstrip('+-'))[0]
     leading = len(integer) > 1 and integer[0] == '0'
     number = None if leading else canonical(s)
-    return '#n:' + number if number is not None else '#t:' + s
+    return '#n:' + number if number is not None else '#t:' + (s.lower() if ignore_case else s)
 
 
 def snapshot(cells, rects, hidden_rows=(), hidden_cols=(), metadata=()):
@@ -92,17 +91,17 @@ class NormalizationTests(unittest.TestCase):
     def test_decimal_zero(self): self.assertEqual(normalize(123), normalize('123.0'))
     def test_leading_zero(self): self.assertNotEqual(normalize(123), normalize('00123'))
     def test_leading_signed_zero(self): self.assertNotEqual(normalize(-123), normalize('-00123'))
-    def test_email_domain_ignored(self): self.assertEqual(normalize('USER@a.com'), normalize('user@b.com'))
+    def test_email_domain_ignored(self): self.assertEqual(normalize('USER@a.com'), normalize('USER@b.com'))
     def test_email_plain(self): self.assertEqual(normalize(' user@a.com '), normalize('user'))
     def test_mailto(self): self.assertEqual(normalize('mailto: user@a.com'), normalize('user'))
     def test_email_leading_zero(self): self.assertEqual(normalize('00123@a.com'), normalize('00123'))
     def test_email_numeric(self): self.assertEqual(normalize('123@a.com'), normalize(123))
-    def test_case(self): self.assertEqual(normalize('ABC'), normalize('abc'))
+    def test_case(self): self.assertNotEqual(normalize('ABC'), normalize('abc'))
     def test_trim(self): self.assertEqual(normalize(' 홍길동 '), normalize('홍길동'))
     def test_internal_space(self): self.assertNotEqual(normalize('홍 길동'), normalize('홍길동'))
     def test_nbsp(self): self.assertEqual(normalize('\u00a0a\u00a0'), normalize('a'))
     def test_zero_width(self): self.assertEqual(normalize('\ufeffa\u200b'), normalize('a'))
-    def test_fullwidth(self): self.assertEqual(normalize('ＡＢＣ１２３'), normalize('abc123'))
+    def test_fullwidth(self): self.assertEqual(normalize('ＡＢＣ１２３'), normalize('ABC123'))
     def test_scientific(self): self.assertEqual(normalize('1.23e2'), normalize(123))
     def test_negative_zero(self): self.assertEqual(normalize('-0.0'), normalize(0))
     def test_comma_literal(self): self.assertNotEqual(normalize('1,234'), normalize(1234))

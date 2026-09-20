@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "product": "ExcelSmartListCompare",
+  "installerVersion": "0.2.0-rc.11",
+  "packageRevision": 1,
+  "date": "2026-09-20",
+  "status": "PARTIAL",
+  "releaseProfile": "documented-exceptions",
+  "releaseDecision": "PUBLISH_WITH_RECORDED_RESULTS",
+  "fullAcceptancePassed": false,
+  "xlamSha256": "9b37c2f05318ef4500784978f62c0ea948bd2e703ef3e5590874c0ef89988176",
+  "installerSha256": "f91e3cb524255318626a5c3a41c7033779f75d6a06b19b06e5f111eb39a894af",
+  "sourceTextSha256": {
+    "src/CSLCList.cls": "eb0c6f5805b30616212f2c7e0382a71da2038396507a1bbce8f783e9f84db38d",
+    "src/CSLCAppEvents.cls": "1422aec4fb85ae03241362502982018afea128e2fee6a623b9fffca0fe977247",
+    "src/modSLCNormalize.bas": "9b701a0dd79964783ed651afc49ae5e1bf16510a7e9ada7e0029c68e2014c5df",
+    "src/modSLCMain.bas": "e516cbf78adb1d74a1d19909b370dd3c190d78870afe5a365a8c08fcac41a25c",
+    "src/modSLCReport.bas": "0a9ab2c3801cf82625954f43e208d90148ad702927262ae7a8a75f395f611887",
+    "src/ThisWorkbook_events.txt": "8e3dd984a00a569f6c46bc998a2f0f8f68138435f8d934e9dc86ae23c6c7f5ec",
+    "src/customUI14.xml": "3f1ca3b18affc986f4c9c66430598927333cc39a79d381a2b8ba37fa60b184cb"
+  },
+  "checks": {
+    "sourceMatchesBinary": "PASS: exact final saved XLAM matched all seven serialized VBA modules and RibbonX to the current source; bytes unchanged during testing.",
+    "normalizationAndIntegration": "PASS: saved-and-reopened final XLAM passed normalization, 19 Excel integration checks, 12 cancellation decisions, toolbar initialization and 16 R11 settings/comparison/state checks. Owned Excel exited normally.",
+    "wordingAndState": "PARTIAL: synthetic defaults, completion state and messages were checked. The earlier Boolean false versus string FALSE status-bar restoration issue has not received final native acceptance.",
+    "selectionMatrix": "PARTIAL: basic synthetic selections, filters, hidden cells, tables, overlapping areas and limits passed; the complete physical selection/context matrix is deferred.",
+    "cancellation": "PARTIAL: 12 decision checks and injected cancellation/output rollback passed; actual Esc timing and cancel-button input are deferred.",
+    "autoLoad": "NOT_RUN: final R11 package has not been installed and normal installed startup is deferred.",
+    "reinstall": "NOT_RUN: final R11 installer repair/reinstall lifecycle is deferred.",
+    "uninstall": "NOT_RUN: final R11 installation/removal lifecycle is deferred.",
+    "python": "PASS: 166 fast reference, settings, source-audit, packaging-gate and document-link tests in 25.404 seconds. No Excel or installation was run by this suite.",
+    "docs": "PASS: strict MkDocs build plus generated-link/privacy checks for 15 public pages, 404, search, sitemap and assets.",
+    "windowState": "PARTIAL: synthetic source edits, prior-result preservation, snapshot reuse and owned test-process normal exit passed; multiple windows and separate Excel processes are deferred.",
+    "upgrade": "NOT_RUN: final R11 installer upgrade lifecycle and preference preservation across installation are deferred.",
+    "contextMenuContent": "PARTIAL: all eight generated context menus parse with three shared settings; toolbar action binding and shared action passed. Full physical menu interactions are deferred.",
+    "nativeContextMenu": "NOT_RUN: physical mouse/keyboard interaction across all supported menus is deferred.",
+    "settingsAndState": "PASS: defaults, all four comparison-rule combinations, registry save/reload, invalid-value fallback without overwrite, rule locks, keep/clear policies and reset passed in an isolated settings section; original preferences were not used as test storage.",
+    "outputRollback": "PASS: single-sheet difference layout, no equal-list output, two-sheet explicit preview, bounded samples, exclusions, formula safety, header freeze, injected failure/cancellation rollback and preservation of edited earlier results passed."
+  },
+  "releaseExceptions": {
+    "userAuthorized": true,
+    "fullAcceptancePassed": false,
+    "decisionRecord": "tools/ExcelSmartListCompare/docs/ADR-0019-R11-release-scope.md",
+    "acceptedIncompleteChecks": [
+      "wordingAndState",
+      "selectionMatrix",
+      "cancellation",
+      "autoLoad",
+      "reinstall",
+      "uninstall",
+      "windowState",
+      "upgrade",
+      "contextMenuContent",
+      "nativeContextMenu"
+    ]
+  },
+  "evidence": {
+    "sourceAuditStatus": "PASS",
+    "serializedModuleCount": 7,
+    "sourceAuditSha256": "ffa0a600726c40a5e0b9f7482d23ee5895c1a6c6ee42b11dbb4d4b60827a7e97",
+    "runtimeEvidenceSha256": "b764ce1ebe79f101b9cb2e88fee4586724209a530a3dbfe50a36759e68cf8f5f",
+    "pythonEvidenceSha256": "345261226633ae6d34573b6402c1756ebb0114d1c0776b99aded884070d1ace6",
+    "runtimeTests": [
+      {
+        "name": "SLC_UiProbe",
+        "status": "PASS",
+        "result": "PASS: toolbar and settings controls initialized",
+        "elapsedSeconds": 0.1265504
+      },
+      {
+        "name": "SLC_TestAll",
+        "status": "PASS",
+        "result": "PASS: normalization + 19 Excel integration checks + 12 cancellation decision checks",
+        "elapsedSeconds": 3.4032896999999998
+      },
+      {
+        "name": "SLC_UsabilityTests",
+        "status": "PASS",
+        "result": "PASS: 16 R11 settings/comparison/state checks; PASS: injected cancellation/failure output rollback (not physical Esc); bounded samples, error locations, single-sheet differences, no identical report, 2-sheet preview, formula safety, header freeze",
+        "elapsedSeconds": 13.637534899999999
+      }
+    ],
+    "ownedRuntimeExcelExited": true,
+    "temporaryVbaAccessRestored": true,
+    "originalInstalledFilesPreserved": 5,
+    "originalRegistrationPreserved": true,
+    "environment": {
+      "osVersion": "Microsoft Windows NT 10.0.22631.0",
+      "powerShellVersion": "5.1.22621.6133",
+      "excelVersion": "16.0",
+      "excelBuild": "20326",
+      "excelProcessBitness": 64,
+      "bitnessProbe": "IsWow64Process",
+      "bitnessError": null
+    },
+    "userValidation": "tools/ExcelSmartListCompare/docs/RC11_USER_VALIDATION.md",
+    "scope": "Fast essential checks on the exact final XLAM. Installation lifecycle, large-data benchmarks, real cancellation and full native UI matrix are deferred as explicitly requested."
+  }
+}

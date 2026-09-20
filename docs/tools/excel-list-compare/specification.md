@@ -2,7 +2,7 @@
 
 도구 ID: ExcelSmartListCompare / EXCEL-LIST-COMPARE
 
-명세 버전·상태: 0.4 · 2026-09-20 · **RC10 사용성 개선과 현재 결과를 보존한 게시 결정. 전체 인수 NOT_MET 유지**
+명세 버전·상태: 0.5 · 2026-09-20 · **R11 요구사항 추가. R11 구현·검증 전이며 RC10까지의 실제 판정 유지**
 
 제품 책임: 도구 개발·검증 담당
 
@@ -13,6 +13,8 @@
 관련 ADR: [처리 부하와 취소 확정 시점](../../../tools/ExcelSmartListCompare/docs/ADR-0011-Bounded-processing-and-cancellation.md), [Windows PowerShell 실행 경로와 설치 단계 기록](../../../tools/ExcelSmartListCompare/docs/ADR-0012-System-PowerShell-launcher.md), [설치 실행기의 모듈 검색 경로](../../../tools/ExcelSmartListCompare/docs/ADR-0013-Windows-module-path.md), [작업 중인 Excel에서 눌린 Esc 확인](../../../tools/ExcelSmartListCompare/docs/ADR-0014-Foreground-held-Esc.md), [비교 전 확인과 결과 근거](../../../tools/ExcelSmartListCompare/docs/ADR-0016-Comparison-usability.md)
 
 이 문서는 저장소에 보존하는 개발 명세이며 공개 사이트에 포함하지 않는다. 공개 사용 안내에는 확정된 지원 범위와 알려진 제한만 직접 요약한다. 조직별 배포 승인, 서명 정책과 적용 환경은 아직 결정되지 않았다.
+
+**R11의 최신 구현 기준은 [R11 제품 명세](r11-specification.md)와 [ADR-0018](../../../tools/ExcelSmartListCompare/docs/ADR-0018-R11-comparison-options.md)이다.** 두 설정 접근 경로, 메일·대소문자·첫 목록 유지 옵션, 일치 시 결과 미생성과 성공 후 기본 비우기를 정의한다. 아래 본문은 RC10까지의 계약·관찰 기록이며, R11에서 충돌하는 비교 규칙·원문 변형 수집·결과 생성·완료 후 상태는 새 명세가 우선한다. 새 요구를 과거 버전의 구현이나 검증 결과로 해석하지 않는다.
 
 사용자는 원격 환경에서 재시작·관리자 작업 없이 현재 가능한 파일을 배포하도록 명시했고, 후속 요청에서 제품명과 버전으로 안내를 통일하도록 했다. [ADR-0015 배포와 검증 결과 기록](../../../tools/ExcelSmartListCompare/docs/ADR-0015-Recorded-release-results.md)에 따라 현재 포장 프로필은 `documented-exceptions`, 배포 결정은 `PUBLISH_WITH_RECORDED_RESULTS`다. RC9 최초 게시와 설치 안내 수정판 setup.2 게시를 마쳤다. 아래 RC9 실기 기록은 당시 파일에 한정하며 RC10의 검증이 아니다. RC10은 사용자의 별도 요청과 [ADR-0017](../../../tools/ExcelSmartListCompare/docs/ADR-0017-RC10-publication.md)에 따라 현재 상태로 게시하며, 실제 RC10 결과는 [검증 기록](../../../tools/ExcelSmartListCompare/docs/USABILITY_RC10_REPORT.md)에 보존한다. 기존 전체 인수는 `NOT_MET`이며 실패·부분 검증·미실행은 그대로다. 서명 없는 EXE·ZIP의 제작·게시 성공을 새 EXE 설치 수명주기 통과로 표시하지 않는다.
 
@@ -132,9 +134,9 @@ candidate-07은 현재 작업 중인 Excel 창에 한정해 눌린 Esc를 추가
 
 실제 버튼·우클릭·창 전환 검증과 `Application.Run`·메뉴 등록 검사를 별도로 기록한다. 화면 도구가 없으면 실제 화면 인수는 `NEEDS_MANUAL`이며 등록 API 성공으로 대체하지 않는다. 이벤트를 끈 경우 기존 추가 기능 도구 모음의 상태가 늦게 갱신되는 경계는 유지한다.
 
-### 차기 소스 후보 0.2.0-rc.10의 사용성 요구
+### RC10의 사용성 요구와 당시 검증
 
-아래 요구는 2026-09-19 사용자 요청에 따른 차기 소스 후보에 적용한다. 현재 다운로드되는 RC9에는 이 동작이 들어 있다고 안내하지 않는다. 소스 구현·자동 시험·실제 최종 XLAM·설치·게시 상태를 각각 기록하며 RC9 검증 결과를 RC10의 결과로 재사용하지 않는다. 설계 결정은 [ADR-0016](../../../tools/ExcelSmartListCompare/docs/ADR-0016-Comparison-usability.md)을 따른다.
+아래 요구는 2026-09-19 사용자 요청에 따른 RC10의 당시 계약이다. RC10의 이후 게시 결정과 최종 검증 기록은 문서 앞부분의 ADR-0017과 검증 기록을 따른다. 소스 구현·자동 시험·실제 최종 XLAM·설치·게시 상태를 각각 기록하며 RC9 검증 결과를 RC10의 결과로 재사용하지 않는다. 설계 결정은 [ADR-0016](../../../tools/ExcelSmartListCompare/docs/ADR-0016-Comparison-usability.md)을 따른다. R11의 비교 설정·결과 생성·원문 변형 수집·첫 목록 유지 정책은 [R11 제품 명세](r11-specification.md)에서 별도로 변경하며 아래 역사적 요구·판정을 고치지 않는다.
 
 | ID | 요구 행동 | 완료 기준 | 검증 경계 |
 |---|---|---|---|
@@ -214,3 +216,5 @@ RC10 후속 설치 시험에서는 자동화 환경의 파일 해시·등록 대
 2026-09-19 · v0.3: 담은 목록 확인·비교 규칙과 제외 근거·오류/중복 위치 표본·요약과 상세 시트·명시적 취소 상태·첫 목록 재사용을 차기 소스 후보 0.2.0-rc.10 요구로 추가했다. 공개 RC9 안내의 대용량 분할 조건을 바로잡았으며 과거 실기 판정은 유지한다.
 
 2026-09-20 · v0.4: 사용자의 RC10 현재 상태 게시 요청과 설치 안내·별도 검증 자료 분리 결정을 반영했다. 직렬화 소스와 실제 내장 시험의 동일 XLAM을 재포장하며 기존 실패·부분 검증·미실행은 유지한다.
+
+2026-09-20 · v0.5: R11 명세에 비교 설정의 두 접근 경로와 세 기본값, 설정 잠금, 일치 시 출력 생략, 성공 후 기본 비우기·선택적 유지와 실패 복구를 추가했다. 관련 ADR·인수 조건을 연결했으며 R11 구현·실기는 미실시다. 결과표 형식과 재시작 후 설정 기억 여부는 미결정으로 남긴다.

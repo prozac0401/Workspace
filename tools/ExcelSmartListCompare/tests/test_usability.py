@@ -1,4 +1,4 @@
-"""RC10 usability regression contracts and independent comparison counterexamples.
+"""R11 usability regression contracts and independent comparison counterexamples.
 
 These tests do not compile or execute VBA. Run windows-usability.ps1 against an
 explicit newly built XLAM for Excel integration; native input remains separate.
@@ -9,7 +9,11 @@ import re
 import unittest
 import xml.etree.ElementTree as ET
 
-from test_reference import normalize, snapshot
+from test_reference import normalize as normalize_rules, snapshot
+from functools import partial
+
+# These counterexamples deliberately exercise the optional case-insensitive rule.
+normalize = partial(normalize_rules, ignore_case=True)
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -70,7 +74,7 @@ class ComparisonCounterexamples(unittest.TestCase):
         self.assertNotEqual(Counter(first), Counter(second))
 
     def test_scattered_duplicates_keep_multiplicity(self):
-        cells = {(1, 1): "A", (2, 1): "B", (99, 1): "a"}
+        cells = {(1, 1): "a", (2, 1): "b", (99, 1): "a"}
         result = snapshot(cells, [(1, 1, 2, 1), (99, 1, 99, 1)])
         self.assertEqual(result[normalize("a")], 2)
         self.assertEqual(sum(result.values()), 3)
@@ -93,15 +97,16 @@ class UsabilitySourceContracts(unittest.TestCase):
         cls.report = (SRC / "modSLCReport_utf8.bas").read_text(encoding="utf-8")
         cls.model = (SRC / "CSLCList_utf8.cls").read_text(encoding="utf-8")
 
-    def test_match_and_difference_share_report_path(self):
+    def test_equality_exits_before_report_creation(self):
         compare = procedure(self.main, "ShowComparison")
         self.assertIn("SLC_WriteUsabilityResults", compare)
         self.assertNotIn("MsgBox", compare)
-        self.assertNotRegex(compare, r"(?i)If\s+excessA\s*=\s*0.*Then\s+Exit")
+        self.assertLess(compare.index("If matched = a.Total And matched = b.Total Then Exit Function"), compare.index("SLC_WriteUsabilityResults"))
 
-    def test_successful_comparison_retains_first_snapshot(self):
+    def test_successful_comparison_obeys_keep_setting(self):
         run = procedure(self.main, "RunSelection")
-        self.assertNotRegex(run, r"(?i)Set\s+mPending\s*=\s*Nothing")
+        self.assertIn("If Not keepFirst Then Set mPending = Nothing", run)
+        self.assertLess(run.index("Set completedResult = ShowComparison"), run.index("If Not keepFirst Then Set mPending = Nothing"))
         self.assertIn("Set previousPending = mPending", run)
         self.assertIn("Set mPending = previousPending", run)
         clear = procedure(self.main, "SLC_Clear")
@@ -160,11 +165,11 @@ class UsabilitySourceContracts(unittest.TestCase):
             body = procedure(self.model, name)
             self.assertNotRegex(body, r"(?im)^\s*(?:Set\s+)?(?:Counts|Total|DuplicateExcess)\b.*=")
             self.assertNotRegex(body, r"(?i)Counts\.(?:Add|Remove|RemoveAll)")
-        for field in ["OmittedOccurrences", "OmittedVariantCandidates", "OmittedErrors"]:
+        for field in ["OmittedOccurrences", "OmittedErrors"]:
             self.assertRegex(self.model, rf"{field} = {field} \+ 1")
 
     def test_sampling_is_bounded_and_snapshot_has_no_live_objects(self):
-        for name in ["MAX_OCCURRENCES", "MAX_VARIANTS", "MAX_ERRORS", "MAX_PER_KEY"]:
+        for name in ["MAX_OCCURRENCES", "MAX_ERRORS", "MAX_PER_KEY"]:
             match = re.search(rf"Const {name} As Long = (\d+)", self.model)
             self.assertIsNotNone(match)
             self.assertGreater(int(match[1]), 0)
@@ -180,11 +185,14 @@ class UsabilitySourceContracts(unittest.TestCase):
         for label in ["#DIV/0!", "#N/A", "#VALUE!", "#REF!"]:
             self.assertIn(label, error)
 
-    def test_output_has_summary_and_three_detail_sheets(self):
+    def test_difference_is_one_sheet_and_preview_has_locations(self):
         write = procedure(self.report, "WriteReport")
-        for sheet in ["요약", "차이·중복", "제외·발생위치", "규칙으로 같아진 값"]:
+        for sheet in ["요약", "명단비교_결과", "제외·발생위치"]:
             self.assertIn('"' + sheet + '"', write)
-        self.assertIn(".SplitRow = 1", procedure(self.report, "FormatTable"))
+        self.assertIn(".SplitRow = headerRow", procedure(self.report, "FormatTable"))
+        self.assertIn("FormatTable ws, outRow - 1, 10, True, 8", procedure(self.report, "WriteDifferences"))
+        self.assertNotIn("WriteVariants", self.report)
+        self.assertNotIn("VariantSamples", self.model)
         self.assertIn("생략", procedure(self.report, "WriteSummary"))
         self.assertIn("원본 전체", procedure(self.report, "WriteSummary"))
 

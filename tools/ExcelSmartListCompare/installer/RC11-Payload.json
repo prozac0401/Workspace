@@ -1,0 +1,15 @@
+{
+  "engineVersion": "0.2.0-rc.11",
+  "packageRevision": 1,
+  "releaseProfile": "documented-exceptions",
+  "releaseDecision": "PUBLISH_WITH_RECORDED_RESULTS",
+  "fullAcceptancePassed": false,
+  "validationSha256": "a94206cfbb0ef770343c431d5ff3d77ffb2f2fc2053b5669852c0f2dcbdc0fc4",
+  "sha256": {
+    "Install.cmd": "856101b23c7296a97406e41ccb1bbf475d4d196e392f0d1dcce085eb5cdd6bd5",
+    "Uninstall.cmd": "35874701e8d930f1258d7cd9e7de554855c7e989e02f54f686014908c56b1712",
+    "Setup.ps1": "f91e3cb524255318626a5c3a41c7033779f75d6a06b19b06e5f111eb39a894af",
+    "README.md": "c716caa877bbe14d3d7c0c5c45ce1b1db75572f6735c53bc20841b90056c7acb",
+    "ExcelSmartListCompare.xlam": "9b37c2f05318ef4500784978f62c0ea948bd2e703ef3e5590874c0ef89988176"
+  }
+}
