@@ -35,15 +35,15 @@ Private Function WriteReport(ByVal a As CSLCList, ByVal b As CSLCList, _
     setState = True
     Application.EnableEvents = False
     Application.ScreenUpdating = False
-    SLC_WorkStatus "요약 작성 중"
+    SLC_WorkStatus "확인할 내용 정리 중"
     SLC_WorkCheckpoint
     Set wb = Application.Workbooks.Add(xlWBATWorksheet)
     Set summary = wb.Worksheets(1)
     If b Is Nothing Then
         summary.Name = "요약"
         WriteSummary summary, a, b, matched, excessA, excessB
-        SLC_WorkStatus "제외·발생위치 작성 중"
-        Set ws = AddSheet(wb, "제외·발생위치")
+        SLC_WorkStatus "값과 셀 위치 정리 중"
+        Set ws = AddSheet(wb, "값과 위치")
         WriteLocations ws, a, b
     Else
         summary.Name = "명단비교_결과"
@@ -89,49 +89,39 @@ Private Sub WriteSummary(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As 
     Dim rows As New Collection, row As Variant, buffer() As Variant
     Dim fill As Long, outRow As Long, result As String
     If b Is Nothing Then
-        result = "담은 첫 번째 목록 확인 (비교 전)"
+        result = "담아 둔 첫 번째 목록입니다. 아직 비교하지 않았습니다."
     ElseIf excessA = 0 And excessB = 0 Then
-        result = "비교 대상 값·개수 일치"
+        result = "두 목록의 값과 개수가 같습니다."
     Else
-        result = "비교 대상 값 또는 개수에 차이 있음"
+        result = "두 목록의 값이나 개수가 다릅니다."
     End If
-    rows.Add Array("확인 결과", result, "선택한 원본 전체의 동일성을 뜻하지 않습니다.")
-    rows.Add Array("위치 / 선택 범위", a.Source, SourceOf(b))
-    rows.Add Array("담은 시각", Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"), CapturedOf(b))
-    rows.Add Array("비교 대상 항목", a.Total, MetricOf(b, "total"))
-    rows.Add Array("서로 다른 비교값", a.Counts.Count, MetricOf(b, "unique"))
-    rows.Add Array("중복 (두 번째 발생부터)", a.DuplicateExcess, MetricOf(b, "duplicate"))
-    If Not b Is Nothing Then
-        rows.Add Array("짝지어진 항목", matched, matched)
-        rows.Add Array("남은 항목", excessA, excessB)
-    End If
-    rows.Add Array("제외: 빈칸·공백·빈문자", a.BlankCount, MetricOf(b, "blank"))
-    rows.Add Array("제외: 오류", a.ErrorCount, MetricOf(b, "error"))
-    rows.Add Array("제외: 제목·합계", a.MetadataCount, MetricOf(b, "metadata"))
-    rows.Add Array("읽은 가시 셀 (제외 전)", a.VisibleCellCount, MetricOf(b, "visible"))
-    rows.Add Array("읽은 가시 영역", a.FragmentCount, MetricOf(b, "fragments"))
-    rows.Add Array("숨김·필터 제외", "숨긴 셀과 필터로 가려진 셀은 읽지 않습니다. 제외 개수는 별도로 집계하지 않습니다.", "일반 범위의 제목은 자동으로 제외하지 않습니다.")
-    rows.Add Array("오류가 있는 경우", "오류 셀을 뺀 결과이므로 원본 전체가 같다고 볼 수 없습니다.", "제외·발생위치 시트에서 오류 종류와 위치 표본을 확인하세요.")
-    rows.Add Array("발생위치 표본 / 생략", LocationSummary(a), LocationSummary(b))
-    rows.Add Array("오류 표본 / 생략", ErrorSummary(a), ErrorSummary(b))
-    rows.Add Array("표본 한도 (각 목록)", "발생위치 1,200개 / 오류 200개. 발생위치는 비교값당 5개까지.", "위치 표본은 전체 목록이 아닙니다.")
-    rows.Add Array("비교 규칙", SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), "순서·숫자 표기·전각 영숫자·일부 공백 차이는 무시합니다. 텍스트 00123과 숫자 123은 다릅니다.")
-    rows.Add Array("원문·위치 읽기", "대표 값과 대표 주소는 처음 발견한 셀입니다. 위치 표본은 특정 셀이 잘못됐다는 뜻이 아닙니다.", "긴 원문은 셀을 선택한 뒤 수식 입력줄에서 확인하세요. 셀은 수식이 아닌 텍스트로 기록합니다.")
-    rows.Add Array("첫 번째 목록 상태", SLC_CompletionPolicyText(), "원본을 고쳐도 담은 값은 바뀌지 않습니다. 수정한 원본은 다시 담으세요.")
-    rows.Add Array("보관과 저장", "원본과 이전 결과는 바꾸지 않습니다. 이 결과는 원하는 위치에 직접 저장하세요.", "결과는 담은 시점의 기록입니다. Excel을 종료하면 기억한 목록은 사라집니다.")
-    InitBuffer buffer, 3
+    rows.Add Array("확인 중인 목록", result)
+    rows.Add Array("가져온 파일·시트·범위", a.Source)
+    rows.Add Array("담은 시각", Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
+    rows.Add Array("비교할 값의 개수", a.Total)
+    rows.Add Array("중복을 뺀 값의 개수", a.Counts.Count)
+    rows.Add Array("같은 값의 추가 개수", CStr(a.DuplicateExcess) & "개 (예: 같은 값이 3개이면 추가 개수는 2개)")
+    rows.Add Array("비교에서 뺀 셀", ExclusionText(a))
+    rows.Add Array("값과 셀 위치 표시", LocationSummary(a))
+    rows.Add Array("오류 셀 위치 표시", ErrorSummary(a))
+    rows.Add Array("일부만 표시하는 이유", "[값과 위치]에는 최대 1,200개, 같은 값은 5개, 오류는 200개까지 표시합니다. 비교할 때는 전체 개수를 셉니다.")
+    rows.Add Array("비교 설정", SLC_RulesText(a.CompareFullEmail, a.IgnoreCase))
+    rows.Add Array("비교에서 빠지는 셀", "숨긴 셀과 필터로 가려진 셀은 읽지 않으며 개수도 세지 않습니다. 일반 범위의 제목은 직접 빼고 선택하세요.")
+    rows.Add Array("원본을 수정했다면", "수정한 범위를 다시 담으세요. 이 파일은 담았을 때의 내용이며 자동으로 바뀌지 않습니다.")
+    rows.Add Array("저장하기", "이 확인용 파일은 필요할 때 직접 저장하세요. Excel을 완전히 종료하면 기억한 첫 목록은 사라집니다.")
+    InitBuffer buffer, 2
     outRow = 2
-    WriteHeaders ws, Array("항목", "첫 번째 목록 / 설명", "두 번째 목록 / 설명")
+    WriteHeaders ws, Array("확인할 내용", "담은 첫 번째 목록")
     For Each row In rows
         PutRow ws, buffer, fill, outRow, row
     Next row
     FlushRows ws, buffer, fill, outRow
-    FormatTable ws, outRow - 1, 3, False
-    ws.Columns("A").ColumnWidth = 29
-    ws.Columns("B:C").ColumnWidth = 52
-    ws.Range("A2:C" & CStr(outRow - 1)).Rows.AutoFit
-    ws.Range("A2:C2").Interior.Color = RGB(232, 241, 248)
-    ws.Range("A2:C2").Font.Bold = True
+    FormatTable ws, outRow - 1, 2, False
+    ws.Columns("A").ColumnWidth = 25
+    ws.Columns("B").ColumnWidth = 80
+    ws.Range("A2:B" & CStr(outRow - 1)).Rows.AutoFit
+    ws.Range("A2:B2").Interior.Color = RGB(232, 241, 248)
+    ws.Range("A2:B2").Font.Bold = True
 End Sub
 
 Private Function SourceOf(ByVal list As CSLCList) As String
@@ -158,28 +148,28 @@ End Function
 
 Private Function LocationSummary(ByVal list As CSLCList) As String
     If list Is Nothing Then LocationSummary = "비교 전": Exit Function
-    LocationSummary = "저장 " & list.OccurrenceSamples.Count & "개 / 생략 " & list.OmittedOccurrences & "개"
+    LocationSummary = "표시 " & list.OccurrenceSamples.Count & "개 / 표시하지 않은 위치 " & list.OmittedOccurrences & "개"
 End Function
 
 Private Function ErrorSummary(ByVal list As CSLCList) As String
     If list Is Nothing Then ErrorSummary = "비교 전": Exit Function
-    ErrorSummary = "저장 " & list.ErrorSamples.Count & "개 / 생략 " & list.OmittedErrors & "개"
+    ErrorSummary = "표시 " & list.ErrorSamples.Count & "개 / 표시하지 않은 오류 " & list.OmittedErrors & "개"
 End Function
 
 Private Sub WriteDifferences(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
     Dim keys As Variant, k As Variant, buffer() As Variant, fill As Long, outRow As Long, tick As Long
     InitBuffer buffer, 10
     outRow = 1
-    PutRow ws, buffer, fill, outRow, Array("명단 비교 결과", "값 또는 개수가 다른 항목")
+    PutRow ws, buffer, fill, outRow, Array("두 목록의 차이", "값이나 개수가 다른 항목만 표시합니다.")
     PutRow ws, buffer, fill, outRow, Array("첫 번째 목록", a.Source)
     PutRow ws, buffer, fill, outRow, Array("두 번째 목록", b.Source)
-    PutRow ws, buffer, fill, outRow, Array("담은 시각", Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"), Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    PutRow ws, buffer, fill, outRow, Array("비교 대상 항목", a.Total, b.Total, "원본과 이전 결과는 바꾸지 않았습니다.")
-    PutRow ws, buffer, fill, outRow, Array("제외 집계", ExclusionText(a), ExclusionText(b), "숨긴 셀·필터 제외는 읽지 않습니다. 오류를 뺀 결과는 원본 전체 일치가 아닙니다.")
-    PutRow ws, buffer, fill, outRow, Array("비교 기준", SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), SLC_CompletionPolicyText())
+    PutRow ws, buffer, fill, outRow, Array("담은 시각", "첫 목록: " & Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"), "둘째 목록: " & Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
+    PutRow ws, buffer, fill, outRow, Array("비교한 값의 개수", "첫 목록: " & CStr(a.Total) & "개", "둘째 목록: " & CStr(b.Total) & "개", "원본 값은 처음 발견한 셀의 예입니다.")
+    PutRow ws, buffer, fill, outRow, Array("비교에서 뺀 셀", "첫 목록: " & ExclusionText(a), "둘째 목록: " & ExclusionText(b), "숨긴 셀·필터로 가려진 셀은 제외합니다. 오류 셀은 비교하지 못했습니다.")
+    PutRow ws, buffer, fill, outRow, Array("비교 설정", SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), "더 많은 개수와 원본 셀 위치: F~K열 선택 → 우클릭 → 숨기기 취소")
     FlushRows ws, buffer, fill, outRow
-    WriteHeaders ws, Array("상태", "비교에 쓴 값", "첫 목록 원래 값 (예)", "첫 목록 개수", _
-        "둘째 목록 원래 값 (예)", "둘째 목록 개수", "첫 목록 남은 수", "둘째 목록 남은 수", "첫 목록 대표 주소", "둘째 목록 대표 주소"), 8
+    WriteHeaders ws, Array("차이", "비교한 값", "첫 목록 원본 값 (예)", "첫 목록 개수", _
+        "둘째 목록 원본 값 (예)", "둘째 목록 개수", "첫 목록이 더 많은 개수", "둘째 목록이 더 많은 개수", "첫 목록 원본 셀 (예)", "둘째 목록 원본 셀 (예)"), 8
     outRow = 9
     keys = a.Counts.Keys
     For Each k In keys
@@ -195,26 +185,31 @@ Private Sub WriteDifferences(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b
     Next k
     FlushRows ws, buffer, fill, outRow
     FormatTable ws, outRow - 1, 10, True, 8
-    ws.Columns("A").ColumnWidth = 24
-    ws.Columns("B:C").ColumnWidth = 28
-    ws.Columns("E").ColumnWidth = 28
+    ws.Columns("A").ColumnWidth = 20
+    ws.Columns("B").ColumnWidth = 32
+    ws.Columns("C").ColumnWidth = 26
+    ws.Columns("E").ColumnWidth = 26
     ws.Columns("D").ColumnWidth = 13
     ws.Columns("F:H").ColumnWidth = 13
+    ws.Columns("G:H").ColumnWidth = 18
     ws.Columns("I:J").ColumnWidth = 18
     ws.Range("D9:D" & CStr(outRow - 1)).NumberFormat = "0"
     ws.Range("F9:H" & CStr(outRow - 1)).NumberFormat = "0"
-    ws.Range("B2:J2").Merge
-    ws.Range("B3:J3").Merge
-    ws.Range("D5:J5").Merge
-    ws.Range("D6:J6").Merge
-    ws.Range("C7:J7").Merge
-    ws.Rows(6).RowHeight = 64
+    ws.Columns("G:J").Hidden = True
+    ws.Range("B1:F1").Merge
+    ws.Range("B2:F2").Merge
+    ws.Range("B3:F3").Merge
+    ws.Range("D5:F5").Merge
+    ws.Range("D6:F6").Merge
+    ws.Range("C7:F7").Merge
+    ws.Rows(4).RowHeight = 42
+    ws.Rows(6).RowHeight = 52
     ws.Rows(7).RowHeight = 48
     ws.Range("A1:J1").Font.Bold = True
 End Sub
 
 Private Function ExclusionText(ByVal list As CSLCList) As String
-    ExclusionText = "빈칸 " & CStr(list.BlankCount) & " / 오류 " & CStr(list.ErrorCount) & " / 제목·합계 " & CStr(list.MetadataCount)
+    ExclusionText = "빈칸 " & CStr(list.BlankCount) & "개 / 오류 " & CStr(list.ErrorCount) & "개 / 표 제목·합계 " & CStr(list.MetadataCount) & "개"
 End Function
 
 
@@ -225,9 +220,9 @@ Private Sub AddDifference(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRe
     cb = CountOf(b, key)
     If ca = cb Then Exit Sub
     If ca = 0 Then
-        status = "두 번째 목록에만 있음"
+        status = "둘째 목록에만 있음"
     ElseIf cb = 0 Then
-        status = "첫 번째 목록에만 있음"
+        status = "첫 목록에만 있음"
     ElseIf ca <> cb Then
         status = "개수가 다름"
     Else
@@ -240,7 +235,7 @@ End Sub
 
 Private Sub WriteLocations(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
     Dim buffer() As Variant, fill As Long, outRow As Long
-    WriteHeaders ws, Array("구분", "목록", "비교에 쓴 값", "원래 값 / 오류 종류", "셀 주소", "읽는 방법 / 생략")
+    WriteHeaders ws, Array("구분", "목록", "비교한 값", "원본 값 / 오류", "원본 셀 위치", "안내")
     InitBuffer buffer, 6
     outRow = 2
     AddErrorRows ws, buffer, fill, outRow, a, "첫 번째"
@@ -251,33 +246,34 @@ Private Sub WriteLocations(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b A
     FormatTable ws, outRow - 1, 6, True
     ws.Columns("A").ColumnWidth = 18
     ws.Columns("B").ColumnWidth = 12
+    ws.Columns("B").Hidden = True
     ws.Columns("C").ColumnWidth = 25
     ws.Columns("D").ColumnWidth = 38
     ws.Columns("E").ColumnWidth = 16
-    ws.Columns("F").ColumnWidth = 55
+    ws.Columns("F").ColumnWidth = 38
 End Sub
 
 Private Sub AddErrorRows(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, _
                          ByRef outRow As Long, ByVal list As CSLCList, ByVal label As String)
     Dim sample As Variant
     If list.ErrorSamples.Count = 0 Then
-        PutRow ws, buffer, fill, outRow, Array("오류 안내", label, "", "저장된 오류 표본 없음", "", ErrorSummary(list))
+        PutRow ws, buffer, fill, outRow, Array("오류 안내", label, "", "표시할 오류 없음", "", ErrorSummary(list))
     Else
         For Each sample In list.ErrorSamples
-            PutRow ws, buffer, fill, outRow, Array("제외한 오류", label, "", sample(1), sample(0), "담은 시점의 오류입니다. 원본은 변경하지 않습니다.")
+            PutRow ws, buffer, fill, outRow, Array("비교에서 뺀 오류", label, "", sample(1), sample(0), "원본에서 오류를 확인하세요.")
         Next sample
     End If
     If list.OmittedErrors > 0 Then
-        PutRow ws, buffer, fill, outRow, Array("오류 표본 생략", label, "", "", "", CStr(list.OmittedErrors) & "개는 표본 한도로 위치를 저장하지 않았습니다.")
+        PutRow ws, buffer, fill, outRow, Array("추가 오류", label, "", "", "", CStr(list.OmittedErrors) & "개는 표시 한도를 넘어 위치를 표시하지 않았습니다.")
     End If
 End Sub
 
 Private Sub AddLocationRows(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, _
                             ByRef outRow As Long, ByVal list As CSLCList, ByVal label As String)
     Dim sample As Variant
-    PutRow ws, buffer, fill, outRow, Array("발생위치 안내", label, "", "", "", LocationSummary(list) & "; 특정 셀이 잘못되었다는 뜻이 아닙니다.")
+    PutRow ws, buffer, fill, outRow, Array("위치 안내", label, "", "원본 파일·시트는 [요약]에서 확인하세요.", "", LocationSummary(list))
     For Each sample In list.OccurrenceSamples
-        PutRow ws, buffer, fill, outRow, Array("발생위치 표본", label, Mid$(CStr(sample(0)), 4), sample(1), sample(2), "목록의 원본 위치는 요약을 확인하세요.")
+        PutRow ws, buffer, fill, outRow, Array("담은 값", label, Mid$(CStr(sample(0)), 4), sample(1), sample(2), "")
     Next sample
 End Sub
 
@@ -431,7 +427,7 @@ Public Function SLC_ReportTests() As String
     Set testBook = WriteReport(a, b, 3, 5, 0)
     AssertReport testBook.Worksheets.Count = 1, "Comparison sheet count"
     AssertReport testBook.Worksheets(1).Name = "명단비교_결과", "RC9 compatible sheet name"
-    AssertReport testBook.Worksheets(1).Cells(8, 3).Value2 = "첫 목록 원래 값 (예)", "RC9 compatible columns"
+    AssertReport testBook.Worksheets(1).Cells(8, 3).Value2 = "첫 목록 원본 값 (예)", "RC9 compatible columns"
     AssertReport InStr(CStr(testBook.Worksheets(1).Cells(6, 2).Value2), "오류 1") > 0, "Excluded errors disclosed"
     For Each ws In testBook.Worksheets
         formulaState = ws.UsedRange.HasFormula
@@ -464,7 +460,7 @@ Public Function SLC_ReportTests() As String
     AssertReport testBook Is Nothing, "Equal values must not create a result"
     Set testBook = WriteReport(a, absent, 0, 0, 0)
     AssertReport testBook.Worksheets.Count = 2, "Preview sheet count"
-    AssertReport CStr(testBook.Worksheets(1).Cells(2, 2).Value2) = "담은 첫 번째 목록 확인 (비교 전)", "Preview heading"
+    AssertReport CStr(testBook.Worksheets(1).Cells(2, 2).Value2) = "담아 둔 첫 번째 목록입니다. 아직 비교하지 않았습니다.", "Preview heading"
     testBook.Close SaveChanges:=False
     Set testBook = Nothing
     If Not oldBook Is Nothing Then oldBook.Activate

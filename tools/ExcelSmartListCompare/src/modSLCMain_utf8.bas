@@ -72,7 +72,7 @@ Public Function SLC_RibbonReady() As Boolean
 End Function
 
 Public Function SLC_ReleaseVersion() As String
-    SLC_ReleaseVersion = "0.2.0-rc.11"
+    SLC_ReleaseVersion = "0.2.0-rc.12"
 End Function
 
 Public Sub SLC_GetContextMenu(ByVal control As Office.IRibbonControl, ByRef content)
@@ -377,11 +377,11 @@ Private Sub PreviewSnapshot(ByRef completedResult As Workbook, Optional ByVal ra
     mCancelled = False
     mStarted = Timer
     Application.EnableCancelKey = xlErrorHandler
-    SetPhase "담은 목록 확인 자료 작성 중"
+    SetPhase "담은 첫 목록의 확인용 파일 만드는 중"
     Set completedResult = SLC_WriteSnapshotPreview(mPending)
     operationCommitted = True
     Application.EnableCancelKey = xlDisabled
-    mLastOutcome = "담은 목록 확인 자료를 만들었습니다. 첫 목록은 유지됩니다."
+    mLastOutcome = "담은 첫 목록의 확인용 파일을 열었습니다. 이어서 두 번째 목록과 비교할 수 있습니다."
 Finished:
     ReleaseStatus
     mBusy = False
@@ -488,7 +488,7 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean, ByRef completedResult As 
         Application.EnableCancelKey = xlDisabled
         Set mPending = current
         operationCommitted = True
-        mLastOutcome = "첫 목록 담기 완료 · [담은 목록 확인]에서 출처와 제외 셀을 확인하세요."
+        mLastOutcome = "첫 목록을 담았습니다. [담은 목록 확인]에서 값과 원본 위치를 볼 수 있습니다."
     Else
         Set completedResult = ShowComparison(mPending, current)
         ' Output completion or the last equality checkpoint precedes this commit.
@@ -1173,21 +1173,21 @@ Private Sub RefreshSettingsControls(ByVal control As CommandBarControl)
 End Sub
 
 Public Function SLC_RulesText(ByVal fullEmail As Boolean, ByVal ignoreCase As Boolean) As String
-    If fullEmail Then SLC_RulesText = "메일 전체 주소 비교" Else SLC_RulesText = "메일 @ 앞부분만 비교"
-    If ignoreCase Then SLC_RulesText = SLC_RulesText & " / 대소문자 무시" Else SLC_RulesText = SLC_RulesText & " / 대소문자 구분"
+    If fullEmail Then SLC_RulesText = "메일: 전체 주소 비교" Else SLC_RulesText = "메일: @ 앞부분만 비교"
+    If ignoreCase Then SLC_RulesText = SLC_RulesText & " / 대문자·소문자: 같게 봄" Else SLC_RulesText = SLC_RulesText & " / 대문자·소문자: 구분함"
 End Function
 
 Public Function SLC_CompletionPolicyText() As String
     If mKeepFirst Then
-        SLC_CompletionPolicyText = "비교 성공 후 첫 목록 유지"
+        SLC_CompletionPolicyText = "비교가 끝나면 첫 목록을 남깁니다."
     Else
-        SLC_CompletionPolicyText = "비교 성공 후 첫 목록 비우기"
+        SLC_CompletionPolicyText = "비교가 끝나면 첫 목록을 비웁니다."
     End If
 End Function
 
 Private Function EqualityMessage(ByVal a As CSLCList, ByVal b As CSLCList) As String
     If a.ErrorCount + b.ErrorCount > 0 Then
-        EqualityMessage = "오류를 제외한 비교 대상이 같습니다." & vbCrLf & _
+        EqualityMessage = "오류 셀을 뺀 나머지 값과 개수가 같습니다." & vbCrLf & _
             "제외한 오류: 첫 목록 " & CStr(a.ErrorCount) & "개 / 두 번째 목록 " & CStr(b.ErrorCount) & "개"
     Else
         EqualityMessage = "선택한 비교 기준으로 두 목록의 값과 개수가 같습니다."
@@ -1199,7 +1199,7 @@ Public Sub SLC_About()
     If mBusy Then Exit Sub
     MsgBox "Excel 명단 비교 " & SLC_ReleaseVersion() & vbCrLf & vbCrLf & _
         "1. 첫 목록의 셀을 선택하고 [첫 번째 목록 담기]를 누르세요." & vbCrLf & _
-        "2. 출처를 확인하세요. [담은 목록 확인]에서 표본과 제외 셀을 볼 수 있습니다." & vbCrLf & _
+        "2. [담은 목록 확인]에서 담은 값의 일부와 원본 위치를 확인하세요." & vbCrLf & _
         "3. 두 번째 목록을 선택하고 [두 번째 목록 담아 비교]를 누르세요." & vbCrLf & vbCrLf & _
         "선택한 셀 전체가 목록 하나입니다. 순서와 방향은 무시하고 값별 개수를 비교합니다." & vbCrLf & _
         "[비교 설정]에서 메일 전체 주소·대소문자 무시·첫 목록 유지를 선택하세요." & vbCrLf & _

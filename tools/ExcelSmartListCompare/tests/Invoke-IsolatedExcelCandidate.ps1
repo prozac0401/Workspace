@@ -4,10 +4,12 @@ param(
     [Parameter(Mandatory=$true)][string]$OutputDirectory,
     [switch]$ApprovedTemporaryVbaAccess,
     [switch]$ProbeOnly,
-    [ValidateSet('0.2.0-rc.10','0.2.0-rc.11')][string]$ExpectedReleaseVersion='0.2.0-rc.11'
+    [switch]$BuildOnly,
+    [ValidateSet('0.2.0-rc.10','0.2.0-rc.11','0.2.0-rc.12')][string]$ExpectedReleaseVersion='0.2.0-rc.11'
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
+if($ProbeOnly -and $BuildOnly){throw 'Choose ProbeOnly or BuildOnly, not both.'}
 $repoRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
 $toolRoot=Split-Path -Parent $PSScriptRoot
 $artifacts=[IO.Path]::GetFullPath((Join-Path $repoRoot 'artifacts'))
@@ -24,7 +26,8 @@ $evidence=Join-Path $output 'build.private';[void][IO.Directory]::CreateDirector
 $sourceSnapshot=Join-Path $evidence 'source';[void][IO.Directory]::CreateDirectory($sourceSnapshot)
 $utf8=New-Object Text.UTF8Encoding($false)
 $audit=[ordered]@{
-    schemaVersion=1;mode=$(if($ProbeOnly){'Probe'}else{'BuildAndTest'});status='NOT_RUN';phase='preflight'
+    schemaVersion=1;mode=$(if($ProbeOnly){'Probe'}elseif($BuildOnly){'BuildOnly'}else{'BuildAndTest'});status='NOT_RUN';phase='preflight'
+    runtimeTests=$(if($BuildOnly){'NOT_RUN: user-requested wording-only release'}else{'NOT_RUN'})
     startedUtc=[DateTime]::UtcNow.ToString('o');finishedUtc=$null;failure=$null;cleanupErrors=@()
     releaseVersion=$null;expectedSha256=$null;actualSha256=$null;finalSha256=$null;candidatePath=$null
     tests=@();owner=$null;existingExcelBefore=@();existingExcelPreserved=$null;excelExited=$null
@@ -336,6 +339,7 @@ public static class SlcIsolatedBinding {
         $q="'"+([string]$candidateBook.Name).Replace("'","''")+"'!"
         $audit.releaseVersion=[string]$excel.Run($q+'SLC_ReleaseVersion')
         if($audit.releaseVersion -cne $ExpectedReleaseVersion){throw 'Saved candidate release version mismatch.'}
+        if(-not $BuildOnly){
         # A normal workbook provides the same active-window context as use of
         # the add-in. Keep ownership explicit and close it with the other books.
         $harnessBook=$excel.Workbooks.Add(-4167);[void]$ownedBooks.Add($harnessBook)
@@ -351,6 +355,8 @@ public static class SlcIsolatedBinding {
         }
         $audit.phase='detach-candidate-ui';Save-Audit
         [void]$excel.Run($q+'SLC_DetachUI')
+        $audit.runtimeTests='PASS'
+        }
         Close-OwnedBook $candidateBook;$candidateBook=$null
         $audit.finalSha256=Hash-File $candidate
         if($audit.finalSha256 -cne $audit.expectedSha256){throw 'Candidate bytes changed during read-only testing.'}

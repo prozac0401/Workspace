@@ -35,15 +35,15 @@ Private Function WriteReport(ByVal a As CSLCList, ByVal b As CSLCList, _
     setState = True
     Application.EnableEvents = False
     Application.ScreenUpdating = False
-    SLC_WorkStatus SLC_U("C694 C57D 0020 C791 C131 0020 C911")
+    SLC_WorkStatus SLC_U("D655 C778 D560 0020 B0B4 C6A9 0020 C815 B9AC 0020 C911")
     SLC_WorkCheckpoint
     Set wb = Application.Workbooks.Add(xlWBATWorksheet)
     Set summary = wb.Worksheets(1)
     If b Is Nothing Then
         summary.Name = SLC_U("C694 C57D")
         WriteSummary summary, a, b, matched, excessA, excessB
-        SLC_WorkStatus SLC_U("C81C C678 00B7 BC1C C0DD C704 CE58 0020 C791 C131 0020 C911")
-        Set ws = AddSheet(wb, SLC_U("C81C C678 00B7 BC1C C0DD C704 CE58"))
+        SLC_WorkStatus SLC_U("AC12 ACFC 0020 C140 0020 C704 CE58 0020 C815 B9AC 0020 C911")
+        Set ws = AddSheet(wb, SLC_U("AC12 ACFC 0020 C704 CE58"))
         WriteLocations ws, a, b
     Else
         summary.Name = SLC_U("BA85 B2E8 BE44 AD50 005F ACB0 ACFC")
@@ -89,49 +89,39 @@ Private Sub WriteSummary(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As 
     Dim rows As New Collection, row As Variant, buffer() As Variant
     Dim fill As Long, outRow As Long, result As String
     If b Is Nothing Then
-        result = SLC_U("B2F4 C740 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 D655 C778 0020 0028 BE44 AD50 0020 C804 0029")
+        result = SLC_U("B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C785 B2C8 B2E4 002E 0020 C544 C9C1 0020 BE44 AD50 D558 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E")
     ElseIf excessA = 0 And excessB = 0 Then
-        result = SLC_U("BE44 AD50 0020 B300 C0C1 0020 AC12 00B7 AC1C C218 0020 C77C CE58")
+        result = SLC_U("B450 0020 BAA9 B85D C758 0020 AC12 ACFC 0020 AC1C C218 AC00 0020 AC19 C2B5 B2C8 B2E4 002E")
     Else
-        result = SLC_U("BE44 AD50 0020 B300 C0C1 0020 AC12 0020 B610 B294 0020 AC1C C218 C5D0 0020 CC28 C774 0020 C788 C74C")
+        result = SLC_U("B450 0020 BAA9 B85D C758 0020 AC12 C774 B098 0020 AC1C C218 AC00 0020 B2E4 B985 B2C8 B2E4 002E")
     End If
-    rows.Add Array(SLC_U("D655 C778 0020 ACB0 ACFC"), result, SLC_U("C120 D0DD D55C 0020 C6D0 BCF8 0020 C804 CCB4 C758 0020 B3D9 C77C C131 C744 0020 B73B D558 C9C0 0020 C54A C2B5 B2C8 B2E4 002E"))
-    rows.Add Array(SLC_U("C704 CE58 0020 002F 0020 C120 D0DD 0020 BC94 C704"), a.Source, SourceOf(b))
-    rows.Add Array(SLC_U("B2F4 C740 0020 C2DC AC01"), Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"), CapturedOf(b))
-    rows.Add Array(SLC_U("BE44 AD50 0020 B300 C0C1 0020 D56D BAA9"), a.Total, MetricOf(b, "total"))
-    rows.Add Array(SLC_U("C11C B85C 0020 B2E4 B978 0020 BE44 AD50 AC12"), a.Counts.Count, MetricOf(b, "unique"))
-    rows.Add Array(SLC_U("C911 BCF5 0020 0028 B450 0020 BC88 C9F8 0020 BC1C C0DD BD80 D130 0029"), a.DuplicateExcess, MetricOf(b, "duplicate"))
-    If Not b Is Nothing Then
-        rows.Add Array(SLC_U("C9DD C9C0 C5B4 C9C4 0020 D56D BAA9"), matched, matched)
-        rows.Add Array(SLC_U("B0A8 C740 0020 D56D BAA9"), excessA, excessB)
-    End If
-    rows.Add Array(SLC_U("C81C C678 003A 0020 BE48 CE78 00B7 ACF5 BC31 00B7 BE48 BB38 C790"), a.BlankCount, MetricOf(b, "blank"))
-    rows.Add Array(SLC_U("C81C C678 003A 0020 C624 B958"), a.ErrorCount, MetricOf(b, "error"))
-    rows.Add Array(SLC_U("C81C C678 003A 0020 C81C BAA9 00B7 D569 ACC4"), a.MetadataCount, MetricOf(b, "metadata"))
-    rows.Add Array(SLC_U("C77D C740 0020 AC00 C2DC 0020 C140 0020 0028 C81C C678 0020 C804 0029"), a.VisibleCellCount, MetricOf(b, "visible"))
-    rows.Add Array(SLC_U("C77D C740 0020 AC00 C2DC 0020 C601 C5ED"), a.FragmentCount, MetricOf(b, "fragments"))
-    rows.Add Array(SLC_U("C228 AE40 00B7 D544 D130 0020 C81C C678"), SLC_U("C228 AE34 0020 C140 ACFC 0020 D544 D130 B85C 0020 AC00 B824 C9C4 0020 C140 C740 0020 C77D C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 C81C C678 0020 AC1C C218 B294 0020 BCC4 B3C4 B85C 0020 C9D1 ACC4 D558 C9C0 0020 C54A C2B5 B2C8 B2E4 002E"), SLC_U("C77C BC18 0020 BC94 C704 C758 0020 C81C BAA9 C740 0020 C790 B3D9 C73C B85C 0020 C81C C678 D558 C9C0 0020 C54A C2B5 B2C8 B2E4 002E"))
-    rows.Add Array(SLC_U("C624 B958 AC00 0020 C788 B294 0020 ACBD C6B0"), SLC_U("C624 B958 0020 C140 C744 0020 BE80 0020 ACB0 ACFC C774 BBC0 B85C 0020 C6D0 BCF8 0020 C804 CCB4 AC00 0020 AC19 B2E4 ACE0 0020 BCFC 0020 C218 0020 C5C6 C2B5 B2C8 B2E4 002E"), SLC_U("C81C C678 00B7 BC1C C0DD C704 CE58 0020 C2DC D2B8 C5D0 C11C 0020 C624 B958 0020 C885 B958 C640 0020 C704 CE58 0020 D45C BCF8 C744 0020 D655 C778 D558 C138 C694 002E"))
-    rows.Add Array(SLC_U("BC1C C0DD C704 CE58 0020 D45C BCF8 0020 002F 0020 C0DD B7B5"), LocationSummary(a), LocationSummary(b))
-    rows.Add Array(SLC_U("C624 B958 0020 D45C BCF8 0020 002F 0020 C0DD B7B5"), ErrorSummary(a), ErrorSummary(b))
-    rows.Add Array(SLC_U("D45C BCF8 0020 D55C B3C4 0020 0028 AC01 0020 BAA9 B85D 0029"), SLC_U("BC1C C0DD C704 CE58 0020 0031 002C 0032 0030 0030 AC1C 0020 002F 0020 C624 B958 0020 0032 0030 0030 AC1C 002E 0020 BC1C C0DD C704 CE58 B294 0020 BE44 AD50 AC12 B2F9 0020 0035 AC1C AE4C C9C0 002E"), SLC_U("C704 CE58 0020 D45C BCF8 C740 0020 C804 CCB4 0020 BAA9 B85D C774 0020 C544 B2D9 B2C8 B2E4 002E"))
-    rows.Add Array(SLC_U("BE44 AD50 0020 ADDC CE59"), SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), SLC_U("C21C C11C 00B7 C22B C790 0020 D45C AE30 00B7 C804 AC01 0020 C601 C22B C790 00B7 C77C BD80 0020 ACF5 BC31 0020 CC28 C774 B294 0020 BB34 C2DC D569 B2C8 B2E4 002E 0020 D14D C2A4 D2B8 0020 0030 0030 0031 0032 0033 ACFC 0020 C22B C790 0020 0031 0032 0033 C740 0020 B2E4 B985 B2C8 B2E4 002E"))
-    rows.Add Array(SLC_U("C6D0 BB38 00B7 C704 CE58 0020 C77D AE30"), SLC_U("B300 D45C 0020 AC12 ACFC 0020 B300 D45C 0020 C8FC C18C B294 0020 CC98 C74C 0020 BC1C ACAC D55C 0020 C140 C785 B2C8 B2E4 002E 0020 C704 CE58 0020 D45C BCF8 C740 0020 D2B9 C815 0020 C140 C774 0020 C798 BABB B410 B2E4 B294 0020 B73B C774 0020 C544 B2D9 B2C8 B2E4 002E"), SLC_U("AE34 0020 C6D0 BB38 C740 0020 C140 C744 0020 C120 D0DD D55C 0020 B4A4 0020 C218 C2DD 0020 C785 B825 C904 C5D0 C11C 0020 D655 C778 D558 C138 C694 002E 0020 C140 C740 0020 C218 C2DD C774 0020 C544 B2CC 0020 D14D C2A4 D2B8 B85C 0020 AE30 B85D D569 B2C8 B2E4 002E"))
-    rows.Add Array(SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 C0C1 D0DC"), SLC_CompletionPolicyText(), SLC_U("C6D0 BCF8 C744 0020 ACE0 CCD0 B3C4 0020 B2F4 C740 0020 AC12 C740 0020 BC14 B00C C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 C218 C815 D55C 0020 C6D0 BCF8 C740 0020 B2E4 C2DC 0020 B2F4 C73C C138 C694 002E"))
-    rows.Add Array(SLC_U("BCF4 AD00 ACFC 0020 C800 C7A5"), SLC_U("C6D0 BCF8 ACFC 0020 C774 C804 0020 ACB0 ACFC B294 0020 BC14 AFB8 C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 C774 0020 ACB0 ACFC B294 0020 C6D0 D558 B294 0020 C704 CE58 C5D0 0020 C9C1 C811 0020 C800 C7A5 D558 C138 C694 002E"), SLC_U("ACB0 ACFC B294 0020 B2F4 C740 0020 C2DC C810 C758 0020 AE30 B85D C785 B2C8 B2E4 002E 0020 0045 0078 0063 0065 006C C744 0020 C885 B8CC D558 BA74 0020 AE30 C5B5 D55C 0020 BAA9 B85D C740 0020 C0AC B77C C9D1 B2C8 B2E4 002E"))
-    InitBuffer buffer, 3
+    rows.Add Array(SLC_U("D655 C778 0020 C911 C778 0020 BAA9 B85D"), result)
+    rows.Add Array(SLC_U("AC00 C838 C628 0020 D30C C77C 00B7 C2DC D2B8 00B7 BC94 C704"), a.Source)
+    rows.Add Array(SLC_U("B2F4 C740 0020 C2DC AC01"), Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
+    rows.Add Array(SLC_U("BE44 AD50 D560 0020 AC12 C758 0020 AC1C C218"), a.Total)
+    rows.Add Array(SLC_U("C911 BCF5 C744 0020 BE80 0020 AC12 C758 0020 AC1C C218"), a.Counts.Count)
+    rows.Add Array(SLC_U("AC19 C740 0020 AC12 C758 0020 CD94 AC00 0020 AC1C C218"), CStr(a.DuplicateExcess) & SLC_U("AC1C 0020 0028 C608 003A 0020 AC19 C740 0020 AC12 C774 0020 0033 AC1C C774 BA74 0020 CD94 AC00 0020 AC1C C218 B294 0020 0032 AC1C 0029"))
+    rows.Add Array(SLC_U("BE44 AD50 C5D0 C11C 0020 BE80 0020 C140"), ExclusionText(a))
+    rows.Add Array(SLC_U("AC12 ACFC 0020 C140 0020 C704 CE58 0020 D45C C2DC"), LocationSummary(a))
+    rows.Add Array(SLC_U("C624 B958 0020 C140 0020 C704 CE58 0020 D45C C2DC"), ErrorSummary(a))
+    rows.Add Array(SLC_U("C77C BD80 B9CC 0020 D45C C2DC D558 B294 0020 C774 C720"), SLC_U("005B AC12 ACFC 0020 C704 CE58 005D C5D0 B294 0020 CD5C B300 0020 0031 002C 0032 0030 0030 AC1C 002C 0020 AC19 C740 0020 AC12 C740 0020 0035 AC1C 002C 0020 C624 B958 B294 0020 0032 0030 0030 AC1C AE4C C9C0 0020 D45C C2DC D569 B2C8 B2E4 002E 0020 BE44 AD50 D560 0020 B54C B294 0020 C804 CCB4 0020 AC1C C218 B97C 0020 C149 B2C8 B2E4 002E"))
+    rows.Add Array(SLC_U("BE44 AD50 0020 C124 C815"), SLC_RulesText(a.CompareFullEmail, a.IgnoreCase))
+    rows.Add Array(SLC_U("BE44 AD50 C5D0 C11C 0020 BE60 C9C0 B294 0020 C140"), SLC_U("C228 AE34 0020 C140 ACFC 0020 D544 D130 B85C 0020 AC00 B824 C9C4 0020 C140 C740 0020 C77D C9C0 0020 C54A C73C BA70 0020 AC1C C218 B3C4 0020 C138 C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 C77C BC18 0020 BC94 C704 C758 0020 C81C BAA9 C740 0020 C9C1 C811 0020 BE7C ACE0 0020 C120 D0DD D558 C138 C694 002E"))
+    rows.Add Array(SLC_U("C6D0 BCF8 C744 0020 C218 C815 D588 B2E4 BA74"), SLC_U("C218 C815 D55C 0020 BC94 C704 B97C 0020 B2E4 C2DC 0020 B2F4 C73C C138 C694 002E 0020 C774 0020 D30C C77C C740 0020 B2F4 C558 C744 0020 B54C C758 0020 B0B4 C6A9 C774 BA70 0020 C790 B3D9 C73C B85C 0020 BC14 B00C C9C0 0020 C54A C2B5 B2C8 B2E4 002E"))
+    rows.Add Array(SLC_U("C800 C7A5 D558 AE30"), SLC_U("C774 0020 D655 C778 C6A9 0020 D30C C77C C740 0020 D544 C694 D560 0020 B54C 0020 C9C1 C811 0020 C800 C7A5 D558 C138 C694 002E 0020 0045 0078 0063 0065 006C C744 0020 C644 C804 D788 0020 C885 B8CC D558 BA74 0020 AE30 C5B5 D55C 0020 CCAB 0020 BAA9 B85D C740 0020 C0AC B77C C9D1 B2C8 B2E4 002E"))
+    InitBuffer buffer, 2
     outRow = 2
-    WriteHeaders ws, Array(SLC_U("D56D BAA9"), SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 002F 0020 C124 BA85"), SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D 0020 002F 0020 C124 BA85"))
+    WriteHeaders ws, Array(SLC_U("D655 C778 D560 0020 B0B4 C6A9"), SLC_U("B2F4 C740 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D"))
     For Each row In rows
         PutRow ws, buffer, fill, outRow, row
     Next row
     FlushRows ws, buffer, fill, outRow
-    FormatTable ws, outRow - 1, 3, False
-    ws.Columns("A").ColumnWidth = 29
-    ws.Columns("B:C").ColumnWidth = 52
-    ws.Range("A2:C" & CStr(outRow - 1)).Rows.AutoFit
-    ws.Range("A2:C2").Interior.Color = RGB(232, 241, 248)
-    ws.Range("A2:C2").Font.Bold = True
+    FormatTable ws, outRow - 1, 2, False
+    ws.Columns("A").ColumnWidth = 25
+    ws.Columns("B").ColumnWidth = 80
+    ws.Range("A2:B" & CStr(outRow - 1)).Rows.AutoFit
+    ws.Range("A2:B2").Interior.Color = RGB(232, 241, 248)
+    ws.Range("A2:B2").Font.Bold = True
 End Sub
 
 Private Function SourceOf(ByVal list As CSLCList) As String
@@ -158,28 +148,28 @@ End Function
 
 Private Function LocationSummary(ByVal list As CSLCList) As String
     If list Is Nothing Then LocationSummary = SLC_U("BE44 AD50 0020 C804"): Exit Function
-    LocationSummary = SLC_U("C800 C7A5 0020") & list.OccurrenceSamples.Count & SLC_U("AC1C 0020 002F 0020 C0DD B7B5 0020") & list.OmittedOccurrences & SLC_U("AC1C")
+    LocationSummary = SLC_U("D45C C2DC 0020") & list.OccurrenceSamples.Count & SLC_U("AC1C 0020 002F 0020 D45C C2DC D558 C9C0 0020 C54A C740 0020 C704 CE58 0020") & list.OmittedOccurrences & SLC_U("AC1C")
 End Function
 
 Private Function ErrorSummary(ByVal list As CSLCList) As String
     If list Is Nothing Then ErrorSummary = SLC_U("BE44 AD50 0020 C804"): Exit Function
-    ErrorSummary = SLC_U("C800 C7A5 0020") & list.ErrorSamples.Count & SLC_U("AC1C 0020 002F 0020 C0DD B7B5 0020") & list.OmittedErrors & SLC_U("AC1C")
+    ErrorSummary = SLC_U("D45C C2DC 0020") & list.ErrorSamples.Count & SLC_U("AC1C 0020 002F 0020 D45C C2DC D558 C9C0 0020 C54A C740 0020 C624 B958 0020") & list.OmittedErrors & SLC_U("AC1C")
 End Function
 
 Private Sub WriteDifferences(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
     Dim keys As Variant, k As Variant, buffer() As Variant, fill As Long, outRow As Long, tick As Long
     InitBuffer buffer, 10
     outRow = 1
-    PutRow ws, buffer, fill, outRow, Array(SLC_U("BA85 B2E8 0020 BE44 AD50 0020 ACB0 ACFC"), SLC_U("AC12 0020 B610 B294 0020 AC1C C218 AC00 0020 B2E4 B978 0020 D56D BAA9"))
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("B450 0020 BAA9 B85D C758 0020 CC28 C774"), SLC_U("AC12 C774 B098 0020 AC1C C218 AC00 0020 B2E4 B978 0020 D56D BAA9 B9CC 0020 D45C C2DC D569 B2C8 B2E4 002E"))
     PutRow ws, buffer, fill, outRow, Array(SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D"), a.Source)
     PutRow ws, buffer, fill, outRow, Array(SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D"), b.Source)
-    PutRow ws, buffer, fill, outRow, Array(SLC_U("B2F4 C740 0020 C2DC AC01"), Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"), Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
-    PutRow ws, buffer, fill, outRow, Array(SLC_U("BE44 AD50 0020 B300 C0C1 0020 D56D BAA9"), a.Total, b.Total, SLC_U("C6D0 BCF8 ACFC 0020 C774 C804 0020 ACB0 ACFC B294 0020 BC14 AFB8 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E"))
-    PutRow ws, buffer, fill, outRow, Array(SLC_U("C81C C678 0020 C9D1 ACC4"), ExclusionText(a), ExclusionText(b), SLC_U("C228 AE34 0020 C140 00B7 D544 D130 0020 C81C C678 B294 0020 C77D C9C0 0020 C54A C2B5 B2C8 B2E4 002E 0020 C624 B958 B97C 0020 BE80 0020 ACB0 ACFC B294 0020 C6D0 BCF8 0020 C804 CCB4 0020 C77C CE58 AC00 0020 C544 B2D9 B2C8 B2E4 002E"))
-    PutRow ws, buffer, fill, outRow, Array(SLC_U("BE44 AD50 0020 AE30 C900"), SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), SLC_CompletionPolicyText())
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("B2F4 C740 0020 C2DC AC01"), SLC_U("CCAB 0020 BAA9 B85D 003A 0020") & Format$(a.CapturedAt, "yyyy-mm-dd hh:nn:ss"), SLC_U("B458 C9F8 0020 BAA9 B85D 003A 0020") & Format$(b.CapturedAt, "yyyy-mm-dd hh:nn:ss"))
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("BE44 AD50 D55C 0020 AC12 C758 0020 AC1C C218"), SLC_U("CCAB 0020 BAA9 B85D 003A 0020") & CStr(a.Total) & SLC_U("AC1C"), SLC_U("B458 C9F8 0020 BAA9 B85D 003A 0020") & CStr(b.Total) & SLC_U("AC1C"), SLC_U("C6D0 BCF8 0020 AC12 C740 0020 CC98 C74C 0020 BC1C ACAC D55C 0020 C140 C758 0020 C608 C785 B2C8 B2E4 002E"))
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("BE44 AD50 C5D0 C11C 0020 BE80 0020 C140"), SLC_U("CCAB 0020 BAA9 B85D 003A 0020") & ExclusionText(a), SLC_U("B458 C9F8 0020 BAA9 B85D 003A 0020") & ExclusionText(b), SLC_U("C228 AE34 0020 C140 00B7 D544 D130 B85C 0020 AC00 B824 C9C4 0020 C140 C740 0020 C81C C678 D569 B2C8 B2E4 002E 0020 C624 B958 0020 C140 C740 0020 BE44 AD50 D558 C9C0 0020 BABB D588 C2B5 B2C8 B2E4 002E"))
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("BE44 AD50 0020 C124 C815"), SLC_RulesText(a.CompareFullEmail, a.IgnoreCase), SLC_U("B354 0020 B9CE C740 0020 AC1C C218 C640 0020 C6D0 BCF8 0020 C140 0020 C704 CE58 003A 0020 0046 007E 004B C5F4 0020 C120 D0DD 0020 2192 0020 C6B0 D074 B9AD 0020 2192 0020 C228 AE30 AE30 0020 CDE8 C18C"))
     FlushRows ws, buffer, fill, outRow
-    WriteHeaders ws, Array(SLC_U("C0C1 D0DC"), SLC_U("BE44 AD50 C5D0 0020 C4F4 0020 AC12"), SLC_U("CCAB 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), SLC_U("CCAB 0020 BAA9 B85D 0020 AC1C C218"), _
-        SLC_U("B458 C9F8 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 AC1C C218"), SLC_U("CCAB 0020 BAA9 B85D 0020 B0A8 C740 0020 C218"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 B0A8 C740 0020 C218"), SLC_U("CCAB 0020 BAA9 B85D 0020 B300 D45C 0020 C8FC C18C"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 B300 D45C 0020 C8FC C18C")), 8
+    WriteHeaders ws, Array(SLC_U("CC28 C774"), SLC_U("BE44 AD50 D55C 0020 AC12"), SLC_U("CCAB 0020 BAA9 B85D 0020 C6D0 BCF8 0020 AC12 0020 0028 C608 0029"), SLC_U("CCAB 0020 BAA9 B85D 0020 AC1C C218"), _
+        SLC_U("B458 C9F8 0020 BAA9 B85D 0020 C6D0 BCF8 0020 AC12 0020 0028 C608 0029"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 AC1C C218"), SLC_U("CCAB 0020 BAA9 B85D C774 0020 B354 0020 B9CE C740 0020 AC1C C218"), SLC_U("B458 C9F8 0020 BAA9 B85D C774 0020 B354 0020 B9CE C740 0020 AC1C C218"), SLC_U("CCAB 0020 BAA9 B85D 0020 C6D0 BCF8 0020 C140 0020 0028 C608 0029"), SLC_U("B458 C9F8 0020 BAA9 B85D 0020 C6D0 BCF8 0020 C140 0020 0028 C608 0029")), 8
     outRow = 9
     keys = a.Counts.Keys
     For Each k In keys
@@ -195,26 +185,31 @@ Private Sub WriteDifferences(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b
     Next k
     FlushRows ws, buffer, fill, outRow
     FormatTable ws, outRow - 1, 10, True, 8
-    ws.Columns("A").ColumnWidth = 24
-    ws.Columns("B:C").ColumnWidth = 28
-    ws.Columns("E").ColumnWidth = 28
+    ws.Columns("A").ColumnWidth = 20
+    ws.Columns("B").ColumnWidth = 32
+    ws.Columns("C").ColumnWidth = 26
+    ws.Columns("E").ColumnWidth = 26
     ws.Columns("D").ColumnWidth = 13
     ws.Columns("F:H").ColumnWidth = 13
+    ws.Columns("G:H").ColumnWidth = 18
     ws.Columns("I:J").ColumnWidth = 18
     ws.Range("D9:D" & CStr(outRow - 1)).NumberFormat = "0"
     ws.Range("F9:H" & CStr(outRow - 1)).NumberFormat = "0"
-    ws.Range("B2:J2").Merge
-    ws.Range("B3:J3").Merge
-    ws.Range("D5:J5").Merge
-    ws.Range("D6:J6").Merge
-    ws.Range("C7:J7").Merge
-    ws.Rows(6).RowHeight = 64
+    ws.Columns("G:J").Hidden = True
+    ws.Range("B1:F1").Merge
+    ws.Range("B2:F2").Merge
+    ws.Range("B3:F3").Merge
+    ws.Range("D5:F5").Merge
+    ws.Range("D6:F6").Merge
+    ws.Range("C7:F7").Merge
+    ws.Rows(4).RowHeight = 42
+    ws.Rows(6).RowHeight = 52
     ws.Rows(7).RowHeight = 48
     ws.Range("A1:J1").Font.Bold = True
 End Sub
 
 Private Function ExclusionText(ByVal list As CSLCList) As String
-    ExclusionText = SLC_U("BE48 CE78 0020") & CStr(list.BlankCount) & SLC_U("0020 002F 0020 C624 B958 0020") & CStr(list.ErrorCount) & SLC_U("0020 002F 0020 C81C BAA9 00B7 D569 ACC4 0020") & CStr(list.MetadataCount)
+    ExclusionText = SLC_U("BE48 CE78 0020") & CStr(list.BlankCount) & SLC_U("AC1C 0020 002F 0020 C624 B958 0020") & CStr(list.ErrorCount) & SLC_U("AC1C 0020 002F 0020 D45C 0020 C81C BAA9 00B7 D569 ACC4 0020") & CStr(list.MetadataCount) & SLC_U("AC1C")
 End Function
 
 
@@ -225,9 +220,9 @@ Private Sub AddDifference(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRe
     cb = CountOf(b, key)
     If ca = cb Then Exit Sub
     If ca = 0 Then
-        status = SLC_U("B450 0020 BC88 C9F8 0020 BAA9 B85D C5D0 B9CC 0020 C788 C74C")
+        status = SLC_U("B458 C9F8 0020 BAA9 B85D C5D0 B9CC 0020 C788 C74C")
     ElseIf cb = 0 Then
-        status = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D C5D0 B9CC 0020 C788 C74C")
+        status = SLC_U("CCAB 0020 BAA9 B85D C5D0 B9CC 0020 C788 C74C")
     ElseIf ca <> cb Then
         status = SLC_U("AC1C C218 AC00 0020 B2E4 B984")
     Else
@@ -240,7 +235,7 @@ End Sub
 
 Private Sub WriteLocations(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As CSLCList)
     Dim buffer() As Variant, fill As Long, outRow As Long
-    WriteHeaders ws, Array(SLC_U("AD6C BD84"), SLC_U("BAA9 B85D"), SLC_U("BE44 AD50 C5D0 0020 C4F4 0020 AC12"), SLC_U("C6D0 B798 0020 AC12 0020 002F 0020 C624 B958 0020 C885 B958"), SLC_U("C140 0020 C8FC C18C"), SLC_U("C77D B294 0020 BC29 BC95 0020 002F 0020 C0DD B7B5"))
+    WriteHeaders ws, Array(SLC_U("AD6C BD84"), SLC_U("BAA9 B85D"), SLC_U("BE44 AD50 D55C 0020 AC12"), SLC_U("C6D0 BCF8 0020 AC12 0020 002F 0020 C624 B958"), SLC_U("C6D0 BCF8 0020 C140 0020 C704 CE58"), SLC_U("C548 B0B4"))
     InitBuffer buffer, 6
     outRow = 2
     AddErrorRows ws, buffer, fill, outRow, a, SLC_U("CCAB 0020 BC88 C9F8")
@@ -251,33 +246,34 @@ Private Sub WriteLocations(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b A
     FormatTable ws, outRow - 1, 6, True
     ws.Columns("A").ColumnWidth = 18
     ws.Columns("B").ColumnWidth = 12
+    ws.Columns("B").Hidden = True
     ws.Columns("C").ColumnWidth = 25
     ws.Columns("D").ColumnWidth = 38
     ws.Columns("E").ColumnWidth = 16
-    ws.Columns("F").ColumnWidth = 55
+    ws.Columns("F").ColumnWidth = 38
 End Sub
 
 Private Sub AddErrorRows(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, _
                          ByRef outRow As Long, ByVal list As CSLCList, ByVal label As String)
     Dim sample As Variant
     If list.ErrorSamples.Count = 0 Then
-        PutRow ws, buffer, fill, outRow, Array(SLC_U("C624 B958 0020 C548 B0B4"), label, "", SLC_U("C800 C7A5 B41C 0020 C624 B958 0020 D45C BCF8 0020 C5C6 C74C"), "", ErrorSummary(list))
+        PutRow ws, buffer, fill, outRow, Array(SLC_U("C624 B958 0020 C548 B0B4"), label, "", SLC_U("D45C C2DC D560 0020 C624 B958 0020 C5C6 C74C"), "", ErrorSummary(list))
     Else
         For Each sample In list.ErrorSamples
-            PutRow ws, buffer, fill, outRow, Array(SLC_U("C81C C678 D55C 0020 C624 B958"), label, "", sample(1), sample(0), SLC_U("B2F4 C740 0020 C2DC C810 C758 0020 C624 B958 C785 B2C8 B2E4 002E 0020 C6D0 BCF8 C740 0020 BCC0 ACBD D558 C9C0 0020 C54A C2B5 B2C8 B2E4 002E"))
+            PutRow ws, buffer, fill, outRow, Array(SLC_U("BE44 AD50 C5D0 C11C 0020 BE80 0020 C624 B958"), label, "", sample(1), sample(0), SLC_U("C6D0 BCF8 C5D0 C11C 0020 C624 B958 B97C 0020 D655 C778 D558 C138 C694 002E"))
         Next sample
     End If
     If list.OmittedErrors > 0 Then
-        PutRow ws, buffer, fill, outRow, Array(SLC_U("C624 B958 0020 D45C BCF8 0020 C0DD B7B5"), label, "", "", "", CStr(list.OmittedErrors) & SLC_U("AC1C B294 0020 D45C BCF8 0020 D55C B3C4 B85C 0020 C704 CE58 B97C 0020 C800 C7A5 D558 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E"))
+        PutRow ws, buffer, fill, outRow, Array(SLC_U("CD94 AC00 0020 C624 B958"), label, "", "", "", CStr(list.OmittedErrors) & SLC_U("AC1C B294 0020 D45C C2DC 0020 D55C B3C4 B97C 0020 B118 C5B4 0020 C704 CE58 B97C 0020 D45C C2DC D558 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E"))
     End If
 End Sub
 
 Private Sub AddLocationRows(ByVal ws As Worksheet, ByRef buffer() As Variant, ByRef fill As Long, _
                             ByRef outRow As Long, ByVal list As CSLCList, ByVal label As String)
     Dim sample As Variant
-    PutRow ws, buffer, fill, outRow, Array(SLC_U("BC1C C0DD C704 CE58 0020 C548 B0B4"), label, "", "", "", LocationSummary(list) & SLC_U("003B 0020 D2B9 C815 0020 C140 C774 0020 C798 BABB B418 C5C8 B2E4 B294 0020 B73B C774 0020 C544 B2D9 B2C8 B2E4 002E"))
+    PutRow ws, buffer, fill, outRow, Array(SLC_U("C704 CE58 0020 C548 B0B4"), label, "", SLC_U("C6D0 BCF8 0020 D30C C77C 00B7 C2DC D2B8 B294 0020 005B C694 C57D 005D C5D0 C11C 0020 D655 C778 D558 C138 C694 002E"), "", LocationSummary(list))
     For Each sample In list.OccurrenceSamples
-        PutRow ws, buffer, fill, outRow, Array(SLC_U("BC1C C0DD C704 CE58 0020 D45C BCF8"), label, Mid$(CStr(sample(0)), 4), sample(1), sample(2), SLC_U("BAA9 B85D C758 0020 C6D0 BCF8 0020 C704 CE58 B294 0020 C694 C57D C744 0020 D655 C778 D558 C138 C694 002E"))
+        PutRow ws, buffer, fill, outRow, Array(SLC_U("B2F4 C740 0020 AC12"), label, Mid$(CStr(sample(0)), 4), sample(1), sample(2), "")
     Next sample
 End Sub
 
@@ -431,7 +427,7 @@ Public Function SLC_ReportTests() As String
     Set testBook = WriteReport(a, b, 3, 5, 0)
     AssertReport testBook.Worksheets.Count = 1, "Comparison sheet count"
     AssertReport testBook.Worksheets(1).Name = SLC_U("BA85 B2E8 BE44 AD50 005F ACB0 ACFC"), "RC9 compatible sheet name"
-    AssertReport testBook.Worksheets(1).Cells(8, 3).Value2 = SLC_U("CCAB 0020 BAA9 B85D 0020 C6D0 B798 0020 AC12 0020 0028 C608 0029"), "RC9 compatible columns"
+    AssertReport testBook.Worksheets(1).Cells(8, 3).Value2 = SLC_U("CCAB 0020 BAA9 B85D 0020 C6D0 BCF8 0020 AC12 0020 0028 C608 0029"), "RC9 compatible columns"
     AssertReport InStr(CStr(testBook.Worksheets(1).Cells(6, 2).Value2), SLC_U("C624 B958 0020 0031")) > 0, "Excluded errors disclosed"
     For Each ws In testBook.Worksheets
         formulaState = ws.UsedRange.HasFormula
@@ -464,7 +460,7 @@ Public Function SLC_ReportTests() As String
     AssertReport testBook Is Nothing, "Equal values must not create a result"
     Set testBook = WriteReport(a, absent, 0, 0, 0)
     AssertReport testBook.Worksheets.Count = 2, "Preview sheet count"
-    AssertReport CStr(testBook.Worksheets(1).Cells(2, 2).Value2) = SLC_U("B2F4 C740 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D 0020 D655 C778 0020 0028 BE44 AD50 0020 C804 0029"), "Preview heading"
+    AssertReport CStr(testBook.Worksheets(1).Cells(2, 2).Value2) = SLC_U("B2F4 C544 0020 B454 0020 CCAB 0020 BC88 C9F8 0020 BAA9 B85D C785 B2C8 B2E4 002E 0020 C544 C9C1 0020 BE44 AD50 D558 C9C0 0020 C54A C558 C2B5 B2C8 B2E4 002E"), "Preview heading"
     testBook.Close SaveChanges:=False
     Set testBook = Nothing
     If Not oldBook Is Nothing Then oldBook.Activate

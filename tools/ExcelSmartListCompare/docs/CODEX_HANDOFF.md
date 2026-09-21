@@ -1,8 +1,10 @@
 # Windows 빌드·실기 검증 인계
 
-상태: **RC10 게시 완료 · 전체 인수 NOT_MET 유지** · 2026-09-20
+상태: **R12 문구 교정 배포 · 기능 테스트 미실행** · 2026-09-21
 
-## 현재 기준
+현재 안내는 [R12 사용 안내](RC12_USER_GUIDE.md), 제작·게시 결과는 [R12 기록](RC12_RELEASE_REPORT.md)을 따른다. 비교 로직은 R11을 유지한다. R12의 기존 테스트 생략은 사용자의 명시적 요청과 [ADR-0020](ADR-0020-R12-wording-release.md)에 한정한다. 제작에는 `Invoke-IsolatedExcelCandidate.ps1 -BuildOnly -ExpectedReleaseVersion 0.2.0-rc.12`와 `package_r12.py`를 사용한다. 임시 VBA 접근은 명시적인 허용을 받은 경우에만 선택하며 제작 후 원복한다.
+
+## RC10 당시 기준과 후속 검증 참고
 
 - 제품 안내: [RC10 설치·사용](RC10_USER_GUIDE.md)
 - 배포 파일·해시·게시 확인: [RC10 게시 기록](RC10_PUBLICATION_20260920.md)
