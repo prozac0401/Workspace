@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "product": "ExcelSmartListCompare",
+  "version": "0.2.0-rc.12",
+  "releaseProfile": "wording-only-no-tests",
+  "releaseDecision": "PUBLISH_WORDING_ONLY_WITHOUT_RUNTIME_TESTS",
+  "fullAcceptancePassed": false,
+  "sourceCommit": "c1e365d2155a594d4b864609da7656796bd1a345",
+  "xlamSha256": "78b89e4b0ca33eb9e14d81ddfc2f3a551503b95dafe4a674516ef2f54b74cc9c",
+  "exeSha256": "620bf021fe7a37392b8b761da00c6cf72c80f249a6f31781dd3ce9e0e57d1a23",
+  "payloadSha256": {
+    "Install.cmd": "856101b23c7296a97406e41ccb1bbf475d4d196e392f0d1dcce085eb5cdd6bd5",
+    "Uninstall.cmd": "35874701e8d930f1258d7cd9e7de554855c7e989e02f54f686014908c56b1712",
+    "Setup.ps1": "859cc2020ea93cd8fa96a73a8244433af896112b353a4347c3761ed153c35656",
+    "README.md": "74e71897c5e76ef92908807493bb27a50f9380473d7fc7fb26ea5331c47fdbf5",
+    "ExcelSmartListCompare.xlam": "78b89e4b0ca33eb9e14d81ddfc2f3a551503b95dafe4a674516ef2f54b74cc9c"
+  },
+  "fileVersion": "0.2.0.12001",
+  "sourceScope": {
+    "baseline": "excel-smart-list-compare-v0.2.0-rc.11",
+    "unchangedFiles": [
+      "src/CSLCList.cls",
+      "src/CSLCList_utf8.cls",
+      "src/CSLCAppEvents.cls",
+      "src/CSLCAppEvents_utf8.cls",
+      "src/modSLCNormalize.bas",
+      "src/modSLCNormalize_utf8.bas",
+      "src/ThisWorkbook_events.txt",
+      "src/customUI14.xml",
+      "Install.cmd",
+      "Uninstall.cmd",
+      "installer/SingleFile.iss"
+    ],
+    "mainModule": "string literals only",
+    "installerEngine": "version string only",
+    "reportDataAndTransactionLogic": "unchanged; display strings only",
+    "reportPresentation": "wording, summary rows, widths, merged cells and hidden columns"
+  },
+  "build": {
+    "mode": "BuildOnly",
+    "savedSourceMatches": true,
+    "releaseVersionFromSource": "0.2.0-rc.12",
+    "excelExited": true,
+    "temporaryAccessRestored": true,
+    "existingInstallationPreserved": true,
+    "compilerSha256": "a7472a35be9cd63da59e54c2622a0d8b048ab2ec85382e2b2d47a5a79dbf9bef",
+    "buildRecordSha256": "f28d03e6471bc1faffa4ff4407a8ffca6fb5803340c47bd96cbc3c76b355c024",
+    "serializedSourceAuditSha256": "bed5066d483a851de7fafbde98df30dc63efe07b44ec6274beb1832fc5dd31c6"
+  },
+  "tests": {
+    "pythonRegression": "NOT_RUN: explicitly omitted by the user for the R12 wording release",
+    "excelFunctional": "NOT_RUN: explicitly omitted by the user for the R12 wording release",
+    "excelUI": "NOT_RUN: explicitly omitted by the user for the R12 wording release",
+    "performance": "NOT_RUN: explicitly omitted by the user for the R12 wording release",
+    "cancellation": "NOT_RUN: explicitly omitted by the user for the R12 wording release",
+    "installUpgradeUninstall": "NOT_RUN: explicitly omitted by the user for the R12 wording release"
+  },
+  "installerExecutedOnUserPc": false
+}
