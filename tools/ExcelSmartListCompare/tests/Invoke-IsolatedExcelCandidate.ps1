@@ -331,6 +331,16 @@ public static class SlcIsolatedBinding {
         $audit.expectedSha256=Hash-File $candidate;$audit.actualSha256=$audit.expectedSha256
         $audit.phase='candidate-saved';Save-Audit
         Assert-OwnedWorkspace
+        if($BuildOnly){
+            # Building does not require macro execution or reopening an untrusted
+            # add-in. Audit serialized source separately with audit_candidate.py.
+            $mainSource=[IO.File]::ReadAllText((Join-Path $sourceSnapshot 'modSLCMain.bas'),[Text.Encoding]::ASCII)
+            $versionMatch=[regex]::Match($mainSource,'(?m)^\s*SLC_ReleaseVersion\s*=\s*"([^"]+)"\s*$')
+            if(-not $versionMatch.Success -or $versionMatch.Groups[1].Value -cne $ExpectedReleaseVersion){throw 'Imported release version mismatch.'}
+            $audit.releaseVersion=$versionMatch.Groups[1].Value
+            $audit.releaseVersionSource='imported-source'
+            $audit.serializedSourceAudit='NOT_RUN: use external read-only source audit'
+        }else{
         Set-Phase 'before-saved-candidate-reopen'
         $candidateBook=$excel.Workbooks.Open($candidate,0,$true);[void]$ownedBooks.Add($candidateBook)
         Set-Phase 'after-saved-candidate-reopen'
@@ -339,7 +349,6 @@ public static class SlcIsolatedBinding {
         $q="'"+([string]$candidateBook.Name).Replace("'","''")+"'!"
         $audit.releaseVersion=[string]$excel.Run($q+'SLC_ReleaseVersion')
         if($audit.releaseVersion -cne $ExpectedReleaseVersion){throw 'Saved candidate release version mismatch.'}
-        if(-not $BuildOnly){
         # A normal workbook provides the same active-window context as use of
         # the add-in. Keep ownership explicit and close it with the other books.
         $harnessBook=$excel.Workbooks.Add(-4167);[void]$ownedBooks.Add($harnessBook)
@@ -356,8 +365,8 @@ public static class SlcIsolatedBinding {
         $audit.phase='detach-candidate-ui';Save-Audit
         [void]$excel.Run($q+'SLC_DetachUI')
         $audit.runtimeTests='PASS'
-        }
         Close-OwnedBook $candidateBook;$candidateBook=$null
+        }
         $audit.finalSha256=Hash-File $candidate
         if($audit.finalSha256 -cne $audit.expectedSha256){throw 'Candidate bytes changed during read-only testing.'}
         $audit.status='PASS';$exitCode=0

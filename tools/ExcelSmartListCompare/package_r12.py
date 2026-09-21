@@ -83,6 +83,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate", type=Path, required=True)
     parser.add_argument("--build-record", type=Path, required=True)
+    parser.add_argument("--source-audit", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--iscc", type=Path, default=Path(r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"))
     args = parser.parse_args()
@@ -95,7 +96,7 @@ def main():
             or record.get("tests") != [] or not record.get("runtimeTests", "").startswith("NOT_RUN")
             or record.get("releaseVersion") != VERSION or record.get("cleanupErrors") != []
             or any(record.get(key) is not True for key in ("candidateSaved", "accessRestored", "installedPreserved", "existingExcelPreserved", "excelExited"))
-            or any(record.get(key) != "PASS" for key in ("inMemoryImportAudit", "serializedSourceAudit"))
+            or record.get("inMemoryImportAudit") != "PASS" or record.get("releaseVersionSource") != "imported-source"
             or Path(record.get("candidatePath", "")).resolve() != candidate
             or digest(candidate) != record.get("finalSha256") or digest(candidate) != record.get("expectedSha256")):
         raise SystemExit("R12 requires a matching successful BuildOnly record with no product tests and complete cleanup.")
@@ -104,6 +105,14 @@ def main():
     hashes = {item["name"]: item["sha256"] for item in record["inputHashes"]}
     if set(hashes) != expected_inputs or any(digest(TOOL / "src" / name) != value for name, value in hashes.items()):
         raise SystemExit("Build inputs do not match the current source.")
+    source_audit = json.loads(args.source_audit.read_text(encoding="utf-8-sig"))
+    if (source_audit.get("status") != "PASS" or source_audit.get("errors") != []
+            or source_audit.get("xlamSha256Before") != digest(candidate)
+            or source_audit.get("xlamSha256After") != digest(candidate)
+            or source_audit.get("sourceHashes") != hashes
+            or source_audit.get("serializedVba", {}).get("status") != "PASS"
+            or source_audit.get("scriptSha256") != digest(TOOL / "tests/audit_candidate.py")):
+        raise SystemExit("Saved XLAM does not have a matching read-only serialized source audit.")
     commit = git("rev-parse", "HEAD").decode().strip()
     names = git("ls-files", "tools/ExcelSmartListCompare", "scripts/package-excel-launcher-release.py").decode().splitlines()
     # Older R11 notes may be edited locally by another task; they are not R12 inputs.
@@ -147,9 +156,10 @@ def main():
                   "fullAcceptancePassed": False, "sourceCommit": commit,
                   "xlamSha256": digest(candidate), "exeSha256": digest(exe), "payloadSha256": pins,
                   "fileVersion": "0.2.0.12001", "sourceScope": scope,
-                  "build": {"mode": "BuildOnly", "savedSourceMatches": True, "releaseVersionRead": VERSION,
+                  "build": {"mode": "BuildOnly", "savedSourceMatches": True, "releaseVersionFromSource": VERSION,
                             "excelExited": True, "temporaryAccessRestored": True, "existingInstallationPreserved": True,
-                            "compilerSha256": digest(args.iscc), "buildRecordSha256": digest(args.build_record)},
+                            "compilerSha256": digest(args.iscc), "buildRecordSha256": digest(args.build_record),
+                            "serializedSourceAuditSha256": digest(args.source_audit)},
                   "tests": {name: "NOT_RUN: explicitly omitted by the user for the R12 wording release" for name in (
                       "pythonRegression", "excelFunctional", "excelUI", "performance", "cancellation", "installUpgradeUninstall")},
                   "installerExecutedOnUserPc": False}
