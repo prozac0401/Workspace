@@ -80,7 +80,33 @@
     "verifiedAtUtc": "2026-09-21T04:08:17.876629+00:00"
   },
   "pages": {
-    "status": "PENDING",
-    "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/"
+    "status": "PASS",
+    "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/",
+    "httpStatus": 200,
+    "verifiedAtUtc": "2026-09-21T04:11:00.029751+00:00",
+    "r12GuideAndDownloadLinks": true,
+    "workflowUrl": "https://github.com/prozac0401/Workspace/actions/runs/35559927189",
+    "workflowStatus": "PASS",
+    "deploymentCommit": "4b2c60d49c4891b95a31812bbeb4225b06108cdb",
+    "pagesChecked": [
+      {
+        "url": "https://prozac0401.github.io/Workspace/",
+        "httpStatus": 200,
+        "sha256": "5cdd35eb4095ffc73bcf7c4cef29c8e6795e9f0df9ef481fe1070d0773ca4f25"
+      },
+      {
+        "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/",
+        "httpStatus": 200,
+        "sha256": "82ce361485e4b099140867f98b7f02cd94ba89ed4d501dbbac66324cac9fe69f"
+      }
+    ],
+    "nonPublicSpecification": {
+      "url": "https://prozac0401.github.io/Workspace/tools/excel-list-compare/r12-specification/",
+      "httpStatus": 404
+    }
+  },
+  "finalBuildCleanup": {
+    "temporaryVbaAccessRestored": true,
+    "remainingExcelProcesses": 0
   }
 }
