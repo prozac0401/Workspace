@@ -40,6 +40,7 @@ $audit=[ordered]@{
 $excel=$null;$process=$null;$bootstrap=$null;$bootstrapBook=$null;$candidateBook=$null;$probeBook=$null;$harnessBook=$null
 $installedPath=$null;$installedManifest=$null;$installedSnapshot=$null;$securityPath=$null
 $accessSnapshotTaken=$false;$securityWritten=$false;$unknownBooks=$false;$ownedBooks=New-Object Collections.ArrayList
+$priorEnableEvents=$null
 $mutex=$null;$locked=$false;$exitCode=1
 function Save-Audit {
     $destination=Join-Path $output 'usability.private.json';$temporary=Join-Path $output 'usability.private.writing'
@@ -279,6 +280,7 @@ public static class SlcIsolatedBinding {
     $excel.UserControl=$false
     Set-Phase 'after-user-control'
     Set-Phase 'before-disable-events'
+    $priorEnableEvents=[bool]$excel.EnableEvents
     $excel.EnableEvents=$false
     Set-Phase 'after-disable-events'
     Set-Phase 'before-excel-version'
@@ -379,7 +381,7 @@ public static class SlcIsolatedBinding {
     if($null -ne $excel){
         try{Assert-OwnedWorkspace}catch{$unknownBooks=$true;$audit.cleanupErrors+=@($_.Exception.Message)}
         for($i=$ownedBooks.Count-1;$i -ge 0;$i--){try{Close-OwnedBook $ownedBooks[$i]}catch{$audit.cleanupErrors+=@($_.Exception.Message)}}
-        if(-not $unknownBooks){try{Assert-OwnedApplication;Set-Phase 'before-owned-excel-quit';$excel.Quit();Set-Phase 'after-owned-excel-quit'}catch{$audit.cleanupErrors+=@($_.Exception.Message)}}
+        if(-not $unknownBooks){try{Assert-OwnedApplication;if($null -ne $priorEnableEvents){$excel.EnableEvents=$priorEnableEvents};Set-Phase 'before-owned-excel-quit';$excel.Quit();Set-Phase 'after-owned-excel-quit'}catch{$audit.cleanupErrors+=@($_.Exception.Message)}}
         Release-Com $excel;$excel=$null
     }
     $candidateBook=$null;$probeBook=$null;$bootstrapBook=$null;$harnessBook=$null
