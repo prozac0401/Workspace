@@ -46,8 +46,9 @@ hide:
 |---|---|
 | 폴더에 업무 진행 상태를 표시하고 싶어요 | **[FolderState 0.1.3 RC1 받기](tools/folderstate/installation.md)** — 폴더를 고르고 현재 상태를 누르세요. |
 | Excel의 두 목록에서 값과 개수의 차이를 찾고 싶어요 | **[Excel 명단 비교 R12 받기](tools/excel-list-compare/index.md)** — 첫 번째 목록을 담고 두 번째 목록을 선택해 비교하세요. |
+| 보던 문서 위치나 웹페이지로 다시 돌아가고 싶어요 | **[업무 책갈피 0.2.0 받기](tools/bookmark/index.md)** — Ctrl+Alt+B로 남기고 목록이나 포스트잇 스티커에서 이어가세요. |
 
-FolderState 0.1.3 RC1은 폴더 확인과 아이콘 위치 적용을 분리합니다. Excel 명단 비교 R12는 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 다운로드 전에 각 설치 안내에서 사용 환경과 제한을 확인하세요.
+FolderState 0.1.3 RC1은 폴더 확인과 아이콘 위치 적용을 분리합니다. Excel 명단 비교 R12는 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 업무 책갈피 0.2.0은 스티커의 이동·크기 조절과 최근 삭제 복원을 지원합니다. 다운로드 전에 각 설치 안내에서 사용 환경과 제한을 확인하세요.
 
 </section>
 
@@ -208,6 +209,6 @@ FolderState 0.1.3 RC1은 폴더 확인과 아이콘 위치 적용을 분리합�
 </div>
 
 !!! info "회사 기준을 먼저 확인하세요"
-    이 업무 안내는 **제안 단계**입니다. 회사에서 허용한 저장 위치와 자료 보관 기간, 기준으로 쓸 원본, 백업 방법은 [회사에서 정할 항목](policies/decisions.md)을 참고해 결정하세요. 상태를 바꾸거나 업무를 끝내도 되는지는 담당자가 확인합니다. 프로그램은 시험용이며 사용 가능한 환경과 제한은 [FolderState 설치 안내](tools/folderstate/installation.md)와 [Excel 명단 비교 안내](tools/excel-list-compare/index.md)를 보세요.
+    이 업무 안내는 **제안 단계**입니다. 회사에서 허용한 저장 위치와 자료 보관 기간, 기준으로 쓸 원본, 백업 방법은 [회사에서 정할 항목](policies/decisions.md)을 참고해 결정하세요. 상태를 바꾸거나 업무를 끝내도 되는지는 담당자가 확인합니다. 프로그램별 배포 상태와 사용 환경·제한은 [FolderState 설치 안내](tools/folderstate/installation.md), [Excel 명단 비교 안내](tools/excel-list-compare/index.md), [업무 책갈피 안내](tools/bookmark/index.md)를 보세요.
 
 </div>

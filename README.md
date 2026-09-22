@@ -1,17 +1,18 @@
 # Workspace
 
-**필요한 자료를 찾고, 다음에 할 일을 알 수 있도록 돕습니다.** 파일과 메일을 정리하는 방법, 폴더에 진행 상태를 표시하는 FolderState, 두 목록을 비교하는 Excel 명단 비교를 제공합니다.
+**필요한 자료를 찾고, 다음에 할 일을 알 수 있도록 돕습니다.** 파일과 메일을 정리하는 방법, 폴더에 진행 상태를 표시하는 FolderState, 두 목록을 비교하는 Excel 명단 비교, 저장한 작업 위치로 돌아가는 업무 책갈피를 안내합니다.
 
 [지금 할 일 찾기](docs/quick-reference.md)에서 자신의 상황을 골라 보세요. 처음 사용한다면 [업무 하나로 시작하기](docs/getting-started.md)를 따라 하면 됩니다. 반복하는 업무는 복사용 기본 폴더를 만들어 두고 새 업무를 시작할 때 복사해 씁니다. 업무가 끝나면 그 폴더를 통째로 보관합니다.
 
 - **[FolderState 설치·사용](docs/tools/folderstate/installation.md)**: Windows 폴더 아이콘으로 업무 진행 상태를 표시합니다.
 - **[Excel 명단 비교 설치·사용](docs/tools/excel-list-compare/index.md)**: 두 목록에서 다른 값과 중복된 값을 찾습니다.
+- **[업무 책갈피 설치·사용](docs/tools/bookmark/index.md)**: 문서 위치·웹페이지를 남기고 목록이나 포스트잇 스티커에서 다시 엽니다.
 - **[파일과 메일 정리하기](docs/policies/workspace.md)**: 현재 업무, 복사용 기본 폴더, 끝난 업무를 어디에 둘지 안내합니다.
 - **[놓치는 일과 반복 작업 줄이기](docs/policies/work-efficiency.md)**: 요청을 모으거나 이전 해결 방법을 찾기 어려울 때 필요한 방법만 골라 씁니다.
 
 [안내 사이트](https://prozac0401.github.io/Workspace/) · [폴더 상태 도구의 최초 명세](01_Windows_Explorer_폴더상태도구_명세.md) · [파일·폴더·메일 정리의 최초 설계안](02_사무실PC_파일폴더이메일_정리설계안.md)
 
-업무 안내는 **제안 단계**입니다. 저장 위치와 자료 보관 기간 등은 회사에서 정한 기준을 따릅니다. 안내 사이트에는 업무 안내와 두 프로그램의 설치·사용법을 공개합니다. 개발 명세·설계·양식·배포·검증 기록은 이 저장소에서 관리하며 사이트에는 공개하지 않습니다.
+업무 안내는 **제안 단계**입니다. 저장 위치와 자료 보관 기간 등은 회사에서 정한 기준을 따릅니다. 안내 사이트에는 업무 안내와 세 프로그램의 설치·사용법을 공개합니다. 개발 명세·설계·양식·배포·검증 기록은 저장소에서 관리하며 사이트에는 공개하지 않습니다.
 
 ## 프로그램 받기
 
@@ -19,8 +20,11 @@
 |---|---|---|
 | FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
 | Excel 명단 비교 0.2.0 R12 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
+| 업무 책갈피 0.2.0 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.0/WorkBookmark-0.2.0-win-x64.msi) · [ZIP·배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.0) | [설치·사용 안내](docs/tools/bookmark/index.md) |
 
-Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 사용자 요청에 따라 기존 테스트는 실행하지 않았으며 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 두 프로그램의 설치 파일에는 코드 서명이 없습니다.
+Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 사용자 요청에 따라 기존 테스트는 실행하지 않았으며 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 세 프로그램의 설치 파일에는 코드 서명이 없습니다.
+
+업무 책갈피 0.2.0은 포스트잇 스티커와 최근 삭제 복원을 추가했습니다. 기존 데이터 형식을 갱신하므로 업데이트 전에 [백업·복원 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 배포 파일은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark)에서 관리합니다.
 
 현재 배포·검증 결과와 과거 기록은 [배포·검증 안내](docs/delivery/index.md)에서 구분해 확인하세요.
 

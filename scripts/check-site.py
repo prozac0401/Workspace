@@ -15,6 +15,7 @@ public_routes = {
     'tools/folderstate/', 'tools/folderstate/installation/',
     'tools/folderstate/troubleshooting/',
     'tools/excel-list-compare/',
+    'tools/bookmark/',
 }
 public_assets = {
     'assets/extra.css', 'assets/folderstate.png',
