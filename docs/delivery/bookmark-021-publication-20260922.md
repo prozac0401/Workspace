@@ -2,7 +2,7 @@
 
 ## 요청과 변경
 
-사용자가 포스트잇 수정본의 확인 후 공개 배포를 요청했습니다. BookMark 저장소에서 제품 소스·MSI·ZIP을 배포하고, Workspace의 기존 공개 안내와 다운로드 링크를 0.2.1로 맞춥니다.
+사용자가 포스트잇 수정본의 확인 후 공개 배포를 요청했습니다. BookMark 저장소에서 제품 소스·MSI·ZIP을 배포하고, Workspace의 기존 공개 안내와 다운로드 링크를 0.2.1로 맞췄습니다.
 
 - 스티커 모드 시작 시 자동 표시와 일반 창보다 항상 위 표시.
 - 이어가기를 누른 스티커에만 처리 표시.
@@ -39,4 +39,11 @@ GitHub 업로드 자산 6개의 크기와 SHA-256을 로컬 최종 배포본과 
 
 로컬 `python -m mkdocs build --strict`와 `scripts/check-site.py site`를 통과했습니다. 공개 16페이지+404, 8개 자산, 검색·사이트맵 공개 범위와 로컬 링크를 확인했습니다. 생성된 업무 책갈피 페이지의 0.2.1 다운로드·검증 링크 5개와 새 조작 설명을 별도 검토했습니다. 이전 고정 버튼 안내, 업무 기록·로컬 경로·원시 진단 링크는 포함하지 않았습니다.
 
-비인증 다운로드 확인과 Pages 워크플로·실제 공개 URL 결과는 완료 후 아래에 추가합니다.
+## 게시 후 확인
+
+- 위 배포 파일 6개를 인증정보 없이 HTTPS로 다시 내려받아 모두 HTTP 200과 표의 SHA-256 일치를 확인했습니다. 내려받은 MSI의 `NotSigned`, 소스 커밋 정보, 패키지 검사 54/54와 실제 설치 `NOT RUN`도 대조했습니다.
+- Workspace 안내 커밋은 `823ae5eb90f3cb15237a26435460ca75cb777f75`이며, [Documentation 실행 35707170181](https://github.com/prozac0401/Workspace/actions/runs/35707170181)의 빌드·Pages 배포 성공을 확인했습니다.
+- [공개 업무 책갈피 안내](https://prozac0401.github.io/Workspace/tools/bookmark/)를 포함한 공개 페이지 16개와 자산 8개에서 비인증 HTTP 200을 확인했습니다. 홈페이지·도구 안내에 0.2.1이 표시되고, MSI·ZIP 다운로드가 v0.2.1을 가리키며, 이전 v0.2.0 다운로드 링크가 남지 않았습니다.
+- 실제 HTML에서 같은 스티커 메모 입력, 일반 창 최상단 표시, 검사 수와 실기 제한을 확인했습니다. Pages 공개 범위와 기존 Excel R11 작업은 유지했습니다.
+
+로컬 증거는 `artifacts/bookmark-021-publication-20260922/anonymous-download-verification.json`, `public-site-verification.json`, `pages-deploy.log`에 보관하고 Pages에 복사하지 않았습니다. 본 절은 게시 성공 후 결과를 기록하는 후속 문서 변경입니다.
