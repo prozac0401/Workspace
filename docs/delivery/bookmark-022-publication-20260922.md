@@ -38,4 +38,11 @@ Release 빌드 경고 0·오류 0, 데스크톱 검사 **197개**를 통과했�
 
 `python -m mkdocs build --strict`와 `scripts/check-site.py site`를 통과했습니다. 공개 16페이지+404, 검색·사이트맵·로컬 링크와 자산 8개를 확인했습니다. 사용 안내에서 버튼을 누르는 설명을 메모 영역 클릭으로 바꾸고, 실제 이번 검사 수인 Desktop 197개·패키지 54개를 표시했습니다.
 
-비인증 다운로드와 Pages 게시 결과는 확인 후 아래에 기록합니다.
+## 게시 후 확인
+
+- 공개 자산 6개를 인증정보 없이 다시 내려받아 로컬 최종 배포본과 SHA-256 일치를 확인했습니다. 내려받은 소스 커밋 정보, MSI `NotSigned`, 패키지 54/54·관리 이미지 추출 성공·실제 설치 `NOT RUN`도 대조했습니다.
+- 안내 커밋 `adeebcdd57f204da2a614adf3c9c8173e2f836c9`의 [Documentation 실행 35709798992](https://github.com/prozac0401/Workspace/actions/runs/35709798992)이 빌드·Pages 배포에 성공했습니다.
+- [공개 사용 안내](https://prozac0401.github.io/Workspace/tools/bookmark/)와 홈페이지에서 0.2.2 표시 및 다운로드 링크를 확인했습니다. 메모 영역 왼쪽 한 번 클릭·별도 버튼 제거·197/54 검사 수가 실제 HTML에 반영됐으며 이전 v0.2.1 다운로드 링크는 남지 않았습니다.
+- 공개 페이지 16개와 자산 8개 모두 비인증 HTTP 200을 확인했습니다. 배포가 진행 중일 때의 첫 조회는 0.2.1이었으며, 워크플로 성공 후 다시 조회해 새 내용 반영을 확인했습니다.
+
+로컬 확인 자료는 `artifacts/bookmark-022-publication-20260922/public-download-verification.json`, `public-site-verification.json`, `pages-deploy.log`에 보관하며 Pages에 복사하지 않습니다. 이 절은 게시 성공 후 결과를 추가하는 후속 기록입니다.
