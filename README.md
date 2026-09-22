@@ -20,11 +20,11 @@
 |---|---|---|
 | FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
 | Excel 명단 비교 0.2.0 R12 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
-| 업무 책갈피 0.2.1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.1/WorkBookmark-0.2.1-win-x64.msi) · [ZIP·배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.1) | [설치·사용 안내](docs/tools/bookmark/index.md) |
+| 업무 책갈피 0.2.2 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.2/WorkBookmark-0.2.2-win-x64.msi) · [ZIP·배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.2) | [설치·사용 안내](docs/tools/bookmark/index.md) |
 
 Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 사용자 요청에 따라 기존 테스트는 실행하지 않았으며 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 세 프로그램의 설치 파일에는 코드 서명이 없습니다.
 
-업무 책갈피 0.2.1은 포스트잇을 항상 위에 표시하고, 해당 스티커 안에서 메모를 입력하며 파일 종류 아이콘을 보여 줍니다. 0.2.0과 같은 데이터 형식을 사용합니다. 업데이트 전에 [백업·복원 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 배포 파일은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark)에서 관리합니다.
+업무 책갈피 0.2.2는 포스트잇의 메모 글이나 빈 메모 영역을 한 번 눌러 바로 편집합니다. 스티커를 항상 위에 표시하고 파일 종류 아이콘을 보여 줍니다. 0.2.0과 같은 데이터 형식을 사용합니다. 업데이트 전에 [백업·복원 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 배포 파일은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark)에서 관리합니다.
 
 현재 배포·검증 결과와 과거 기록은 [배포·검증 안내](docs/delivery/index.md)에서 구분해 확인하세요.
 
