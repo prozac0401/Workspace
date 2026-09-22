@@ -42,4 +42,11 @@ Release 전체 솔루션 빌드 경고 0·오류 0, Desktop 검사 **209개**를
 
 `python -m mkdocs build --strict`와 `scripts/check-site.py site`를 통과했습니다. 공개 페이지 16개+404, 자산 8개, 검색·사이트맵·로컬 링크와 비공개 원본 제외 범위를 확인했습니다. 홈페이지와 설치·사용 안내에 0.2.3 다운로드, 창 이동 자동저장·저장 버튼 제거, 실제 검사 수 209개·54개를 반영했습니다.
 
-공개 다운로드 재확인과 Pages 배포 후 확인은 완료 뒤 이 기록에 추가합니다. 로컬 자료는 `artifacts/bookmark-023-publication-20260922`에 보관하며 Pages에 복사하지 않습니다.
+## 게시 후 확인
+
+- 공개 자산 6개를 인증 없이 내려받아 모두 HTTP 200과 로컬 최종 배포본의 크기·SHA-256 일치를 확인했습니다. 내려받은 소스 스냅샷의 커밋·깨끗한 작업 트리, MSI `NotSigned`, 패키지 54/54·관리 이미지 추출 성공·실제 설치 `NOT RUN`도 대조했습니다.
+- 안내 커밋 `853aa6e30cacfaa46e9ce8fc5ee3277e01d24107`의 [Documentation 실행 35713843707](https://github.com/prozac0401/Workspace/actions/runs/35713843707)이 빌드·Pages 배포에 성공했습니다.
+- [공개 사용 안내](https://prozac0401.github.io/Workspace/tools/bookmark/)와 홈페이지에서 0.2.3 표시를 확인했습니다. 다른 창·스티커로 이동할 때 자동저장, 저장 버튼 제거, 검사 수 209개·54개 및 새 MSI·ZIP 링크가 실제 HTML에 반영됐습니다. 이전 v0.2.2 다운로드 링크는 남지 않았습니다.
+- 공개 페이지 16개와 자산 8개 모두 비인증 HTTP 200을 확인했습니다.
+
+로컬 자료는 `artifacts/bookmark-023-publication-20260922/public-download-verification.json`, `public-site-verification.json`, `pages-deploy.log`에 보관하며 Pages에 복사하지 않습니다. 이 절은 게시 성공 후 결과를 추가하는 후속 기록입니다.
