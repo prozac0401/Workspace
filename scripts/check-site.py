@@ -3,6 +3,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 import json
+import re
 import sys
 import xml.etree.ElementTree as ET
 
@@ -17,6 +18,7 @@ public_routes = {
     'tools/excel-list-compare/',
     'tools/bookmark/',
     'tools/excel-selection-export/', 'tools/file-list-to-excel/',
+    'tools/visible-cells-paste/',
 }
 public_assets = {
     'assets/extra.css', 'assets/folderstate.png',
@@ -74,6 +76,10 @@ else:
     for entry in json.loads(search_file.read_text(encoding='utf-8'))['docs']:
         route = route_from_url(entry['location'])
         search_routes.add(route)
+        if route == 'tools/visible-cells-paste/':
+            text = entry.get('title', '') + ' ' + entry.get('text', '')
+            if re.search(r'평가판|시험|테스트|미검증|검증\s*(?:상태|결과)|\b(?:PASS|FAIL|BLOCKED)\b|NOT RUN', text, re.IGNORECASE):
+                errors.append('VisibleCellsPaste public guide contains development status or test results')
         if route not in public_routes:
             errors.append(f'Non-public search entry: {entry["location"]}')
     for route in sorted(public_routes - search_routes):

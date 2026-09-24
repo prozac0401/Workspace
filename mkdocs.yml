@@ -21,6 +21,7 @@ exclude_docs: |
   !/tools/bookmark/index.md
   !/tools/excel-selection-export/index.md
   !/tools/file-list-to-excel/index.md
+  !/tools/visible-cells-paste/index.md
   !/assets/extra.css
   !/assets/folderstate.png
   !/assets/handbook/workspace-flow.webp
@@ -97,6 +98,7 @@ nav:
       - 업무 책갈피 설치·사용: tools/bookmark/index.md
       - 선택범위 내보내기 설치·사용: tools/excel-selection-export/index.md
       - 탐색기 파일 목록을 Excel로: tools/file-list-to-excel/index.md
+      - 보이는 칸 붙여넣기 설치·사용: tools/visible-cells-paste/index.md
   - 불편할 때 더 살펴보기:
       - 반복되는 불편 줄이기: policies/work-efficiency.md
       - 일을 이어서 하고 다른 사람에게 넘기기: policies/folder-workflow.md
