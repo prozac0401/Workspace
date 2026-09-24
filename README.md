@@ -1,18 +1,20 @@
 # Workspace
 
-**필요한 자료를 찾고, 다음에 할 일을 알 수 있도록 돕습니다.** 파일과 메일을 정리하는 방법, 폴더에 진행 상태를 표시하는 FolderState, 두 목록을 비교하는 Excel 명단 비교, 저장한 작업 위치로 돌아가는 업무 책갈피를 안내합니다.
+**필요한 자료를 찾고, 다음에 할 일을 알 수 있도록 돕습니다.** 파일과 메일을 정리하는 방법, 폴더에 진행 상태를 표시하는 FolderState, 두 목록을 비교하는 Excel 명단 비교, 저장한 작업 위치로 돌아가는 업무 책갈피, 보이는 셀을 새 통합문서로 만드는 선택범위 내보내기, 탐색기 파일 목록과 중복 검사 결과를 Excel로 만드는 File List to Excel을 안내합니다.
 
 [지금 할 일 찾기](docs/quick-reference.md)에서 자신의 상황을 골라 보세요. 처음 사용한다면 [업무 하나로 시작하기](docs/getting-started.md)를 따라 하면 됩니다. 반복하는 업무는 복사용 기본 폴더를 만들어 두고 새 업무를 시작할 때 복사해 씁니다. 업무가 끝나면 그 폴더를 통째로 보관합니다.
 
 - **[FolderState 설치·사용](docs/tools/folderstate/installation.md)**: Windows 폴더 아이콘으로 업무 진행 상태를 표시합니다.
 - **[Excel 명단 비교 설치·사용](docs/tools/excel-list-compare/index.md)**: 두 목록에서 다른 값과 중복된 값을 찾습니다.
+- **[선택범위 내보내기 설치·사용](docs/tools/excel-selection-export/index.md)**: 설치 후 Excel 시작 시 메뉴가 준비되며, 보이는 셀과 수식 결과를 새 통합문서로 만듭니다.
+- **[File List to Excel 설치·사용](docs/tools/file-list-to-excel/index.md)**: 탐색기에서 파일·폴더를 우클릭해 목록과 중복 검사 결과를 Excel로 만듭니다.
 - **[업무 책갈피 설치·사용](docs/tools/bookmark/index.md)**: 문서 위치·웹페이지를 남기고 목록이나 포스트잇 스티커에서 다시 엽니다.
 - **[파일과 메일 정리하기](docs/policies/workspace.md)**: 현재 업무, 복사용 기본 폴더, 끝난 업무를 어디에 둘지 안내합니다.
 - **[놓치는 일과 반복 작업 줄이기](docs/policies/work-efficiency.md)**: 요청을 모으거나 이전 해결 방법을 찾기 어려울 때 필요한 방법만 골라 씁니다.
 
 [안내 사이트](https://prozac0401.github.io/Workspace/) · [폴더 상태 도구의 최초 명세](01_Windows_Explorer_폴더상태도구_명세.md) · [파일·폴더·메일 정리의 최초 설계안](02_사무실PC_파일폴더이메일_정리설계안.md)
 
-업무 안내는 **제안 단계**입니다. 저장 위치와 자료 보관 기간 등은 회사에서 정한 기준을 따릅니다. 안내 사이트에는 업무 안내와 세 프로그램의 설치·사용법을 공개합니다. 개발 명세·설계·양식·배포·검증 기록은 저장소에서 관리하며 사이트에는 공개하지 않습니다.
+업무 안내는 **제안 단계**입니다. 저장 위치와 자료 보관 기간 등은 회사에서 정한 기준을 따릅니다. 안내 사이트에는 업무 안내와 다섯 프로그램의 설치·사용법을 공개합니다. 개발 명세·설계·양식·배포·검증 기록은 저장소에서 관리하며 사이트에는 공개하지 않습니다.
 
 ## 프로그램 받기
 
@@ -20,17 +22,21 @@
 |---|---|---|
 | FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
 | Excel 명단 비교 0.2.0 R12 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
+| 선택범위 내보내기 0.1.0-rc.9 평가판 | [Excel x64용 EXE](https://github.com/prozac0401/Workspace/releases/download/excel-selection-export-v0.1.0-rc.9/ExcelSelectionExport-0.1.0-rc.9-x64-Setup.exe) · [x86용·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.9) | [설치·사용·알려진 제한](docs/tools/excel-selection-export/index.md) |
+| File List to Excel 1.1.0 | [Windows x64 MSI](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.1.0/FileListToExcel-1.1.0-win-x64.msi) · [배포 자료](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.1.0) | [설치·사용 안내](docs/tools/file-list-to-excel/index.md) |
 | 업무 책갈피 0.2.3 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.3/WorkBookmark-0.2.3-win-x64.msi) · [ZIP·배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.3) | [설치·사용 안내](docs/tools/bookmark/index.md) |
 
-Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 사용자 요청에 따라 기존 테스트는 실행하지 않았으며 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 세 프로그램의 설치 파일에는 코드 서명이 없습니다.
+Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 사용자 요청에 따라 기존 테스트는 실행하지 않았으며 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 현재 안내하는 설치 파일에는 코드 서명이 없습니다.
 
 업무 책갈피 0.2.3은 포스트잇의 메모 영역을 눌러 편집하고 다른 창이나 스티커로 이동하면 자동 저장합니다. 스티커에는 저장 버튼이 없습니다. 스티커를 항상 위에 표시하고 파일 종류 아이콘을 보여 줍니다. 0.2.0과 같은 데이터 형식을 사용합니다. 업데이트 전에 [백업·복원 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 배포 파일은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark)에서 관리합니다.
+
+선택범위 내보내기는 컴파일된 COM 추가 기능이며 명단 비교와 설치·메뉴·제거가 별도입니다. 현재 PC에서 자동 메뉴와 실제 내보내기를 확인했지만, Undo 기록 소실과 외부 API 시험 후 Excel 잔존 문제가 남아 있습니다. x86 실제 실행·격리 환경·재부팅·완전 제거·전체 공존 시험은 미실행입니다. 시험판 게시를 전체 인수 완료로 해석하지 않습니다. File List to Excel은 별도 저장소에서 이미 공개된 v1.1.0만 안내하며, 미게시 개발 기능은 포함하지 않습니다.
 
 현재 배포·검증 결과와 과거 기록은 [배포·검증 안내](docs/delivery/index.md)에서 구분해 확인하세요.
 
 ## 개발자가 프로그램을 만드는 방법
 
-FolderState는 C# / .NET 10 / WPF로 만들었습니다. 아래 명령은 Windows 11 x64에서 실행합니다. .NET SDK 버전은 `global.json`을 따릅니다. 두 도구의 현재 확인 범위는 [배포·검증 안내](docs/delivery/index.md)를 참고하세요.
+FolderState는 C# / .NET 10 / WPF로 만들었습니다. 아래 명령은 Windows 11 x64에서 실행합니다. .NET SDK 버전은 `global.json`을 따릅니다. 각 도구의 현재 확인 범위는 [배포·검증 안내](docs/delivery/index.md)를 참고하세요.
 
 ```powershell
 dotnet run --project tests/FolderState.Tests -c Release
