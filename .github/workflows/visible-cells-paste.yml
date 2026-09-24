@@ -1,0 +1,50 @@
+name: VisibleCellsPaste Windows build
+on:
+  push:
+    branches: [main]
+    paths: ['tools/VisibleCellsPaste/**', 'docs/tools/visible-cells-paste/**', '.github/workflows/visible-cells-paste.yml']
+  pull_request:
+    paths: ['tools/VisibleCellsPaste/**', 'docs/tools/visible-cells-paste/**', '.github/workflows/visible-cells-paste.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build, test and verify standalone package
+        # Package metadata inspection uses Windows PowerShell and .NET Framework.
+        shell: powershell
+        run: ./tools/VisibleCellsPaste/build/build.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visible-cells-paste-windows-build
+          path: |
+            artifacts/visible-cells-paste/*/VisibleCellsPaste_*.zip
+            artifacts/visible-cells-paste/*/SHA256SUMS.txt
+            artifacts/visible-cells-paste/*/package/build-manifest.json
+            artifacts/visible-cells-paste/*/compile-x86.log
+            artifacts/visible-cells-paste/*/compile-x64.log
+            artifacts/visible-cells-paste/*/compile-setup.log
+            artifacts/visible-cells-paste/*/core-tests-build.log
+            artifacts/visible-cells-paste/*/core-tests.log
+            artifacts/visible-cells-paste/*/native-clipboard-tests-build.log
+            artifacts/visible-cells-paste/*/native-clipboard-tests.log
+            artifacts/visible-cells-paste/*/bulk-snapshot-tests-build.log
+            artifacts/visible-cells-paste/*/bulk-snapshot-tests.log
+            artifacts/visible-cells-paste/*/addin-lifecycle-tests-build.log
+            artifacts/visible-cells-paste/*/addin-lifecycle-tests.log
+            artifacts/visible-cells-paste/*/com-lifetime-tests-build.log
+            artifacts/visible-cells-paste/*/com-lifetime-tests.log
+            artifacts/visible-cells-paste/*/global-state-recovery-tests-build.log
+            artifacts/visible-cells-paste/*/global-state-recovery-tests.log
+            artifacts/visible-cells-paste/*/presentation-entry-tests-build.log
+            artifacts/visible-cells-paste/*/presentation-entry-tests.log
+            artifacts/visible-cells-paste/*/setup-tests-build.log
+            artifacts/visible-cells-paste/*/setup-tests.log
+          if-no-files-found: warn
