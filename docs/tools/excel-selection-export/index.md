@@ -36,7 +36,7 @@ Excel의 **파일 → 계정 → Excel 정보**에서 비트수를 확인한 뒤
 ## 한 번 설치하고 메뉴 사용하기 {#install}
 
 1. 필요한 작업을 저장하고 Excel 창을 모두 닫습니다.
-2. Excel 비트수에 맞는 **ExcelSelectionExport-0.1.0-rc.9-x64-Setup.exe** 또는 **x86-Setup.exe**를 실행합니다.
+2. Excel 비트수에 맞는 **ExcelSelectionExport-0.1.0-rc.9-x64-Setup.exe** 또는 **ExcelSelectionExport-0.1.0-rc.9-x86-Setup.exe**를 실행합니다.
 3. 설치를 마친 뒤 Excel을 평소처럼 엽니다.
 4. 셀을 우클릭해 **선택범위 내보내기 → 새 Excel로** 메뉴를 확인합니다.
 

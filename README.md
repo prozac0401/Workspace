@@ -18,6 +18,12 @@
 
 ## 프로그램 받기
 
+**다운로드 전 확인:** 현재 안내하는 설치 파일에는 코드 서명이 없습니다. 제품별 설치 안내에서 사용 환경과 알려진 제한을 먼저 확인하세요.
+
+선택범위 내보내기는 컴파일된 COM 추가 기능이며 명단 비교와 설치·메뉴·제거가 별도입니다. 현재 PC에서 자동 메뉴와 실제 내보내기를 확인했지만, Undo 기록 소실과 외부 API 시험 후 Excel 잔존 문제가 남아 있습니다. x86 실제 실행·격리 환경·재부팅·완전 제거·전체 공존 시험은 미실행입니다. 시험판 게시를 전체 인수 완료로 해석하지 않습니다. File List to Excel은 별도 저장소에서 이미 공개된 v1.1.0만 안내하며, 미게시 개발 기능은 포함하지 않습니다.
+
+File List to Excel v1.1.0은 일부 시험 PC에서 파일 우클릭 메뉴 등록을 확인하지 못한 알려진 문제가 있습니다. 자세한 결과와 미검증 환경은 [설치 안내](docs/tools/file-list-to-excel/index.md)에서 확인하세요.
+
 | 프로그램 | 설치 파일 | 확인할 내용 |
 |---|---|---|
 | FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
@@ -29,8 +35,6 @@
 Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 사용자 요청에 따라 기존 테스트는 실행하지 않았으며 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 현재 안내하는 설치 파일에는 코드 서명이 없습니다.
 
 업무 책갈피 0.2.3은 포스트잇의 메모 영역을 눌러 편집하고 다른 창이나 스티커로 이동하면 자동 저장합니다. 스티커에는 저장 버튼이 없습니다. 스티커를 항상 위에 표시하고 파일 종류 아이콘을 보여 줍니다. 0.2.0과 같은 데이터 형식을 사용합니다. 업데이트 전에 [백업·복원 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 배포 파일은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark)에서 관리합니다.
-
-선택범위 내보내기는 컴파일된 COM 추가 기능이며 명단 비교와 설치·메뉴·제거가 별도입니다. 현재 PC에서 자동 메뉴와 실제 내보내기를 확인했지만, Undo 기록 소실과 외부 API 시험 후 Excel 잔존 문제가 남아 있습니다. x86 실제 실행·격리 환경·재부팅·완전 제거·전체 공존 시험은 미실행입니다. 시험판 게시를 전체 인수 완료로 해석하지 않습니다. File List to Excel은 별도 저장소에서 이미 공개된 v1.1.0만 안내하며, 미게시 개발 기능은 포함하지 않습니다.
 
 현재 배포·검증 결과와 과거 기록은 [배포·검증 안내](docs/delivery/index.md)에서 구분해 확인하세요.
 
