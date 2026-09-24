@@ -60,9 +60,9 @@ BrtOleSize의 공식 의미는 임베디드 표시 범위다. 위의 복사 원�
 
 필터 표본의 BrtOleSize는 원래 B13:B16(4행)을 나타내고 BrtWsDim/셀 테이블은 B13부터3행이다. 빈칸은 가운데1개로 유지됐다. 1900-02-29라는 Excel XML 표시 문자열도 .NET 날짜로 해석하지 않고 네이티브 숫자60으로 읽었다.
 
-기계 판정·각 형식의 SHA256·셀별 원시 레코드 좌표·제품 출력은 [독립 날짜 검증 JSON](../../../artifacts/visible-cells-paste/release-validation/date-capture/independent-date-review.json)에 기록했다. 각 캡처 실행 로그의 모든 sequence가 동일하고 CutCopyMode=1이 확인된 것도 대조했다. 원본 업무 파일·실시간 Excel·실시간 클립보드에 접근하지 않고 저장된 합성 표본만 분석했다.
+기계 판정·각 형식의 SHA256·셀별 원시 레코드 좌표·제품 출력은 독립 날짜 검증 JSON (`artifacts/visible-cells-paste/release-validation/date-capture/independent-date-review.json`)에 기록했다. 각 캡처 실행 로그의 모든 sequence가 동일하고 CutCopyMode=1이 확인된 것도 대조했다. 원본 업무 파일·실시간 Excel·실시간 클립보드에 접근하지 않고 저장된 합성 표본만 분석했다.
 
-1900 원본의 가로3항목을 Date1904=True인 대상의 보이는 E2/E5/E8에 실제 우클릭 메뉴로 붙여넣었다. [붙여넣기 결과](../../../artifacts/visible-cells-paste/release-validation/date-capture/cross-date-system-ui-paste.json)에서45200/0.5/0.125가 그대로 들어가고, 숨긴 E3/E4/E6/E7의102/103/105/106과 전체 숫자 표시 형식0.0000이 유지됐다. [되돌리기 결과](../../../artifacts/visible-cells-paste/release-validation/date-capture/cross-date-system-ui-undo.json)는 E2:E8이 초기값101~107로 복구되고 날짜 체계·숨김·표시 형식이 유지된 것을 보여 준다. 초기값 근거는 DateFlowProbe.cs의 target 명령이며, 제품 진단은 success 후 undone을 보고했다. 이 독립 대조는 해당 실제 UI 시험의 저장 로그를 읽은 것으로, UI 조작을 새로 수행한 것은 아니다.
+1900 원본의 가로3항목을 Date1904=True인 대상의 보이는 E2/E5/E8에 실제 우클릭 메뉴로 붙여넣었다. 붙여넣기 결과 (`artifacts/visible-cells-paste/release-validation/date-capture/cross-date-system-ui-paste.json`)에서45200/0.5/0.125가 그대로 들어가고, 숨긴 E3/E4/E6/E7의102/103/105/106과 전체 숫자 표시 형식0.0000이 유지됐다. 되돌리기 결과 (`artifacts/visible-cells-paste/release-validation/date-capture/cross-date-system-ui-undo.json`)는 E2:E8이 초기값101~107로 복구되고 날짜 체계·숨김·표시 형식이 유지된 것을 보여 준다. 초기값 근거는 DateFlowProbe.cs의 target 명령이며, 제품 진단은 success 후 undone을 보고했다. 이 독립 대조는 해당 실제 UI 시험의 저장 로그를 읽은 것으로, UI 조작을 새로 수행한 것은 아니다.
 
 ## 공식 해석 근거
 
