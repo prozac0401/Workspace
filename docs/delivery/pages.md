@@ -10,7 +10,7 @@ docs/의 Markdown과 mkdocs.yml을 편집합니다. main 반영 후 문서 워�
 
 ## 검토 범위
 
-GitHub Pages에는 업무 운영 안내와 FolderState·Excel 명단 비교·업무 책갈피(WorkBookmark)·선택범위 내보내기·File List to Excel의 다운로드·설치·사용 안내를 게시합니다. 지금 할 일 찾기·자료 정리의 10가지 습관·업무 하나로 시작하기와 회사에서 정할 항목은 업무 안내의 일부로 포함합니다. 메뉴는 시작 → 자료와 업무 정리 → 프로그램 받기 → 불편할 때 더 살펴보기로 구분합니다. 추가 개선안을 기본 사용의 선행 조건으로 두지 않습니다. 개발 정책·원문 명세·설계·양식·배포·검증 기록과 assets/help.html·assets/verification.json은 게시하지 않습니다. 문서 원본은 삭제하지 않고 저장소에서 관리합니다. 공개 Git 저장소의 파일과 이력 자체는 계속 열람 가능하며, Pages 제외는 접근 통제가 아닙니다.
+GitHub Pages에는 업무 운영 안내와 FolderState·Excel 명단 비교·업무 책갈피(WorkBookmark)·선택범위 내보내기·File List to Excel·보이는 칸 붙여넣기의 다운로드·설치·사용 안내를 게시합니다. 지금 할 일 찾기·자료 정리의 10가지 습관·업무 하나로 시작하기와 회사에서 정할 항목은 업무 안내의 일부로 포함합니다. 메뉴는 시작 → 자료와 업무 정리 → 프로그램 받기 → 불편할 때 더 살펴보기로 구분합니다. 추가 개선안을 기본 사용의 선행 조건으로 두지 않습니다. 개발 정책·원문 명세·설계·양식·배포·검증 기록과 assets/help.html·assets/verification.json은 게시하지 않습니다. 문서 원본은 삭제하지 않고 저장소에서 관리합니다. 공개 Git 저장소의 파일과 이력 자체는 계속 열람 가능하며, Pages 제외는 접근 통제가 아닙니다.
 
 설치 파일은 각 도구의 GitHub Release 버전별 URL에 연결합니다. 서로 다른 제품과 시험판의 링크가 섞이지 않도록 `releases/latest/download`는 사용하지 않습니다. 소스 ZIP, 원문 명세, 로컬 진단·검수 파일을 Pages 자산으로 복사하지 않습니다. 다운로드 링크를 추가할 때는 표시 버전과 실제 자산의 이름·내용을 대조하고, 게시 후 실제 URL을 확인합니다. 현재 안내는 Workspace 저장소의 FolderState 0.1.3 RC1·Excel 명단 비교 0.2.0 R12와 별도 `prozac0401/BookMark` 저장소의 WorkBookmark 0.2.3 MSI·포터블 ZIP, Workspace의 선택범위 내보내기 0.1.0-rc.9 평가판 x64/x86 EXE, 별도 `prozac0401/File-List-To-Excel` 저장소의 v1.1.0 x64 MSI에 버전별 링크를 사용합니다. 새 버전을 게시할 때는 홈페이지·루트 README·도구별 설치와 사용 안내를 함께 맞추고, 이전 버전의 시험 결과를 새 파일의 결과로 바꾸어 표시하지 않습니다. 공개 범위 확장은 [ADR-0006](../design/0006-public-tool-downloads.md)과 업무 책갈피 안내를 추가한 [ADR-0008](../design/0008-bookmark-public-guide.md), 두 Excel 도구 안내를 추가한 [ADR-0011](../design/0011-excel-tools-public-guides.md)을 따릅니다.
 
@@ -27,8 +27,10 @@ python -m mkdocs build --strict
 python scripts/check-site.py site
 ```
 
-검사기는 공개 18개 페이지와 404 이외의 HTML, 제외한 원본 자산의 복사, 비공개 문서의 검색·사이트맵 노출, 깨진 로컬 링크를 실패로 처리합니다. 공개 문서 추가 시 설정과 검사기의 명시 목록을 함께 검토합니다. Excel 공개 주소는 `tools/excel-list-compare/`, 업무 책갈피 공개 주소는 `tools/bookmark/`입니다. 선택범위 내보내기는 `tools/excel-selection-export/`, File List to Excel은 `tools/file-list-to-excel/`입니다. 도구 안내를 추가하면서 공개 자산은 늘리지 않습니다. 기존에 노출된 개발 문서 주소는 새 배포 후 404가 되어야 합니다. 검색엔진이나 브라우저의 과거 캐시 삭제까지 보장하지 않습니다.
+검사기는 공개 19개 페이지와 404 이외의 HTML, 제외한 원본 자산의 복사, 비공개 문서의 검색·사이트맵 노출, 깨진 로컬 링크를 실패로 처리합니다. 공개 문서 추가 시 설정과 검사기의 명시 목록을 함께 검토합니다. Excel 공개 주소는 `tools/excel-list-compare/`, 업무 책갈피 공개 주소는 `tools/bookmark/`입니다. 선택범위 내보내기는 `tools/excel-selection-export/`, File List to Excel은 `tools/file-list-to-excel/`입니다. 도구 안내를 추가하면서 공개 자산은 늘리지 않습니다. 기존에 노출된 개발 문서 주소는 새 배포 후 404가 되어야 합니다. 검색엔진이나 브라우저의 과거 캐시 삭제까지 보장하지 않습니다.
 
 ## 운영
 
 오류가 있으면 이전 정상 문서 원본 커밋으로 되돌려 빌드합니다. 생성된 HTML만 직접 편집하지 않습니다. 제품 릴리스와 문서 게시를 연결하되 미검증 상태를 숨기지 않습니다.
+
+보이는 칸 붙여넣기 공개 주소는 tools/visible-cells-paste/입니다. 사용자 요청에 따라 이 페이지는 다운로드·설치·사용·지원 범위·되돌리기·제거만 안내하고 평가·시험 상태·결과는 내부에 보존합니다. 버전0.1.0은 Workspace의 visible-cells-paste-v0.1.0 Release 자산에 고정 연결합니다. 지원 입력과 보안·복구 제한은 사용 안내에 직접 유지합니다. 결정 범위는 [ADR-0012](../design/0012-visible-cells-paste-public-guide.md)를 따릅니다.
