@@ -1,6 +1,6 @@
 # ADR-0012 · 보이는 칸 붙여넣기의 공개 사용 안내와 릴리스
 
-상태: 채택 · 날짜: 2026-09-24 · 결정 담당: 저장소 관리
+상태: 부분 대체 — 고정 다운로드 링크는 [ADR-0014](0014-visible-cells-paste-download-list.md)로 대체, 나머지 결정 유지 · 날짜: 2026-09-24 · 결정 담당: 저장소 관리
 
 관련: 사용자 요청 — 보이는 칸 붙여넣기를 RELEASE로 게시하고 Workspace GitHub Pages에는 사용 방법만 안내하며 평가·시험 상태·시험 결과를 표시하지 않음. [정책 문서 작성 규칙](../policies/documentation.md), [Pages 운영](../delivery/pages.md).
 

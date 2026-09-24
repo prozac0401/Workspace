@@ -4,10 +4,11 @@ Excel에서 복사한 값을 **선택한 한 열의 보이는 칸에만** 순서
 
 ## 프로그램 받기 {#download}
 
-**보이는 칸 붙여넣기 0.1.0** · Windows 데스크톱 Excel · .NET Framework 4.8
+**보이는 칸 붙여넣기** · Windows 데스크톱 Excel · .NET Framework 4.8
 
-[설치 파일 ZIP 받기](https://github.com/prozac0401/Workspace/releases/download/visible-cells-paste-v0.1.0/VisibleCellsPaste_0.1.0.zip){ .md-button .md-button--primary }
-[버전별 다운로드](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.0){ .md-button }
+[배포 파일 목록](https://github.com/prozac0401/Workspace/releases){ .md-button .md-button--primary }
+
+배포 목록에서 **보이는 칸 붙여넣기** 버전을 선택한 뒤, **Assets**의 `VisibleCellsPaste_버전.zip`을 받습니다.
 
 웹용 Excel과 Mac용 Excel에서는 사용할 수 없습니다. 여러 열 붙여넣기는 지원하지 않습니다. 아래 [지원 범위](#supported)와 [되돌리기 조건](#undo)을 먼저 확인하세요.
 
