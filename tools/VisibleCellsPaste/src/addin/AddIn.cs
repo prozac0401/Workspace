@@ -2,8 +2,8 @@ using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Windows.Forms;
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion("0.1.1.0")]
+[assembly: AssemblyFileVersion("0.1.1.0")]
 [assembly: ComVisible(false)]
 namespace VisibleCellsPaste {
  [ComVisible(true), Guid("B65AD801-ABAF-11D0-BB8B-00A0C90F2744"), InterfaceType(ComInterfaceType.InterfaceIsDual)]
@@ -24,35 +24,53 @@ public interface ICallbacks {
 [ComVisible(true),Guid("856B2219-6225-42ED-8FF1-2D06E5913AC8"),ProgId("Workspace.VisibleCellsPaste"),ClassInterface(ClassInterfaceType.None),ComDefaultInterface(typeof(ICallbacks))]
 public sealed class AddIn : StandardOleMarshalObject, IDTExtensibility2, IRibbonExtensibility, ICallbacks {
 private object application; private bool connected; private int clicks; private ExcelEngine engine; private bool busy; private string outcome="idle"; private System.Windows.Forms.Timer timer; private PreparedPaste pending;
-public void OnConnection(object app,int mode,object instance,[In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom) {if(connected||engine!=null)Disconnect();application=app;try{engine=new ExcelEngine(app);((dynamic)instance).Object=this;connected=true;}catch{Disconnect();throw;}}
+public void OnConnection(object app,int mode,object instance,[In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom) {try{if(connected||engine!=null)Disconnect();application=app;try{engine=new ExcelEngine(app);((dynamic)instance).Object=this;connected=true;}catch{Disconnect();throw;}}finally{ExcelEngine.Release(instance);}}
 public void OnDisconnection(int mode,[In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom) {Disconnect();}
 public void OnAddInsUpdate([In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom){}
 public void OnStartupComplete([In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom){}
 public void OnBeginShutdown([In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom){Disconnect();}
 public string GetCustomUI(string id) {return "<customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui'><contextMenus><contextMenu idMso='ContextMenuCell'><button id='VCPVisibleCellsPastePasteCellV1' insertBeforeMso='Cut' tag='VCP.VisibleCellsPaste.Paste.v1' label='보이는 칸에 붙여넣기' onAction='Paste'/><button id='VCPVisibleCellsPasteUndoCellV1' insertBeforeMso='Cut' tag='VCP.VisibleCellsPaste.Undo.v1' label='마지막 붙여넣기 되돌리기' onAction='Undo'/></contextMenu><contextMenu idMso='ContextMenuListRange'><button id='VCPVisibleCellsPastePasteTableV1' insertBeforeMso='Cut' tag='VCP.VisibleCellsPaste.Paste.v1' label='보이는 칸에 붙여넣기' onAction='Paste'/><button id='VCPVisibleCellsPasteUndoTableV1' insertBeforeMso='Cut' tag='VCP.VisibleCellsPaste.Undo.v1' label='마지막 붙여넣기 되돌리기' onAction='Undo'/></contextMenu></contextMenus></customUI>";}
-public void Paste(object control){
+public void Paste(object control){try{PasteCore();}finally{ExcelEngine.Release(control);}}
+private void PasteCore(){
  if(!connected||busy)return;busy=true;clicks++;
  try {var source=ClipboardReader.ReadSnapshot(Convert.ToInt32(((dynamic)application).CutCopyMode));pending=engine.Prepare(source);
- if(pending.Formulas>0||pending.Clears>0||pending.Plan.RequiresSizeConfirmation) {string msg="보이는 "+pending.Before.Length+"칸에 복사한 순서대로 입력합니다.\n기존 수식 "+pending.Formulas+"개가 값으로 바뀌고, 내용이 있는 "+pending.Clears+"칸이 빈칸으로 지워집니다.\n복사한 순서대로 입력합니다. 이름이나 사번을 찾아 연결하지 않습니다. 원본과 대상의 개수가 같아도 사람의 순서까지 일치한다는 뜻은 아닙니다.";if(MessageBox.Show(new Owner(application),msg,"보이는 칸 붙여넣기",MessageBoxButtons.OKCancel,MessageBoxIcon.Warning)!=DialogResult.OK){pending=null;busy=false;return;}}
+ if(pending.Formulas>0||pending.Clears>0||pending.Plan.RequiresSizeConfirmation) {string msg="보이는 "+pending.Before.Length+"칸에 복사한 순서대로 입력합니다.\n기존 수식 "+pending.Formulas+"개가 값으로 바뀌고, 내용이 있는 "+pending.Clears+"칸이 빈칸으로 지워집니다.\n복사한 순서대로 입력합니다. 이름이나 사번을 찾아 연결하지 않습니다. 원본과 대상의 개수가 같아도 사람의 순서까지 일치한다는 뜻은 아닙니다.";if(MessageBox.Show(new Owner(application),msg,"보이는 칸 붙여넣기",MessageBoxButtons.OKCancel,MessageBoxIcon.Warning)!=DialogResult.OK){pending.Dispose();pending=null;busy=false;return;}}
  timer=new System.Windows.Forms.Timer();timer.Interval=50;timer.Tick+=RunPending;timer.Start();outcome="pending";
- }catch(Exception e){pending=null;busy=false;Notice(e);}
+ }catch(Exception e){if(pending!=null)pending.Dispose();pending=null;busy=false;Notice(e);}
 }
-public void Undo(object control){if(!connected||busy)return;busy=true;try{engine.UndoLast();outcome="undone";ShowStatus("마지막 붙여넣기를 되돌렸습니다.");}catch(Exception e){Notice(e);}finally{busy=false;}}
+public void Undo(object control){try{UndoCore();}finally{ExcelEngine.Release(control);}}
+private void UndoCore(){if(!connected||busy)return;busy=true;try{engine.UndoLast();outcome="undone";ShowStatus("마지막 붙여넣기를 되돌렸습니다.");}catch(Exception e){Notice(e);}finally{busy=false;}}
 public string GetDiagnostics(){return "stage=M2;connected="+connected+";clicks="+clicks+";bitness="+(IntPtr.Size*8)+";outcome="+outcome+";engine="+(engine==null?"none":engine.LastOutcome);}
 
 private sealed class Owner:IWin32Window {readonly IntPtr hwnd;public Owner(object a){hwnd=new IntPtr(Convert.ToInt64(((dynamic)a).Hwnd));}public IntPtr Handle{get{return hwnd;}}}
 private void Disconnect(){
  connected=false;
- try {
+ try{
   if(timer!=null){timer.Stop();timer.Dispose();timer=null;}
   if(statusTimer!=null){statusTimer.Stop();statusTimer.Dispose();statusTimer=null;RestoreStatus();}
  }finally{
-  pending=null;
-  try{if(engine!=null)engine.Dispose();}
-  finally{engine=null;application=null;busy=false;}
+  try{if(pending!=null)pending.Dispose();}
+  finally{pending=null;try{if(engine!=null)engine.Dispose();}
+   finally{engine=null;application=null;busy=false;}}
  }
 }
-private void RunPending(object sender,EventArgs args){timer.Stop();timer.Dispose();timer=null;var work=pending;pending=null;try{if(work==null||!connected)return;if(work.Plan.RequiresSizeConfirmation){using(var progress=new ProgressDialog()){Exception failure=null;progress.Shown+=delegate{progress.BeginInvoke((Action)delegate{try{engine.Apply(work,delegate{Application.DoEvents();return progress.Canceled;},delegate(string text){progress.SetStage(text);});}catch(Exception e){failure=e;}finally{progress.Finish();}});};progress.ShowDialog(new Owner(application));if(failure!=null)throw failure;}}else engine.Apply(work,null,null);outcome="success";ShowStatus("보이는 "+engine.LastCount+"칸에 붙여넣었습니다.");}catch(Exception e){Notice(e);}finally{busy=false;}}
+private void RunPending(object sender,EventArgs args){
+ timer.Stop();timer.Dispose();timer=null;var work=pending;pending=null;bool engineOwnsWork=false;
+ try{
+  if(work==null||!connected)return;
+  if(work.Plan.RequiresSizeConfirmation){
+   using(var progress=new ProgressDialog()){
+    Exception failure=null;
+    progress.Shown+=delegate{progress.BeginInvoke((Action)delegate{
+     try{engineOwnsWork=true;engine.Apply(work,delegate{Application.DoEvents();return progress.Canceled;},delegate(string text){progress.SetStage(text);});}
+     catch(Exception e){failure=e;}finally{progress.Finish();}
+    });};
+    progress.ShowDialog(new Owner(application));if(failure!=null)throw failure;
+   }
+  }else{engineOwnsWork=true;engine.Apply(work,null,null);}
+  outcome="success";ShowStatus("보이는 "+engine.LastCount+"칸에 붙여넣었습니다.");
+ }catch(Exception e){Notice(e);}finally{try{if(work!=null&&!engineOwnsWork)work.Dispose();}finally{busy=false;}}
+}
 private string BuildNoticeMessage(Exception error){
  if(error is ValidationException)return error.Message;
  string state=engine==null?null:engine.LastOutcome;

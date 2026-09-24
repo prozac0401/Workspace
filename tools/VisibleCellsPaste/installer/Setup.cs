@@ -22,7 +22,8 @@ namespace VisibleCellsPaste.Installation
         internal const string ProgId = "Workspace.VisibleCellsPaste";
         internal const string Clsid = "{856B2219-6225-42ED-8FF1-2D06E5913AC8}";
         internal const string AddinClass = "VisibleCellsPaste.AddIn";
-        internal const string AssemblyIdentity = "VisibleCellsPaste.AddIn, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null";
+        internal const string AssemblyVersion = "0.1.1.0";
+        internal const string AssemblyIdentity = "VisibleCellsPaste.AddIn, Version=" + AssemblyVersion + ", Culture=neutral, PublicKeyToken=null";
         internal const string AssemblyName = "VisibleCellsPaste.AddIn.dll";
         internal const string ManifestName = "installation.xml";
         private static bool silent;
@@ -164,6 +165,9 @@ namespace VisibleCellsPaste.Installation
                 throw new InvalidDataException("설치 매니페스트 소유권/버전을 확인할 수 없습니다. 기존 파일을 변경하지 않았습니다.");
             foreach (XElement f in doc.Root.Element("files").Elements("file")) SafePath(target, (string)f.Attribute("path"));
             string[] allowed = Registration(target, Path.Combine(target, AssemblyName), "0").Select(v => v.Key + "|" + v.Name).ToArray();
+            // Accept only this product's exact prior assembly-version keys during 0.1.0 upgrades.
+            allowed = allowed.Concat(allowed.Where(v => v.Contains(@"\InprocServer32\" + AssemblyVersion + "|"))
+                .Select(v => v.Replace(@"\InprocServer32\" + AssemblyVersion + "|", @"\InprocServer32\0.1.0.0|"))).ToArray();
             foreach (XElement r in doc.Root.Element("registry").Elements("value"))
             {
                 RegValue value = ParseReg(r);
@@ -187,7 +191,7 @@ namespace VisibleCellsPaste.Installation
             string addin = @"Software\Microsoft\Office\Excel\Addins\" + ProgId;
             list.Add(Reg(cls, "", AddinClass)); list.Add(Reg(cls + @"\ProgId", "", ProgId));
             list.Add(Reg(prog, "", AddinClass)); list.Add(Reg(prog + @"\CLSID", "", Clsid));
-            foreach (string sub in new[] { cls + @"\InprocServer32", cls + @"\InprocServer32\0.1.0.0" })
+            foreach (string sub in new[] { cls + @"\InprocServer32", cls + @"\InprocServer32\" + AssemblyVersion })
             {
                 list.Add(Reg(sub, "Class", AddinClass)); list.Add(Reg(sub, "Assembly", AssemblyIdentity)); list.Add(Reg(sub, "RuntimeVersion", "v4.0.30319")); list.Add(Reg(sub, "CodeBase", ClrCodeBase(dll)));
             }
@@ -199,6 +203,12 @@ namespace VisibleCellsPaste.Installation
             list.Add(Reg(uninstall, "NoModify", "1", RegistryValueKind.DWord)); list.Add(Reg(uninstall, "NoRepair", "1", RegistryValueKind.DWord));
             list.Add(Reg(@"Software\VisibleCellsPaste", "Owner", Identity));
             return list;
+        }
+        private static IEnumerable<XElement> RegistryManifest(List<RegValue> registrations, List<RegValue> oldRegs)
+        {
+            // Keep prior version ownership for uninstall without rewriting those registry values.
+            return registrations.Select(x => x.PreserveOnly ? oldRegs.First(v => v.Key == x.Key && v.Name == x.Name).Xml() : x.Xml())
+                .Concat(oldRegs.Where(old => !registrations.Any(current => current.Key == old.Key && current.Name == old.Name)).Select(old => old.Xml()));
         }
         private static RegValue ParseReg(XElement x) { return Reg((string)x.Attribute("key"), (string)x.Attribute("name"), (string)x.Attribute("data"), (RegistryValueKind)Enum.Parse(typeof(RegistryValueKind), (string)x.Attribute("kind"))); }
         private static string Current(RegistryKey hive, RegValue value)
@@ -272,7 +282,7 @@ namespace VisibleCellsPaste.Installation
                     var files = new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
                     if (previous != null) foreach (XElement f in previous.Root.Element("files").Elements("file")) files[(string)f.Attribute("path")] = (string)f.Attribute("sha256");
                     foreach (var item in sources) files[item.Key] = Hash(SafePath(target, item.Key));
-                    var manifest = new XDocument(new XElement("installation", new XAttribute("identity", Identity), new XAttribute("schema", "1"), new XAttribute("root", target), new XAttribute("architecture", arch), new XAttribute("version", version), new XAttribute("utc", DateTime.UtcNow.ToString("o")), new XElement("files", files.Select(p => new XElement("file", new XAttribute("path", p.Key), new XAttribute("sha256", p.Value)))), new XElement("registry", registrations.Select(x => x.PreserveOnly ? oldRegs.First(v => v.Key == x.Key && v.Name == x.Name).Xml() : x.Xml()))));
+                    var manifest = new XDocument(new XElement("installation", new XAttribute("identity", Identity), new XAttribute("schema", "1"), new XAttribute("root", target), new XAttribute("architecture", arch), new XAttribute("version", version), new XAttribute("utc", DateTime.UtcNow.ToString("o")), new XElement("files", files.Select(p => new XElement("file", new XAttribute("path", p.Key), new XAttribute("sha256", p.Value)))), new XElement("registry", RegistryManifest(registrations, oldRegs))));
                     string pending = Path.Combine(transaction, "manifest.xml"); manifest.Save(pending);
                     string manifestPath = Path.Combine(target, ManifestName);
                     if (File.Exists(manifestPath)) File.Replace(pending, manifestPath, null); else File.Move(pending, manifestPath);

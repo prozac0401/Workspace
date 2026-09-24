@@ -18,9 +18,9 @@ namespace VisibleCellsPaste
                 string letters = ColumnLetters(segment.Column);
                 string firstAddress = "$" + letters + "$" + segment.FirstRow;
                 string lastAddress = "$" + letters + "$" + segment.LastRow;
-                dynamic range = sheet.Range[firstAddress + ":" + lastAddress];
-                try
+                using (var references = new ComScope())
                 {
+                    dynamic range = references.Own((object)sheet.Range[firstAddress + ":" + lastAddress]);
                     object hasFormula = range.HasFormula;
                     object format = range.NumberFormat;
                     if (!(hasFormula is bool) || !(format is string))
@@ -59,7 +59,6 @@ namespace VisibleCellsPaste
                         };
                     }
                 }
-                finally { ExcelEngine.Release((object)range); }
             }
             return result;
         }
