@@ -31,3 +31,7 @@ BookMark 변경 문서의 상대 링크52개 누락0, Workspace strict 빌드·�
 ## T10 · File List to Excel
 
 [기존 1.2.0 릴리스](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0)에 합성 폴더246검사·실제10파일 복사·원본 보존·제거와 T12 대표 공존 확인을 추가했다. 기존 MSI와 체크섬 자산2개의 이름·크기·SHA-256은 변경 전후 동일하다. File List 제품 소스는 변경하지 않았으며 업무 자료 수용·x86·추가 환경 검증으로 확대하지 않는다.
+
+## T11·T12 · 명단 비교 R12와 공존
+
+[기존 R12 릴리스](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12)와 공개 안내에 합성 대표 비교·정상 종료·다른 제품 순차 제거 후 보존 확인을 추가했다. 기존 자산8개의 이름·크기·SHA-256은 변경 전후 동일하다. T11의 전체 회귀·설치 수명주기 조건부 대기는 유지하며 이번 대표 공존 확인을 전체 재시험으로 표시하지 않는다. T12는 별도 제품 버전이 아니므로 네 제품의 동일 자산에 대한 검증 기록으로 연결한다.

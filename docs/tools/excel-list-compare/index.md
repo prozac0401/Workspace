@@ -9,7 +9,7 @@
 
 수정일: 2026-09-21 · [파일 확인용 SHA-256](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Setup.exe.sha256) · [배포 내용](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12) · [제작·배포 기록](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Verification.zip)
 
-R12는 비교 로직을 유지한 문구·표 표시 교정판입니다. 이번 버전의 기능·설치 테스트는 요청에 따라 실행하지 않았습니다. 설치 파일에는 코드 서명이 없습니다.
+R12는 비교 로직을 유지한 문구·표 표시 교정판입니다. 제작 당시 기능·설치 전체 시험은 요청에 따라 생략했습니다. 2026-09-27에는 같은 제품 파일로 합성 통합문서의 대표 비교·정상 종료와 다른 세 도구의 순차 제거 후 메뉴·설정 보존을 확인했습니다. 이 확인은 R12 전체 기능·성능·취소·설치 수명주기 검증을 대신하지 않습니다. 설치 파일에는 코드 서명이 없습니다.
 
 두 목록의 값과 개수가 같은지 확인합니다. 같으면 짧게 알려주고, 차이가 있으면 새 Excel 파일에 표시합니다.
 
