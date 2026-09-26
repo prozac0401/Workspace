@@ -23,3 +23,5 @@
 ## 로컬 내보내기 후속 결정
 
 - [ADR-0018 · 원본 Undo를 보존하는 출력 생성 분리](0018-excel-selection-export-undo.md)
+
+- [ADR-0019 · 공개 payload를 재사용하는 단일 설치 EXE](0019-visible-cells-paste-single-installer.md)

@@ -89,3 +89,7 @@ powershell -NoProfile -File tools/VisibleCellsPaste/build/build.ps1 -Version 0.1
 ```
 
 ZIP과 `SHA256SUMS.txt`는 `artifacts/visible-cells-paste/0.1.1`에 생성됩니다. 최종 사용자는 개발 SDK·Python·Node.js를 설치하거나 VBA 코드를 만들 필요가 없습니다.
+
+## 로컬 단일 설치 파일 후보
+
+공개 0.1.1 payload를 포함한 단일 EXE 후보의 설치·제거와 재현 방법은 [단일 설치 안내](docs/single-installer.md)를 따릅니다. 공개 ZIP을 대체해 게시한 상태는 아닙니다.

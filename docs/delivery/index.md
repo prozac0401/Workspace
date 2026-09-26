@@ -38,3 +38,5 @@
 - [Excel RC9 게시·검증](../../tools/ExcelSmartListCompare/docs/RC9_APPROVED_RETEST_20260917.md)
 
 과거 기록은 당시 파일의 증거입니다. 현재 버전의 사용법이나 최신 시험 결과로 해석하지 않습니다. 초기 Excel 지시와 소스 압축본은 [원본 보존 폴더](../../tools/ExcelSmartListCompare/archive/README.md)에 있습니다.
+
+[보이는 칸 붙여넣기 단일 EXE 후보](visible-cells-paste-single-20260927.md)는 로컬 패키징·자동 설치 검증 기록이며 실제 Excel 후속 시험은 대기 중입니다.
