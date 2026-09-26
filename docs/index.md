@@ -46,7 +46,7 @@ hide:
 |---|---|
 | 폴더에 업무 진행 상태를 표시하고 싶어요 | **[FolderState 0.1.3 RC1 받기](tools/folderstate/installation.md)** — 폴더를 고르고 현재 상태를 누르세요. |
 | Excel의 두 목록에서 값과 개수의 차이를 찾고 싶어요 | **[Excel 명단 비교 R12 받기](tools/excel-list-compare/index.md)** — 첫 번째 목록을 담고 두 번째 목록을 선택해 비교하세요. |
-| Excel에서 보이는 셀만 새 파일로 만들고 싶어요 | **[선택범위 내보내기 0.1.0-rc.9 평가판 받기](tools/excel-selection-export/index.md)** — 한 번 설치한 뒤 셀을 우클릭해 보이는 행·열과 수식 결과를 새 통합문서로 만드세요. |
+| Excel에서 보이는 셀만 새 파일로 만들고 싶어요 | **[선택범위 내보내기 0.1.0-rc.10 평가판 받기](tools/excel-selection-export/index.md)** — 한 번 설치한 뒤 셀을 우클릭해 보이는 행·열과 수식 결과를 새 통합문서로 만드세요. |
 | 탐색기의 파일 목록을 정리하거나 같은 파일을 찾고 싶어요 | **[File List to Excel 1.2.0 받기](tools/file-list-to-excel/index.md)** — 파일·폴더를 우클릭해 목록이나 중복 검사 결과를 Excel로 여세요. |
 | Excel에서 숨긴 행을 건너뛰어 값을 넣고 싶어요 | **[보이는 칸 붙여넣기 받기](tools/visible-cells-paste/index.md)** — 한 행 또는 한 열을 복사하고 대상 한 열을 선택하세요. |
 | 보던 문서 위치나 웹페이지로 다시 돌아가고 싶어요 | **[업무 책갈피 0.2.3 받기](tools/bookmark/index.md)** — Ctrl+Alt+B로 남기고 목록이나 포스트잇 스티커에서 이어가세요. |
