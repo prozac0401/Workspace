@@ -6,7 +6,7 @@
 
 **Windows 11 x64용이며 설치 파일은 서명되지 않았습니다.** ARM64 탐색기는 지원하지 않습니다. 회사 PC에서는 승인된 설치 절차를 따르세요.
 
-1.2.0은 설치·복구·제거·공개 1.1.0에서의 업데이트와 실제 Excel x64의 필터 파일 복사를 확인했습니다. 이전 시험의 파일 메뉴 조회 실패는 실행 문맥을 분리한 후속 검사로 확인했습니다. 실제 Excel x86, 재로그인·재부팅, 원격 SMB 장애, 회사 보안 정책 등은 미검증입니다. 환경별 제한은 [v1.2.0 릴리스 안내](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0)를 확인하세요.
+1.2.0은 설치·복구·제거·공개 1.1.0에서의 업데이트와 실제 Excel x64의 필터 파일 복사를 확인했습니다. 이전 시험의 파일 메뉴 조회 실패는 실행 문맥을 분리한 후속 검사로 확인했습니다. 실제 Excel x86, 재로그인·재부팅, 원격 SMB 장애, 회사 보안 정책 등은 미검증입니다. 2026-09-27 후속 확인은 합성 폴더만 사용했습니다. 여섯 목록 생성·실제 Excel의 파일10개 복사·원본 보존·정상 종료·제거와 네 도구 대표 기능의 순차 공존을 확인했으며, 업무 자료 수용이나 모든 환경의 검증을 뜻하지 않습니다. 환경별 제한은 [v1.2.0 릴리스 안내](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0)를 확인하세요.
 
 [**v1.2.0 Windows x64 MSI 다운로드**](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [SHA-256 체크섬](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/SHA256SUMS.txt) · [원본 저장소](https://github.com/prozac0401/File-List-To-Excel)
 

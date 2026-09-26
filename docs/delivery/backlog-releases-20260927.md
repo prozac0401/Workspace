@@ -27,3 +27,7 @@ BookMark 변경 문서의 상대 링크52개 누락0, Workspace strict 빌드·�
 ## T09 · FolderState
 
 [기존 0.1.3 RC1 릴리스](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1)에 2026-09-27 후속 설치31검사·실제 메뉴/상태/복구와 보존 범위를 추가했다. 기존 자산3개의 이름·크기·SHA-256은 변경 전후 동일하다. 새 PC·재부팅·공유/동기화·접근성·회사 승인은 미검증으로 유지한다.
+
+## T10 · File List to Excel
+
+[기존 1.2.0 릴리스](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0)에 합성 폴더246검사·실제10파일 복사·원본 보존·제거와 T12 대표 공존 확인을 추가했다. 기존 MSI와 체크섬 자산2개의 이름·크기·SHA-256은 변경 전후 동일하다. File List 제품 소스는 변경하지 않았으며 업무 자료 수용·x86·추가 환경 검증으로 확대하지 않는다.
