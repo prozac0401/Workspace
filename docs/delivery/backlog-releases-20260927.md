@@ -23,3 +23,7 @@
 BookMark 수정 두 커밋을 main에 push하고 [0.2.4 평가판](https://github.com/prozac0401/BookMark/releases/tag/v0.2.4)을 `3f87da7`에 게시했다. 검증 MSI 75,451,327 bytes·SHA-256 `aebd7bb3844951a02b7323ffa1d1ddd16b06ff542f0bc90691de3eb1f6f370f3`가 GitHub 자산과 일치했다. 구조 검증 JSON·체크섬·후속 검증 요약을 첨부했다. 새 포터블 ZIP은 제작하지 않았으며 기존 0.2.3 ZIP을 버전 표시와 함께 보존한다. 실제 스티커 입력·IME·자동 저장·초안·작업 재개는 NOT_RUN, 재로그인·재부팅·추가 환경도 남아 있다. 두 저장소의 현재 설치 안내에 기존 사용자 지정 경로를 명시적으로 제거한 뒤 이전하는 절차를 반영했다.
 
 BookMark 변경 문서의 상대 링크52개 누락0, Workspace strict 빌드·공개19페이지/404·생성 링크 검사 PASS.
+
+## T09 · FolderState
+
+[기존 0.1.3 RC1 릴리스](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1)에 2026-09-27 후속 설치31검사·실제 메뉴/상태/복구와 보존 범위를 추가했다. 기존 자산3개의 이름·크기·SHA-256은 변경 전후 동일하다. 새 PC·재부팅·공유/동기화·접근성·회사 승인은 미검증으로 유지한다.
