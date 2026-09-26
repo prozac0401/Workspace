@@ -131,6 +131,7 @@ namespace ExcelSelectionExport {
    try { StopResultTimer(); if(window!=null) outcome="display-canceled:disconnected"; }
    finally { Release(window); busy=false; }
   }
+  [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr window);
   private void ActivateResultWindow(object sender,EventArgs args) {
    object window=resultWindow; resultWindow=null;
    try {
@@ -138,6 +139,18 @@ namespace ExcelSelectionExport {
     if(window==null) return;
     if(!connected || application==null) {outcome="display-canceled:disconnected";return;}
     ((dynamic)window).Activate();
+    // Template loading and closing the progress dialog can leave the source SDI
+    // window in front even after Excel accepts Activate. Raise the exact result
+    // window on the deferred UI callback (never an arbitrary Excel process).
+    if(Marshal.IsComObject(window)) {
+     long expectedHandle=Convert.ToInt64(((dynamic)window).Hwnd);
+     SetForegroundWindow(new IntPtr(expectedHandle));
+     object activeWindow=((dynamic)application).ActiveWindow;
+     try {
+      if(activeWindow==null || Convert.ToInt64(((dynamic)activeWindow).Hwnd)!=expectedHandle)
+       throw new InvalidOperationException("새 통합문서가 활성 창으로 전환되지 않았습니다.");
+     } finally {Release(activeWindow);}
+    }
     outcome="success";
    } catch(Exception ex) {
     outcome="display-error:"+ex.GetType().Name; lastError=ex.ToString();

@@ -1,7 +1,7 @@
 ﻿[CmdletBinding()]
 param(
     [ValidatePattern('^[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.]+)?$')]
-    [string]$Version = '0.1.0-rc.9',
+    [string]$Version = '0.1.0-rc.10',
     [string]$InnoCompiler = (Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) 'Inno Setup 6\ISCC.exe')
 )
 $ErrorActionPreference = 'Stop'
@@ -76,7 +76,7 @@ function Invoke-BuildTool([string]$FilePath, [string[]]$Arguments, [string]$LogP
     }
 }
 $sourceRecords = @()
-foreach ($sourceFile in $sources + @((Join-Path $productRoot 'installer\SetupProbe.cs'), (Join-Path $productRoot 'installer\SelectionExport.iss'), (Join-Path $productRoot 'tests\SetupProbeTests.cs'), (Join-Path $productRoot 'tests\M1Tests.cs'), (Join-Path $productRoot 'tests\EngineTests.cs'), (Join-Path $productRoot 'tests\EngineGuardTests.cs'), (Join-Path $productRoot 'tests\Test-Package.ps1'), (Join-Path $productRoot 'README.md'), (Join-Path $productRoot 'CHANGELOG.md'), $PSCommandPath)) {
+foreach ($sourceFile in $sources + @((Join-Path $productRoot 'installer\SetupProbe.cs'), (Join-Path $productRoot 'installer\SelectionExport.iss'), (Join-Path $productRoot 'tests\SetupProbeTests.cs'), (Join-Path $productRoot 'tests\M1Tests.cs'), (Join-Path $productRoot 'tests\EngineTests.cs'), (Join-Path $productRoot 'tests\EngineGuardTests.cs'), (Join-Path $productRoot 'tests\OutputWorkspaceTests.cs'), (Join-Path $productRoot 'tests\Test-Package.ps1'), (Join-Path $productRoot 'README.md'), (Join-Path $productRoot 'CHANGELOG.md'), $PSCommandPath)) {
     $sourceRecords += [ordered]@{ path = $sourceFile.Substring($repoRoot.Length + 1); sha256 = (Get-FileHash -LiteralPath $sourceFile -Algorithm SHA256).Hash }
 }
 foreach ($arch in @('x86', 'x64')) {
@@ -96,6 +96,9 @@ foreach ($arch in @('x86', 'x64')) {
     $guardTests = Join-Path $payload 'EngineGuardTests.exe'
     Invoke-BuildTool $compiler @('/nologo', '/target:exe', "/platform:$arch", '/main:EngineGuardTests', "/out:$guardTests", '/reference:System.Core.dll', (Join-Path $productRoot 'tests\EngineGuardTests.cs')) (Join-Path $payload 'engine-guard-tests-build.log')
     Invoke-BuildTool $guardTests @($dll) (Join-Path $payload 'engine-guard-tests.log')
+    $workspaceTests = Join-Path $payload 'OutputWorkspaceTests.exe'
+    Invoke-BuildTool $compiler @('/nologo', '/target:exe', "/platform:$arch", '/main:OutputWorkspaceTests', "/out:$workspaceTests", '/reference:Microsoft.CSharp.dll', '/reference:System.Core.dll', (Join-Path $productRoot 'tests\OutputWorkspaceTests.cs'), (Join-Path $productRoot 'src\OutputWorkspace.cs')) (Join-Path $payload 'output-workspace-tests-build.log')
+    Invoke-BuildTool $workspaceTests @() (Join-Path $payload 'output-workspace-tests.log')
     Copy-Item -LiteralPath (Join-Path $productRoot 'README.md') -Destination (Join-Path $payload 'README.md')
     Copy-Item -LiteralPath (Join-Path $productRoot 'CHANGELOG.md') -Destination (Join-Path $payload 'CHANGELOG.md')
     [IO.File]::WriteAllText((Join-Path $payload 'product.id'), 'Workspace.ExcelSelectionExport.2A2A4B8C-6D6C-4E28-AB96-E34B9B4319A1', [Text.Encoding]::ASCII)

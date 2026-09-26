@@ -19,3 +19,7 @@
 - [ADR-0015 · 최초 G0 조사](0015-image-copy-save-g0.md)
 - [ADR-0016 · 독립 메뉴 배치](0016-image-copy-save-direct-menu.md)
 - [ADR-0017 · Explorer 호출과 helper 결과 연결](0017-image-copy-save-invocation.md)
+
+## 로컬 내보내기 후속 결정
+
+- [ADR-0018 · 원본 Undo를 보존하는 출력 생성 분리](0018-excel-selection-export-undo.md)

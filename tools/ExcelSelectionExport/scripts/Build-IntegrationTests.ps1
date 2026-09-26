@@ -76,6 +76,8 @@ $targets = @(
     @{ Name = 'ExcelProbe'; EntryPoint = 'ExcelProbe'; References = @('Microsoft.CSharp.dll', 'System.Core.dll', 'System.IO.Compression.dll', 'System.IO.Compression.FileSystem.dll') },
     @{ Name = 'FunctionalTests'; EntryPoint = 'ExcelSelectionExport.IntegrationTests.FunctionalTests'; References = @('Microsoft.CSharp.dll', 'System.Core.dll') },
     @{ Name = 'EngineFailureTests'; EntryPoint = 'ExcelSelectionExport.IntegrationTests.EngineFailureTests'; References = @('Microsoft.CSharp.dll', 'System.Core.dll') },
+    @{ Name = 'OutputCancellationTests'; EntryPoint = 'ExcelSelectionExport.IntegrationTests.OutputCancellationTests'; References = @('Microsoft.CSharp.dll', 'System.Core.dll', 'System.IO.Compression.dll', 'System.IO.Compression.FileSystem.dll') },
+    @{ Name = 'UndoHistoryTests'; EntryPoint = 'UndoHistoryTests'; References = @('Microsoft.CSharp.dll', 'System.Core.dll') },
     @{ Name = 'CancellationTests'; EntryPoint = 'ExcelSelectionExport.IntegrationTests.CancellationTests'; References = @('Microsoft.CSharp.dll', 'System.Core.dll') }
 )
 $records = @()
@@ -86,12 +88,14 @@ foreach ($target in $targets) {
     $arguments = @('/nologo', '/target:exe', '/optimize+', "/platform:$Architecture", ("/main:" + $target.EntryPoint), "/out:$output")
     $arguments += @($target.References | ForEach-Object { '/reference:' + $_ })
     $arguments += $source
+    if ($target.Name -eq 'OutputCancellationTests') { $arguments += (Join-Path $productRoot 'tests\ExcelProbe.cs') }
     Invoke-IntegrationCompiler $arguments (Join-Path $outputRoot ($target.Name + '.compile.log'))
     $records += [ordered]@{
         name = $target.Name; source = $source.Substring($repoRoot.Length + 1);
         sourceSha256 = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash;
         output = [IO.Path]::GetFileName($output); outputSha256 = (Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash;
         references = $target.References
+        additionalSources = @(if ($target.Name -eq 'OutputCancellationTests') { [ordered]@{ path = 'tools/ExcelSelectionExport/tests/ExcelProbe.cs'; sha256 = (Get-FileHash -LiteralPath (Join-Path $productRoot 'tests\ExcelProbe.cs') -Algorithm SHA256).Hash } })
     }
 }
 $manifest = [ordered]@{

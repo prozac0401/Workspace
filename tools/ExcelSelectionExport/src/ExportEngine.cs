@@ -146,6 +146,8 @@ namespace ExcelSelectionExport
             readonly List<int> columns = new List<int>();
             dynamic selection, sheet, book, cells, sheetRows, sheetColumns;
             dynamic output, outputSheet, outputCells;
+            object outputApplication;
+            OutputWorkspace outputWorkspace;
             VisibleRangePlan plan;
             object[,] values;
             CellFormat[,] cellFormats;
@@ -440,14 +442,15 @@ namespace ExcelSelectionExport
                 sourcePhase = false;
                 // Snapshot is complete. Other add-ins must not attach sheets/links to our new document via events.
                 app.EnableEvents = false;
-                // Create Excel's SDI window while the normal UI state is restored.
-                // Reapply the input/redraw guard only after the window exists.
-                PrepareOutputUi();
-                Status = "저장 전 새 통합문서를 만들고 있습니다.";
-                dynamic workbooks = app.Workbooks;
+                // Some workbook/style mutations clear Excel's shared native Undo history.
+                // Build only in an owned, hidden Excel instance; the source receives a
+                // completed template with Workbooks.Add and no subsequent data setters.
+                Status = "새 통합문서의 값과 서식을 준비하고 있습니다.";
+                outputWorkspace = new OutputWorkspace(appObject);
+                outputApplication = outputWorkspace.Application;
+                dynamic workbooks = ((dynamic)outputApplication).Workbooks;
                 try { output = workbooks.Add(-4167); }
                 finally { ExportEngine.Release((object)workbooks); }
-                GuardOutputUi();
                 output.Date1904 = date1904;
                 dynamic outputSheets = output.Worksheets;
                 try { outputSheet = outputSheets[1]; }
@@ -536,6 +539,32 @@ namespace ExcelSelectionExport
                 Status = "수식과 외부 연결이 남지 않았는지 확인하고 있습니다.";
                 VerifyOutput();
                 foreach (int verified in VerifyValues()) yield return verified;
+                Check();
+                Status = "완성된 내용을 새 Excel 창으로 열고 있습니다.";
+                string template = outputWorkspace.SaveTemplate((object)output);
+                CloseOutput();
+                outputWorkspace.CloseApplication();
+                Check();
+                // The original instance only opens the completed template. Keep all
+                // names, styles, values and sizes in the template to preserve Undo.
+                PrepareOutputUi();
+                outputApplication = appObject;
+                workbooks = app.Workbooks;
+                try { output = workbooks.Add(template); }
+                finally { ExportEngine.Release((object)workbooks); }
+                GuardOutputUi();
+                // A template-based workbook starts with Saved=true despite having
+                // no file path. This flag restores the normal save-on-close prompt;
+                // it does not mutate cells/styles or clear the native Undo stack.
+                output.Saved = false;
+                outputSheets = output.Worksheets;
+                try { outputSheet = outputSheets[1]; }
+                finally { ExportEngine.Release((object)outputSheets); }
+                outputCells = outputSheet.Cells;
+                VerifyOutput();
+                foreach (int verified in VerifyValues()) yield return verified;
+                outputWorkspace.Dispose();
+                outputWorkspace = null;
                 successful = true;
                 yield return 0;
             }
@@ -656,13 +685,28 @@ namespace ExcelSelectionExport
                 try { app.Interactive = oldInteractive; } catch { restored = false; }
                 changedState = !restored;
             }
-            internal void Rollback()
+            void ReleaseOutput()
+            {
+                ExportEngine.Release((object)outputCells); ExportEngine.Release((object)outputSheet); ExportEngine.Release((object)output);
+                outputCells = null; outputSheet = null; output = null;
+            }
+            void CloseOutput()
             {
                 if (output == null) return;
-                bool alerts = true;
-                try { alerts = Convert.ToBoolean(app.DisplayAlerts); app.DisplayAlerts = false; output.Close(false); }
-                finally { try { app.DisplayAlerts = alerts; } catch { } }
-                successful = false;
+                dynamic owner = outputApplication ?? appObject;
+                bool alerts = Convert.ToBoolean(owner.DisplayAlerts);
+                bool closed = false;
+                try { owner.DisplayAlerts = false; output.Close(false); closed = true; }
+                finally
+                {
+                    try { owner.DisplayAlerts = alerts; }
+                    finally { if (closed) ReleaseOutput(); }
+                }
+            }
+            internal void Rollback()
+            {
+                try { CloseOutput(); }
+                finally { successful = false; }
             }
             public void Dispose()
             {
@@ -674,11 +718,24 @@ namespace ExcelSelectionExport
                     try { ComEventsHelper.Remove(appObject, appEvents, 1570, onClose); } catch { }
                 }
                 RestoreState();
-                ExportEngine.Release((object)outputCells); ExportEngine.Release((object)outputSheet); ExportEngine.Release((object)output);
-                outputCells = null; outputSheet = null; output = null;
-                for (int i = owned.Count - 1; i >= 0; i--) ExportEngine.Release((object)owned[i]);
-                owned.Clear();
-                selection = null; sheet = null; book = null; cells = null; sheetRows = null; sheetColumns = null;
+                try
+                {
+                    // Rollback may fail transiently. Retry only this operation's
+                    // unfinished workbook, never a successfully returned result.
+                    if (!successful) CloseOutput();
+                }
+                finally
+                {
+                    ReleaseOutput();
+                    outputApplication = null;
+                    try { if (outputWorkspace != null) outputWorkspace.Dispose(); }
+                    finally
+                    {
+                        for (int i = owned.Count - 1; i >= 0; i--) ExportEngine.Release((object)owned[i]);
+                        owned.Clear();
+                        selection = null; sheet = null; book = null; cells = null; sheetRows = null; sheetColumns = null;
+                    }
+                }
             }
         }
 

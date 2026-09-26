@@ -30,12 +30,46 @@ class ExcelProbe {
    Entry(z,"xl/worksheets/sheet1.xml","<worksheet xmlns='http://schemas.openxmlformats.org/spreadsheetml/2006/main'><sheetViews><sheetView workbookViewId='0'><selection activeCell='A1' sqref='A1:B2'/></sheetView></sheetViews><sheetData><row r='1'><c r='A1' t='inlineStr'><is><t>M1 synthetic</t></is></c><c r='B1'><v>42</v></c></row><row r='2'><c r='A2' t='inlineStr'><is><t>001234</t></is></c><c r='B2'><v>17</v></c></row></sheetData></worksheet>");
   }
  }
- [STAThread] static int Main(string[] a) { Console.OutputEncoding=new UTF8Encoding(false); try {return MainCore(a);} finally {GC.Collect();GC.WaitForPendingFinalizers();GC.Collect();GC.WaitForPendingFinalizers();} }
+ static void Release(object value) { if(value!=null && Marshal.IsComObject(value)) Marshal.ReleaseComObject(value); }
+ [STAThread] static int Main(string[] a) {
+  Console.OutputEncoding=new UTF8Encoding(false);
+  int code;
+  try {code=MainCore(a);} finally {GC.Collect();GC.WaitForPendingFinalizers();GC.Collect();GC.WaitForPendingFinalizers();}
+  if(code==0 && a[0]=="close") {
+   int pid=int.Parse(File.ReadAllText(a[1]+".pid"));
+   try {using(var process=Process.GetProcessById(pid)) {
+    if(!process.WaitForExit(15000)) {Console.Error.WriteLine("FAIL: owned Excel remains after Close/Quit and COM release; pid="+pid);return 2;}
+   }} catch(ArgumentException) { }
+   Console.WriteLine("PASS: owned Excel process exited naturally; pid="+pid);
+  }
+  return code;
+ }
  [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)] static int MainCore(string[] a) {try {
   if(a[0]=="start") {var file=Path.GetFullPath(a[2]);Fixture(file);var p=Process.Start(new ProcessStartInfo(a[1],"/x \""+file+"\""){UseShellExecute=true}); File.WriteAllText(file+".pid",p.Id.ToString());Console.WriteLine("pid="+p.Id);return 0;}
-  int pid=int.Parse(File.ReadAllText(a[1]+".pid"));dynamic app=Attach(pid);
-  if(a[0]=="inspect") {dynamic add=app.COMAddIns.Item("Workspace.ExcelSelectionExport"); Console.WriteLine("pid="+pid+";Excel="+app.Version+";Build="+app.Build+";Connected="+add.Connect+";Workbooks="+app.Workbooks.Count+";Diagnostics="+add.Object.GetDiagnostics());Console.WriteLine("Selection="+app.Selection.Address);try{Console.WriteLine("LastError="+add.Object.GetLastError());}catch{} return 0;}
-  if(a[0]=="close") {foreach(dynamic book in app.Workbooks) {string full=(string)book.FullName; if(!String.Equals(full,Path.GetFullPath(a[1]),StringComparison.OrdinalIgnoreCase))throw new Exception("Unexpected workbook; will not close: "+book.Name);} app.Workbooks[1].Close(false);app.Quit();Console.WriteLine("Owned Excel closed");return 0;}
-  throw new Exception("Unknown command");
+  int pid=int.Parse(File.ReadAllText(a[1]+".pid"));object app=Attach(pid);
+  try {
+   object books=((dynamic)app).Workbooks;
+   try {
+    if(a[0]=="inspect") {
+     object adds=null,add=null,callback=null,selection=null;
+     try {
+      adds=((dynamic)app).COMAddIns;add=((dynamic)adds).Item("Workspace.ExcelSelectionExport");callback=((dynamic)add).Object;
+      Console.WriteLine("pid="+pid+";Excel="+((dynamic)app).Version+";Build="+((dynamic)app).Build+";Connected="+((dynamic)add).Connect+";Workbooks="+((dynamic)books).Count+";Diagnostics="+((dynamic)callback).GetDiagnostics());
+      selection=((dynamic)app).Selection;Console.WriteLine("Selection="+((dynamic)selection).Address);
+      Console.WriteLine("LastError="+((dynamic)callback).GetLastError());return 0;
+     } finally {Release(selection);Release(callback);Release(add);Release(adds);}
+    }
+    if(a[0]=="close") {
+     if((int)((dynamic)books).Count!=1)throw new Exception("Expected exactly one owned fixture; refusing Close/Quit.");
+     object book=((dynamic)books).Item(1);
+     try {
+      if(!String.Equals((string)((dynamic)book).FullName,Path.GetFullPath(a[1]),StringComparison.OrdinalIgnoreCase))throw new Exception("Unexpected workbook; refusing Close/Quit.");
+      ((dynamic)book).Close(false);
+     } finally {Release(book);}
+     ((dynamic)app).Quit();Console.WriteLine("Close/Quit requested for owned fixture");return 0;
+    }
+    throw new Exception("Unknown command");
+   } finally {Release(books);}
+  } finally {Release(app);}
  }catch(Exception e){Console.Error.WriteLine(e.ToString());return 1;} }
 }

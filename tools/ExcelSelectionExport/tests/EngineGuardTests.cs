@@ -129,6 +129,23 @@ class EngineGuardTests
                 completionJob.Dispose();
                 Assert(completionFake.EnableEvents&&completionFake.Interactive&&completionFake.ScreenUpdating==!persistent&&completionFake.Writes==6,"cleanup independently retries all flags after completion rejection; persistent="+persistent);
             }
+            var closeFake=new CloseApplicationFake();
+            var closeBook=new CloseWorkbookFake{FailOnce=true};
+            var closeJob=(IDisposable)constructor.Invoke(new object[]{new RestoreApplication()});
+            jobType.GetField("outputApplication",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(closeJob,closeFake);
+            jobType.GetField("output",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(closeJob,closeBook);
+            bool closeRejected=false;
+            try{jobType.GetMethod("Rollback",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(closeJob,null);}
+            catch(TargetInvocationException error){closeRejected=error.InnerException is InvalidOperationException;}
+            Assert(closeRejected&&closeFake.DisplayAlerts&&Object.ReferenceEquals(jobType.GetField("output",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(closeJob),closeBook),"failed rollback retains owned workbook and restores alerts for retry");
+            closeJob.Dispose();
+            Assert(closeBook.CloseCalls==2&&closeBook.Closed&&closeFake.DisplayAlerts,"Dispose retries and closes only the incomplete owned workbook");
+            closeJob.Dispose();Assert(closeBook.CloseCalls==2,"repeated disposal never recloses workbook");
+            var deliveredBook=new CloseWorkbookFake();
+            var deliveredJob=(IDisposable)constructor.Invoke(new object[]{new RestoreApplication()});
+            jobType.GetField("output",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(deliveredJob,deliveredBook);
+            jobType.GetField("successful",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(deliveredJob,true);
+            deliveredJob.Dispose();Assert(deliveredBook.CloseCalls==0,"successful result remains open when engine releases references");
             Console.WriteLine("PASS "+count+" engine guards/block/cleanup cases");return 0;
         }
         catch(Exception ex){Console.Error.WriteLine(ex);return 1;}
@@ -146,3 +163,6 @@ public sealed class RestoreApplication
     public bool ScreenUpdating { get { return screen; } set { Writes++; if(FailScreenAlways)throw new InvalidOperationException("persistent synthetic restoration failure"); if(FailScreenOnce){FailScreenOnce=false;throw new InvalidOperationException("synthetic restoration failure");} screen=value; } }
     public bool Interactive { get { return interactive; } set { Writes++; interactive=value; } }
 }
+
+public sealed class CloseApplicationFake { public bool DisplayAlerts {get;set;} public CloseApplicationFake(){DisplayAlerts=true;} }
+public sealed class CloseWorkbookFake { public bool FailOnce,Closed;public int CloseCalls; public void Close(bool save){CloseCalls++;if(FailOnce){FailOnce=false;throw new InvalidOperationException("transient close failure");}Closed=true;} }
