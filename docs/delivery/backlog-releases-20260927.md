@@ -35,3 +35,9 @@ BookMark 변경 문서의 상대 링크52개 누락0, Workspace strict 빌드·�
 ## T11·T12 · 명단 비교 R12와 공존
 
 [기존 R12 릴리스](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12)와 공개 안내에 합성 대표 비교·정상 종료·다른 제품 순차 제거 후 보존 확인을 추가했다. 기존 자산8개의 이름·크기·SHA-256은 변경 전후 동일하다. T11의 전체 회귀·설치 수명주기 조건부 대기는 유지하며 이번 대표 공존 확인을 전체 재시험으로 표시하지 않는다. T12는 별도 제품 버전이 아니므로 네 제품의 동일 자산에 대한 검증 기록으로 연결한다.
+
+## T02·T03·T04 · ImageCopySave
+
+[설치 신뢰 차단 후보 초안](https://github.com/prozac0401/Workspace/releases/tag/untagged-1587bc4162cf82e91a17)을 생성했다. 릴리스 ID397361812, 예정 태그 `image-copy-save-v0.1.1`, 대상 커밋 `85fea6a`, draft=true·prerelease=true를 확인했다. 서명 사본 MSIX 64,335,585 bytes·SHA-256 `263bfb40780bd536034a8bf78e50a58bb57f683a998d03f9bd35b970cbcc5ae9`가 업로드 자산과 일치했다. 체크섬과 차단 요약을 첨부했다.
+
+실제 설치0x800B0109와 격리 환경 native183/종료77은 해결되지 않았다. G0·외부 앱·설치 수명주기 NOT_RUN을 유지하며 초안은 공개 릴리스가 아니다. 공개 Pages 허용 목록이나 다운로드를 추가하지 않았다. 개인 키·인증서 암호·로컬 진단은 게시하지 않았다.
