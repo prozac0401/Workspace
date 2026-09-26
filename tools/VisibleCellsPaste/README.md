@@ -11,8 +11,8 @@ Excel에서 복사한 한 행 또는 한 열의 값을, 선택한 한 열의 보
 Windows 데스크톱 Excel과 .NET Framework 4.8이 필요합니다. 웹용 Excel과 Mac용 Excel은 지원하지 않습니다.
 
 1. 열려 있는 Excel 문서를 저장하고 모든 Excel을 종료합니다.
-2. 배포 ZIP을 한 폴더에 모두 풉니다.
-3. **Install.cmd**를 실행합니다. 설치 프로그램이 Excel의 32·64비트를 확인하고 맞는 파일을 설치합니다.
+2. 배포 **VisibleCellsPaste-0.1.1-Setup.exe**를 실행합니다.
+3. 설치 안내를 확인합니다. 설치 프로그램이 Excel의 32·64비트를 확인하고 맞는 파일을 설치합니다. ZIP 방식은 전체 압축 해제 후 **Install.cmd**를 실행합니다.
 4. 평소처럼 Excel을 실행합니다. 셀을 우클릭하면 **보이는 칸에 붙여넣기**와 **마지막 붙여넣기 되돌리기**가 나타납니다.
 
 현재 Windows 사용자 계정의 `%LOCALAPPDATA%\VisibleCellsPaste`에 설치하며 Excel 시작 시 자동으로 로드됩니다. 관리자 권한, VBA 편집기, 모듈 가져오기, 매크로 수동 실행은 필요하지 않습니다.
@@ -70,7 +70,7 @@ Excel 프로세스가 실행 중이면 설치·제거를 중단합니다. 설치
 
 ## 업데이트·제거와 보안
 
-업데이트는 Excel을 저장·종료하고 새 ZIP을 모두 푼 뒤 **Install.cmd**를 실행합니다. 제거는 Excel을 저장·종료하고 **Uninstall.cmd**를 실행하거나 Windows의 설치된 앱에서 **보이는 칸 붙여넣기**를 제거합니다.
+업데이트는 Excel을 저장·종료하고 새 **Setup.exe**를 실행합니다. ZIP 방식은 전체 압축 해제 후 **Install.cmd**를 실행합니다. 제거는 Excel을 저장·종료하고 **Uninstall.cmd**를 실행하거나 Windows의 설치된 앱에서 **보이는 칸 붙여넣기**를 제거합니다.
 
 이 도구의 자동 로드 등록과 소유 파일만 정리합니다. 사용자 통합문서, 다른 추가 기능, PERSONAL.XLSB와 Office 보안 설정은 지우지 않습니다. 외부에서 수정한 파일은 덮어쓰거나 지우지 않으므로 남은 파일 안내를 확인하세요.
 
@@ -92,4 +92,4 @@ ZIP과 `SHA256SUMS.txt`는 `artifacts/visible-cells-paste/0.1.1`에 생성됩니
 
 ## 로컬 단일 설치 파일 후보
 
-공개 0.1.1 payload를 포함한 단일 EXE 후보의 설치·제거와 재현 방법은 [단일 설치 안내](docs/single-installer.md)를 따릅니다. 공개 ZIP을 대체해 게시한 상태는 아닙니다.
+공개 0.1.1 payload를 그대로 포함한 [단일 EXE 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1)를 추가했습니다. 설치·제거와 재현 방법은 [단일 설치 안내](docs/single-installer.md)를 따릅니다. 기존 ZIP도 보존합니다.

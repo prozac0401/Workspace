@@ -32,9 +32,9 @@ File List to Excel v1.2.0의 설치·복구·제거와 이전 버전 업그레�
 | 선택범위 내보내기 0.1.0-rc.10 평가판 | [Excel x64용 EXE](https://github.com/prozac0401/Workspace/releases/download/excel-selection-export-v0.1.0-rc.10/ExcelSelectionExport-0.1.0-rc.10-x64-Setup.exe) · [x86용·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.10) | [설치·사용·알려진 제한](docs/tools/excel-selection-export/index.md) |
 | File List to Excel 1.2.0 | [Windows x64 MSI](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [배포 자료](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) | [설치·사용 안내](docs/tools/file-list-to-excel/index.md) |
 | 업무 책갈피 0.2.4 평가판 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.4/WorkBookmark-0.2.4-win-x64.msi) · [평가판 배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.4) | [설치·사용 안내](docs/tools/bookmark/index.md) |
-| 보이는 칸 붙여넣기 0.1.1 | [Windows 설치 ZIP](https://github.com/prozac0401/Workspace/releases/download/visible-cells-paste-v0.1.1/VisibleCellsPaste_0.1.1.zip) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1) | [설치·사용 안내](docs/tools/visible-cells-paste/index.md) |
+| 보이는 칸 붙여넣기 0.1.1 | [Windows 단일 설치 EXE](https://github.com/prozac0401/Workspace/releases/download/visible-cells-paste-v0.1.1-setup.1/VisibleCellsPaste-0.1.1-Setup.exe) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1) | [설치·사용 안내](docs/tools/visible-cells-paste/index.md) |
 
-Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 사용자 요청에 따라 기존 테스트는 실행하지 않았으며 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 현재 안내하는 설치 파일에는 코드 서명이 없습니다.
+Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 제작 당시 사용자 요청에 따라 전체 테스트는 생략했으며, 이후 합성 대표 비교·정상 종료·공존 보존만 확인했습니다. 당시 결정은 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 현재 안내하는 설치 파일에는 코드 서명이 없습니다.
 
 업무 책갈피 0.2.4 평가판은 사용자 지정 설치 경로의 복구·제거를 수정했습니다. 기존 포스트잇의 메모 영역을 눌러 편집하고 다른 창이나 스티커로 이동하면 자동 저장합니다. 스티커에는 저장 버튼이 없습니다. 스티커를 항상 위에 표시하고 파일 종류 아이콘을 보여 줍니다. 0.2.0과 같은 데이터 형식을 사용합니다. 업데이트 전에 [백업·복원 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 배포 파일은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark)에서 관리합니다.
 

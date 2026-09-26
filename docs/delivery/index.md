@@ -8,9 +8,9 @@
 |---|---|---|
 | FolderState 0.1.3 RC1 | [설치](../tools/folderstate/installation.md) · [사용](../tools/folderstate/index.md) | [공개 MSI 수명주기](folderstate-lifecycle-20260926.md) · [2026-09-20 게시](releases-20260920.md) · [사용성 시험](folderstate-usability-20260919.md) |
 | Excel 명단 비교 0.2.0 R12 | [설치·사용](../tools/excel-list-compare/index.md) | [R12 제작·배포 기록](../../tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md) · [테스트 미실행 결정](../../tools/ExcelSmartListCompare/docs/ADR-0020-R12-wording-release.md) |
-| 선택범위 내보내기 0.1.0-rc.10 평가판 | [설치·사용](../tools/excel-selection-export/index.md) | [실제 평가 결과](excel-selection-export-evaluation-20260924.md) · [GitHub 릴리스·Pages 게시](excel-tools-publication-20260924.md) |
+| 선택범위 내보내기 0.1.0-rc.10 평가판 | [설치·사용](../tools/excel-selection-export/index.md) | [rc.10 Undo 검증](excel-selection-export-undo-20260926.md) · [후속 게시](backlog-releases-20260927.md) |
 | File List to Excel 1.2.0 | [설치·사용](../tools/file-list-to-excel/index.md) | [원본 릴리스](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) · [Workspace 소개 게시](excel-tools-publication-20260924.md) |
-| 보이는 칸 붙여넣기 0.1.1 | [설치·사용](../tools/visible-cells-paste/index.md) | [설치·검증](../../tools/VisibleCellsPaste/docs/install-security.md) · [공개 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1) |
+| 보이는 칸 붙여넣기 0.1.1 | [설치·사용](../tools/visible-cells-paste/index.md) | [설치·검증](../../tools/VisibleCellsPaste/docs/install-security.md) · [단일 EXE 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1) |
 | 업무 책갈피 0.2.4 평가판 | [설치·사용](../tools/bookmark/index.md) | [0.2.3·0.2.4 수명주기](bookmark-lifecycle-20260927.md) · [0.2.4 게시](backlog-releases-20260927.md) · [BookMark 릴리스](https://github.com/prozac0401/BookMark/releases/tag/v0.2.4) |
 
 현재 안내하는 설치 파일은 서명되지 않았습니다. 선택범위 내보내기는 전체 인수 미완료인 평가판이며 알려진 실패와 미실행 시험은 실제 평가 기록에 남깁니다. File List to Excel은 별도 저장소의 v1.2.0과 선택형 Excel 파일 복사를 안내합니다. FolderState는 사전 릴리스이며, Excel R12는 사용자 요청으로 기능 테스트를 생략한 문구 교정 배포입니다. 업무 책갈피 0.2.4 평가판은 BookMark 저장소에서 배포하며 현재 PC 설치 경로 수명주기는 확인했으나 회사 환경·실제 한글 IME·자동 저장·작업 재개·여러 모니터 검증은 남아 있습니다. 제품의 자동검사·패키지 확인과 Workspace 문서 검증은 위 배포 기록에서 구분합니다. 파일 게시와 상용 인수 승인을 구분합니다.
@@ -39,4 +39,4 @@
 
 과거 기록은 당시 파일의 증거입니다. 현재 버전의 사용법이나 최신 시험 결과로 해석하지 않습니다. 초기 Excel 지시와 소스 압축본은 [원본 보존 폴더](../../tools/ExcelSmartListCompare/archive/README.md)에 있습니다.
 
-[보이는 칸 붙여넣기 단일 EXE 후보](visible-cells-paste-single-20260927.md)는 로컬 패키징·자동 설치 검증 기록이며 실제 Excel 후속 시험은 대기 중입니다.
+[보이는 칸 붙여넣기 단일 EXE](visible-cells-paste-single-20260927.md)는 실제 Excel 후속 확인을 마친 동일 파일을 게시했습니다. [항목별 릴리스 기록](backlog-releases-20260927.md)에서 설치 자산과 Pages 결과를 확인합니다. ImageCopySave는 설치 신뢰 오류로 초안에만 보존하며 공개 다운로드 대상이 아닙니다.

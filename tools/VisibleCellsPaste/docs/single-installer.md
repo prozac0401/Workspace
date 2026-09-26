@@ -1,6 +1,6 @@
-# 단일 EXE 설치 후보
+# 단일 EXE 설치
 
-대상: 제품 0.1.1 · wrapper 0.1.1.1 · 서명 없는 로컬 평가 산출물
+대상: 제품 0.1.1 · wrapper 0.1.1.1 · 서명 없는 단일 설치 파일
 
 Excel 문서를 저장하고 모두 종료한 뒤 **VisibleCellsPaste-0.1.1-Setup.exe**를 실행합니다. 안내에서 확인을 누르면 현재 Windows 사용자에게 설치합니다. 이후 Excel을 평소처럼 열고 셀 우클릭 메뉴를 사용합니다. ZIP 압축 해제와 Install.cmd 실행은 필요하지 않습니다.
 
@@ -8,7 +8,7 @@ Excel 문서를 저장하고 모두 종료한 뒤 **VisibleCellsPaste-0.1.1-Setu
 
 제거는 Excel을 모두 종료한 뒤 Windows **설치된 앱 → 보이는 칸 붙여넣기 → 제거**를 사용합니다. 기술 담당자는 같은 EXE에 `--uninstall`을 전달할 수도 있습니다. 일반 사용자가 별도 스크립트나 개발 도구를 설치할 필요는 없습니다.
 
-현재 공개 릴리스의 다운로드는 기존 ZIP입니다. 이 EXE를 공개 게시하거나 조직 배포 승인을 받은 것으로 안내하지 않습니다. 실제 시험과 한계는 Workspace의 순차 백로그 및 배포 기록을 따릅니다.
+검증한 EXE를 [단일 설치 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1)에 게시했습니다. 기존 ZIP은 보존합니다. 현재 PC의 실제 붙여넣기·Undo·정상 시작/종료·제거를 확인했으며 x86 실제 Office·새 PC·재부팅 검증은 남아 있습니다. 조직 배포 승인은 별도입니다. 실제 시험과 한계는 Workspace의 순차 백로그 및 배포 기록을 따릅니다.
 
 ## 개발자 재현
 

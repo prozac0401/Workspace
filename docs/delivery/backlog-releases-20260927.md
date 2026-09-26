@@ -41,3 +41,13 @@ BookMark 변경 문서의 상대 링크52개 누락0, Workspace strict 빌드·�
 [설치 신뢰 차단 후보 초안](https://github.com/prozac0401/Workspace/releases/tag/untagged-1587bc4162cf82e91a17)을 생성했다. 릴리스 ID397361812, 예정 태그 `image-copy-save-v0.1.1`, 대상 커밋 `85fea6a`, draft=true·prerelease=true를 확인했다. 서명 사본 MSIX 64,335,585 bytes·SHA-256 `263bfb40780bd536034a8bf78e50a58bb57f683a998d03f9bd35b970cbcc5ae9`가 업로드 자산과 일치했다. 체크섬과 차단 요약을 첨부했다.
 
 실제 설치0x800B0109와 격리 환경 native183/종료77은 해결되지 않았다. G0·외부 앱·설치 수명주기 NOT_RUN을 유지하며 초안은 공개 릴리스가 아니다. 공개 Pages 허용 목록이나 다운로드를 추가하지 않았다. 개인 키·인증서 암호·로컬 진단은 게시하지 않았다.
+
+## 안내 최종 정리
+
+기존 VisibleCellsPaste ZIP 릴리스의 문자로 표시되던 줄바꿈을 실제 Markdown 줄바꿈으로 정리하고 새 EXE 릴리스를 연결했다. 기존 자산2개는 불변이다. README·소스 설치 안내·배포 색인에서 과거 후보/미게시 문구를 정리했으며, 과거 시험 기록 원문은 당시 결과로 유지한다.
+
+## GitHub Pages와 최종 검증
+
+[77ab8a2 문서 배포](https://github.com/prozac0401/Workspace/actions/runs/36265171890)가 성공했다. 실제 공개 사이트19페이지 모두 HTTP200이며 BookMark0.2.4·선택범위rc.10·붙여넣기Setup.exe 안내를 확인했다. README와 현재 공개 설치 안내의 직접 다운로드15개 모두 HTTP200, 파일 크기도 공개 자산과 일치했다. 개발 배포 기록·ImageCopySave·개발 문서 정책 경로는 실제 사이트에서404로 공개 제외를 확인했다.
+
+원시 HTTP 검사 결과는 로컬 artifacts의 publication 아래에 보관한다. 공개 다운로드에는 실제 검증한 파일만 첨부했으며 설치·Excel 시험을 병행하지 않았다. 마지막 현재 안내 문구 정리도 strict 빌드와 생성 링크 검사 후 push한다. BookMark main은 `6609de7`까지 push했으며 원래 두 저장소 작업 폴더의 사용자 변경은 보존했다.
