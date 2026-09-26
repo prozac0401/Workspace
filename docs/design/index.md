@@ -13,3 +13,9 @@
 | [ADR-0012](0012-visible-cells-paste-public-guide.md) | 보이는 칸 붙여넣기 사용 안내와 버전별 릴리스 | 구현에 채택 |
 
 “구현에 채택”은 회사 정책이나 상용 출시 승인을 뜻하지 않습니다. 후속 변경은 새 ADR로 대체 관계를 남깁니다.
+
+## 로컬 이미지 후보에서 이어받은 결정
+
+- [ADR-0015 · 최초 G0 조사](0015-image-copy-save-g0.md)
+- [ADR-0016 · 독립 메뉴 배치](0016-image-copy-save-direct-menu.md)
+- [ADR-0017 · Explorer 호출과 helper 결과 연결](0017-image-copy-save-invocation.md)

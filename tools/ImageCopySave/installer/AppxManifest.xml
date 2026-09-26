@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Evaluation identity proposal. No signing certificate or production identity is selected. -->
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+         xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+         xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
+         IgnorableNamespaces="uap uap10 rescap com desktop4 desktop5">
+  <Identity Name="ImageCopySave.Evaluation" Publisher="CN=ImageCopySave.Evaluation" Version="0.1.1.0" ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>그림 복사·저장 평가 후보</DisplayName>
+    <PublisherDisplayName>ImageCopySave Evaluation</PublisherDisplayName>
+    <Description>탐색기 메뉴 구현 검증용 패키지</Description>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Resources><Resource Language="ko-KR" /></Resources>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.22000.0" />
+  </Dependencies>
+  <Applications>
+    <Application Id="ImageCopySave" Executable="ImageCopySave.Helper.exe" uap10:RuntimeBehavior="packagedClassicApp" uap10:TrustLevel="mediumIL">
+      <uap:VisualElements DisplayName="그림 복사·저장" Description="그림 복사·저장 탐색기 메뉴" BackgroundColor="transparent" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" AppListEntry="none" />
+      <Extensions>
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:SurrogateServer DisplayName="ImageCopySave commands">
+              <com:Class Id="9C030D44-BBFA-48B7-BD63-53470C112830" Path="ImageCopySave.Shell.dll" ThreadingModel="STA" />
+              <com:Class Id="B481F5D0-A2B3-47D7-A139-B6C2F60B36DE" Path="ImageCopySave.Shell.dll" ThreadingModel="STA" />
+            </com:SurrogateServer>
+          </com:ComServer>
+        </com:Extension>
+        <desktop4:Extension Category="windows.fileExplorerContextMenus">
+          <desktop4:FileExplorerContextMenus>
+            <desktop5:ItemType Type="Directory\Background">
+              <desktop5:Verb Id="SaveImage" Clsid="9C030D44-BBFA-48B7-BD63-53470C112830" />
+            </desktop5:ItemType>
+            <desktop5:ItemType Type="*">
+              <desktop5:Verb Id="CopyImage" Clsid="B481F5D0-A2B3-47D7-A139-B6C2F60B36DE" />
+            </desktop5:ItemType>
+          </desktop4:FileExplorerContextMenus>
+        </desktop4:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities><rescap:Capability Name="runFullTrust" /></Capabilities>
+</Package>

@@ -1,0 +1,43 @@
+# Inactive template. Activate only after explicit remote-upload/CI authorization.
+# Copy to .github/workflows/image-copy-save-native-tests.yml on the approved test branch.
+name: ImageCopySave native engine evaluation
+on:
+  push:
+    branches: [codex/image-copy-save-native-tests]
+    paths:
+      - 'tools/ImageCopySave/**'
+      - '.github/workflows/image-copy-save-native-tests.yml'
+permissions:
+  contents: read
+jobs:
+  native-tests:
+    runs-on: windows-2025
+    timeout-minutes: 20
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
+      DOTNET_GENERATE_ASPNET_CERTIFICATE: 'false'
+      # Enables only the guarded, test-owned disposable VHD scenario on hosted CI.
+      IMAGE_COPY_SAVE_TEST_ISOLATED_FS: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: global.json
+      - name: Require all native clipboard tests
+        shell: pwsh
+        run: ./tools/ImageCopySave/build/ci.ps1
+      - name: Retain test evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: image-copy-save-native-test-results
+          path: |
+            artifacts/image-copy-save/ci/results.json
+            artifacts/image-copy-save/ci/helper-build.log
+            artifacts/image-copy-save/ci/tests-build.log
+            artifacts/image-copy-save/ci/tests.log
+          if-no-files-found: error
+          retention-days: 7

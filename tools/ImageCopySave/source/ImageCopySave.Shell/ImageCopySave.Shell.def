@@ -1,0 +1,4 @@
+LIBRARY "ImageCopySave.Shell.dll"
+EXPORTS
+    DllGetClassObject PRIVATE
+    DllCanUnloadNow PRIVATE

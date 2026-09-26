@@ -40,6 +40,10 @@ Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확
 
 현재 배포·검증 결과와 과거 기록은 [배포·검증 안내](docs/delivery/index.md)에서 구분해 확인하세요.
 
+## 개발 중인 도구
+
+[그림 복사·저장](tools/ImageCopySave/README.md)은 클립보드 그림 저장과 그림 파일 복사를 위한 0.1.1 로컬 평가 후보입니다. 엔진·native Shell·unsigned MSIX가 있으며, 실제 탐색기 메뉴와 설치 검증은 아직 완료되지 않았습니다. 공개 다운로드는 제공하지 않습니다.
+
 ## 개발자가 프로그램을 만드는 방법
 
 FolderState는 C# / .NET 10 / WPF로 만들었습니다. 아래 명령은 Windows 11 x64에서 실행합니다. .NET SDK 버전은 `global.json`을 따릅니다. 각 도구의 현재 확인 범위는 [배포·검증 안내](docs/delivery/index.md)를 참고하세요.
