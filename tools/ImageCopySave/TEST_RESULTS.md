@@ -1,6 +1,10 @@
 # 그림 복사·저장 · 검증 기록
 
-기록일: 2026-09-25(KST) · 제품 판정: **G0 BLOCKED / 배포 불가** · v1.1 독립 메뉴 승인, 변경된 경로의 G0 실기 NOT RUN
+기록일: 2026-09-27(KST) · 제품 판정: **G0 BLOCKED / 배포 불가** · v1.1 독립 메뉴 승인, 변경된 경로의 G0 실기 NOT RUN
+
+## 현재 PC 서명·설치 시도 — 2026-09-27
+
+기존 허용 인증서로 새 0.1.1.0 사본 서명과 SignTool 일반 정책 검증은 PASS입니다. 실제 일반 사용자 설치는 신뢰 오류 `0x800B0109`로 실패했고, 후속 현재 사용자 패키지 등록은 0개입니다. 신뢰 저장소·보안 설정 변경 없이 중단했습니다. G0·재설치·업데이트·제거는 BLOCKED/NOT RUN을 유지합니다. [설치 시도와 패키지 해시](../../docs/delivery/image-copy-save-signing-20260927.md). 아래 날짜별 미실행 표시는 당시 이력입니다.
 
 ## 로컬 통합 후보 재검증 — 2026-09-25
 
@@ -110,8 +114,8 @@ PASS는 표에 명시한 실제 실행 범위에 한정합니다. BLOCKED는 G0/
 | AT-37 | 설치된 Word/PowerPoint에 붙여넣기 | NOT RUN | Word/PowerPoint 버전/붙여넣기 NOT RUN |
 | AT-38 | 실제 사용하는 메일·메신저 본문에 붙여넣기 | NOT RUN | 메일/메신저 버전/붙여넣기 NOT RUN |
 | AT-39 | 메뉴 및 4K 이미지 반복 성능 측정 | NOT RUN | 4K 합성 gradient/alpha 엔진 Save/Read 2회 예열+10회 측정 P50/P95 기록 PASS. 실제 메뉴·helper/clipboard 전체 지연·탐색기 응답성 미실행 |
-| AT-40 | 설치·재설치·업데이트·제거 반복 | BLOCKED | unsigned MSIX 제작·구조/408개 입력 해시 검사 PASS. 설치·재설치·업데이트·제거 NOT RUN |
-| AT-41 | 일반 사용자 계정 설치/사용 | BLOCKED | package identity 후보 작성, 서명·신뢰 방식 미결정. 일반 사용자 설치 NOT RUN |
+| AT-40 | 설치·재설치·업데이트·제거 반복 | BLOCKED | 2026-09-27 서명 PASS, 최초 설치 신뢰 오류0x800B0109. 재설치·업데이트·제거 NOT RUN |
+| AT-41 | 일반 사용자 계정 설치/사용 | BLOCKED | 일반 사용자 설치 실제 FAIL(0x800B0109), 실패 후 등록0개. 신뢰 변경 없음 |
 | AT-42 | 앱 종료·Windows 로그인 후 프로세스/시작항목 점검 | BLOCKED | 감시기/서비스/시작 등록 구현 없음; 설치 후 로그인 점검 NOT RUN |
 | AT-43 | 원본/로그/네트워크 점검 | NOT RUN | 원본 보호·메타데이터 제거 및 손상 원본 실패 시 실제 helper 원시 stdout/stderr의 fixture 경로·텍스트·이미지 정보 비노출 PASS. 전체 설치 로그/네트워크 실측 NOT RUN |
 | AT-44 | 기존 복사·붙여넣기·기본 연결·다른 메뉴 회귀 | BLOCKED | 메뉴/기본 연결 미등록; 설치 전후 회귀 NOT RUN |

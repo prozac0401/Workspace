@@ -1,7 +1,7 @@
 # 그림 복사·저장 · G0 메뉴 구현성 검증
 
 도구 ID: ImageCopySave  
-기록 버전: 0.5 · 2026-09-25  
+기록 버전: 0.6 · 2026-09-27  
 기준: [ImageCopySave-REQ-1.1](ImageCopySave_Requirements_v1.1.md)  
 기록 상태: 검토 · G0 **BLOCKED** · Windows 11 탐색기 실기 **NOT RUN**  
 책임: 도구 개발·검증 담당  
@@ -9,6 +9,8 @@
 관련 결정: [ADR-0016](../../design/0016-image-copy-save-direct-menu.md) · 과거 [ADR-0015](../../design/0015-image-copy-save-g0.md)
 
 ## 현재 판정 — v1.1
+
+2026-09-27 기존 허용 인증서로 사본 서명·SignTool 검증은 PASS였으나, 일반 사용자 MSIX 설치는 `0x800B0109`로 거절됐다. 실패 후 현재 사용자 패키지 등록은 0개다. 신뢰 저장소를 변경하지 않았으며 실제 메뉴·수명주기는 계속 미실행이다. [실행 근거](../../delivery/image-copy-save-signing-20260927.md).
 
 사용자가 기본 ‘새로 만들기’ 내부 위치 조건을 해제했다. 저장 명령은 실제 로컬 폴더 배경의 Windows 11 첫 우클릭 메뉴에 별도 명령으로 제공하는 후보를 구현했다. 이미지가 없을 때 완전히 숨김, 상주 감시 없음, 레거시 메뉴에만 두지 않음, 설치기가 등록을 담당한다는 나머지 조건은 유지한다. [v1.0 원문](ImageCopySave_Requirements_v1.0.md)은 변경하지 않았다.
 
@@ -29,7 +31,9 @@
 | v1.1 요구·ADR·manifest·PowerShell 구문 | 작성·정적 확인 |
 | native DLL 로컬 빌드·순수 정책/직접 COM 66개 | 최신 로컬66개 PASS / 0 FAIL. clipboard/Invoke/OS 등록·Explorer 미실행 |
 | unsigned full MSIX pack/unpack·구조 검사 | 최신0.1.1 로컬 PASS, 입력408개 해시 일치. 서명·설치 성공을 의미하지 않음 |
-| Windows 11 메뉴·Invoke·사용자별 설치/제거 | NOT RUN |
+| 기존 인증서 서명·SignTool 검증 | PASS, 현재 PC의 실제 MSIX 설치 허용을 보장하지 않음 |
+| 일반 사용자 최초 설치 | FAIL / 0x800B0109, 실패 후 등록0개 |
+| Windows 11 메뉴·Invoke·재설치/업데이트/제거 | BLOCKED / NOT RUN |
 
 이전 후보는 도구 누락으로 CI에서 빌드했으나, 이번에는 Microsoft 고정 payload와 SDK NuGet 서명을 검증해 저장소의 `.tools`에 추출하고 로컬에서 빌드했다. 새 Git worktree·원격 CI는 사용하지 않았다. 시스템 개발 도구 설치나 인증서 신뢰 변경은 하지 않았다. 최신 서명·설치 상태와 산출물은 [로컬 인계 기록](../../delivery/image-copy-save-local-20260925.md)에 별도로 기록한다. 제품의 실제 메뉴 PASS와 빌드 PASS는 구분한다.
 

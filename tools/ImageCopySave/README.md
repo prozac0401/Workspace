@@ -1,6 +1,6 @@
 # 그림 복사·저장 · 로컬 통합 평가 후보
 
-**탐색기 명령과 helper의 호출 상태·결과·비모달 안내를 연결했습니다. 실제 Windows 11 설치·첫 메뉴 검증 전이므로 G0는 BLOCKED입니다.** 저장은 실제 폴더 배경의 첫 우클릭 메뉴를 대상으로 하며 이미지가 없을 때 완전히 숨기는 조건은 유지합니다. 일반 사용자용 출시 완료를 뜻하지 않습니다.
+**탐색기 명령과 helper의 호출 상태·결과·비모달 안내를 연결했습니다. 현재 PC의 실제 MSIX 설치가 신뢰 오류로 차단되어 G0는 BLOCKED입니다.** 2026-09-27 기존 허용 인증서 서명은 통과했지만 설치는 `0x800B0109`로 거절됐고 현재 사용자 등록은 0개입니다. [설치 시도 기록](../../docs/delivery/image-copy-save-signing-20260927.md)을 확인하세요. 저장은 실제 폴더 배경의 첫 우클릭 메뉴를 대상으로 하며 이미지가 없을 때 완전히 숨기는 조건은 유지합니다. 일반 사용자용 출시 완료를 뜻하지 않습니다.
 
 - [현재 요구명세 v1.1](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.1.md) · [메뉴 위치 결정](../../docs/design/0016-image-copy-save-direct-menu.md)
 - [원본 요구명세](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.0.md)
