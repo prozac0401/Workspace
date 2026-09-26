@@ -23,7 +23,7 @@ public sealed class PresentationApplication {
  public int Gets,Sets;
  public object StatusBar {
   get{Gets++;if(Failure=="com-get")throw new COMException("synthetic getter failure");if(Failure=="invalid-get")throw new InvalidComObjectException("synthetic disconnected COM");if(Failure=="other-get")throw new InvalidOperationException("synthetic presentation failure");return Current;}
-  set{Sets++;if(Failure=="com-set")throw new COMException("synthetic setter failure");if(Failure=="invalid-set")throw new InvalidComObjectException("synthetic disconnected COM");Current=value;if(Failure=="after-set")throw new COMException("synthetic partial setter failure");}
+  set{Sets++;if(Failure=="verification-set")throw new InvalidOperationException("VCP-STATUSBAR-RESTORE: synthetic verification failure");if(Failure=="com-set")throw new COMException("synthetic setter failure");if(Failure=="invalid-set")throw new InvalidComObjectException("synthetic disconnected COM");Current=value;if(Failure=="after-set")throw new COMException("synthetic partial setter failure");}
  }
 }
 public sealed class RecoveryTestSheet {
@@ -75,9 +75,10 @@ internal static class PresentationAndEntryTests {
  }
  static void StatusFailure(string failure,string completed){
   var app=new PresentationApplication{Failure=failure};var addin=new AddIn();using(var engine=new ExcelEngine(app)){
-   Outcome(engine,completed);Set(addin,"application",app);Set(addin,"engine",engine);Set(addin,"outcome",completed);
+   Outcome(engine,completed);Set(addin,"application",app);Set(addin,"connected",true);Set(addin,"engine",engine);Set(addin,"outcome",completed);
    Exception error=Invoke(addin,"ShowStatus",new object[]{"synthetic completed feedback"});
    Check(error==null,"Presentation failure escaped into the operation error notice");
+   Check(app.Gets>0&&(!failure.Contains("set")||app.Sets>0),"Connected presentation fault injection was not reached");
    Check((string)Get(addin,"outcome")==completed&&engine.LastOutcome==completed&&!engine.RecoveryRequired,"Completed data outcome was changed by presentation failure");
    Check(Get(addin,"statusTimer")==null&&Get(addin,"ownStatus")==null,"Failed feedback retained a timer or claimed status ownership");
    if(failure=="after-set")Check(Object.Equals(app.Current,"original"),"Partially assigned status was not restored");
@@ -111,7 +112,7 @@ internal static class PresentationAndEntryTests {
   Test("completed undo survives status setter failure",delegate{StatusFailure("com-set","undone");});
   Test("replacing prior status disposes its timer even if restoration throws",delegate{
    var app=new PresentationApplication{Failure="other-get"};var addin=new AddIn();var timer=new System.Windows.Forms.Timer();bool disposed=false;timer.Disposed+=delegate{disposed=true;};
-   Set(addin,"application",app);Set(addin,"statusTimer",timer);Set(addin,"ownStatus","previous");Set(addin,"oldStatus","original");Set(addin,"outcome","success");
+   Set(addin,"application",app);Set(addin,"connected",true);Set(addin,"statusTimer",timer);Set(addin,"ownStatus","previous");Set(addin,"oldStatus","original");Set(addin,"outcome","success");
    Check(Invoke(addin,"ShowStatus",new object[]{"new"})==null&&disposed&&Get(addin,"statusTimer")==null&&(string)Get(addin,"outcome")=="success","Prior status cleanup escaped or leaked timer");
   });
   Test("progress failure cannot bypass restoration of touched visible cells",delegate{RecoveryDespiteProgressFailure(false);});
@@ -119,6 +120,25 @@ internal static class PresentationAndEntryTests {
   foreach(string state in new[]{"success","undone","recovery-required","state-restore-failed","idle","no-change"}){string copy=state;Test("notice reports conservative data outcome "+copy,delegate{NoticeForState(copy);});}
   Test("new validation refusal is accurate after an earlier successful paste",delegate{using(var engine=new ExcelEngine(new object())){Outcome(engine,"success");var addin=new AddIn();Set(addin,"engine",engine);var error=new ValidationException("VCP-COUNT","Counts differ. 변경된 셀은 없습니다.");string message=(string)typeof(AddIn).GetMethod("BuildNoticeMessage",F).Invoke(addin,new object[]{error});Check(message==error.Message,"Stale success replaced current no-write validation");}});
   Test("verified rollback keeps its precise failure explanation",delegate{using(var engine=new ExcelEngine(new object())){Outcome(engine,"rolled-back");var addin=new AddIn();Set(addin,"engine",engine);var error=new InvalidOperationException("원래 내용으로 되돌렸습니다.");string message=(string)typeof(AddIn).GetMethod("BuildNoticeMessage",F).Invoke(addin,new object[]{error});Check(message==error.Message,"Rollback explanation was lost");}});
+
+  foreach(string completed in new[]{"success","undone"}){string saved=completed;Test("completed "+saved+" survives default-control verification failure",delegate{
+   var app=new PresentationApplication{Failure="verification-set",Current="owned feedback"};var addin=new AddIn();
+   using(var engine=new ExcelEngine(app)){
+    Outcome(engine,saved);Set(addin,"application",app);Set(addin,"engine",engine);Set(addin,"outcome",saved);Set(addin,"ownStatus","owned feedback");Set(addin,"oldStatus",false);
+    Check(Invoke(addin,"RestoreStatus",new object[0])==null,"Verification failure escaped the timer restoration boundary");
+    Check(Get(addin,"ownStatus")==null&&(string)Get(addin,"outcome")==saved&&engine.LastOutcome==saved&&!engine.RecoveryRequired,"Presentation failure corrupted the completed outcome");
+   }
+  });}
+  Test("disconnect finishes cleanup when status verification fails",delegate{
+   var app=new PresentationApplication{Failure="verification-set",Current="owned feedback"};var addin=new AddIn();var timer=new System.Windows.Forms.Timer();bool disposed=false;timer.Disposed+=delegate{disposed=true;};var pending=new PreparedPaste();
+   Set(addin,"application",app);Set(addin,"engine",new ExcelEngine(app));Set(addin,"connected",true);Set(addin,"statusTimer",timer);Set(addin,"pending",pending);Set(addin,"ownStatus","owned feedback");Set(addin,"oldStatus",false);
+   Array custom=new object[0];addin.OnDisconnection(0,ref custom);
+   Check(disposed&&pending.IsDisposed&&Get(addin,"statusTimer")==null&&Get(addin,"ownStatus")==null&&Get(addin,"engine")==null&&Get(addin,"application")==null&&!(bool)Get(addin,"connected"),"Status verification failure skipped connection cleanup");
+  });
+  Test("status restoration never overwrites another owner's later message",delegate{
+   var app=new PresentationApplication{Current="another owner"};var addin=new AddIn();Set(addin,"application",app);Set(addin,"ownStatus","owned feedback");Set(addin,"oldStatus",false);
+   Check(Invoke(addin,"RestoreStatus",new object[0])==null&&app.Sets==0&&Object.Equals(app.Current,"another owner")&&Get(addin,"ownStatus")==null,"Later status owner was overwritten");
+  });
   Console.WriteLine("RESULT: "+passed+" passed; "+failed+" failed");return failed==0?0:1;
  }
 }

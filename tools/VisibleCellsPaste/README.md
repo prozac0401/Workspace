@@ -1,6 +1,8 @@
 # 보이는 칸 붙여넣기
 
-**버전 0.1.0**
+**버전 0.1.1 · 공개 전 검증 중**
+
+2026-09-26 설치 후보에서 실제 붙여넣기 후 Excel 종료 충돌을 확인해 공개를 보류했습니다. 후속 수명 관리 수정은 자동 검사와 외부 시험 엔진의 실제 기능 회귀를 통과했으나 새 설치본의 정상 사용·종료 검증이 남아 있습니다. 아래는 구현된 사용 흐름이며 현재 검증·배포 판정은 [시험 보고서](docs/test-report.md)와 [배포 점검](docs/release-checklist.md)을 따릅니다.
 
 Excel에서 복사한 한 행 또는 한 열의 값을, 선택한 한 열의 보이는 칸에 순서대로 넣는 독립 도구입니다. 필터로 가려진 행과 직접 숨긴 행, 선택 밖의 셀은 건드리지 않습니다. 원본과 대상의 개수가 다르면 아무 셀도 바꾸지 않습니다.
 
@@ -83,7 +85,7 @@ Excel 프로세스가 실행 중이면 설치·제거를 중단합니다. 설치
 소스는 `src`, 시험은 `tests`, 제작 스크립트는 `build`, 설치 구성은 `installer`에 있습니다. 제작하려면 저장소에서 다음 명령을 실행합니다.
 
 ```powershell
-powershell -NoProfile -File tools/VisibleCellsPaste/build/build.ps1 -Version 0.1.0
+powershell -NoProfile -File tools/VisibleCellsPaste/build/build.ps1 -Version 0.1.1
 ```
 
-ZIP과 `SHA256SUMS.txt`는 `artifacts/visible-cells-paste/0.1.0`에 생성됩니다. 최종 사용자는 개발 SDK·Python·Node.js를 설치하거나 VBA 코드를 만들 필요가 없습니다.
+ZIP과 `SHA256SUMS.txt`는 `artifacts/visible-cells-paste/0.1.1`에 생성됩니다. 최종 사용자는 개발 SDK·Python·Node.js를 설치하거나 VBA 코드를 만들 필요가 없습니다.

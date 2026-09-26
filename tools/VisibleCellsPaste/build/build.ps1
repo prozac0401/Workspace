@@ -1,6 +1,7 @@
 [CmdletBinding()]
-param([ValidatePattern('^[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.]+)?$')][string]$Version = '0.1.0')
+param([ValidatePattern('^[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.]+)?$')][string]$Version = '0.1.1')
 $ErrorActionPreference = 'Stop'
+$assemblyVersion = ($Version -split '-', 2)[0] + '.0'
 Set-StrictMode -Version Latest
 $productRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $productRoot '..\..'))
@@ -56,6 +57,7 @@ foreach ($arch in @('x86','x64')) {
     New-Item -ItemType Directory -Path $archDir -Force | Out-Null
     $dll = Join-Path $archDir 'VisibleCellsPaste.AddIn.dll'
     Compile (@('/nologo','/target:library','/optimize+','/debug-',"/platform:$arch","/out:$dll") + $references + $sources) (Join-Path $output "compile-$arch.log")
+    if ([Reflection.AssemblyName]::GetAssemblyName($dll).Version.ToString() -ne $assemblyVersion) { throw "Add-in assembly version does not match package version: $arch" }
     $payloadHashes += "$arch/VisibleCellsPaste.AddIn.dll " + (Get-FileHash -LiteralPath $dll -Algorithm SHA256).Hash.ToLowerInvariant()
     $inventory += "$arch/VisibleCellsPaste.AddIn.dll"
 }
@@ -84,6 +86,19 @@ Invoke-Tool $bulkTests @() (Join-Path $output 'bulk-snapshot-tests.log')
 $lifecycleTests = Join-Path $output 'AddInLifecycleTests.exe'
 Compile (@('/nologo','/target:exe','/main:AddInLifecycleTests',"/platform:$nativeTestArch","/out:$lifecycleTests","/reference:$testLibrary") + $references + @((Join-Path $productRoot 'tests\unit\AddInLifecycleTests.cs'))) (Join-Path $output 'addin-lifecycle-tests-build.log')
 Invoke-Tool $lifecycleTests @() (Join-Path $output 'addin-lifecycle-tests.log')
+$comLifetimeTests = Join-Path $output 'ComLifetimeTests.exe'
+Compile (@('/nologo','/target:exe','/main:ComLifetimeTests',"/platform:$nativeTestArch","/out:$comLifetimeTests","/reference:$testLibrary") + $references + @((Join-Path $productRoot 'tests\unit\ComLifetimeTests.cs'))) (Join-Path $output 'com-lifetime-tests-build.log')
+Invoke-Tool $comLifetimeTests @() (Join-Path $output 'com-lifetime-tests.log')
+if ([Environment]::Is64BitOperatingSystem) {
+    # Exercise the event sink's native COM vtable in a real 32-bit CLR as well.
+    $x86TestDir = Join-Path $output 'com-lifetime-x86'
+    New-Item -ItemType Directory -Path $x86TestDir -Force | Out-Null
+    $x86TestLibrary = Join-Path $x86TestDir 'VisibleCellsPaste.AddIn.dll'
+    Copy-Item -LiteralPath (Join-Path $package 'x86\VisibleCellsPaste.AddIn.dll') -Destination $x86TestLibrary -Force
+    $x86ComTests = Join-Path $x86TestDir 'ComLifetimeTests.exe'
+    Compile (@('/nologo','/target:exe','/main:ComLifetimeTests','/platform:x86',"/out:$x86ComTests","/reference:$x86TestLibrary") + $references + @((Join-Path $productRoot 'tests\unit\ComLifetimeTests.cs'))) (Join-Path $output 'com-lifetime-tests-x86-build.log')
+    Invoke-Tool $x86ComTests @() (Join-Path $output 'com-lifetime-tests-x86.log')
+}
 $globalRecoveryTests = Join-Path $output 'GlobalStateRecoveryTests.exe'
 Compile (@('/nologo','/target:exe','/main:GlobalStateRecoveryTests',"/platform:$nativeTestArch","/out:$globalRecoveryTests","/reference:$testLibrary") + $references + @((Join-Path $productRoot 'tests\unit\GlobalStateRecoveryTests.cs'))) (Join-Path $output 'global-state-recovery-tests-build.log')
 Invoke-Tool $globalRecoveryTests @() (Join-Path $output 'global-state-recovery-tests.log')
@@ -111,8 +126,8 @@ foreach ($doc in $docs) {
     Copy-Item -LiteralPath (Join-Path $productRoot "docs\$doc") -Destination (Join-Path $package "docs\$doc") -Force
     $inventory += "docs/$doc"
 }
-$sourceManifest = @($sources + $nativeFixtures + @((Join-Path $productRoot 'installer\Setup.cs'),(Join-Path $productRoot 'installer\Setup.manifest'),(Join-Path $productRoot 'installer\SetupTests.cs'),(Join-Path $productRoot 'tests\unit\CoreTests.cs'),(Join-Path $productRoot 'tests\unit\NativeClipboardTests.cs'),(Join-Path $productRoot 'tests\unit\CellSnapshotReaderTests.cs'),(Join-Path $productRoot 'tests\unit\AddInLifecycleTests.cs'),(Join-Path $productRoot 'tests\unit\GlobalStateRecoveryTests.cs'),(Join-Path $productRoot 'tests\unit\PresentationAndEntryTests.cs'),(Join-Path $productRoot 'tests\fixtures\excel-vertical-5.xml'),(Join-Path $productRoot 'installer\Install.cmd'),(Join-Path $productRoot 'installer\Uninstall.cmd'),(Join-Path $PSScriptRoot 'verify-package.ps1'),(Join-Path $PSScriptRoot 'verify-assembly.ps1'),$PSCommandPath) | ForEach-Object { [ordered]@{ path = $_.Substring($repoRoot.Length + 1); sha256 = (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant() } })
-$manifest = [ordered]@{ product='VisibleCellsPaste'; version=$Version; assemblyVersion='0.1.0.0'; utc=[DateTime]::UtcNow.ToString('o'); architectures=@('x86','x64'); signed=$false; classification='unsigned release build'; actualExcelValidation='See docs/test-report.md. Successful build does not establish Excel acceptance.'; compiler=(Get-Item -LiteralPath $compiler).VersionInfo.FileVersion; sources=$sourceManifest }
+$sourceManifest = @($sources + $nativeFixtures + @((Join-Path $productRoot 'installer\Setup.cs'),(Join-Path $productRoot 'installer\Setup.manifest'),(Join-Path $productRoot 'installer\SetupTests.cs'),(Join-Path $productRoot 'tests\unit\CoreTests.cs'),(Join-Path $productRoot 'tests\unit\NativeClipboardTests.cs'),(Join-Path $productRoot 'tests\unit\CellSnapshotReaderTests.cs'),(Join-Path $productRoot 'tests\unit\AddInLifecycleTests.cs'),(Join-Path $productRoot 'tests\unit\ComLifetimeTests.cs'),(Join-Path $productRoot 'tests\unit\GlobalStateRecoveryTests.cs'),(Join-Path $productRoot 'tests\unit\PresentationAndEntryTests.cs'),(Join-Path $productRoot 'tests\fixtures\excel-vertical-5.xml'),(Join-Path $productRoot 'installer\Install.cmd'),(Join-Path $productRoot 'installer\Uninstall.cmd'),(Join-Path $PSScriptRoot 'verify-package.ps1'),(Join-Path $PSScriptRoot 'verify-assembly.ps1'),$PSCommandPath) | ForEach-Object { [ordered]@{ path = $_.Substring($repoRoot.Length + 1); sha256 = (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant() } })
+$manifest = [ordered]@{ product='VisibleCellsPaste'; version=$Version; assemblyVersion=$assemblyVersion; utc=[DateTime]::UtcNow.ToString('o'); architectures=@('x86','x64'); signed=$false; classification='unsigned release build'; actualExcelValidation='See docs/test-report.md. Successful build does not establish Excel acceptance.'; compiler=(Get-Item -LiteralPath $compiler).VersionInfo.FileVersion; sources=$sourceManifest }
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $package 'build-manifest.json') -Encoding UTF8
 $inventory += 'build-manifest.json'
 $hashLines = @($inventory | Sort-Object | ForEach-Object { (Get-FileHash -LiteralPath (Join-Path $package $_) -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + $_ })
