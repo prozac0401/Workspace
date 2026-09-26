@@ -30,7 +30,10 @@ try {
     $cli = Join-Path $install 'FolderState.Cli.exe'
     Check 'self-contained CLI present' (Test-Path -LiteralPath $cli)
     $output = & $cli set done $business --json
-    Check 'installed CLI works' ($LASTEXITCODE -eq 0)
+    $cliExitCode = $LASTEXITCODE
+    $output | Set-Content -LiteralPath (Join-Path $testRoot 'installed-cli.json') -Encoding UTF8
+    $results.Add(@{name='installed CLI exit';exitCode=$cliExitCode;passed=($cliExitCode -eq 0)})
+    Check 'installed CLI works' ($cliExitCode -eq 0)
     $parsed = $output | ConvertFrom-Json
     Check 'state recorded' ($parsed.Success -eq $true)
     $statePath = Join-Path $business '.folderstate.ini'
@@ -45,7 +48,11 @@ try {
         $installedPackage = $upgrade
         Msi-Run 'downgrade-blocked' @('/i',('"'+$package+'"'),('INSTALLFOLDER="'+$install+'"')) @(1638,1603)
         $downgradeLog = Get-Content -LiteralPath (Join-Path $testRoot 'downgrade-blocked.log') -Raw
-        Check 'downgrade rejected for version reason' (($results[$results.Count-1].exitCode -eq 1638) -or ($downgradeLog -match '더 최신 버전의 FolderState'))
+        # Both released Korean wordings mean the same version guard. Require
+        # MSI's detected newer product as well, rather than accepting any 1603.
+        $newerProductDetected = $downgradeLog -match 'WIX_DOWNGRADE_DETECTED = \{[0-9A-Fa-f-]{36}\}'
+        $versionMessage = $downgradeLog -match '더 (최신|새로운) 버전의 FolderState'
+        Check 'downgrade rejected for version reason' (($results[$results.Count-1].exitCode -eq 1638) -or ($newerProductDetected -and $versionMessage))
         Check 'CLI retained after upgrade' (Test-Path -LiteralPath $cli)
         & $cli status $business --json | Out-Null
         Check 'saved state readable after upgrade' ($LASTEXITCODE -eq 0)
