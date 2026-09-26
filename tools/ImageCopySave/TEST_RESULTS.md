@@ -6,6 +6,8 @@
 
 기존 허용 인증서로 새 0.1.1.0 사본 서명과 SignTool 일반 정책 검증은 PASS입니다. 실제 일반 사용자 설치는 신뢰 오류 `0x800B0109`로 실패했고, 후속 현재 사용자 패키지 등록은 0개입니다. 신뢰 저장소·보안 설정 변경 없이 중단했습니다. G0·재설치·업데이트·제거는 BLOCKED/NOT RUN을 유지합니다. [설치 시도와 패키지 해시](../../docs/delivery/image-copy-save-signing-20260927.md). 아래 날짜별 미실행 표시는 당시 이력입니다.
 
+같은 날 현재 작업 트리의 엔진/helper/시험 Release 빌드는 경고0·오류0으로 완료했습니다. 일반 사용자 컨텍스트의 `metadata-only` 사전 사례는 fresh OS-named station 생성 오류183, 종료77로 NOT RUN입니다. 최초 새 실행 파일 시작의 접근 거부도 별도 보존했습니다. 격리되지 않은 사용자 클립보드로 대체하지 않았고 격리23개 사례 전체를 실행한 것으로 기록하지 않습니다. 기존 62 PASS/24 NOT RUN은 이전 결과이며 새 자동시험 PASS를 추가하지 않습니다. 상세 증거는 위 기록의 T03 절을 따릅니다.
+
 ## 로컬 통합 후보 재검증 — 2026-09-25
 
 새 Git worktree·원격 CI 없이 현재 작업 폴더에서 수행했습니다. Invoke 기준값 전달, WinExe 비모달 진행·취소·결과, UTF-8 결과 연결과 같은 보기 선택 후보를 구현했습니다. [ADR-0017](../../docs/design/0017-image-copy-save-invocation.md)과 [PC 확인 절차](../../docs/tools/image-copy-save/local-verification.md)를 함께 확인합니다.
