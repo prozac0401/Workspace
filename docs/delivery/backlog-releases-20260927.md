@@ -17,3 +17,9 @@
 [0.1.0-rc.10 평가판](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.10)을 게시했다. 태그는 `85fea6a`다. x64 2,137,629 bytes·SHA-256 `9171be45330ce9af86ce7b5eb06614211e3620bd47893912b03dd6ff2829114a`, x86 2,137,740 bytes·`f7d46d731f2c5e34ab8747755252b0f02387e8ce8a44f489fc41e3238e21b79e`가 GitHub 자산과 일치했다. 빌드 manifest·체크섬·경로/로그 없는 검증 요약을 제공했다. 빌드 시점 입력15개 중 Test-Package.ps1만 후속 검사기 변경으로 다르고 제품 소스·설치기·빌드 입력은 같다. 기존 패키지 내부 README의 대기 문구는 제작 당시 상태이며 현재 공개 안내·릴리스 요약이 후속 결과를 설명한다. 실제 x86·새 환경·재부팅·전체 실패/취소·조직 승인은 미완료다.
 
 공개 안내·README·CHANGELOG의 현재 상태를 정리했다. 문서 strict 빌드와 공개19페이지·404·생성 링크·비공개 제외 검사 PASS.
+
+## T08 · BookMark
+
+BookMark 수정 두 커밋을 main에 push하고 [0.2.4 평가판](https://github.com/prozac0401/BookMark/releases/tag/v0.2.4)을 `3f87da7`에 게시했다. 검증 MSI 75,451,327 bytes·SHA-256 `aebd7bb3844951a02b7323ffa1d1ddd16b06ff542f0bc90691de3eb1f6f370f3`가 GitHub 자산과 일치했다. 구조 검증 JSON·체크섬·후속 검증 요약을 첨부했다. 새 포터블 ZIP은 제작하지 않았으며 기존 0.2.3 ZIP을 버전 표시와 함께 보존한다. 실제 스티커 입력·IME·자동 저장·초안·작업 재개는 NOT_RUN, 재로그인·재부팅·추가 환경도 남아 있다. 두 저장소의 현재 설치 안내에 기존 사용자 지정 경로를 명시적으로 제거한 뒤 이전하는 절차를 반영했다.
+
+BookMark 변경 문서의 상대 링크52개 누락0, Workspace strict 빌드·공개19페이지/404·생성 링크 검사 PASS.
