@@ -8,11 +8,11 @@ using System.Windows.Forms;
 namespace VisibleCellsPaste {
  [ComVisible(true), Guid("B65AD801-ABAF-11D0-BB8B-00A0C90F2744"), InterfaceType(ComInterfaceType.InterfaceIsDual)]
  public interface IDTExtensibility2 {
-  [DispId(1)] void OnConnection([MarshalAs(UnmanagedType.IDispatch)] object application, int connectMode, [MarshalAs(UnmanagedType.IDispatch)] object addInInst, [In, Out, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
-  [DispId(2)] void OnDisconnection(int removeMode, [In, Out, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
-  [DispId(3)] void OnAddInsUpdate([In, Out, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
-  [DispId(4)] void OnStartupComplete([In, Out, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
-  [DispId(5)] void OnBeginShutdown([In, Out, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
+  [DispId(1)] void OnConnection([MarshalAs(UnmanagedType.IDispatch)] object application, int connectMode, [MarshalAs(UnmanagedType.IDispatch)] object addInInst, [In, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
+  [DispId(2)] void OnDisconnection(int removeMode, [In, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
+  [DispId(3)] void OnAddInsUpdate([In, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
+  [DispId(4)] void OnStartupComplete([In, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
+  [DispId(5)] void OnBeginShutdown([In, MarshalAs(UnmanagedType.SafeArray, SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom);
  }
  [ComVisible(true), Guid("000C0396-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsDual)]
  public interface IRibbonExtensibility { [DispId(1)] string GetCustomUI(string ribbonId); }
@@ -23,51 +23,83 @@ public interface ICallbacks {
 }
 [ComVisible(true),Guid("856B2219-6225-42ED-8FF1-2D06E5913AC8"),ProgId("Workspace.VisibleCellsPaste"),ClassInterface(ClassInterfaceType.None),ComDefaultInterface(typeof(ICallbacks))]
 public sealed class AddIn : StandardOleMarshalObject, IDTExtensibility2, IRibbonExtensibility, ICallbacks {
+private int activeDepth; private bool disconnectRequested,disconnecting;
 private object application; private bool connected; private int clicks; private ExcelEngine engine; private bool busy; private string outcome="idle"; private System.Windows.Forms.Timer timer; private PreparedPaste pending;
-public void OnConnection(object app,int mode,object instance,[In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom) {try{if(connected||engine!=null)Disconnect();application=app;try{engine=new ExcelEngine(app);((dynamic)instance).Object=this;connected=true;}catch{Disconnect();throw;}}finally{ExcelEngine.Release(instance);}}
-public void OnDisconnection(int mode,[In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom) {Disconnect();}
-public void OnAddInsUpdate([In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom){}
-public void OnStartupComplete([In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom){}
-public void OnBeginShutdown([In,Out,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom){Disconnect();}
+public void OnConnection(object app,int mode,object instance,[In,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom) {
+ bool transferred=false;
+ try{
+  if(activeDepth!=0||disconnecting)throw new InvalidOperationException("VCP-BUSY: 연결 변경 중 기존 작업을 계속 보호합니다.");
+  if(connected||engine!=null||application!=null)Disconnect();
+  // This native callback supplies one Application acquisition. Engine and epoch borrow it.
+  application=app;transferred=true;
+  try{engine=new ExcelEngine(app);((dynamic)instance).Object=this;connected=true;}
+  catch{Disconnect();throw;}
+ }finally{
+  // A failing previous Disconnect never accepts the new incoming acquisition.
+  try{if(!transferred)ExcelEngine.Release(app);}finally{ExcelEngine.Release(instance);}
+ }
+}
+public void OnDisconnection(int mode,[In,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom) {Disconnect();}
+public void OnAddInsUpdate([In,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom){}
+public void OnStartupComplete([In,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom){}
+public void OnBeginShutdown([In,MarshalAs(UnmanagedType.SafeArray,SafeArraySubType=VarEnum.VT_VARIANT)] ref Array custom){Disconnect();}
 public string GetCustomUI(string id) {return "<customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui'><contextMenus><contextMenu idMso='ContextMenuCell'><button id='VCPVisibleCellsPastePasteCellV1' insertBeforeMso='Cut' tag='VCP.VisibleCellsPaste.Paste.v1' label='보이는 칸에 붙여넣기' onAction='Paste'/><button id='VCPVisibleCellsPasteUndoCellV1' insertBeforeMso='Cut' tag='VCP.VisibleCellsPaste.Undo.v1' label='마지막 붙여넣기 되돌리기' onAction='Undo'/></contextMenu><contextMenu idMso='ContextMenuListRange'><button id='VCPVisibleCellsPastePasteTableV1' insertBeforeMso='Cut' tag='VCP.VisibleCellsPaste.Paste.v1' label='보이는 칸에 붙여넣기' onAction='Paste'/><button id='VCPVisibleCellsPasteUndoTableV1' insertBeforeMso='Cut' tag='VCP.VisibleCellsPaste.Undo.v1' label='마지막 붙여넣기 되돌리기' onAction='Undo'/></contextMenu></contextMenus></customUI>";}
-public void Paste(object control){try{PasteCore();}finally{ExcelEngine.Release(control);}}
+public void Paste(object control){try{RunActive(PasteCore);}finally{ExcelEngine.Release(control);}}
 private void PasteCore(){
  if(!connected||busy)return;busy=true;clicks++;
- try {var source=ClipboardReader.ReadSnapshot(Convert.ToInt32(((dynamic)application).CutCopyMode));pending=engine.Prepare(source);
+ try {var source=ClipboardReader.ReadSnapshot(Convert.ToInt32(((dynamic)application).CutCopyMode));if(!connected)return;pending=engine.Prepare(source);if(!connected)return;
  if(pending.Formulas>0||pending.Clears>0||pending.Plan.RequiresSizeConfirmation) {string msg="보이는 "+pending.Before.Length+"칸에 복사한 순서대로 입력합니다.\n기존 수식 "+pending.Formulas+"개가 값으로 바뀌고, 내용이 있는 "+pending.Clears+"칸이 빈칸으로 지워집니다.\n복사한 순서대로 입력합니다. 이름이나 사번을 찾아 연결하지 않습니다. 원본과 대상의 개수가 같아도 사람의 순서까지 일치한다는 뜻은 아닙니다.";if(MessageBox.Show(new Owner(application),msg,"보이는 칸 붙여넣기",MessageBoxButtons.OKCancel,MessageBoxIcon.Warning)!=DialogResult.OK){pending.Dispose();pending=null;busy=false;return;}}
- timer=new System.Windows.Forms.Timer();timer.Interval=50;timer.Tick+=RunPending;timer.Start();outcome="pending";
+ QueuePending();
  }catch(Exception e){if(pending!=null)pending.Dispose();pending=null;busy=false;Notice(e);}
 }
-public void Undo(object control){try{UndoCore();}finally{ExcelEngine.Release(control);}}
+public void Undo(object control){try{RunActive(UndoCore);}finally{ExcelEngine.Release(control);}}
 private void UndoCore(){if(!connected||busy)return;busy=true;try{engine.UndoLast();outcome="undone";ShowStatus("마지막 붙여넣기를 되돌렸습니다.");}catch(Exception e){Notice(e);}finally{busy=false;}}
 public string GetDiagnostics(){return "stage=M2;connected="+connected+";clicks="+clicks+";bitness="+(IntPtr.Size*8)+";outcome="+outcome+";engine="+(engine==null?"none":engine.LastOutcome);}
 
 private sealed class Owner:IWin32Window {readonly IntPtr hwnd;public Owner(object a){hwnd=new IntPtr(Convert.ToInt64(((dynamic)a).Hwnd));}public IntPtr Handle{get{return hwnd;}}}
 private void Disconnect(){
- connected=false;
+ connected=false;disconnectRequested=true;
+ if(activeDepth==0&&!disconnecting)DisconnectNow();
+}
+private void RunActive(Action action){
+ activeDepth++;
+ try{action();}finally{activeDepth--;if(activeDepth==0&&disconnectRequested&&!disconnecting)DisconnectNow();}
+}
+private void QueuePending(){
+ if(!connected)return;
+ timer=new System.Windows.Forms.Timer();timer.Interval=50;timer.Tick+=RunPending;timer.Start();outcome="pending";
+}
+private void DisconnectNow(){
+ if(disconnecting)return;disconnecting=true;
+ try{DisconnectOwnedResources();}finally{disconnectRequested=false;disconnecting=false;}
+}
+private void DisconnectOwnedResources(){
  try{
   if(timer!=null){timer.Stop();timer.Dispose();timer=null;}
   if(statusTimer!=null){statusTimer.Stop();statusTimer.Dispose();statusTimer=null;RestoreStatus();}
  }finally{
   try{if(pending!=null)pending.Dispose();}
   finally{pending=null;try{if(engine!=null)engine.Dispose();}
-   finally{engine=null;application=null;busy=false;}}
+   finally{engine=null;object ownedApplication=application;application=null;busy=false;ExcelEngine.Release(ownedApplication);}}
  }
 }
-private void RunPending(object sender,EventArgs args){
- timer.Stop();timer.Dispose();timer=null;var work=pending;pending=null;bool engineOwnsWork=false;
+private bool CancelPending(ProgressDialog progress){if(progress!=null)Application.DoEvents();return !connected||(progress!=null&&progress.Canceled);}
+private void RunPending(object sender,EventArgs args){RunActive(RunPendingCore);}
+private void RunPendingCore(){
+ if(timer!=null){timer.Stop();timer.Dispose();timer=null;}var work=pending;pending=null;bool engineOwnsWork=false;
  try{
   if(work==null||!connected)return;
   if(work.Plan.RequiresSizeConfirmation){
    using(var progress=new ProgressDialog()){
     Exception failure=null;
     progress.Shown+=delegate{progress.BeginInvoke((Action)delegate{
-     try{engineOwnsWork=true;engine.Apply(work,delegate{Application.DoEvents();return progress.Canceled;},delegate(string text){progress.SetStage(text);});}
+     try{if(!connected)return;engineOwnsWork=true;engine.Apply(work,delegate{return CancelPending(progress);},delegate(string text){progress.SetStage(text);});}
      catch(Exception e){failure=e;}finally{progress.Finish();}
     });};
     progress.ShowDialog(new Owner(application));if(failure!=null)throw failure;
    }
-  }else{engineOwnsWork=true;engine.Apply(work,null,null);}
+  }else{engineOwnsWork=true;engine.Apply(work,delegate{return CancelPending(null);},null);}
+  if(!connected)return;
   outcome="success";ShowStatus("보이는 "+engine.LastCount+"칸에 붙여넣었습니다.");
  }catch(Exception e){Notice(e);}finally{try{if(work!=null&&!engineOwnsWork)work.Dispose();}finally{busy=false;}}
 }
@@ -86,17 +118,18 @@ private string BuildNoticeMessage(Exception error){
  else message="실행 결과를 확인하지 못했습니다. 셀 내용을 확인해 주세요.";
  return message+"\n오류 코드: "+error.HResult.ToString("X8");
 }
-private void Notice(Exception error){outcome=error is RecoveryException||(engine!=null&&engine.RecoveryRequired)?"recovery-required":"error";MessageBox.Show(new Owner(application),BuildNoticeMessage(error),"보이는 칸 붙여넣기",MessageBoxButtons.OK,MessageBoxIcon.Information);}
+private void Notice(Exception error){if(!connected)return;outcome=error is RecoveryException||(engine!=null&&engine.RecoveryRequired)?"recovery-required":"error";MessageBox.Show(new Owner(application),BuildNoticeMessage(error),"보이는 칸 붙여넣기",MessageBoxButtons.OK,MessageBoxIcon.Information);}
 private System.Windows.Forms.Timer statusTimer;private object oldStatus;private string ownStatus;
 private void ShowStatus(string text){
+ if(!connected)return;
  // Success feedback is best effort and must never turn a completed write/undo into a failure notice.
- try{if(statusTimer!=null){statusTimer.Stop();statusTimer.Dispose();statusTimer=null;RestoreStatus();}oldStatus=((dynamic)application).StatusBar;ownStatus=text;((dynamic)application).StatusBar=text;statusTimer=new System.Windows.Forms.Timer();statusTimer.Interval=2500;statusTimer.Tick+=delegate{statusTimer.Stop();statusTimer.Dispose();statusTimer=null;RestoreStatus();};statusTimer.Start();}
+ try{if(statusTimer!=null){statusTimer.Stop();statusTimer.Dispose();statusTimer=null;RestoreStatus();}oldStatus=((dynamic)application).StatusBar;ownStatus=text;((dynamic)application).StatusBar=text;statusTimer=new System.Windows.Forms.Timer();statusTimer.Interval=2500;statusTimer.Tick+=delegate{RunActive(delegate{if(statusTimer!=null){statusTimer.Stop();statusTimer.Dispose();statusTimer=null;}if(connected)RestoreStatus();});};statusTimer.Start();}
  catch(Exception){
   if(statusTimer!=null){try{statusTimer.Stop();statusTimer.Dispose();}catch(Exception){}statusTimer=null;}
   try{RestoreStatus();}catch(Exception){}ownStatus=null;
  }
 }
-private void RestoreStatus(){try{if(application!=null&&Object.Equals((object)((dynamic)application).StatusBar,ownStatus))((dynamic)application).StatusBar=oldStatus;}catch(COMException){}catch(InvalidComObjectException){}ownStatus=null;}
+private void RestoreStatus(){try{if(application!=null&&Object.Equals((object)((dynamic)application).StatusBar,ownStatus))ExcelEngine.RestoreStatusBar(application,oldStatus);}catch(COMException){}catch(InvalidComObjectException){}catch(InvalidOperationException){}finally{ownStatus=null;}}
 
 }
 }

@@ -92,6 +92,23 @@ public sealed class LifetimeApplyRange {
  public object Value2{get{if(first==last)return sheet.Values[first];var result=new object[last-first+1,1];for(int i=first;i<=last;i++)result[i-first,0]=sheet.Values[i];return result;}
   set{for(int i=first;i<=last;i++){if(i!=2&&i!=4)throw new Exception("Hidden or outside write");sheet.Writes.Add(i);var a=value as Array;sheet.Values[i]=Convert.ToDouble(a==null?value:a.GetValue(i-first,0));}}}
 }
+
+public sealed class EpochTestConnection : System.Runtime.InteropServices.ComTypes.IConnectionPoint
+{
+ public string Failure; public int Advises,Unadvises; public object Sink; public Action OnUnadvise; public readonly HashSet<int> Cookies=new HashSet<int>{99};
+ public void GetConnectionInterface(out Guid iid){iid=new Guid("00024413-0000-0000-C000-000000000046");}
+ public void GetConnectionPointContainer(out System.Runtime.InteropServices.ComTypes.IConnectionPointContainer source){source=null;throw new NotSupportedException();}
+ public void Advise(object sink,out int cookie){Advises++;Sink=sink;cookie=Failure=="advise-before-cookie"||Failure=="zero-cookie"?0:73;if(cookie!=0)Cookies.Add(cookie);if(Failure=="advise-before-cookie"||Failure=="advise-after-cookie")throw new COMException("Synthetic Advise failure");}
+ public void Unadvise(int cookie){Unadvises++;if(OnUnadvise!=null)OnUnadvise();if(cookie!=73)throw new Exception("Wrong or foreign subscription cookie");Cookies.Remove(cookie);if(Failure=="unadvise")throw new COMException("Synthetic Unadvise failure");}
+ public void EnumConnections(out System.Runtime.InteropServices.ComTypes.IEnumConnections values){values=null;throw new NotSupportedException();}
+}
+public sealed class EpochTestSource : System.Runtime.InteropServices.ComTypes.IConnectionPointContainer
+{
+ public readonly EpochTestConnection Point=new EpochTestConnection(); public bool FailFind,NullPoint; public int Finds; public Guid Requested;
+ public void EnumConnectionPoints(out System.Runtime.InteropServices.ComTypes.IEnumConnectionPoints values){values=null;throw new NotSupportedException();}
+ public void FindConnectionPoint(ref Guid iid,out System.Runtime.InteropServices.ComTypes.IConnectionPoint point){Finds++;Requested=iid;point=null;if(FailFind)throw new COMException("Synthetic FindConnectionPoint failure");if(!NullPoint)point=Point;}
+}
+
 internal static class ComLifetimeTests {
  const BindingFlags Hidden=BindingFlags.Instance|BindingFlags.NonPublic;
  static int passed,failed;
@@ -146,7 +163,99 @@ internal static class ComLifetimeTests {
    engine.Dispose();Check(p.IsDisposed&&LifetimeNativeHost.Released(sentinel),"Engine shutdown retained outer ownership");
   }
  }
+
+ [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+ delegate int NativeEventInvoke(IntPtr self,int dispId,ref Guid iid,uint lcid,ushort flags,IntPtr parameters,IntPtr result,IntPtr exception,IntPtr argumentError);
+ [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+ delegate int NativeTypeInfoCount(IntPtr self,out uint count);
+ [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+ delegate int NativeTypeInfo(IntPtr self,uint index,uint lcid,out IntPtr info);
+ [StructLayout(LayoutKind.Sequential)]
+ struct EventParameters {public IntPtr Arguments,NamedIds;public uint Count,NamedCount;}
+ static readonly Guid EventsIid=new Guid("00024413-0000-0000-C000-000000000046"),DispatchIid=new Guid("00020400-0000-0000-C000-000000000046");
+ sealed class NativeEventProbe:IDisposable {
+  public readonly UndoEpoch Epoch;public readonly object Sink;public IntPtr Pointer;readonly NativeEventInvoke invoke;
+  public NativeEventProbe(){
+   Epoch=new UndoEpoch(new object());
+   Sink=typeof(UndoEpoch.EventSink).GetConstructor(Hidden,null,new[]{typeof(UndoEpoch)},null).Invoke(new object[]{Epoch});
+   IntPtr unknown=Marshal.GetIUnknownForObject(Sink);try{Guid iid=EventsIid;Marshal.ThrowExceptionForHR(Marshal.QueryInterface(unknown,ref iid,out Pointer));}finally{Marshal.Release(unknown);}
+   invoke=(NativeEventInvoke)Marshal.GetDelegateForFunctionPointer(Marshal.ReadIntPtr(Marshal.ReadIntPtr(Pointer),6*IntPtr.Size),typeof(NativeEventInvoke));
+  }
+  public int Invoke(int dispId,IntPtr parameters,IntPtr result){Guid iid=Guid.Empty;return invoke(Pointer,dispId,ref iid,0,1,parameters,result,IntPtr.Zero,IntPtr.Zero);}
+  public int InvokeWithIid(int dispId,Guid iid){return invoke(Pointer,dispId,ref iid,0,1,new IntPtr(1),IntPtr.Zero,IntPtr.Zero,IntPtr.Zero);}
+  public IntPtr Slot(int index){return Marshal.ReadIntPtr(Marshal.ReadIntPtr(Pointer),index*IntPtr.Size);}
+  public void Dispose(){Epoch.Dispose();if(Pointer!=IntPtr.Zero){Marshal.Release(Pointer);Pointer=IntPtr.Zero;}GC.KeepAlive(Sink);}
+ }
+ static UndoEpoch ConnectEpoch(EpochTestSource source,Action<object> release){
+  return (UndoEpoch)typeof(UndoEpoch).GetConstructor(Hidden,null,new[]{typeof(System.Runtime.InteropServices.ComTypes.IConnectionPointContainer),typeof(Action<object>)},null).Invoke(new object[]{source,release});
+ }
+ static void RawEventTests(){
+  Test("event sink exposes exact AppEvents and IDispatch QI with stable IUnknown identity",delegate{using(var probe=new NativeEventProbe()){
+   Guid dispatch=DispatchIid;IntPtr dispatchPointer;Marshal.ThrowExceptionForHR(Marshal.QueryInterface(probe.Pointer,ref dispatch,out dispatchPointer));
+   try{Guid unknown=new Guid("00000000-0000-0000-C000-000000000046");IntPtr a,b;Marshal.ThrowExceptionForHR(Marshal.QueryInterface(probe.Pointer,ref unknown,out a));try{Marshal.ThrowExceptionForHR(Marshal.QueryInterface(dispatchPointer,ref unknown,out b));try{Check(a==b,"QI changed COM identity");}finally{Marshal.Release(b);}}finally{Marshal.Release(a);}}finally{Marshal.Release(dispatchPointer);}
+   Guid missing=new Guid("786338C4-6BCB-4DD1-8F00-6D57BBFE2BBF");IntPtr unavailable;Check(Marshal.QueryInterface(probe.Pointer,ref missing,out unavailable)==unchecked((int)0x80004002)&&unavailable==IntPtr.Zero,"Unknown QI incorrectly exposed an interface");
+   Guid managed=new Guid("C3FCC19E-A970-11D2-8B5A-00A0C9B7C9C4");Check(Marshal.QueryInterface(probe.Pointer,ref managed,out unavailable)==unchecked((int)0x80004002)&&unavailable==IntPtr.Zero,"Sink exposed the managed-object unwrapping interface");
+  }});
+  Test("native IDispatch type-info slots use the expected ABI",delegate{using(var probe=new NativeEventProbe()){
+   var countCall=(NativeTypeInfoCount)Marshal.GetDelegateForFunctionPointer(probe.Slot(3),typeof(NativeTypeInfoCount));uint count=999;Check(countCall(probe.Pointer,out count)==0&&count==0,"GetTypeInfoCount slot/signature mismatch");
+   var infoCall=(NativeTypeInfo)Marshal.GetDelegateForFunctionPointer(probe.Slot(4),typeof(NativeTypeInfo));IntPtr info=new IntPtr(1);Check(infoCall(probe.Pointer,0,0,out info)==unchecked((int)0x80004001)&&info==IntPtr.Zero,"GetTypeInfo did not fail with a cleared pointer");
+  }});
+  Test("all fourteen native event IDs invalidate without reading DISPPARAMS",delegate{using(var probe=new NativeEventProbe()){
+   int[] ids={1558,1561,1562,1564,1565,1567,1568,1569,1570,1571,1573,1556,1557,3079};long version=probe.Epoch.Version;
+   foreach(int id in ids){Check(probe.Invoke(id,new IntPtr(1),IntPtr.Zero)==0,"Native event failed: "+id);Check(probe.Epoch.Version==++version,"Observed event missing: "+id);}
+  }});
+  Test("native unknown suppressed and disposed events preserve conservative epoch rules",delegate{using(var probe=new NativeEventProbe()){
+   long before=probe.Epoch.Version;Check(probe.Invoke(9999,new IntPtr(1),IntPtr.Zero)==0&&probe.Epoch.Version==before,"Unknown event changed epoch");
+   probe.Epoch.Suppress=true;probe.Invoke(1564,new IntPtr(1),IntPtr.Zero);Check(probe.Epoch.Version==before,"Suppressed own event changed epoch");probe.Epoch.Invalidate();Check(probe.Epoch.Version==before+1,"Explicit invalidation incorrectly obeyed suppression");
+   probe.Epoch.Suppress=false;probe.Epoch.Dispose();long disposed=probe.Epoch.Version;probe.Invoke(1570,new IntPtr(1),IntPtr.Zero);Check(probe.Epoch.Version==disposed&&!probe.Epoch.Available,"Callback after Dispose revived observer");probe.Epoch.Dispose();Check(probe.Epoch.Version==disposed,"Repeat Dispose changed epoch");
+  }});
+  Test("native byref Cancel arguments and canaries stay unchanged while result is VT_EMPTY",delegate{using(var probe=new NativeEventProbe()){
+   int variantSize=IntPtr.Size==8?24:16;IntPtr block=Marshal.AllocHGlobal(112),parameters=Marshal.AllocHGlobal(Marshal.SizeOf(typeof(EventParameters))),result=Marshal.AllocHGlobal(variantSize);
+   try{
+    byte[] original=Enumerable.Repeat((byte)0x5a,112).ToArray();Marshal.Copy(original,0,block,original.Length);
+    IntPtr args=IntPtr.Add(block,8),cancel=IntPtr.Add(block,96);Marshal.WriteInt16(cancel,-1);Marshal.WriteInt16(args,unchecked((short)0x400b));Marshal.WriteIntPtr(args,8,cancel);
+    Marshal.WriteInt16(IntPtr.Add(args,variantSize),9);Marshal.WriteIntPtr(IntPtr.Add(args,variantSize),8,new IntPtr(1));
+    Marshal.StructureToPtr(new EventParameters{Arguments=args,Count=2},parameters,false);Marshal.Copy(block,original,0,original.Length);
+    byte[] filled=Enumerable.Repeat((byte)0xcc,variantSize).ToArray();Marshal.Copy(filled,0,result,filled.Length);
+    Check(probe.Invoke(1570,parameters,result)==0,"BeforeClose native callback failed");
+    byte[] after=new byte[original.Length];Marshal.Copy(block,after,0,after.Length);Check(original.SequenceEqual(after)&&Marshal.ReadInt16(cancel)==-1,"Event argument or Cancel changed");
+    Check(Marshal.ReadInt16(result)==0,"Void event result was not VT_EMPTY");
+   }finally{Marshal.FreeHGlobal(result);Marshal.FreeHGlobal(parameters);Marshal.FreeHGlobal(block);}
+  }});
+  Test("native non-null riid refuses without dereferencing arguments or observing",delegate{using(var probe=new NativeEventProbe()){
+   long before=probe.Epoch.Version;Check(probe.InvokeWithIid(1564,EventsIid)==unchecked((int)0x80020001)&&probe.Epoch.Version==before,"Invalid Invoke riid was accepted");
+  }});
+  Test("dedicated subscription owns one connection point and never unadvises a peer",delegate{
+   var source=new EpochTestSource();var released=new List<object>();var epoch=ConnectEpoch(source,released.Add);
+   Check(epoch.Available&&source.Finds==1&&source.Requested==EventsIid&&source.Point.Advises==1,"Did not establish exactly one event subscription");
+   epoch.Dispose();epoch.Dispose();Check(source.Point.Unadvises==1&&released.Count==1&&Object.ReferenceEquals(released[0],source.Point)&&source.Point.Cookies.SetEquals(new[]{99}),"Subscription released a borrowed source or peer cookie");
+  });
+  Test("failed FindConnectionPoint leaves Undo unavailable with no ownership release",delegate{
+   var source=new EpochTestSource{FailFind=true};int released=0;using(var epoch=ConnectEpoch(source,delegate(object value){released++;})){Check(!epoch.Available&&epoch.Version>0&&source.Point.Advises==0&&released==0,"Find failure created a partial subscription");}
+  });
+  Test("null connection point fails closed without calling Advise",delegate{
+   var source=new EpochTestSource{NullPoint=true};int released=0;using(var epoch=ConnectEpoch(source,delegate(object value){released++;})){Check(!epoch.Available&&source.Point.Advises==0&&released==0,"Null connection was treated as available");}
+  });
+  foreach(string failure in new[]{"advise-before-cookie","advise-after-cookie","zero-cookie"}){string mode=failure;Test("partial event attach releases its acquired point: "+mode,delegate{
+   var source=new EpochTestSource();source.Point.Failure=mode;int released=0;var epoch=ConnectEpoch(source,delegate(object value){Check(Object.ReferenceEquals(value,source.Point),"Released wrong connection");released++;});
+   Check(!epoch.Available&&released==1&&source.Point.Unadvises==(mode=="advise-after-cookie"?1:0)&&source.Point.Cookies.SetEquals(new[]{99}),"Failed attach leaked its point/cookie or enabled Undo");
+   epoch.Dispose();Check(released==1,"Failed attach was released twice");
+  });}
+  Test("Unadvise failure still releases owned connection exactly once",delegate{
+   var source=new EpochTestSource();source.Point.Failure="unadvise";int released=0;var epoch=ConnectEpoch(source,delegate(object value){released++;});
+   IntPtr pointer=Marshal.GetComInterfaceForObject(source.Point.Sink,typeof(IRawExcelEventDispatch),CustomQueryInterfaceMode.Ignore);
+   try{var invoke=(NativeEventInvoke)Marshal.GetDelegateForFunctionPointer(Marshal.ReadIntPtr(Marshal.ReadIntPtr(pointer),6*IntPtr.Size),typeof(NativeEventInvoke));Action late=delegate{long before=epoch.Version;Guid iid=Guid.Empty;Check(invoke(pointer,1564,ref iid,0,1,new IntPtr(1),IntPtr.Zero,IntPtr.Zero,IntPtr.Zero)==0&&epoch.Version==before,"Late event revived disposed epoch");};source.Point.OnUnadvise=late;epoch.Dispose();late();epoch.Dispose();}
+   finally{Marshal.Release(pointer);}
+   Check(!epoch.Available&&released==1&&source.Point.Unadvises==1&&source.Point.Cookies.SetEquals(new[]{99}),"Unadvise failure skipped RCW release or touched peer");
+  });
+  Test("connection release exception cannot revive or repeat disposed observer cleanup",delegate{
+   var source=new EpochTestSource();int released=0;var epoch=ConnectEpoch(source,delegate(object value){released++;throw new InvalidOperationException("Synthetic connection release failure");});epoch.Dispose();long version=epoch.Version;epoch.Dispose();
+   Check(!epoch.Available&&released==1&&source.Point.Unadvises==1&&epoch.Version==version,"Release failure made disposal non-idempotent");
+  });
+ }
+
  [STAThread]static int Main(){
+  RawEventTests();
   Test("scope releases a real acquired RCW before native host shutdown",delegate{using(var h=new LifetimeNativeHost()){object o;using(var refs=new ComScope()){o=refs.Own(h.Acquire());Check(!LifetimeNativeHost.Released(o),"Reference released while in scope");}Check(LifetimeNativeHost.Released(o),"RCW deferred until CLR shutdown");Check(h.ReleaseBase()==0,"Native reference leaked");}});
   Test("repeated native returns of same identity are released by acquisition count",delegate{using(var h=new LifetimeNativeHost()){var refs=new ComScope();object a=refs.Own(h.Acquire()),b=refs.Own(h.Acquire());Check(Object.ReferenceEquals(a,b),"Expected shared RCW identity");refs.Dispose();refs.Dispose();Check(LifetimeNativeHost.Released(a)&&h.ReleaseBase()==0,"Duplicate acquisition leaked or repeated Dispose over-released");}});
   Test("one owned acquisition never final-releases a borrowed acquisition",delegate{using(var h=new LifetimeNativeHost()){object owned=h.Acquire(),borrowed=h.Acquire();using(var refs=new ComScope()){refs.Own(owned);}Check(!LifetimeNativeHost.Released(borrowed),"Scope final-released another owner's reference");Marshal.ReleaseComObject(borrowed);Check(LifetimeNativeHost.Released(borrowed)&&h.ReleaseBase()==0,"Owned acquisition was not released exactly once");}});

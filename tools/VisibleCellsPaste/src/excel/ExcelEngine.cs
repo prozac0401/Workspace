@@ -53,6 +53,19 @@ namespace VisibleCellsPaste {
    }
   }
   public static void Release(object obj){if(obj!=null&&Marshal.IsComObject(obj))try{Marshal.ReleaseComObject(obj);}catch(InvalidComObjectException){}}
+  public static void RestoreStatusBar(object target,object prior) {
+   if(target==null)throw new ArgumentNullException("target");
+   RestoreStatusBarCore(target,prior,Marshal.IsComObject(target));
+  }
+  static void RestoreStatusBarCore(object target,object prior,bool verifyDefaultControl) {
+   dynamic excel=target;excel.StatusBar=prior;
+   if(!verifyDefaultControl||!(prior is bool)||(bool)prior)return;
+   // False is Excel's documented reset. Some Excel builds return BSTR "FALSE" after that PUT.
+   // A verified empty-string reset restores Excel ownership; a literal saved string stays a string.
+   object current=excel.StatusBar;if(current is bool&&!(bool)current)return;
+   excel.StatusBar=String.Empty;current=excel.StatusBar;
+   if(!(current is bool)||(bool)current)throw new InvalidOperationException("VCP-STATUSBAR-RESTORE: Excel 상태 표시줄의 기본 상태 복원을 확인하지 못했습니다.");
+  }
   static bool HasAnyFormula(dynamic range) {object v=range.HasFormula;return !(v is bool && !(bool)v);}
   bool Intersects(object left,object right){object r=app.Intersect(left,right);try{return r!=null;}finally{Release(r);}}
   void GuardTable(dynamic sheet,dynamic selection) {
@@ -85,7 +98,7 @@ namespace VisibleCellsPaste {
    if(busy)throw Reject("VCP-BUSY","이미 작업 중입니다.");if(RecoveryRequired)throw Reject("VCP-RECOVERY-REQUIRED","복구 확인이 필요합니다. 이 Excel에서 후속 쓰기를 차단했습니다.");
    GuardProtectedView();object previous=app.StatusBar;PreparedPaste prepared=null;
    try{
-    try{app.StatusBar="보이는 칸 붙여넣기 · 검사 중";prepared=PrepareCore(source);}finally{app.StatusBar=previous;}
+    try{app.StatusBar="보이는 칸 붙여넣기 · 검사 중";prepared=PrepareCore(source);}finally{try{RestoreStatusBar((object)app,previous);}catch(Exception error){FailStateRestoration(new[]{"StatusBar:"+error.HResult.ToString("X8")});}}
     return prepared;
    }catch{if(prepared!=null)prepared.Dispose();throw;}
   }
@@ -291,10 +304,13 @@ namespace VisibleCellsPaste {
    var errors=new List<string>();
    try{app.Calculation=calculation;}catch(Exception e){errors.Add("Calculation:"+e.HResult.ToString("X8"));}
    try{app.ScreenUpdating=screen;}catch(Exception e){errors.Add("ScreenUpdating:"+e.HResult.ToString("X8"));}
-   try{app.StatusBar=status;}catch(Exception e){errors.Add("StatusBar:"+e.HResult.ToString("X8"));}
+   try{RestoreStatusBar((object)app,status);}catch(Exception e){errors.Add("StatusBar:"+e.HResult.ToString("X8"));}
    try{app.EnableEvents=events;}catch(Exception e){errors.Add("EnableEvents:"+e.HResult.ToString("X8"));}
    epoch.Suppress=oldSuppress;busy=false;
-   if(errors.Count>0){undoAllowed=false;RecoveryRequired=true;RecoveryDetail=(RecoveryDetail??"")+"\n데이터 처리 결과: "+LastOutcome+"\n전역 상태 복구 실패: "+String.Join(", ",errors);LastOutcome="state-restore-failed";throw new InvalidOperationException(RecoveryDetail+"\n자동 저장하지 않았습니다. 후속 쓰기를 차단했습니다.");}
+   if(errors.Count>0)FailStateRestoration(errors);
+  }
+  void FailStateRestoration(IEnumerable<string> errors) {
+   undoAllowed=false;RecoveryRequired=true;RecoveryDetail=(RecoveryDetail??"")+"\n데이터 처리 결과: "+LastOutcome+"\n전역 상태 복구 실패: "+String.Join(", ",errors);LastOutcome="state-restore-failed";throw new InvalidOperationException(RecoveryDetail+"\n자동 저장하지 않았습니다. 후속 쓰기를 차단했습니다.");
   }
 
  }

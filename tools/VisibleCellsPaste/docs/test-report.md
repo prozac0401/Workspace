@@ -2,30 +2,89 @@
 
 제품: 보이는 칸 붙여넣기 / VisibleCellsPaste 0.1.1 후속 수정 및 0.1.0 이력
 
-기록일: 2026-09-24  
+기록일: 2026-09-26 · 2026-09-24 이력 보존
 분류: 서명 없는 배포물. 실제 실행한 범위와 미검증 환경을 분리하며 조직 배포 승인을 의미하지 않습니다.
 
-## 0.1.0 게시 후 종료 검증과 0.1.1 후속 수정
+## 현재 판정: 후속 후보의 실제 설치·UI 종료 검증 대기, 공개 보류
 
-2026-09-24에 공개한 0.1.0을 합성 통합문서에서 실제 메뉴로 사용한 뒤 Excel을 닫는 검사에서 종료 실패를 3회 확인했습니다. 자체 Undo를 실행하지 않고 붙여넣기만 한 경우도 포함합니다. 같은 환경에서 Excel 기본 복사·붙여넣기·실행 취소 후 닫는 대조 시나리오는 정상 종료했으나, 이 제한된 비교만으로 원인 객체나 모든 공존 조건을 확정하지 않습니다.
+2026-09-26 최종 설치 후보의 정상 자동 로드와 실제 메뉴 붙여넣기는 통과했으나, 저장하지 않고 Excel을 닫는 과정에서 종료 충돌이 재현됐습니다. 설치 DLL은 SHA-256 `8741b19f1b9533e05f3c6ad126b87ec31e326e71c05438de3bb0a96ec0072ed7`입니다. Application Error 1000의 UTC 시각은 08:32:09.9715100이며 WER는 BEX64, ntdll.dll, c0000409, 부가 값 0xA를 기록했습니다. 최초 프로세스 관찰만으로 정상 종료라고 판정했던 중간 기록은 최종 실패 판정으로 정정합니다.
 
-종료 실패를 확인한 뒤 0.1.0 공개 릴리스를 초안(draft)으로 전환하고 최신 릴리스 표시를 해제했습니다. 태그는 보존했으며, 릴리스 상태를 다시 조회해 보류를 확인했습니다. 0.1.1은 아직 공개하지 않았습니다.
+새 사건의 덤프는 찾지 못했습니다. 2026-09-24 덤프의 CLR RCW 정리·SafeReleasePreemp 스택을 새 사건에서도 관찰했다고 쓰지 않습니다. 상태바 복원 수정이나 특정 COM 객체·다른 추가 기능을 이번 원인으로 확정할 근거도 없습니다. 0.1.1은 공개하지 않았으며 새 설치본의 실제 UI 종료 게이트 통과 전까지 공개를 보류합니다.
 
-로컬 진단의 공통 경로는 CLR 종료 중 InnerCoEEShutDownCOM → RCWCleanupList::CleanupAllWrappers → RCW::ReleaseAllInterfaces → SafeReleasePreemp입니다. 마지막 COM 해제 호출에서 잘못된 간접 호출 대상이 관찰됐습니다. 종료 시 남은 COM 참조의 수명 문제가 의심되지만, 제한된 덤프만으로 어떤 객체가 잘못됐는지나 책임 코드를 특정하지 못했습니다. 진단 원본과 사적인 실행 정보는 저장소·배포물·사이트에 포함하지 않습니다.
+### 버전·시험 단계별 결과
 
-| 추가 종료 게이트 | 현재 판정 | 근거·남은 일 |
+| 범위 | 현재 판정 | 근거·한계 |
 |---|---|---|
-| 0.1.0 실제 메뉴 사용 후 정상 종료 | **FAIL** | 합성 시나리오에서 3회 실패. 아래의 이전 기능·설치 PASS를 현재 종료 안전성의 근거로 확대하지 않음 |
-| 0.1.0 공개 릴리스 | **보류** | draft=true·latest=false로 전환하고 상태를 다시 확인. 태그 유지 |
-| 0.1.1 COM 수명 수정 | 구현 완료·실제 종료 재검증 대기 | callback·연결 인자·대기 작업·준비된 작업·임시 Range/Collection의 소유와 해제를 명시하는 수정. 설계는 ADR-0013에 기록 |
-| 0.1.1 실제 설치·자동 로드·사용 후 종료 | **BLOCKED / NOT RUN** | 종료 뒤 남은 Excel 프로세스 때문에 새 설치가 차단됨. 설치 가드를 유지했으며 수정본 설치와 실제 종료 시험은 아직 하지 않음 |
-| 0.1.1 배포 | 미완료 | 소스 변경·순수 시험·빌드만으로 종료 오류 해결이나 공개 완료를 표시하지 않음 |
+| 0.1.0 실제 메뉴 사용 후 종료 | **FAIL 이력 보존** | 합성 시나리오 3회 실패. 릴리스는 draft·최신 표시 해제, 태그 유지 |
+| 초기 0.1.1 build02 자동 검사 | **189 PASS** | 당시 8종 검사와 패키지 검사. 후속 제품 수정 전 결과 |
+| 초기 0.1.1 실제 업그레이드·두 UI 종료 | **PASS 이력 보존** | DLL `68944bc…`에서 붙여넣기만 / 붙여넣기와 Undo 두 정상 시작 모두 자연 종료, 새 Excel 오류 이벤트 0개 |
+| 실제 기능·복구 59개 | **본문 59 PASS / 정리 검증 FAIL** | 19+30+10 본문과 helper 통과. 종료 wrapper의 전역 상태 정확 복원 대조 실패로 전체 scope exit1 |
+| 상태바 복원 수정 뒤 full-build-02 | **206 PASS** | 8종 자동 검사, 패키지·33개 소스·9개 문서 검사. DLL `8741b19f…` |
+| 같은 후보의 R17 OS 클립보드 | **4 PASS / 8회 거절** | 제품 읽기 전후 sequence·owner·formats·payload SHA-256 불변 |
+| 0.1.1 실제 제거·제거 후 시작·재설치 | **PASS** | 비승격 제거, 자체 메뉴 없음, 다른 메뉴·외부 합성 파일·보안 설정 보존. `8741b19f…` 재설치 성공 |
+| 같은 최종 후보의 자동 메뉴·붙여넣기 | **PASS** | 외부 Excel COM 검사나 디버거 없이 85/90/78 입력 확인 |
+| 같은 최종 후보의 붙여넣기 후 종료 | **FAIL** | 위 08:32:09 UTC의 새 종료 충돌. 초기 두 종료 PASS로 대체하지 않음 |
+| 후속 raw 이벤트·연결 수명 소스 검사 | **개별 검사 PASS** | native COM/이벤트 36개씩 x64·x86, 연결 수명 46개, 안내/진입 26개. 실제 Excel 종료와 구분 |
+| 후속 full-build-03 및 문서 재포장 | **284 PASS / 패키지 PASS** | 9종 검사·PE/COM·ZIP 내부 무결성 통과. 시험한 7개 비문서 payload를 보존한 문서 재포장으로 9개 문서·33개 소스·17개 항목·16개 내부 해시 일치 확인 |
+| 후속 실제 기능·복구 60개 | **60 PASS / 정리 검증 PASS** | 20+30+10, scope exit0·cleanup0. 기존 파일 SHA·객체·개수·선택·5개 전역 속성의 타입·값 정확 복원. 외부 시험 엔진이며 새 설치본 종료 증거가 아님 |
+| 후속 생산 DLL R17 OS 클립보드 | **4 PASS / 8회 거절** | DLL `7080305a…`의 실제 읽기. sequence·owner·formats·bytes 불변, Excel COM 접속 없음 |
+| 후속 후보 설치·정상 시작·두 UI 종료 | **NOT RUN** | 접근 거부되는 잔여 Excel 프로세스로 새 설치 게이트 차단. 사전검사 우회 없음 |
+| main 반영·최종 CI·0.1.1 공개 | **이 기록 고정 시점 미완료** | 이후 병합·CI 결과는 PR에서 확인. 소스 검증·병합과 새 설치본의 공개 게이트를 구분 |
 
-0.1.1은 COM 범위와 callback 참조의 소유·해제, 이전 Undo 해제 실패 시 새 기록의 복구·폐기, 동일 작업 재진입 시 바깥 작업 보존과 재연결 실패 시 새 연결 인자 정리를 구현했습니다. OLE IStream을 사용하는 COM 수명 검사와 가짜 Excel 객체를 사용하는 실패·재진입 검사를 수행하며, 실제 Excel 종료 시험과 구분합니다. 첫 중간 빌드의 184개 회귀 및 패키지 검사는 통과했으나 이후 독립 검토에서 발견한 재진입·재연결 문제를 수정했으므로 그 ZIP은 최종본이 아닙니다. 최종 빌드의 검사 수·해시·소스 일치는 해당 배포물의 외부 검증 기록으로 관리합니다.
+### 0.1.0 종료 실패와 초기 0.1.1 결과
 
-중간 0.1.1 설치기의 실제 실행은 남은 Excel 프로세스를 감지해 exit1로 중단했습니다. 기존 설치 매니페스트와 HKCU 두 view의 CodeBase·LoadBehavior 전후가 일치했습니다. 이 결과는 변경 없이 거절하는 가드 검증이며 수정본 설치 성공이 아닙니다.
+2026-09-24의 0.1.0 실제 메뉴 사용 후 종료 실패 3회에는 자체 Undo를 실행하지 않고 붙여넣기만 한 경우도 포함합니다. 같은 환경의 Excel 기본 복사·붙여넣기·실행 취소 후 종료 대조는 정상 종료했으나, 모든 공존 조건이나 책임 객체를 확정하지 않습니다. 당시 덤프에는 CLR 종료 중 InnerCoEEShutDownCOM → RCWCleanupList::CleanupAllWrappers → RCW::ReleaseAllInterfaces → SafeReleasePreemp 및 잘못된 COM 해제 호출 대상이 관찰됐습니다. 이 진단은 9월 24일 사건에만 해당합니다.
 
-수정 후에는 실제 설치와 정상 자동 로드, 붙여넣기만 수행한 경우 및 붙여넣기/Undo 후 종료, 취소·검증 거절·부분 실패 뒤 종료를 다시 확인해야 합니다. 같은 설치 상태의 반복 시작/종료와 기존 기능 회귀도 별도 기록합니다. 이전 59개 실제 Excel 회귀와 순수 시험 수치는 0.1.1 수정본의 통과 기록이 아닙니다.
+초기 수명 수정은 임시 COM 범위·PreparedPaste 소유권·callback 반환·동일 작업 재진입·이전 Undo 해제 실패와 재연결 정리를 보완했습니다. 첫 중간 184개 회귀 뒤 build02의 코어 47·native 35·bulk 8·연결 17·COM 수명 22·전역 복원 8·안내/진입 22·설치 30, 총 189개가 통과했습니다. 당시 Windows CI 35990030412와 문서 CI 35990030354도 통과했습니다. 이후 소스의 검증 결과로 확대하지 않습니다.
+
+9월 26일 초기 설치 DLL SHA-256은 `68944bc82381e664fd17f51e33e213574c3a852eb5ac7a892777111049dfd796`, ZIP은 `da11aacdaf2240c674903f7a6594160df8dc85d36da655e23ed2ca045641c9fd`입니다. 비승격 0.1.0→0.1.1 업그레이드 후 정상 자동 메뉴로 붙여넣기만 한 경우와 별도 시작에서 붙여넣기/Undo한 경우 모두 UI의 저장 안 함으로 닫고 프로세스 소멸·새 Excel Application 1000/1001/1002 이벤트 0개를 확인했습니다. 디버거·외부 Excel COM 검사·수동 VBA 실행은 없었습니다. 이 두 PASS는 이후 최종 후보의 종료 FAIL과 함께 보존합니다.
+
+### 상태바 정확 복원 결함과 후속 수정
+
+`regression-59/run-02/`의 19+30+10 본문은 통과했지만 종료 wrapper의 전역 상태 복원 대조가 실패했습니다. 진단에서 StatusBar는 Boolean false가 아닌 문자열 `"FALSE"`였고 나머지 네 전역 속성의 타입·값, 기존 워크북·선택·Protected View 개수는 보존됐습니다. 최초 wrapper의 원시 시작값은 기록되지 않았으므로 후속 진단으로 이를 추정하지 않습니다. 첫 `run-01`은 시험 시작 전 합성 파일 해시 읽기의 공유 모드 오류로 중단됐으며 시험용 읽기만 공유 모드로 보완했습니다.
+
+일반·typed PIA·직접 IDispatch의 Boolean false 할당 모두 현재 Excel에서 문자열 FALSE로 읽혔습니다. 직접 VT_BOOL 전달도 같아 원인을 boxing으로 단정하지 않습니다. 빈 문자열과 null 입력은 실제 Boolean false로 읽혔고, saved Boolean false만 복원하는 로컬 후보는 실제 문자열 FALSE·한글 문자열을 그대로 보존했습니다. 제품은 공용 RestoreStatusBar로 기존 값을 할당하고, 저장값이 Boolean false인 COM 객체에서 실제 Boolean false인지 검사합니다. 그렇지 않으면 확인된 빈 문자열 reset을 적용해 다시 검사하고, 여전히 다르면 명시적으로 실패합니다. 실제 문자열은 변환하지 않습니다.
+
+Prepare의 시작값 getter 실패는 변경 전 재시도 가능한 실패로 유지합니다. 상태 복원 실패는 state-restore-failed로 후속 쓰기를 차단하며, 완료 후 안내 실패와 분리합니다. 추가 기능의 상태 안내·종료 정리에서는 확인 실패가 완료된 셀 작업의 결과를 바꾸거나 타이머를 남기지 않도록 처리합니다. 자동 검사의 타입 비교를 문자열 비교로 완화하지 않았습니다. full-build-02의 206개 통과는 이 소스까지의 결과이며 뒤이은 종료 실패를 상쇄하지 않습니다.
+
+### 종료 재현 뒤 추가한 COM 경계 보완
+
+ComEventsHelper는 callback이 사용하지 않는 이벤트 인자도 관리 객체로 변환하므로 임시 RCW가 생길 수 있습니다. 특정 이벤트 인자가 이번 충돌 원인이라는 증거는 없습니다. 후속 구현은 전용 IDispatch sink가 기존 14개 이벤트의 DISPID만 관찰하도록 하여 DISPPARAMS·VARIANT와 Cancel 인자를 읽거나 바꾸지 않습니다. 별도 connection point와 자신의 Advise cookie만 소유하며 Unadvise 실패에도 획득한 connection point를 한 번 반환합니다. 연결 실패는 Undo 관찰 불가로 처리합니다.
+
+OnConnection이 받은 Application 참조 한 번은 추가 기능이 소유하고, 엔진·Undo 관찰자는 빌립니다. IDTExtensibility2의 custom 인자는 설치된 PIA와 같은 [In] 계약으로 맞췄습니다. 명령·확인창·진행·상태 타이머 callback 중 연결 종료가 재진입하면 새 작업을 막고 가장 바깥 callback이 끝난 뒤 실제 정리를 수행합니다. 공유 객체의 임의 FinalRelease나 강제 GC는 사용하지 않습니다.
+
+COM 수명 시험은 x64와 x86에서 각각 36개가 통과했습니다. 실제 CCW의 QI 정체성·IDispatch vtable 호출·14개 이벤트·빈 결과·Cancel 불변·늦은 callback을 검사하고, connection point의 실패·cookie 정리는 가짜 객체로 주입했습니다. 이는 실제 Excel connection point·32비트 Excel·정상 종료 검증이 아닙니다. 연결 수명은 46개, 안내/진입은 26개가 개별 통과했습니다. 안내 시험은 정상 연결 fixture를 명시하고 실제 실패주입 도달을 검사했으며 기존 성공 판정·복구 assertion을 유지했습니다.
+
+### 새 소스의 실제 60개 회귀와 R17
+
+`regression-60/raw-event-run-01/summary.json`에서 Functional 20·Extended 30·RemainingSafety 10, 합계 60개가 통과했습니다. scope exit0·실패0·cleanup0이며 기존 합성 파일 SHA-256, 워크북 객체·개수·선택·저장 상태와 Protected View 개수를 복원했습니다. EnableEvents·Calculation·ScreenUpdating·StatusBar·DisplayAlerts는 시작·종료의 실제 타입과 값이 모두 일치했습니다. StatusBar 시작·종료는 Boolean false였고 문자열 변환으로 비교 기준을 완화하지 않았습니다.
+
+추가 U12-statusbar-ownership-all-paths는 실제 Boolean false와 실제 문자열 FALSE를 각각 Prepare·거절·Apply·Undo·쓰기 실패 복구·취소 복구·복구 실패 뒤에도 정확히 보존했습니다. 구 `68944bc…` 설치본의 Prepare-only 실패 재현과 새 소스의 통과를 분리해 보존합니다. 시험 DLL은 시험 전용 실패주입 빌드이며 생산 소스 13개의 해시가 full-build-03과 일치합니다. 외부 EXE에서 합성 불변 스냅샷으로 실행했고 기존 `8741b19f…` 설치 추가 기능이 함께 있었습니다. 따라서 새 DLL의 정상 자동 로드·실제 클립보드 붙여넣기·종료 안전성을 입증하지 않으며, 실패주입은 자연 발생 COM 장애를 재현했다는 뜻이 아닙니다.
+
+`r17-os-clipboard-raw-event/summary.json`은 생산 DLL `7080305a…`로 합성 OS 클립보드 4종·8회 거절을 확인했습니다. 각 읽기 전후 sequence·owner·formats·payload bytes가 불변이었습니다. 승인된 두 소유 Excel의 정확한 실행 정체성만 허용하는 로컬 시험 사본을 사용했고 검사마다 일치를 확인했습니다. 원 시험 소스·제품은 변경하지 않았고 Excel 실행·COM 접속·설치·등록 변경은 없었습니다. 같은 시점의 60개 회귀는 OS 클립보드를 사용하지 않았습니다. 첫 CVTRES 실행 실패와 동일 컴파일 명령 재시도 성공도 보존합니다. R17 반복 실행은 요구사항 완료 수에 중복 합산하지 않습니다.
+
+### 로컬 증거와 남은 게이트
+
+근거 루트는 `artifacts/visible-cells-paste/release-validation/resume-2026-09-26/`입니다. 원시 덤프·개인 경로·실행 식별자·진단 본문은 저장소·배포물·공개 사이트에 복사하지 않습니다.
+
+| 범위 | 로컬 근거 |
+|---|---|
+| 초기 업그레이드·두 UI 종료 | `install/summary.json`, `ui-paste-only-observation.json`, `ui-paste-only-exit.json`, `ui-paste-undo-observation.json`, `ui-paste-undo-exit.json` |
+| 59개 본문·상태바 대조 | `regression-59/run-02/`, 그 안의 `global-state-diagnostic/{setter-results,raw-setter-results,input-variants-results,candidate-restore-results}.json` |
+| 상태바 수정·206개 전체 빌드 | `status-restore-fix/`, `final-full-build-02/immutable-build/` |
+| 최종 후보 R17 | `r17-os-clipboard-final/{process.json,stdout.log,summary.json,fixtures/non-excel-clipboard-results.json}` |
+| 제거·재설치 | `uninstall/summary.json`, `uninstall/ui-menu-absence.json`, `reinstall/summary.json` |
+| 최종 후보 실제 붙여넣기·종료 실패 | `final-ui/paste-only-observation.json`, `final-ui/paste-only-final-outcome.json`, `final-ui/paste-only-failure-events.xml` |
+| 새 WER와 덤프 부재 | `final-ui-crash-diagnostic/summary.json` |
+| raw 이벤트 x86/x64 | `raw-event-fix/source-and-results.json`, `raw-event-fix/{x64,x86}/com-lifetime-tests.log` |
+| 연결 재진입·안내 회귀 | `addin-deferred-disconnect/`, 그 안의 `presentation/after-fixture.log` |
+| 새 소스 실제 60개 회귀 | `regression-60/raw-event-run-01/summary.json`, 같은 폴더의 `production-source-alignment.json` |
+| 새 생산 DLL R17 | `r17-os-clipboard-raw-event/{summary.json,execution.json,fixtures/non-excel-clipboard-results.json}` |
+| 새 설치를 막는 잔여 프로세스 | `residual-process-25276/result.json` |
+
+R17은 실제 Windows 클립보드의 소유 합성 Unicode 텍스트·HTML 표·DIB 그림·파일 목록 4종을 최종 후보 DLL의 읽기 경로에 전달한 시험입니다. caller mode 0/1마다 VCP-CLIPBOARD-COPY-UNVERIFIED로 거절해 8회 모두 읽기 전후 sequence·owner·formats·payload SHA-256이 일치했습니다. Excel 실행·COM 접속은 없었습니다. 최초 helper 실행 EPERM과 동일 명령 한 번 재시도 exit0 기록을 함께 보존하며, 4개 사례를 59개 본문이나 이전 동일 R17과 중복 합산하지 않습니다.
+
+최종 후보 ZIP SHA-256은 `4e7acf626f73889b13263cad6c2d5c69b6ff7219a81ff097b7faaeda8cfb679a`입니다. 실제 제거·메뉴 부재·같은 ZIP 재설치는 통과했지만 후속 정상 사용 종료는 실패했습니다. 새 소스 후보는 다른 산출물이므로 위 설치 결과를 승계하지 않습니다. 잔여 Excel의 접근 거부를 안전한 종료로 추정하거나 설치 가드를 우회하지 않습니다. full-build-03은 9종 284개와 PE/COM·ZIP 내부 무결성 검사를 통과했습니다. x64 DLL SHA-256은 `7080305afd5a08b2184fbedf9ed3942502184213d096c33864ab3ce1c2ab0329`, 중간 ZIP은 `5fe8f24c364b711dca689f04b5fb0aa9c60bd76fb657a69eff46500ad30c8089`입니다. 제작 중 갱신된 문서와 동봉본의 대조는 실패했으므로 최신 문서를 다시 포장해 검증해야 합니다. 이 ZIP을 최종 배포물이라고 표시하지 않습니다. 60개 회귀와 최신 R17은 완료했지만 새 설치 정상 시작·사용 후 종료·최종 문서·main·CI·공개가 완료되기 전에는 배포 완료로 표시하지 않습니다.
 
 ## 2026-09-24 동결한 0.1.0 결과 요약
 

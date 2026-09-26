@@ -12,6 +12,15 @@ using VisibleCellsPaste;
 class ExtendedTests
 {
     static dynamic app, book, sheet;
+    static ComScope caseRefs;
+    static readonly List<object> caseBooks = new List<object>();
+    static dynamic Own(object value) { return caseRefs.Own(value); }
+    static dynamic R(string address) { return Own((object)sheet.Range[address]); }
+    static dynamic Rows(string address) { dynamic rows = Own((object)sheet.Rows); return Own((object)rows[address]); }
+    static dynamic SortFields() { dynamic sort = Own((object)sheet.Sort); return Own((object)sort.SortFields); }
+    static void Cleanup(string name, Action action) { try { action(); } catch (Exception error) { failed++; results.Add("CLEANUP FAIL " + name + ": " + error); } }
+    static dynamic NewOtherBook() { dynamic books = Own((object)app.Workbooks); object other = Own((object)books.Add()); caseBooks.Add(other); return other; }
+    static void CloseOtherBook(object other) { ((dynamic)other).Close(false); caseBooks.Remove(other); }
     static string output, filter;
     static int passed, failed;
     static readonly List<string> results = new List<string>();
@@ -19,30 +28,33 @@ class ExtendedTests
     static ClipboardSnapshot Source(params CellValue[] values)
     { return new ClipboardSnapshot("SyntheticTyped-test-only", 0, values.Length, 1, true, values, "No real clipboard in these cases"); }
     static ClipboardSnapshot Numbers(params double[] values) { return Source(values.Select(CellValue.Number).ToArray()); }
-    static object V(string address) { return sheet.Range[address].Value2; }
+    static object V(string address) { return R(address).Value2; }
     static bool Number(string address, double value) { return Convert.ToDouble(V(address)) == value; }
     static void Pump() { Application.DoEvents(); }
     static string Signature(string address)
     {
-        dynamic range = sheet.Range[address];
         var text = new StringBuilder();
-        foreach (dynamic cell in range.Cells)
+        using (var refs = new ComScope())
         {
-            CellState state = ExcelEngine.ReadCell((object)sheet, (int)cell.Row, (int)cell.Column);
-            text.Append(state.Address).Append(':').Append(state.Formula).Append(':')
-                .Append(state.Formula ? state.FormulaValue : state.Value.Value).Append(':')
-                .Append(state.Formula ? state.FormulaProperty : state.Value.Kind.ToString()).Append(':')
-                .Append(state.Format).Append(':').Append(cell.EntireRow.Hidden).Append(';');
-            ExcelEngine.Release(cell);
+            dynamic range = refs.Own((object)sheet.Range[address]), cells = refs.Own((object)range.Cells);
+            int count = Convert.ToInt32(range.CountLarge);
+            for (int i = 1; i <= count; i++) using (var cellRefs = new ComScope())
+            {
+                dynamic cell = cellRefs.Own((object)cells[i]), row = cellRefs.Own((object)cell.EntireRow);
+                CellState state = ExcelEngine.ReadCell((object)sheet, (int)cell.Row, (int)cell.Column);
+                text.Append(state.Address).Append(':').Append(state.Formula).Append(':')
+                    .Append(state.Formula ? state.FormulaValue : state.Value.Value).Append(':')
+                    .Append(state.Formula ? state.FormulaProperty : state.Value.Kind.ToString()).Append(':')
+                    .Append(state.Format).Append(':').Append(row.Hidden).Append(';');
+            }
         }
-        ExcelEngine.Release(range);
         return text.ToString();
     }
     static void RefusePrepare(ExcelEngine engine, ClipboardSnapshot source, string checkedRange)
     {
         string before = Signature(checkedRange);
         bool refused = false;
-        try { engine.Prepare(source); } catch (ValidationException) { refused = true; }
+        try { using (var unexpected = engine.Prepare(source)) {} } catch (ValidationException) { refused = true; }
         Check(refused, "Expected prewrite validation refusal");
         Check(before == Signature(checkedRange), "Validation refusal modified cells");
     }
@@ -60,15 +72,18 @@ class ExtendedTests
         Console.WriteLine("START " + id);
         var watch = Stopwatch.StartNew();
         dynamic ownedSheet = null;
+        caseRefs = new ComScope();
         try
         {
             book.Activate();
-            ownedSheet = book.Worksheets.Add(Type.Missing, book.Worksheets[book.Worksheets.Count]);
+            dynamic sheets = Own((object)book.Worksheets);
+            object last = Own((object)sheets[(int)sheets.Count]);
+            ownedSheet = Own((object)sheets.Add(Type.Missing, last));
             sheet = ownedSheet;
             sheet.Name = "VCP_Ext_" + Guid.NewGuid().ToString("N").Substring(0, 8);
-            sheet.Range["E1:E100"].Value2 = 777.0;
-            sheet.Range["E1:E100"].NumberFormat = "0.00";
-            sheet.Range["E2:E4"].Select();
+            R("E1:E100").Value2 = 777.0;
+            R("E1:E100").NumberFormat = "0.00";
+            R("E2:E4").Select();
             Pump();
             action();
             passed++;
@@ -81,14 +96,17 @@ class ExtendedTests
         }
         finally
         {
+            for (int i = caseBooks.Count - 1; i >= 0; i--) { object other = caseBooks[i]; Cleanup("owned other workbook", delegate { ((dynamic)other).Close(false); }); }
+            caseBooks.Clear();
             if (ownedSheet != null)
             {
-                object alerts = app.DisplayAlerts;
-                try { app.DisplayAlerts = false; ownedSheet.Delete(); }
-                catch (Exception error) { results.Add("CLEANUP FAIL " + error.HResult.ToString("X8")); failed++; }
-                finally { app.DisplayAlerts = alerts; ExcelEngine.Release(ownedSheet); }
+                object alerts = null; bool captured = false;
+                try { alerts = app.DisplayAlerts; captured = true; app.DisplayAlerts = false; ownedSheet.Delete(); }
+                catch (Exception error) { results.Add("CLEANUP FAIL sheet: " + error); failed++; }
+                finally { if (captured) Cleanup("DisplayAlerts", delegate { app.DisplayAlerts = alerts; }); }
             }
-            sheet = null;
+            Cleanup("case references", delegate { caseRefs.Dispose(); });
+            caseRefs = null; sheet = null;
             File.WriteAllLines(output, results, Encoding.UTF8);
         }
         Console.WriteLine(results[results.Count - 1]);
@@ -96,21 +114,27 @@ class ExtendedTests
     [STAThread]
     static int Main(string[] args)
     {
-        output = args[1]; filter = args.Length > 2 ? args[2] : null;
+        if (args.Length < 2) throw new ArgumentException("ownedPID result-file [test-filter]");
+        output = Path.GetFullPath(args[1]); filter = args.Length > 2 ? args[2] : null;
+        string boundary = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "artifacts", "visible-cells-paste")) + Path.DirectorySeparatorChar;
+        Check(output.StartsWith(boundary, StringComparison.OrdinalIgnoreCase), "Owned result path required");
+        Directory.CreateDirectory(Path.GetDirectoryName(output));
         Console.WriteLine("Extended start target=" + args[0] + ";filter=" + filter + ";utc=" + DateTime.UtcNow.ToString("o"));
-        app = ExcelProbe.Attach(Int32.Parse(args[0]));
-        book = app.ActiveWorkbook;
-        if (!((string)book.Name).StartsWith("VCP-", StringComparison.Ordinal)) throw new Exception("Owned VCP fixture required");
-        results.Add("Direct Excel engine extended tests; synthetic typed snapshots; no autoload or actual clipboard claim.");
-        object events = app.EnableEvents, calculation = app.Calculation, updating = app.ScreenUpdating, status = app.StatusBar;
+        var refs = new ComScope(); object events = null, calculation = null, updating = null, status = null, alerts = null, originalSheet = null, originalSelection = null; bool captured = false;
         try
         {
+            app = refs.Own((object)ExcelProbe.Attach(Int32.Parse(args[0])));
+            book = refs.Own((object)app.ActiveWorkbook);
+            Check(((string)book.Name).StartsWith("VCP-", StringComparison.Ordinal) && Path.GetFullPath((string)book.FullName).StartsWith(boundary, StringComparison.OrdinalIgnoreCase), "Owned VCP artifact fixture required");
+            originalSheet = refs.Own((object)app.ActiveSheet); originalSelection = refs.Own((object)app.Selection);
+            events = app.EnableEvents; calculation = app.Calculation; updating = app.ScreenUpdating; status = app.StatusBar; alerts = app.DisplayAlerts; captured = true; results.Add("STATUS captured type="+(status==null?"null":status.GetType().AssemblyQualifiedName)+" value=["+status+"]");
+            results.Add("Direct Excel engine extended tests; synthetic typed snapshots; no autoload or actual clipboard claim.");
             app.EnableEvents = true;
             app.ScreenUpdating = true;
             app.Calculation = -4105;
             Test("D04-three-to-two", delegate
             {
-                sheet.Range["E2:E3"].Select();
+                R("E2:E3").Select();
                 using (var e = new ExcelEngine(app)) RefusePrepare(e, Numbers(1, 2, 3), "E1:E5");
             });
             Test("D05-two-to-three", delegate
@@ -120,7 +144,7 @@ class ExtendedTests
             Test("D14-literal-prefixes-locale-text", delegate
             {
                 string[] values = { "+001", "@abc", "1-2", "1,234", "12%", "=1+1" };
-                sheet.Range["E2:E7"].Select();
+                R("E2:E7").Select();
                 using (var e = new ExcelEngine(app))
                 {
                     e.Apply(e.Prepare(Source(values.Select(CellValue.Text).ToArray())), null, null);
@@ -141,143 +165,144 @@ class ExtendedTests
             });
             Test("R01-R02-autofilter-manual-mixed", delegate
             {
-                sheet.Range["D1"].Value2 = "Keep"; sheet.Range["E1"].Value2 = "Value";
-                sheet.Range["D2:D8"].Value2 = new object[,] { { 1 }, { 0 }, { 0 }, { 1 }, { 0 }, { 0 }, { 1 } };
-                sheet.Range["E3"].Formula2 = "=E2*2";
-                sheet.Range["E3:E4"].Interior.Color = 65535;
-                sheet.Range["D1:E8"].AutoFilter(1, 1);
-                sheet.Rows["5:5"].Hidden = true;
-                sheet.Range["E2:E8"].Select();
+                R("D1").Value2 = "Keep"; R("E1").Value2 = "Value";
+                R("D2:D8").Value2 = new object[,] { { 1 }, { 0 }, { 0 }, { 1 }, { 0 }, { 0 }, { 1 } };
+                R("E3").Formula2 = "=E2*2";
+                Own((object)R("E3:E4").Interior).Color = 65535;
+                R("D1:E8").AutoFilter(1, 1);
+                Rows("5:5").Hidden = true;
+                R("E2:E8").Select();
                 string hidden = Signature("E3:E7");
                 using (var e = new ExcelEngine(app)) e.Apply(e.Prepare(Numbers(85, 78)), null, null);
                 Check(Number("E2", 85) && Number("E8", 78), "Mixed visibility mapping");
                 Check(hidden == Signature("E3:E7"), "Hidden definition/value/format/state changed");
-                Check((int)sheet.Range["E3:E4"].Interior.Color == 65535, "Hidden fill changed");
+                Check((int)Own((object)R("E3:E4").Interior).Color == 65535, "Hidden fill changed");
                 Check((bool)sheet.AutoFilterMode && (bool)sheet.FilterMode, "Filter state changed");
             });
             Test("R03-outline-collapse", delegate
             {
-                sheet.Rows["3:4"].Group(); sheet.Rows["6:7"].Group();
-                sheet.Outline.ShowLevels(1, Type.Missing);
-                Check((bool)sheet.Rows["3:3"].Hidden && (bool)sheet.Rows["7:7"].Hidden, "Outline fixture not collapsed");
-                sheet.Range["E2:E8"].Select();
+                Rows("3:4").Group(); Rows("6:7").Group();
+                Own((object)sheet.Outline).ShowLevels(1, Type.Missing);
+                Check((bool)Rows("3:3").Hidden && (bool)Rows("7:7").Hidden, "Outline fixture not collapsed");
+                R("E2:E8").Select();
                 using (var e = new ExcelEngine(app)) e.Apply(e.Prepare(Numbers(85, 90, 78)), null, null);
                 Check(Number("E2", 85) && Number("E5", 90) && Number("E8", 78) && Number("E3", 777), "Outline hidden mapping");
             });
             Test("R05-off-viewport", delegate
             {
-                sheet.Range["E1:E100"].Select(); app.ActiveWindow.ScrollRow = 1;
-                int lastVisible = (int)app.ActiveWindow.VisibleRange.Row + (int)app.ActiveWindow.VisibleRange.Rows.Count - 1;
+                R("E1:E100").Select(); dynamic window = Own((object)app.ActiveWindow); window.ScrollRow = 1;
+                dynamic visible = Own((object)window.VisibleRange), visibleRows = Own((object)visible.Rows);
+                int lastVisible = (int)visible.Row + (int)visibleRows.Count - 1;
                 Check(lastVisible < 100, "Fixture must extend beyond viewport");
                 using (var e = new ExcelEngine(app)) e.Apply(e.Prepare(Numbers(Enumerable.Range(1, 100).Select(x => (double)x).ToArray())), null, null);
                 Check(Number("E1", 1) && Number("E100", 100), "Offscreen cells not processed");
             });
             Test("R06-entire-row", delegate
             {
-                sheet.Rows["2:2"].Select();
+                Rows("2:2").Select();
                 using (var e = new ExcelEngine(app)) RefusePrepare(e, Numbers(1), "E1:E5");
             });
             Test("R10-legacy-array", delegate
             {
-                sheet.Range["E2:E3"].FormulaArray = "=ROW(E2:E3)";
-                sheet.Range["E2"].Select();
-                Check((bool)sheet.Range["E2"].HasArray, "Legacy array fixture");
+                R("E2:E3").FormulaArray = "=ROW(E2:E3)";
+                R("E2").Select();
+                Check((bool)R("E2").HasArray, "Legacy array fixture");
                 using (var e = new ExcelEngine(app)) RefusePrepare(e, Numbers(1), "E1:E5");
             });
             Test("R10-mixed-single-array-cell", delegate
             {
-                sheet.Range["E3"].FormulaArray = "=ROW(E3)";
-                Check((bool)sheet.Range["E3"].HasArray && !(bool)sheet.Range["E2"].HasArray, "Mixed array fixture");
-                sheet.Range["E2:E4"].Select();
+                R("E3").FormulaArray = "=ROW(E3)";
+                Check((bool)R("E3").HasArray && !(bool)R("E2").HasArray, "Mixed array fixture");
+                R("E2:E4").Select();
                 using (var e = new ExcelEngine(app)) RefusePrepare(e, Numbers(1, 2, 3), "E1:E5");
             });
             Test("R10-mixed-spill-and-constant", delegate
             {
-                sheet.Range["G2"].Formula2 = "=SEQUENCE(3)"; sheet.Range["G5"].Value2 = 777.0;
-                sheet.Range["G3:G5"].Select();
+                R("G2").Formula2 = "=SEQUENCE(3)"; R("G5").Value2 = 777.0;
+                R("G3:G5").Select();
                 using (var e = new ExcelEngine(app)) RefusePrepare(e, Numbers(1, 2, 3), "G1:G6");
             });
             Test("R09-mixed-merge-cell", delegate
             {
-                sheet.Range["E3:F3"].Merge(); sheet.Range["E2:E4"].Select();
+                R("E3:F3").Merge(); R("E2:E4").Select();
                 using (var e = new ExcelEngine(app)) RefusePrepare(e, Numbers(1, 2, 3), "E1:F5");
             });
             Test("R13-mixed-validation-cell", delegate
             {
-                sheet.Range["E3"].Validation.Add(1, 1, 1, "1", "10"); sheet.Range["E2:E4"].Select();
+                Own((object)R("E3").Validation).Add(1, 1, 1, "1", "10"); R("E2:E4").Select();
                 using (var e = new ExcelEngine(app)) RefusePrepare(e, Numbers(1, 2, 3), "E1:E5");
             });
             Test("R08-validation-outside-single-target", delegate
             {
-                sheet.Range["E3"].Validation.Add(1, 1, 1, "1", "10"); sheet.Range["E2"].Select();
+                Own((object)R("E3").Validation).Add(1, 1, 1, "1", "10"); R("E2").Select();
                 using (var e = new ExcelEngine(app)) e.Apply(e.Prepare(Numbers(85)), null, null);
                 Check(Number("E2", 85) && Number("E3", 777), "Outside validation incorrectly rejected or modified");
             });
             Test("R13-hidden-only-validation-preserved", delegate
             {
-                sheet.Range["E3"].Validation.Add(1, 1, 1, "1", "10");
-                sheet.Range["E3"].EntireRow.Hidden = true;
-                sheet.Range["E2:E4"].Select();
+                Own((object)R("E3").Validation).Add(1, 1, 1, "1", "10");
+                Own((object)R("E3").EntireRow).Hidden = true;
+                R("E2:E4").Select();
                 string before = Signature("E3");
-                string first = Convert.ToString(sheet.Range["E3"].Validation.Formula1);
-                string second = Convert.ToString(sheet.Range["E3"].Validation.Formula2);
+                string first = Convert.ToString(Own((object)R("E3").Validation).Formula1);
+                string second = Convert.ToString(Own((object)R("E3").Validation).Formula2);
                 using (var e = new ExcelEngine(app)) e.Apply(e.Prepare(Numbers(85, 90)), null, null);
                 Check(Number("E2", 85) && Number("E4", 90), "Visible targets not written in order");
                 Check(before == Signature("E3"), "Hidden validation cell value/type/format/hidden state changed");
-                Check((int)sheet.Range["E3"].Validation.Type == 1 && (int)sheet.Range["E3"].Validation.Operator == 1
-                    && Convert.ToString(sheet.Range["E3"].Validation.Formula1) == first
-                    && Convert.ToString(sheet.Range["E3"].Validation.Formula2) == second, "Hidden validation rule changed");
+                Check((int)Own((object)R("E3").Validation).Type == 1 && (int)Own((object)R("E3").Validation).Operator == 1
+                    && Convert.ToString(Own((object)R("E3").Validation).Formula1) == first
+                    && Convert.ToString(Own((object)R("E3").Validation).Formula2) == second, "Hidden validation rule changed");
             });
             Test("D08-U01-all-blank-apply-undo", delegate
             {
-                sheet.Range["E2"].Formula2 = "=10+5";
-                sheet.Range["E3"].NumberFormat = "@"; sheet.Range["E3"].Value2 = "00123"; sheet.Range["E3"].NumberFormat = "00000";
-                sheet.Range["E4"].Value2 = true; sheet.Range["E2:E4"].Select();
+                R("E2").Formula2 = "=10+5";
+                R("E3").NumberFormat = "@"; R("E3").Value2 = "00123"; R("E3").NumberFormat = "00000";
+                R("E4").Value2 = true; R("E2:E4").Select();
                 string before = Signature("E1:E5");
                 using (var e = new ExcelEngine(app))
                 {
                     e.Apply(e.Prepare(Source(CellValue.Empty(), CellValue.Empty(), CellValue.Empty())), null, null);
                     Check(V("E2") == null && V("E3") == null && V("E4") == null, "All blank items did not clear exactly three cells");
-                    Check(!(bool)app.CommandBars.GetEnabledMso("Undo"), "Native Undo must remain disabled after own empty write");
+                    Check(!(bool)Own((object)app.CommandBars).GetEnabledMso("Undo"), "Native Undo must remain disabled after own empty write");
                     e.UndoLast(); Check(before == Signature("E1:E5"), "All blank write did not restore before types/formulas/formats");
                 }
             });
             Test("U02-mixed-formula-type-format-backup", delegate
             {
-                sheet.Range["E2"].Formula2 = "=10+5"; sheet.Range["E2"].NumberFormat = "00000";
-                sheet.Range["E3"].NumberFormat = "@"; sheet.Range["E3"].Value2 = "00123"; sheet.Range["E3"].NumberFormat = "0.0";
-                object standardFormat = sheet.Range["F1"].NumberFormat;
-                sheet.Range["E4"].ClearContents(); sheet.Range["E4"].NumberFormat = standardFormat;
-                sheet.Range["E2:E4"].Select(); string before = Signature("E1:E5");
+                R("E2").Formula2 = "=10+5"; R("E2").NumberFormat = "00000";
+                R("E3").NumberFormat = "@"; R("E3").Value2 = "00123"; R("E3").NumberFormat = "0.0";
+                object standardFormat = R("F1").NumberFormat;
+                R("E4").ClearContents(); R("E4").NumberFormat = standardFormat;
+                R("E2:E4").Select(); string before = Signature("E1:E5");
                 using (var e = new ExcelEngine(app))
                 {
                     e.Apply(e.Prepare(Source(CellValue.Text("=1+1"), CellValue.Number(85), CellValue.Empty())), null, null);
-                    Check(!(bool)sheet.Range["E2"].HasFormula && (string)V("E2") == "=1+1", "Mixed write literal");
-                    Check((string)sheet.Range["E2"].NumberFormat == "00000" && (string)sheet.Range["E3"].NumberFormat == "0.0" && Object.Equals((object)sheet.Range["E4"].NumberFormat, standardFormat), "Mixed formats changed");
+                    Check(!(bool)R("E2").HasFormula && (string)V("E2") == "=1+1", "Mixed write literal");
+                    Check((string)R("E2").NumberFormat == "00000" && (string)R("E3").NumberFormat == "0.0" && Object.Equals((object)R("E4").NumberFormat, standardFormat), "Mixed formats changed");
                     var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
                     var epoch = (UndoEpoch)typeof(ExcelEngine).GetField("epoch", flags).GetValue(e);
-                    results.Add("U02 gate available=" + epoch.Available + ";epoch=" + epoch.Version + ";savedEpoch=" + typeof(ExcelEngine).GetField("undoEpoch", flags).GetValue(e) + ";allowed=" + typeof(ExcelEngine).GetField("undoAllowed", flags).GetValue(e) + ";savedCommand=" + typeof(ExcelEngine).GetField("undoCommand", flags).GetValue(e) + ";nativeUndo=" + app.CommandBars.GetEnabledMso("Undo") + ";sortFields=" + sheet.Sort.SortFields.Count + ";selection=" + app.Selection.Address);
+                    results.Add("U02 gate available=" + epoch.Available + ";epoch=" + epoch.Version + ";savedEpoch=" + typeof(ExcelEngine).GetField("undoEpoch", flags).GetValue(e) + ";allowed=" + typeof(ExcelEngine).GetField("undoAllowed", flags).GetValue(e) + ";savedCommand=" + typeof(ExcelEngine).GetField("undoCommand", flags).GetValue(e) + ";nativeUndo=" + Own((object)app.CommandBars).GetEnabledMso("Undo") + ";sortFields=" + SortFields().Count + ";selection=" + Own((object)app.Selection).Address);
                     e.UndoLast(); Check(before == Signature("E1:E5"), "Mixed formula/type/format backup failed");
                 }
             });
             Test("R13-table-header-total", delegate
             {
-                sheet.Range["E1"].Value2 = "Data";
-                dynamic table = sheet.ListObjects.Add(1, sheet.Range["E1:E4"], Type.Missing, 1);
+                R("E1").Value2 = "Data";
+                dynamic tables = Own((object)sheet.ListObjects); dynamic table = Own((object)tables.Add(1, R("E1:E4"), Type.Missing, 1));
                 try
                 {
                     using (var e = new ExcelEngine(app))
                     {
-                        table.HeaderRowRange.Select(); RefusePrepare(e, Numbers(1), "E1:E6");
+                        Own((object)table.HeaderRowRange).Select(); RefusePrepare(e, Numbers(1), "E1:E6");
                         table.ShowTotals = true;
-                        table.TotalsRowRange.Select(); RefusePrepare(e, Numbers(1), "E1:E6");
+                        Own((object)table.TotalsRowRange).Select(); RefusePrepare(e, Numbers(1), "E1:E6");
                     }
                 }
-                finally { ExcelEngine.Release(table); }
+                finally { /* Table acquisition belongs to the case scope. */ }
             });
             Test("D16-empty-string-storage", delegate
             {
-                sheet.Range["E2"].Select();
+                R("E2").Select();
                 using (var e = new ExcelEngine(app)) e.Apply(e.Prepare(Source(CellValue.Text(""))), null, null);
                 var state = ExcelEngine.ReadCell((object)sheet, 2, 5);
                 Check(!state.Formula && (state.Value.Kind == CellValueKind.Empty || state.Value.Equals(CellValue.Text(""))), "Empty string position or literal contract");
@@ -285,38 +310,37 @@ class ExtendedTests
             });
             Test("R12-hidden-mixed-formula-column", delegate
             {
-                sheet.Range["E1"].Value2 = "Data";
-                dynamic table = sheet.ListObjects.Add(1, sheet.Range["E1:E8"], Type.Missing, 1);
-                object autoFill = app.AutoCorrect.AutoFillFormulasInLists;
+                R("E1").Value2 = "Data";
+                dynamic tables = Own((object)sheet.ListObjects); dynamic table = Own((object)tables.Add(1, R("E1:E8"), Type.Missing, 1));
+                object autoFill = Own((object)app.AutoCorrect).AutoFillFormulasInLists;
                 try
                 {
-                    app.AutoCorrect.AutoFillFormulasInLists = false;
-                    sheet.Range["E8"].Formula2 = "=1+2";
+                    Own((object)app.AutoCorrect).AutoFillFormulasInLists = false;
+                    R("E8").Formula2 = "=1+2";
                 }
-                finally { app.AutoCorrect.AutoFillFormulasInLists = autoFill; }
-                Check(!(bool)sheet.Range["E2"].HasFormula && (bool)sheet.Range["E8"].HasFormula, "Fixture must remain mixed");
-                sheet.Rows["8:8"].Hidden = true; sheet.Range["E2:E4"].Select();
+                finally { Own((object)app.AutoCorrect).AutoFillFormulasInLists = autoFill; }
+                Check(!(bool)R("E2").HasFormula && (bool)R("E8").HasFormula, "Fixture must remain mixed");
+                Rows("8:8").Hidden = true; R("E2:E4").Select();
                 using (var e = new ExcelEngine(app)) RefusePrepare(e, Numbers(1, 2, 3), "E1:E8");
-                Check((bool)sheet.Rows["8:8"].Hidden && (string)sheet.Range["E8"].Formula2 == "=1+2", "Hidden formula or visibility changed");
-                ExcelEngine.Release((object)table);
+                Check((bool)Rows("8:8").Hidden && (string)R("E8").Formula2 == "=1+2", "Hidden formula or visibility changed");
             });
             Test("U04-identical-values-sort", delegate
             {
-                sheet.Range["D2:D4"].Value2 = new object[,] { { 3 }, { 1 }, { 2 } };
+                R("D2:D4").Value2 = new object[,] { { 3 }, { 1 }, { 2 } };
                 using (var e = new ExcelEngine(app))
                 {
                     e.Apply(e.Prepare(Numbers(1, 1, 1)), null, null);
-                    sheet.Range["D2:E4"].Sort(sheet.Range["D2"], 1);
+                    R("D2:E4").Sort(R("D2"), 1);
                     Pump(); Check(Number("D2", 1), "Sort fixture did not reorder rows");
                     RefuseUndo(e, "D1:E5");
                 }
             });
             Test("U04-preexisting-sort-configuration", delegate
             {
-                sheet.Range["D2:D4"].Value2 = new object[,] { { 3 }, { 1 }, { 2 } };
-                sheet.Range["D2:E4"].Sort(sheet.Range["D2"], 1);
-                Check((int)sheet.Sort.SortFields.Count > 0, "Fixture requires existing sort state");
-                sheet.Range["E2:E4"].Select();
+                R("D2:D4").Value2 = new object[,] { { 3 }, { 1 }, { 2 } };
+                R("D2:E4").Sort(R("D2"), 1);
+                Check((int)SortFields().Count > 0, "Fixture requires existing sort state");
+                R("E2:E4").Select();
                 using (var e = new ExcelEngine(app))
                 {
                     e.Apply(e.Prepare(Numbers(1, 2, 3)), null, null);
@@ -325,19 +349,19 @@ class ExtendedTests
             });
             Test("U04-table-identical-values-sort", delegate
             {
-                sheet.Range["D1"].Value2 = "Key"; sheet.Range["E1"].Value2 = "Pasted";
-                sheet.Range["D2:D4"].Value2 = new object[,] { { 3 }, { 1 }, { 2 } };
-                dynamic table = sheet.ListObjects.Add(1, sheet.Range["D1:E4"], Type.Missing, 1);
-                sheet.Range["E2:E4"].Select();
+                R("D1").Value2 = "Key"; R("E1").Value2 = "Pasted";
+                R("D2:D4").Value2 = new object[,] { { 3 }, { 1 }, { 2 } };
+                dynamic tables = Own((object)sheet.ListObjects); dynamic table = Own((object)tables.Add(1, R("D1:E4"), Type.Missing, 1));
+                R("E2:E4").Select();
                 using (var e = new ExcelEngine(app))
                 {
                     e.Apply(e.Prepare(Numbers(1, 1, 1)), null, null);
-                    table.Sort.SortFields.Add(table.ListColumns[1].DataBodyRange, 0, 1);
-                    table.Sort.Header = 1; table.Sort.Apply(); Pump();
+                    dynamic sort = Own((object)table.Sort), fields = Own((object)sort.SortFields), columns = Own((object)table.ListColumns), firstColumn = Own((object)columns[1]);
+                    object sortKey = Own((object)firstColumn.DataBodyRange); Own((object)fields.Add(sortKey, 0, 1));
+                    sort.Header = 1; sort.Apply(); Pump();
                     Check(Number("D2", 1), "Table sort fixture must reorder rows");
                     RefuseUndo(e, "D1:E5");
                 }
-                ExcelEngine.Release((object)table);
             });
             Test("U01-normal-immediate-undo", delegate
             {
@@ -354,7 +378,7 @@ class ExtendedTests
                 using (var e = new ExcelEngine(app))
                 {
                     e.Apply(e.Prepare(Numbers(1, 1, 1)), null, null);
-                    sheet.Rows["2:2"].Delete(); Pump(); RefuseUndo(e, "E1:E5");
+                    Rows("2:2").Delete(); Pump(); RefuseUndo(e, "E1:E5");
                 }
             });
             Test("U05-sheet-rename", delegate
@@ -371,15 +395,16 @@ class ExtendedTests
                 using (var e = new ExcelEngine(app))
                 {
                     e.Apply(e.Prepare(Numbers(1, 2, 3)), null, null);
-                    dynamic other = app.Workbooks.Add();
+                    dynamic other = NewOtherBook();
+                    dynamic otherSheets = Own((object)other.Worksheets), otherSheet = Own((object)otherSheets[1]), otherRange = Own((object)otherSheet.Range["A1"]);
                     try
                     {
-                        other.Worksheets[1].Range["A1"].Value2 = "other-owned-test";
+                        otherRange.Value2 = "other-owned-test";
                         bool refused = false; try { e.UndoLast(); } catch (ValidationException) { refused = true; }
                         Check(refused && Number("E2", 1), "Wrong workbook Undo wrote original");
-                        Check((string)other.Worksheets[1].Range["A1"].Value2 == "other-owned-test", "Wrong workbook was modified");
+                        Check((string)otherRange.Value2 == "other-owned-test", "Wrong workbook was modified");
                     }
-                    finally { other.Close(false); ExcelEngine.Release((object)other); book.Activate(); }
+                    finally { try { CloseOtherBook((object)other); } finally { book.Activate(); } }
                 }
             });
             Test("U13-later-automation-edit", delegate
@@ -387,7 +412,7 @@ class ExtendedTests
                 using (var e = new ExcelEngine(app))
                 {
                     e.Apply(e.Prepare(Numbers(1, 2, 3)), null, null);
-                    sheet.Range["J1"].Value2 = 42.0; Pump();
+                    R("J1").Value2 = 42.0; Pump();
                     RefuseUndo(e, "E1:E5"); Check(Number("J1", 42), "Later edit changed");
                 }
             });
@@ -421,9 +446,22 @@ class ExtendedTests
                 }
             });
         }
+        catch (Exception error) { failed++; results.Add("HARNESS FAIL " + error); }
         finally
         {
-            app.EnableEvents = events; app.Calculation = calculation; app.ScreenUpdating = updating; app.StatusBar = status;
+            if (captured)
+            {
+                Cleanup("original workbook", delegate { book.Activate(); });
+                Cleanup("original sheet", delegate { ((dynamic)originalSheet).Activate(); });
+                Cleanup("original selection", delegate { ((dynamic)originalSelection).Select(); });
+                Cleanup("EnableEvents", delegate { app.EnableEvents = events; });
+                Cleanup("Calculation", delegate { app.Calculation = calculation; });
+                Cleanup("ScreenUpdating", delegate { app.ScreenUpdating = updating; });
+                Cleanup("StatusBar", delegate { object beforeStatus=app.StatusBar; results.Add("STATUS cleanup-before type="+(beforeStatus==null?"null":beforeStatus.GetType().AssemblyQualifiedName)+" value=["+beforeStatus+"]"); ExcelEngine.RestoreStatusBar((object)app,status); object afterStatus=app.StatusBar; results.Add("STATUS cleanup-after type="+(afterStatus==null?"null":afterStatus.GetType().AssemblyQualifiedName)+" value=["+afterStatus+"]"); Check(Object.Equals(status,afterStatus),"Extended StatusBar cleanup type/value mismatch"); });
+                Cleanup("DisplayAlerts", delegate { app.DisplayAlerts = alerts; });
+            }
+            Cleanup("suite references", delegate { refs.Dispose(); });
+            sheet = null; book = null; app = null;
         }
         results.Add("SUMMARY passed=" + passed + " failed=" + failed);
         File.WriteAllLines(output, results, Encoding.UTF8);

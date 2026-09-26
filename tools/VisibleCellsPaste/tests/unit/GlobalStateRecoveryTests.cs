@@ -13,6 +13,7 @@ public sealed class GlobalRecoveryApplication
     public readonly List<string> SetterAttempts = new List<string>();
     public string FailedSetter;
     public bool FailAfterAssignment;
+    public bool FailStatusGet, FailStatusRestore;
     public bool ForbidAnyAccess;
     public int Accesses, CellAccesses;
     public object CalculationState = -4135, StatusState = "during write";
@@ -32,7 +33,7 @@ public sealed class GlobalRecoveryApplication
     }
     public object Calculation { get { Access(); return CalculationState; } set { Attempt("Calculation", delegate { CalculationState = value; }); } }
     public bool ScreenUpdating { get { Access(); return ScreenState; } set { Attempt("ScreenUpdating", delegate { ScreenState = value; }); } }
-    public object StatusBar { get { Access(); return StatusState; } set { Attempt("StatusBar", delegate { StatusState = value; }); } }
+    public object StatusBar { get { Access(); if (FailStatusGet) throw new COMException("Synthetic status snapshot failure"); return StatusState; } set { Attempt("StatusBar", delegate { if (FailStatusRestore && Object.Equals(value, false)) throw new InvalidOperationException("Synthetic status restoration verification failure"); StatusState = value; }); } }
     public bool EnableEvents { get { Access(); return EventsState; } set { Attempt("EnableEvents", delegate { EventsState = value; }); } }
     public object ActiveProtectedViewWindow { get { Access(); return null; } }
     public object ActiveWorkbook { get { Access(); return Book; } }
@@ -48,6 +49,28 @@ public sealed class GlobalRecoverySheet
     public object Range { get { app.CellAccesses++; throw new Exception("Unexpected range access after failed state restoration"); } }
 }
 public sealed class GlobalRecoverySelection { public string Address { get { return "$E$2"; } } }
+
+
+// Managed fault injection for the exact production reset algorithm. Actual Excel COM
+// default-control behavior is verified separately by the owned-host integration harness.
+public sealed class StatusRestoreApplication
+{
+    public readonly List<object> Writes = new List<object>();
+    public object Current = "during operation", ResetResult = false;
+    public object FalseResult = false;
+    public int Reads, ThrowOnWrite, ThrowOnRead;
+    public object StatusBar
+    {
+        get { Reads++; if (Reads == ThrowOnRead) throw new COMException("Synthetic status read failure"); return Current; }
+        set
+        {
+            Writes.Add(value); if (Writes.Count == ThrowOnWrite) throw new COMException("Synthetic status write failure");
+            if (value is bool && !(bool)value) Current = FalseResult;
+            else if (value is string && (string)value == "") Current = ResetResult;
+            else Current = value;
+        }
+    }
+}
 
 internal static class GlobalStateRecoveryTests
 {
@@ -113,9 +136,81 @@ internal static class GlobalStateRecoveryTests
             AssertFutureWorkBlocked(engine, app);
         }
     }
+
+    private static void RestoreWithExcelVerification(object application, object prior)
+    {
+        // Exercises the real algorithm with injected postconditions; this does not model COM marshalling.
+        var method = typeof(ExcelEngine).GetMethod("RestoreStatusBarCore", BindingFlags.Static | BindingFlags.NonPublic);
+        try { method.Invoke(null, new object[] { application, prior, true }); }
+        catch (TargetInvocationException error) { throw error.InnerException; }
+    }
+    private static void StatusRestoreRegression()
+    {
+        Test("managed original false uses the direct setter without a COM probe", delegate {
+            var app = new StatusRestoreApplication(); ExcelEngine.RestoreStatusBar(app, false);
+            Check(app.Writes.Count == 1 && app.Writes[0] is bool && !(bool)app.Writes[0] && app.Reads == 0, "Managed restoration changed the original type or probed COM");
+        });
+        foreach (string prior in new[] { "FALSE", "기존 상태 메시지" }) {
+            string saved = prior; Test("literal status text is preserved: " + saved, delegate {
+                var app = new StatusRestoreApplication(); RestoreWithExcelVerification(app, saved);
+                Check(app.Writes.Count == 1 && Object.Equals(app.Current, saved) && app.Reads == 0, "Literal status text was treated as Excel default control");
+            });
+        }
+        Test("documented false reset avoids fallback when Excel control is verified", delegate {
+            var app = new StatusRestoreApplication(); RestoreWithExcelVerification(app, false);
+            Check(app.Writes.Count == 1 && app.Reads == 1 && app.Current is bool && !(bool)app.Current, "Verified default control caused an extra mutation");
+        });
+        Test("false rendered as text falls back and verifies Boolean default control", delegate {
+            var app = new StatusRestoreApplication { FalseResult = "FALSE" }; RestoreWithExcelVerification(app, false);
+            Check(app.Writes.SequenceEqual(new object[] { false, "" }) && app.Reads == 2 && app.Current is bool && !(bool)app.Current, "Fallback did not verify exact Boolean false");
+        });
+        Test("numeric zero is not accepted as verified Boolean default control", delegate {
+            var app = new StatusRestoreApplication { FalseResult = 0 }; RestoreWithExcelVerification(app, false);
+            Check(app.Writes.Count == 2 && app.Current is bool && !(bool)app.Current, "A coerced numeric result bypassed fallback");
+        });
+        Test("failed fallback postcondition raises an explicit restoration failure", delegate {
+            var app = new StatusRestoreApplication { FalseResult = "FALSE", ResetResult = "" };
+            Exception failure = null; try { RestoreWithExcelVerification(app, false); } catch (Exception error) { failure = error; }
+            Check(failure is InvalidOperationException && failure.Message.Contains("VCP-STATUSBAR-RESTORE") && app.Writes.Count == 2, "Unverified reset was reported as restored");
+        });
+        foreach (int write in new[] { 1, 2 }) {
+            int position = write; Test("status reset write failure propagates at attempt " + position, delegate {
+                var app = new StatusRestoreApplication { FalseResult = "FALSE", ThrowOnWrite = position };
+                Exception failure = null; try { RestoreWithExcelVerification(app, false); } catch (Exception error) { failure = error; }
+                Check(failure is COMException && app.Writes.Count == position, "A failed reset setter was swallowed or retried");
+            });
+        }
+        Test("status verification getter failure is not mistaken for restored state", delegate {
+            var app = new StatusRestoreApplication { ThrowOnRead = 1 };
+            Exception failure = null; try { RestoreWithExcelVerification(app, false); } catch (Exception error) { failure = error; }
+            Check(failure is COMException && app.Writes.Count == 1 && app.Reads == 1, "Failed verification caused a blind reset");
+        });
+        Test("Prepare status snapshot getter failure remains retryable without mutations", delegate {
+            var app = new GlobalRecoveryApplication { FailStatusGet = true, StatusState = false };
+            using (var engine = new ExcelEngine(app)) {
+                Exception failure = null; try { engine.Prepare(Source()); } catch (Exception error) { failure = error; }
+                Check(failure is COMException && !engine.RecoveryRequired && app.SetterAttempts.Count == 0 && app.CellAccesses == 0, "Read-only failure mutated state or blocked retry");
+                app.FailStatusGet = false;
+                Validation(delegate { engine.Prepare(Source()); }, "VCP-SELECTION");
+                Check(!engine.RecoveryRequired && Object.Equals(app.StatusState, false), "Retry did not restore the original state");
+            }
+        });
+        Test("Prepare restoration failure blocks future work without accessing cells", delegate {
+            var app = new GlobalRecoveryApplication { FailStatusRestore = true, StatusState = false };
+            using (var engine = new ExcelEngine(app)) {
+                Field("undoAllowed").SetValue(engine, true);
+                Exception failure = null; try { engine.Prepare(Source()); } catch (Exception error) { failure = error; }
+                Check(failure is InvalidOperationException && engine.RecoveryRequired && engine.LastOutcome == "state-restore-failed", "Prepare restoration failure was not recorded");
+                Check(engine.RecoveryDetail.Contains("StatusBar:") && !(bool)Field("busy").GetValue(engine) && !(bool)Field("undoAllowed").GetValue(engine) && app.CellAccesses == 0, "Prepare restore failure retained write/undo eligibility");
+                AssertFutureWorkBlocked(engine, app);
+            }
+        });
+    }
+
     private static int Main()
     {
         Console.OutputEncoding = new UTF8Encoding(false);
+        StatusRestoreRegression();
         foreach (string property in Order) { string captured = property; Test("failed " + property + " isolates cleanup and blocks future writes", delegate { OneFailure(captured, false); }); }
         Test("setter mutates then throws still blocks further work", delegate { OneFailure("StatusBar", true); });
         Test("all four restore failures are aggregated without skipping cleanup", delegate {

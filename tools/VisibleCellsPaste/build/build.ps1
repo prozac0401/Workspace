@@ -89,6 +89,16 @@ Invoke-Tool $lifecycleTests @() (Join-Path $output 'addin-lifecycle-tests.log')
 $comLifetimeTests = Join-Path $output 'ComLifetimeTests.exe'
 Compile (@('/nologo','/target:exe','/main:ComLifetimeTests',"/platform:$nativeTestArch","/out:$comLifetimeTests","/reference:$testLibrary") + $references + @((Join-Path $productRoot 'tests\unit\ComLifetimeTests.cs'))) (Join-Path $output 'com-lifetime-tests-build.log')
 Invoke-Tool $comLifetimeTests @() (Join-Path $output 'com-lifetime-tests.log')
+if ([Environment]::Is64BitOperatingSystem) {
+    # Exercise the event sink's native COM vtable in a real 32-bit CLR as well.
+    $x86TestDir = Join-Path $output 'com-lifetime-x86'
+    New-Item -ItemType Directory -Path $x86TestDir -Force | Out-Null
+    $x86TestLibrary = Join-Path $x86TestDir 'VisibleCellsPaste.AddIn.dll'
+    Copy-Item -LiteralPath (Join-Path $package 'x86\VisibleCellsPaste.AddIn.dll') -Destination $x86TestLibrary -Force
+    $x86ComTests = Join-Path $x86TestDir 'ComLifetimeTests.exe'
+    Compile (@('/nologo','/target:exe','/main:ComLifetimeTests','/platform:x86',"/out:$x86ComTests","/reference:$x86TestLibrary") + $references + @((Join-Path $productRoot 'tests\unit\ComLifetimeTests.cs'))) (Join-Path $output 'com-lifetime-tests-x86-build.log')
+    Invoke-Tool $x86ComTests @() (Join-Path $output 'com-lifetime-tests-x86.log')
+}
 $globalRecoveryTests = Join-Path $output 'GlobalStateRecoveryTests.exe'
 Compile (@('/nologo','/target:exe','/main:GlobalStateRecoveryTests',"/platform:$nativeTestArch","/out:$globalRecoveryTests","/reference:$testLibrary") + $references + @((Join-Path $productRoot 'tests\unit\GlobalStateRecoveryTests.cs'))) (Join-Path $output 'global-state-recovery-tests-build.log')
 Invoke-Tool $globalRecoveryTests @() (Join-Path $output 'global-state-recovery-tests.log')

@@ -41,6 +41,8 @@ jobs:
             artifacts/visible-cells-paste/*/addin-lifecycle-tests.log
             artifacts/visible-cells-paste/*/com-lifetime-tests-build.log
             artifacts/visible-cells-paste/*/com-lifetime-tests.log
+            artifacts/visible-cells-paste/*/com-lifetime-tests-x86-build.log
+            artifacts/visible-cells-paste/*/com-lifetime-tests-x86.log
             artifacts/visible-cells-paste/*/global-state-recovery-tests-build.log
             artifacts/visible-cells-paste/*/global-state-recovery-tests.log
             artifacts/visible-cells-paste/*/presentation-entry-tests-build.log
