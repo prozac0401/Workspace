@@ -21,18 +21,18 @@
 
 **다운로드 전 확인:** 현재 안내하는 설치 파일에는 코드 서명이 없습니다. 제품별 설치 안내에서 사용 환경과 알려진 제한을 먼저 확인하세요.
 
-선택범위 내보내기는 컴파일된 COM 추가 기능이며 명단 비교와 설치·메뉴·제거가 별도입니다. 현재 PC에서 자동 메뉴와 실제 내보내기를 확인했지만, Undo 기록 소실과 외부 API 시험 후 Excel 잔존 문제가 남아 있습니다. x86 실제 실행·격리 환경·재부팅·완전 제거·전체 공존 시험은 미실행입니다. 시험판 게시를 전체 인수 완료로 해석하지 않습니다. File List to Excel은 별도 저장소에서 이미 공개된 v1.1.0만 안내하며, 미게시 개발 기능은 포함하지 않습니다.
+선택범위 내보내기는 컴파일된 COM 추가 기능이며 명단 비교와 설치·메뉴·제거가 별도입니다. 현재 PC에서 자동 메뉴와 실제 내보내기를 확인했지만, Undo 기록 소실과 외부 API 시험 후 Excel 잔존 문제가 남아 있습니다. x86 실제 실행·격리 환경·재부팅·완전 제거·전체 공존 시험은 미실행입니다. 시험판 게시를 전체 인수 완료로 해석하지 않습니다. File List to Excel은 별도 저장소의 v1.2.0을 안내하며, 선택 설치로 Excel에서 선택한 실제 파일을 새 폴더에 복사할 수 있습니다.
 
-File List to Excel v1.1.0은 일부 시험 PC에서 파일 우클릭 메뉴 등록을 확인하지 못한 알려진 문제가 있습니다. 자세한 결과와 미검증 환경은 [설치 안내](docs/tools/file-list-to-excel/index.md)에서 확인하세요.
+File List to Excel v1.2.0의 설치·복구·제거와 이전 버전 업그레이드는 검증되어 있습니다. 선택형 파일 복사의 지원 범위와 미검증 환경은 [설치 안내](docs/tools/file-list-to-excel/index.md)에서 확인하세요.
 
 | 프로그램 | 설치 파일 | 확인할 내용 |
 |---|---|---|
 | FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
 | Excel 명단 비교 0.2.0 R12 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
 | 선택범위 내보내기 0.1.0-rc.9 평가판 | [Excel x64용 EXE](https://github.com/prozac0401/Workspace/releases/download/excel-selection-export-v0.1.0-rc.9/ExcelSelectionExport-0.1.0-rc.9-x64-Setup.exe) · [x86용·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.9) | [설치·사용·알려진 제한](docs/tools/excel-selection-export/index.md) |
-| File List to Excel 1.1.0 | [Windows x64 MSI](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.1.0/FileListToExcel-1.1.0-win-x64.msi) · [배포 자료](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.1.0) | [설치·사용 안내](docs/tools/file-list-to-excel/index.md) |
+| File List to Excel 1.2.0 | [Windows x64 MSI](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [배포 자료](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) | [설치·사용 안내](docs/tools/file-list-to-excel/index.md) |
 | 업무 책갈피 0.2.3 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.3/WorkBookmark-0.2.3-win-x64.msi) · [ZIP·배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.3) | [설치·사용 안내](docs/tools/bookmark/index.md) |
-| 보이는 칸 붙여넣기 0.1.0 | [Windows 설치 ZIP](https://github.com/prozac0401/Workspace/releases/download/visible-cells-paste-v0.1.0/VisibleCellsPaste_0.1.0.zip) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.0) | [설치·사용 안내](docs/tools/visible-cells-paste/index.md) |
+| 보이는 칸 붙여넣기 0.1.1 | [Windows 설치 ZIP](https://github.com/prozac0401/Workspace/releases/download/visible-cells-paste-v0.1.1/VisibleCellsPaste_0.1.1.zip) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1) | [설치·사용 안내](docs/tools/visible-cells-paste/index.md) |
 
 Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 사용자 요청에 따라 기존 테스트는 실행하지 않았으며 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 현재 안내하는 설치 파일에는 코드 서명이 없습니다.
 
