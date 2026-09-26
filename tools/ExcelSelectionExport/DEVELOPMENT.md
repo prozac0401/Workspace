@@ -101,3 +101,7 @@ rc.9 API 시험 뒤에는 ExcelProbe close가 종료0으로 합성 문서를 닫
 rc.9 실제 UI 측정에서는 내보내기 전 활성화된 원본 편집 Undo가 내보낸 뒤 비활성화됐습니다. 원본 값·수식 전후 동일 검사와 실행 취소 기록을 구분합니다. 2026-09-26 조사에서 같은 Excel 인스턴스에 대한 시트 이름·기본 글꼴·셀 기록을 원인 동작으로 확인했으며, rc.10의 분리된 출력 경로로 수정합니다. 최신 결과는 [Undo 조사·수정 검증 기록](../../docs/delivery/excel-selection-export-undo-20260926.md)을 따릅니다. 최종 rc.10은 단위249개, 설치본 API11사례·930개, 실제 메뉴 Undo3·Redo3의 110개, 직접 엔진 출력단계 취소17개 검사를 통과했습니다. x86/x64 패키지와 x64 설치·DLL 해시 일치, 작업용 Excel 정상 종료·임시 파일 정리를 확인했습니다. 최종 원본 Excel은 API로 Close+Quit한 뒤 빈 프로세스가 남았으므로 기존 API 종료 제한은 유지합니다. rc.9 결과를 소급해 통과로 바꾸지 않습니다.
 
 검증 기록에는 패키지 버전·해시, Windows/Excel 버전·비트수, 시험 방식, 실제 결과, 미실행 조건을 적습니다. 격리 프로필·재로그인/재부팅·x86 Excel 등 확인하지 않은 항목은 미실행으로 남깁니다. 사용자 경로를 포함할 수 있는 로그는 artifacts 아래에 보관하며 공개 문서·공개 사이트에 복사하지 않습니다.
+
+## 설치 실패 회귀
+
+Test-Package.ps1의 Lifecycle에 PreviousVersion·PreviousPackageDirectory를 함께 주면 이전 버전 설치부터 업데이트와 제거를 검사합니다. TestLockedRepair는 시험이 설치한 DLL만 잠가 교체 실패·등록 보존·후속 복구를 확인합니다. Test-ActivationFailure.ps1은 PackageDirectory와 실제 InnoCompiler 경로를 받아 격리한 잘못된 assembly 패키지를 만들고 종료30·정상 패키지 복구·제거를 검사합니다. 두 도구는 기존 설치나 Excel 실행 중에는 거절합니다. 시험용 잘못된 EXE를 배포하지 마세요. 실제 결과와 미실행 범위는 [설치 기록](../../docs/delivery/excel-selection-export-installer-20260927.md)을 따릅니다.

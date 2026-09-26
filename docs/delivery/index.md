@@ -17,7 +17,7 @@
 
 [순차 처리 백로그](WORKSPACE_Tool_Backlog_20260926.md)에서 로컬 후보와 공개 버전의 차이·남은 작업을 확인합니다.
 
-로컬 선택범위 내보내기 rc.10은 [Undo 수정](excel-selection-export-undo-20260926.md)과 [종료 재검증](excel-selection-export-lifetime-20260927.md)을 별도로 기록합니다. 공개 rc.9 다운로드를 바꾼 것은 아닙니다.
+로컬 선택범위 내보내기 rc.10은 [Undo 수정](excel-selection-export-undo-20260926.md)과 [종료 재검증](excel-selection-export-lifetime-20260927.md)·[설치 수명주기](excel-selection-export-installer-20260927.md)를 별도로 기록합니다. 공개 rc.9 다운로드를 바꾼 것은 아닙니다.
 
 ## 개발·게시 절차
 

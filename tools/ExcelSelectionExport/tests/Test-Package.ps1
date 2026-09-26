@@ -4,6 +4,9 @@ param(
     [string]$Action = 'Snapshot',
     [string]$Version = '0.1.0-rc.9',
     [string]$PackageDirectory,
+    [string]$PreviousVersion,
+    [string]$PreviousPackageDirectory,
+    [switch]$TestLockedRepair,
     [string]$OutputDirectory,
     [string]$Baseline
 )
@@ -141,6 +144,10 @@ if (@(Get-Process -Name EXCEL -ErrorAction SilentlyContinue).Count -ne 0) { thro
 if ((Test-Path -LiteralPath $productDirectory) -or (Product-Registered)) { throw 'An existing SelectionExport installation or folder was found. Preserve it; use Snapshot/Compare or a clean test profile.' }
 $x64Package = Join-Path $PackageDirectory "ExcelSelectionExport-$Version-x64-Setup.exe"
 $x86Package = Join-Path $PackageDirectory "ExcelSelectionExport-$Version-x86-Setup.exe"
+if ([bool]$PreviousVersion -ne [bool]$PreviousPackageDirectory) { throw 'Specify both PreviousVersion and PreviousPackageDirectory for cross-version upgrade.' }
+if ($PreviousVersion -eq $Version) { throw 'Cross-version upgrade requires different versions.' }
+$previousPackage = if ($PreviousVersion) { Join-Path $PreviousPackageDirectory "ExcelSelectionExport-$PreviousVersion-x64-Setup.exe" } else { $null }
+if ($previousPackage -and -not (Test-Path -LiteralPath $previousPackage -PathType Leaf)) { throw 'The previous x64 installer is missing.' }
 $probe = Join-Path $PackageDirectory 'x64\SetupProbe.exe'
 if (-not (Test-Path -LiteralPath $probe -PathType Leaf)) { throw 'Build the x64 setup probe first.' }
 $probeReport = Join-Path $OutputDirectory 'preflight.ini'
@@ -158,15 +165,46 @@ try {
     $mismatchLog = Get-Content -LiteralPath (Join-Path $OutputDirectory '01-x86-mismatch.log') -Raw
     Check ($mismatchLog -match 'preflight exit=13|\[E13\]') 'Architecture mismatch has distinct E13 diagnostic'
     Assert-Safety $baselineState (Capture-Safety) 'Mismatch leaves security and other tools unchanged'
+    if ($previousPackage) {
+        Check ((Run-Package $previousPackage '01b-previous-install') -eq 0) 'Previous-version installation succeeds'
+        $previousDll = Join-Path $productDirectory "versions\$PreviousVersion\x64\ExcelSelectionExport.AddIn.dll"
+        Check (Test-Path -LiteralPath $previousDll -PathType Leaf) 'Previous-version payload exists'
+        $previousHash = (Get-FileHash -LiteralPath $previousDll -Algorithm SHA256).Hash
+        Assert-Safety $baselineState (Capture-Safety) 'Previous-version installation leaves security and other tools unchanged'
+    }
     Check ((Run-Package $x64Package '02-install') -eq 0) 'x64 initial installation and COM activation succeed'
     Check ((Test-Path -LiteralPath (Join-Path $installedPayload 'ExcelSelectionExport.AddIn.dll')) -and (Product-Registered)) 'Owned payload and registration exist'
+    if ($previousPackage) {
+        Check ((Get-FileHash -LiteralPath $previousDll -Algorithm SHA256).Hash -eq $previousHash) 'Upgrade preserves the previous version payload bytes'
+        $base = [Microsoft.Win32.RegistryKey]::OpenBaseKey('CurrentUser', [Microsoft.Win32.RegistryView]::Registry64)
+        try {
+            $key = $base.OpenSubKey("Software\Classes\CLSID\$clsid\InprocServer32")
+            try {
+                $registeredUri = [Uri]$key.GetValue('CodeBase')
+                Check ($registeredUri.IsFile -and $registeredUri.LocalPath -eq (Join-Path $installedPayload 'ExcelSelectionExport.AddIn.dll')) 'Cross-version upgrade selects the new DLL in COM registration'
+            } finally { if ($key) { $key.Dispose() } }
+        } finally { $base.Dispose() }
+    }
     Assert-Safety $baselineState (Capture-Safety) 'Install leaves security and other tools unchanged'
+    if ($TestLockedRepair) {
+        $dll = Join-Path $installedPayload 'ExcelSelectionExport.AddIn.dll'
+        $hashBefore = (Get-FileHash -LiteralPath $dll -Algorithm SHA256).Hash
+        $registrationBefore = Registry-Fingerprint ([Microsoft.Win32.RegistryHive]::CurrentUser) ([Microsoft.Win32.RegistryView]::Registry64) "Software\Classes\CLSID\$clsid"
+        $locked = [IO.File]::Open($dll, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+        try { $lockedExit = Run-Package $x64Package '02b-locked-repair' }
+        finally { $locked.Dispose() }
+        Check ($lockedExit -ne 0) 'Locked payload replacement reports a failed installation'
+        Check ((Get-FileHash -LiteralPath $dll -Algorithm SHA256).Hash -eq $hashBefore) 'Locked replacement failure preserves the installed DLL'
+        Check ((Registry-Fingerprint ([Microsoft.Win32.RegistryHive]::CurrentUser) ([Microsoft.Win32.RegistryView]::Registry64) "Software\Classes\CLSID\$clsid") -eq $registrationBefore) 'Locked replacement failure preserves COM registration'
+        Assert-Safety $baselineState (Capture-Safety) 'Locked replacement failure leaves security and other tools unchanged'
+    }
     Check ((Run-Package $x64Package '03-repair') -eq 0) 'Same-version repair or upgrade succeeds with Excel closed'
     Assert-Safety $baselineState (Capture-Safety) 'Repair leaves security and other tools unchanged'
     $uninstaller = Join-Path $productDirectory 'unins000.exe'
     Check ((Run-Package $uninstaller '04-uninstall') -eq 0) 'Independent product uninstall succeeds'
     Check (-not (Product-Registered)) 'Owned COM, Office and Apps registration removed'
     Check (-not (Test-Path -LiteralPath (Join-Path $installedPayload 'ExcelSelectionExport.AddIn.dll'))) 'Owned add-in DLL removed'
+    if ($previousPackage) { Check (-not (Test-Path -LiteralPath $previousDll)) 'Uninstall also removes the previous owned payload' }
     Check (([IO.File]::ReadAllText($sentinel, [Text.Encoding]::UTF8)) -ceq $sentinelText) 'Sentinel outside the product survives install, repair and uninstall'
     Assert-Safety $baselineState (Capture-Safety) 'Uninstall leaves security and other tools unchanged'
     Check ((Run-Package $x64Package '05-reinstall') -eq 0) 'Reinstall after removal succeeds'
@@ -175,6 +213,6 @@ try {
     Assert-Safety $baselineState (Capture-Safety) 'Reinstall/removal leaves security and other tools unchanged'
 } finally {
     Save-Json (Capture-Safety) (Join-Path $OutputDirectory 'safety-after.json')
-    Save-Json ([ordered]@{ checks = $checks.ToArray(); limitations = @('Actual Excel menu coexistence and automatic load are separate UI tests.', 'Cross-version upgrade is not covered by same-version repair.', 'No policy or user-disabled setting is modified for testing.', 'x86 Excel runtime loading is not tested on this x64 Excel machine.') }) (Join-Path $OutputDirectory 'package-test-results.json')
+    Save-Json ([ordered]@{ checks = $checks.ToArray(); previousVersion = $PreviousVersion; version = $Version; limitations = @('Actual Excel menu coexistence and automatic load are separate UI tests.', 'Cross-version upgrade is covered only when PreviousVersion and PreviousPackageDirectory are supplied.', 'No policy or user-disabled setting is modified for testing.', 'x86 Excel runtime loading is not tested on this x64 Excel machine.') }) (Join-Path $OutputDirectory 'package-test-results.json')
 }
 Write-Output "Package lifecycle evidence: $OutputDirectory"
