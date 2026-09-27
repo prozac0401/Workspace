@@ -1,6 +1,6 @@
 # 업무 책갈피 0.2.8 링크·사용 안내와 main 반영
 
-날짜: 2026-09-27 · 책임: 문서·배포 담당 · 상태: 공개 자산·문서 검사 완료, main·Pages 반영 준비
+날짜: 2026-09-27 · 책임: 문서·배포 담당 · 상태: main 반영·Pages 배포·실제 공개 링크 확인 완료
 
 ## 요청과 변경 범위
 
@@ -31,4 +31,8 @@ R11의 기록은 2026-09-20 당시 결과이며 이번에 재실행한 시험이
 
 MkDocs strict 빌드와 `scripts/check-site.py` 검사를 통과했다. 공개 20페이지·404와 자산 8개를 유지하며 검색·사이트맵에는 공개 경로만 들어 있다. 생성된 로컬 링크는 모두 연결되고 새 검증 기록·ADR·로컬 네트워크 결과는 Pages에 포함되지 않았다. `git diff --check`도 통과했다.
 
-main 반영 커밋과 실제 Pages 배포 결과는 게시 후 기록한다. 이번 검증은 문서·링크 확인이며 제품 기능·설치 재시험이 아니다.
+변경 10개 파일은 [3e4ff708769a01a1b47fee1ce778c10f934e7bde](https://github.com/prozac0401/Workspace/commit/3e4ff708769a01a1b47fee1ce778c10f934e7bde)로 원격 main에 반영했다. [Documentation 실행 36323149778](https://github.com/prozac0401/Workspace/actions/runs/36323149778)은 성공했으며 원격 main의 커밋도 일치함을 확인했다.
+
+배포 후 실제 [홈](https://prozac0401.github.io/Workspace/)과 [BookMark 안내](https://prozac0401.github.io/Workspace/tools/bookmark/)에서 0.2.8 평가판과 고정 다운로드 링크 5개를 확인했다. 이전 0.2.5 다운로드 링크는 남아 있지 않다. [그림 복사·저장 안내](https://prozac0401.github.io/Workspace/tools/image-copy-save/guide/)는 0.2.0 MSI 연결을 유지한다.
+
+공개 20개 경로·자산 8개·검색·사이트맵은 모두 HTTP 200이다. 검색과 사이트맵은 공개 20개 경로로만 구성되며 이번 내부 배포 기록·R11 명세·ADR의 Pages 경로 3개는 HTTP 404를 확인했다. 새 검증 문서의 상대 링크 30개와 날짜·버전 구분도 대조했다. 이번 검증은 문서·링크 확인이며 제품 기능·설치 재시험이 아니다.
