@@ -1,9 +1,9 @@
 # 그림 복사·저장 · G0 메뉴 구현성 검증
 
 도구 ID: ImageCopySave
-기록 버전: 0.10 · 2026-09-27 후속 중간 실기
+기록 버전: 0.12 · 2026-09-27 후속 중간 실기
 기준: [ImageCopySave-REQ-1.2](ImageCopySave_Requirements_v1.2.md)
-기록 상태: 클래식 직접 표시 일부·MSI 수명주기 시나리오 PASS, 전체 G0 **미완료**
+기록 상태: 클래식 직접 표시 일부·MSI 시나리오·설정 복원 PASS, 기본 메뉴 경로 미확인·응답 없음 원인 미확정, 전체 G0 **미완료**
 책임: 도구 개발·검증 담당
 적용 정책: [추가 도구 개발 기준](../../policies/tools.md), [정책 문서 작성 규칙](../../policies/documentation.md)
 현재 결정: [ADR-0023](../../design/0023-image-copy-save-classic-menu.md), 설치 권한 [ADR-0022](../../design/0022-image-admin-install.md)
@@ -12,21 +12,23 @@
 
 사용자가 Windows 11 기본 메뉴의 ‘더 많은 옵션 표시’ 뒤에 나오는 공통 클래식 메뉴를 현재 경로로 선택했다. Windows 10 스타일의 클래식 직접 표시 설정에서는 같은 명령에 바로 접근한다. 이번 시험의 메뉴 모드 임시 전환과 원상복구도 승인했다. 이전 첫 Windows 11 메뉴 필수 조건과 클래식 전용이면 불합격이라는 판정은 v1.2에서 대체됐다.
 
-새 후보는 native IExplorerCommand를 HKLM의 ExplorerCommandHandler와 x64 COM으로 등록하고 무서명 관리자 MSI가 제품 파일과 등록을 관리하는 방식이다. Windows 11 클래식 직접 표시 모드에서 독립 저장 명령과 실제 저장·복사, 여러 비이미지 상태의 완전 숨김을 확인했다. 제품 MSI 0.1.0 설치·손상 DLL Repair, 0.1.0→0.1.1 업데이트, 제거·깨끗한 상태의 의도된 설치 실패 롤백·0.1.1 재설치는 확인한 시나리오에서 PASS다. 실제 설치 helper의 비상승 실행은 앞선 0.1.0 실제 저장에서 확인했다. 현재 0.1.1 설치 상태지만 재설치 이후 실제 메뉴 관찰은 0건이다. 아래 메뉴 PASS와 8회 반복은 모두 0.1.0에서 얻은 결과다.
+새 후보는 native IExplorerCommand를 HKLM의 ExplorerCommandHandler와 x64 COM으로 등록하고 무서명 관리자 MSI가 제품 파일과 등록을 관리하는 방식이다. Windows 11 클래식 직접 표시 모드에서 독립 저장 명령과 실제 저장·복사, 여러 비이미지 상태의 완전 숨김을 확인했다. 제품 MSI 0.1.0 설치·손상 DLL Repair, 0.1.0→0.1.1 업데이트, 제거·깨끗한 상태의 의도된 설치 실패 롤백·0.1.1 재설치는 확인한 시나리오에서 PASS다. 실제 설치 helper의 비상승 실행은 앞선 0.1.0 실제 저장에서 확인했다. 현재 0.1.1 설치 상태이며 클래식 직접 표시 메뉴의 실제 저장·PNG 이미지 복사도 별도 확인했다. 시험 폴더 A에 8×8 PNG가 생성됐고 저장 전후 clipboard sequence 1442가 유지됐다. 복사 시 1442→1447로 갱신되며 PNG·CF_DIBV5·CF_BITMAP·CF_DIB가 게시됐고 파일 목록 형식은 없었다.
 
-**전체 G0는 미완료다.** 기본 새 메뉴의 ‘더 많은 옵션 표시’ 경로, 두 모드의 20회 상태 전환, 호출 문맥·회귀 전체와 보존 범위·원상복구는 아래 개별 상태로 관리한다. 클래식 직접 표시 반복은 0.1.0에서 8회 통과했다. 0.1.1 재설치 후 9회차 재개 시 UI 도구의 창 활성화 오류가 반복되어 20회 판정은 미완료다. 새 창 선택과 한 차례 복구 시도 뒤에도 활성화하지 못했으며 이 도구 오류를 제품 메뉴 실패로 계상하지 않는다. 이전 관리자·SYSTEM sparse identity 등록이나 엔진 시험의 PASS로 빈 항목을 채우지 않는다. 이전 일반 사용자 등록의 0x80073D2B와 signed full MSIX의 0x800B0109도 새 경로의 현재 실패가 아니다.
+**전체 G0는 미완료다.** 기본 새 메뉴의 ‘더 많은 옵션 표시’ 경로, 미확인 기능의 대표 사례, 호출 문맥·회귀 전체와 보존 범위·원상복구는 아래 개별 상태로 관리한다. 클래식 직접 표시 전환 15회·46개 관찰 행은 모두 PASS다. 1~8회는 0.1.0, 9~15회는 0.1.1이며 같은 버전에서 전부 수행한 것으로 합치지 않는다. 02:53 UTC의 새 시험 Explorer 창에서는 기존 창 활성화 실패 이후 다시 관찰할 수 있었고 그 시점에는 기존 창과 프로세스를 보존했다. 후속 모드 시험에서는 승인된 수동 Explorer 재시작 한 차례와 Workspace 경로 복원이 있었다. 재시작 후 실제 ‘응답 없음’도 관찰했으므로 기존 활성화 실패까지 자동화 도구만의 원인으로 단정하지 않는다. 이전 관리자·SYSTEM sparse identity 등록이나 엔진 시험의 PASS로 빈 항목을 채우지 않는다. 이전 일반 사용자 등록의 0x80073D2B와 signed full MSIX의 0x800B0109도 새 경로의 현재 실패가 아니다.
+
+사용자의 “불필요한 반복테스트는 지양하도록 합니다.” 지시에 따라 고정 20회 반복은 완료 관문에서 제외했다. 미확인 기능은 대표 1회 확인하며 실패나 관련 변경이 있을 때만 해당 사례를 다시 시험한다. 이미 수행한 관찰은 보존하고 16~20회와 다른 모드의 횟수 채우기 반복은 **사용자 지시에 따라 반복 생략**으로 기록한다. 생략한 반복은 제품 실패나 필수 잔여가 아니다. 기본 Windows 11 경로와 설정 원상복구는 필수로 유지한다.
 
 ## 현재 메뉴·설치 검증 매트릭스
 
-| 항목 | Windows 11 기본 새 메뉴 → 더 많은 옵션 표시 | Windows 11 클래식 직접 표시: 0.1.0 실기 | 관련 기준 |
+| 항목 | Windows 11 기본 새 메뉴 → 더 많은 옵션 표시 | Windows 11 클래식 직접 표시: 버전별 실기 | 관련 기준 |
 |---|---|---|---|
 | 실제 폴더 배경 독립 저장 명령 | NOT RUN | PASS: 합성 8×8 이미지에서 독립 명령 활성화 | AT-08·09 |
 | 지원 이미지에서 표시, 텍스트·빈 상태·URL/HTML·파일 목록에서 완전 숨김 | NOT RUN | 이미지·이미지+텍스트 표시, 텍스트·빈 상태·URL/HTML·실제 파일 클립보드 완전 숨김 PASS | AT-01~06 |
-| 이미지→텍스트→빈 상태→이미지 20회, 메뉴를 매번 다시 열기 | NOT RUN | 미완료: 0.1.0에서 8회 통과. 0.1.1 재설치 후 9회차 재개 시 UI 도구 창 활성화 오류, 추가 관찰 0건 | AT-07 |
+| 상태 변경 후 다시 연 메뉴의 대표 표시·숨김 확인 | 대표 상태 확인 NOT RUN. 고정 횟수 반복은 사용자 지시에 따라 생략 | 15회·46행 모두 PASS: 0.1.0에서 1~8회, 0.1.1에서 9~15회. 16~20회는 사용자 지시에 따라 반복 생략 | AT-07: 정량 완료 관문 제외 |
 | 회색 항목·빈 상위 메뉴·중복·불필요한 구분선 부재 | NOT RUN | 위 비이미지 상태에서 저장 항목 자체 없음 확인. 모든 선택·상태의 메뉴 잔재 검사는 NOT RUN | MNU-05 |
 | 메뉴 열기만으로 이미지 디코딩·파일 생성·클립보드 변경 없음 | NOT RUN | URL·HTML·이미지+텍스트·실제 파일 클립보드 메뉴 열기 전후 sequence·파일 목록 불변 PASS. 디코딩 부재의 실행 계측과 전체 상태는 NOT RUN | AT-10 |
-| 지원 이미지 한 개 복사, 다중·혼합·폴더·비지원 파일 숨김 | NOT RUN | PNG 한 개 복사 명령 표시·실제 복사 PASS, PNG 두 개와 TXT 선택에서 명령 없음 PASS. JPEG/BMP·혼합·폴더 선택 등은 NOT RUN | AT-11·12 |
-| 호출 폴더·창·탭 보존, 실제 복사·저장·비모달 피드백 | NOT RUN | 시험 폴더 A에 8×8 PNG 실제 저장·클립보드 sequence 불변, 선택 PNG 실제 이미지 복사 PASS. 복수 창·탭과 피드백·취소 전체는 NOT RUN | AT-13·16~18·33 |
+| 지원 이미지 한 개 복사, 다중·혼합·폴더·비지원 파일 숨김 | NOT RUN | PNG 한 개 복사 명령 표시·실제 복사 PASS(0.1.1 재확인), PNG 두 개와 TXT 선택에서 명령 없음 PASS. JPEG/BMP·혼합·폴더 선택 등은 NOT RUN | AT-11·12 |
+| 호출 폴더·창·탭 보존, 실제 복사·저장·비모달 피드백 | NOT RUN | 0.1.1에서 시험 폴더 A의 8×8 PNG 실제 저장·클립보드 sequence 불변과 선택 PNG 실제 이미지 복사 PASS. 복수 창·탭과 피드백·취소 전체는 NOT RUN | AT-13·16~18·33 |
 | 기존 기본 연결·다른 메뉴·복사/붙여넣기 유지 | NOT RUN | PNG 메뉴의 기존 Open 기본 항목 유지, 실제 파일 복사 후 일반 Paste 활성화 관찰. 기본 연결·타사 메뉴·복사/붙여넣기 전체 회귀는 NOT RUN | AT-44 |
 
 | 제품·정리 항목 | 현재 상태 | 판정 경계 |
@@ -40,18 +42,34 @@
 | 설치 단계의 재부팅·Explorer 재시작 | 없음 | 설치·Repair·업데이트·제거·실패 롤백·재설치 모두 rebootRequired=false, explorerRestarted=false |
 | 일반 사용자 Explorer/helper 실행 | PASS: 0.1.0의 관찰한 실제 저장 실행 | 같은 현재 세션에서 실제 설치 helper와 Explorer의 TokenElevation=false 확인. 관리자 설치와 구분 |
 | 사용자 PNG·원본·알 수 없는 외부 파일·타사 등록 보존 | 설치·Repair·업데이트·제거·실패 롤백·재설치의 합성 보존 PNG, MSI 전체 절차 후 시험 원본 3개 SHA-256 불변 PASS. 전체 보존 인수 NOT RUN | 알 수 없는 외부 파일·타사 등록·기본 연결을 포함한 최종 비교가 남음 |
-| 원래 메뉴 모드·설정 복구 | NOT RUN: 실제 모드 전환 없음 | Inspect로 기존 설정을 읽기만 수행. 이후 모드를 바꾸어 시험한다면 원상복구를 별도 확인 |
+| 기본 새 메뉴 모드 진입 | 설정 이동 PASS, 실제 경로 미확인 | HKCU override를 백업·이동하고 승인된 수동 Explorer 재시작 1회 후에도 관찰 메뉴는 클래식 |
+| 원래 메뉴 모드·설정 복구 | 최종 03:27:33 UTC 복원 PASS | 원본 키·값·Owner·Group·DACL 보존, 백업 키 없음, securityModified=false, journal RESTORED. 03:11 중간 복원·03:21 재진입과 구분 |
+| 검증용 Explorer 수동 갱신 | 승인된 재시작 1회·Workspace 경로 복원 PASS | 03:05 UTC 실시. 제품 설치기 동작과 구분하며 설치 단계의 explorerRestarted=false 기록은 유지 |
+| Explorer 응답 없음 | 관찰 후 자체 회복, 원인 미확정 | 두 번째 배경 우클릭에서 실제 응답 없음 제목 관찰. 단일 덤프로 제품·타사·Explorer·자동화 원인을 확정하지 않음 |
 | 무상주와 시험 소유 등록·프로세스·창 정리 | NOT RUN | 실제 저장 때 helper의 일시 실행은 확인. 제품·시험의 최종 잔재 확인은 별도 |
 | 실제 Windows 10 OS 실행 | NOT RUN | Windows 11의 클래식 직접 표시를 Windows 10 지원 인증으로 사용하지 않음 |
 
-0.1.1 재설치 후 실제 UI 검증은 NOT RUN이다. payload 동일성 확인이 있더라도 0.1.0의 실제 메뉴 결과를 0.1.1 관찰로 바꾸지 않는다. 각 PASS는 적힌 조건에서만 유효하다. 한 모드·일부 입력의 성공을 전체 AT나 두 모드 G0 통과로 확대하지 않는다. NOT RUN은 이 중간 기록에서 해당 실제 시험의 완료 증거가 없다는 뜻이다.
+0.1.1의 실제 저장·복사는 별도 대표 실행 근거로 추가했다. 앞선 0.1.0의 모든 선택 조건·메뉴 사례를 0.1.1에서 재실행한 것으로 바꾸지는 않는다. 각 PASS는 적힌 조건에서만 유효하다. 한 모드·일부 입력의 성공을 전체 AT나 두 모드 G0 통과로 확대하지 않는다. NOT RUN은 이 중간 기록에서 해당 실제 시험의 완료 증거가 없다는 뜻이다.
+
+## 기본 메뉴 전환 시도와 응답 없음 관찰
+
+HKCU 메뉴 override를 백업·이동한 EnableModern은 설정 작업의 성공이다. 03:05 UTC에 승인된 수동 Explorer 재시작을 한 차례 수행하고 Workspace 창의 원래 경로를 복원했지만 기존·새 창에서 관찰한 메뉴는 여전히 클래식이었다. Windows 11 ‘더 많은 옵션 표시’ 진입은 확인하지 못했다. 이 재시작은 제품 설치기가 요구하거나 수행한 동작이 아니다.
+
+재시작 뒤 처음 이미지 활성화 메뉴를 닫고 두 번째로 폴더 배경을 우클릭했을 때 Explorer 제목에 ‘응답 없음’이 나타났다. 저장 명령을 실행한 상황은 아니었고 이후 자체 회복했다. 단일 최소덤프의 95개 스레드에서 제품 DLL 프레임은 0개였으며 메뉴 추적·메시지 대기 상태를 관찰했다. 단일 스냅샷이고 심볼 정보가 제한되어 일시적 정지 시점의 원인이나 제품과의 무관함을 증명하지 못한다. 제품·타사 확장·Explorer·자동화의 상호작용은 미분리이며 기존 창 활성화 실패도 도구만의 문제로 단정하지 않는다.
+
+03:11 UTC에는 원래 HKCU 설정과 Owner·Group·DACL을 보존해 복원하고 백업 키 제거를 확인했다. 03:21 UTC에 추가 비교를 위해 다시 EnableModern 상태로 진입했으며, 03:27:33 UTC 최종 Restore에서 원본 키·값·Owner·Group·DACL 보존과 백업 키 제거, securityModified=false, journal RESTORED를 확인했다. 물리 우클릭 비교 결과를 확보하지 못해 해당 요청과 추가 재시도는 중단했다. 설정 복원은 완료됐고 기본 메뉴의 실제 접근은 미확인 필수 항목으로 남는다.
 
 ## 이번 중간 결과의 로컬 근거
 
 이 절의 경로는 저장소 기준 로컬 시험 산출물이다. 사용자 로그·설치 진단과 원본 증거는 공개 사이트에 게시하지 않는다.
 
 - 실제 UI 관찰: `artifacts/classic-validation-20260927/explorer-observations.json`. 이미지 없음 완전 숨김, 이미지+텍스트 표시, PNG 복사·다중/TXT 제외, 메뉴 전후 sequence·파일 목록 비교가 포함된다. 최초 실제 저장은 합성 8×8 PNG이며 저장 전후 클립보드 sequence가 유지됐다. AT-04는 Explorer에서 sample.png를 실제 Ctrl+C하여 CF_HDROP 등 파일 형식만 있는 상태를 만든 뒤 저장 항목 없음·일반 Paste 활성화·sequence와 파일 목록 불변을 확인했다.
-- 반복 전환 중간 기록: `artifacts/classic-validation-20260927/classic-repeated-menu.json`. 0.1.0에서 초기 이미지 표시 뒤 8회분의 텍스트→빈 상태→이미지 각 메뉴 관찰을 02:26:42 UTC까지 확인했다. 25개 관찰 행은 초기 이미지 1개와 8회×3상태다. 0.1.1 재설치 후 9회차 재개의 UI 도구 창 활성화 오류 때문에 20회 전체는 미완료이며 재설치 이후 관찰 또는 9회차 이후 PASS를 추가하지 않았다.
+- 반복 전환 기록: `artifacts/classic-validation-20260927/classic-repeated-menu.json`. 초기 이미지 1개와 15회×3상태의 총 46행이 모두 PASS다. 1~8회는 0.1.0에서 02:26:42 UTC까지, 9~15회는 0.1.1에서 03:00:24 UTC까지 관찰했다. 16~20회는 사용자 지시에 따라 반복 생략이며 필수 잔여가 아니다.
+- 초기 UI 복구: `artifacts/classic-validation-20260927/ui-recovery-new-window.json`. 02:53 UTC에 새 시험 Explorer 창으로 합성 A 폴더 이동과 저장 메뉴 표시를 확인했다. 기존 시험·업무 창 보존, Explorer 재시작·모드 변경 없음은 이 시점의 기록이다.
+- 0.1.1 대표 실행: `artifacts/classic-validation-20260927/representative-ui-0.1.1.json`. 실제 저장은 유효한 8×8 PNG와 clipboard sequence 불변, 실제 PNG 복사는 이미지 형식 게시와 파일 목록 형식 부재로 PASS다.
+- 승인된 수동 갱신: `artifacts/classic-validation-20260927/refresh-explorer-modern.result.json`과 `workspace-window-restored-modern.json`. 03:05 UTC 검증용 재시작과 Workspace 경로 복원 근거이며 제품 MSI 재시작 근거가 아니다.
+- 응답 없음 관찰·진단: `artifacts/classic-validation-20260927/explorer-unresponsive-observation.json`, `explorer-hang-25028-summary.json`. 한 차례 최소덤프 수집과 오프라인 분석이며 원인 미확정이다. 덤프·스택·로컬 진단 원문을 공개 사이트에 게시하지 않는다.
+- 설정 복원과 재진입: `artifacts/classic-validation-20260927/menu-mode-Restore-20260927T031132596.json`의 복원 PASS 뒤 `menu-mode-EnableModern-20260927T032100729.json`으로 시험 상태에 재진입했다. 이후 `artifacts/classic-validation-20260927/restore-menu-final.log`와 `.result.json`에서 03:27:33 UTC 최종 Restore PASS·exit 0을 확인했고 복원 journal은 RESTORED다.
 - MSI 절차 후 원본 보존: `artifacts/classic-validation-20260927/fixtures-after-msi-sequence.json`. sample.png·second.png·note.txt의 SHA-256이 기준과 같음을 확인했다. 이 3개 합성 시험 파일의 결과를 임의 업무 파일·타사 설정 전체의 검증으로 확대하지 않는다.
 - 실제 런타임 권한: `artifacts/classic-validation-20260927/runtime-save-observed2.log`. 두 번째 실제 저장 중 현재 세션의 설치 helper와 Explorer를 읽기 전용으로 조회해 둘 다 비상승임을 확인했다. helper를 놓친 이전 조회를 권한 PASS 근거로 사용하지 않는다.
 - 제품 빌드: `artifacts/image-copy-save/msi/20260927T015542477Z-94a4973fa9cd4020b4dd6e3cb7f672ef/build-metadata.json`. 0.1.0 x64, NotSigned, 자체 포함 payload, HKLM 클래식 등록. MSI SHA-256은 `9F9E583BC9BC580BE2519DD5516D1BCF12CA1BAEFD93D6F456A5B51FA7D8C6A1`이다.

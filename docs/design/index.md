@@ -32,4 +32,4 @@
 
 - [ADR-0022 · 관리자 설치와 일반 사용자 실행](0022-image-admin-install.md)
 
-- [ADR-0023 · 공통 클래식 메뉴와 무서명 관리자 MSI](0023-image-copy-save-classic-menu.md) — 클래식 직접 표시 일부·MSI 수명주기 시나리오 실증, 전체 인수 미완료
+- [ADR-0023 · 공통 클래식 메뉴와 무서명 관리자 MSI](0023-image-copy-save-classic-menu.md) — 클래식 0.1.1 저장·복사와 MSI 시나리오 실증, 정량 반복 관문 제외, 설정 복원 PASS, 기본 메뉴 경로·안정성 원인 미확정
