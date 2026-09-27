@@ -255,12 +255,11 @@ std::vector<PackageFile> PackageFiles(MSIHANDLE database) {
     if (result.empty()) Fail(L"Package has no owned files");
     return result;
 }
-std::vector<OwnedFile> ReadFiles(MSIHANDLE database, const wchar_t* table) {
-    const bool legacy = wcscmp(table, L"ImageGuardLegacyFile") == 0;
-    if (!Table(database, table)) Fail(L"Required file ownership manifest is missing");
+std::vector<OwnedFile> ReadFiles(MSIHANDLE database) {
+    if (!Table(database, L"ImageGuardFile")) Fail(L"Required file ownership manifest is missing");
     std::vector<OwnedFile> result;
     std::set<std::wstring> paths;
-    Rows(database, legacy ? L"SELECT `Path`, `Sha256` FROM `ImageGuardLegacyFile`" : L"SELECT `Path`, `Sha256` FROM `ImageGuardFile`", [&](MSIHANDLE row) {
+    Rows(database, L"SELECT `Path`, `Sha256` FROM `ImageGuardFile`", [&](MSIHANDLE row) {
         OwnedFile file{Slashes(Record(row, 1)), Lower(Record(row, 2))};
         Relative(file.path);
         if (!HashFormat(file.sha256) || !paths.insert(Lower(file.path)).second) Fail(L"Invalid file ownership manifest");
@@ -277,33 +276,83 @@ void ValidateInventory(MSIHANDLE database, const std::vector<OwnedFile>& files) 
     for (const auto& file : authored) if (expected.erase(Lower(file.path)) != 1) Fail(L"File ownership manifest differs from the package");
     if (!expected.empty()) Fail(L"File ownership manifest is incomplete");
 }
+void AddRegistryValue(Manifest& result, std::set<std::wstring>& roots, std::set<std::wstring>& slots,
+    RegistryValue value, const std::wstring& folder) {
+    Relative(value.key);
+    if (value.key.rfind(L"Software\\Classes\\", 0) != 0 || value.name == L"*" || value.name == L"-" || value.name == L"+" ||
+        value.name.find_first_of(L"\\[]") != std::wstring::npos) Fail(L"Unsupported registry ownership authoring");
+    const std::wstring token = L"[INSTALLFOLDER]";
+    size_t position = 0;
+    while ((position = value.data.find(token, position)) != std::wstring::npos) {
+        value.data.replace(position, token.size(), folder + L"\\"); position += folder.size() + 1;
+    }
+    if (value.data.find_first_of(L"[]") != std::wstring::npos || (!value.data.empty() && value.data.front() == L'#'))
+        Fail(L"Guard only supports literal REG_SZ ownership values");
+    std::wstring root = value.key;
+    const std::wstring suffix = L"\\InprocServer32";
+    if (root.size() >= suffix.size() && Equal(root.substr(root.size() - suffix.size()), suffix)) root.resize(root.size() - suffix.size());
+    if (!slots.insert(Lower(value.key) + L"\n" + Lower(value.name)).second) Fail(L"Duplicate owned registry slot");
+    roots.insert(root); result.registry.push_back(std::move(value));
+}
+void CompleteRegistry(Manifest& result, const std::set<std::wstring>& roots) {
+    if (roots.size() != 7 || result.registry.size() != 23) Fail(L"Unexpected COM/menu ownership inventory");
+    result.roots.assign(roots.begin(), roots.end());
+}
 Manifest ReadManifest(MSIHANDLE database, const std::wstring& folder, std::vector<OwnedFile> files) {
     ValidateInventory(database, files);
     Manifest result; result.files = std::move(files);
     std::set<std::wstring> roots, slots;
     Rows(database, L"SELECT `Root`, `Key`, `Name`, `Value` FROM `Registry`", [&](MSIHANDLE row) {
         if (MsiRecordGetInteger(row, 1) != 2) Fail(L"Guard only supports authored HKLM registration");
-        RegistryValue value{Record(row, 2), Record(row, 3), Record(row, 4), true};
-        Relative(value.key);
-        if (value.key.rfind(L"Software\\Classes\\", 0) != 0 || value.name == L"*" || value.name == L"-" || value.name == L"+" ||
-            value.name.find_first_of(L"\\[]") != std::wstring::npos) Fail(L"Unsupported registry ownership authoring");
-        const std::wstring token = L"[INSTALLFOLDER]";
-        size_t position = 0;
-        while ((position = value.data.find(token, position)) != std::wstring::npos) {
-            value.data.replace(position, token.size(), folder + L"\\"); position += folder.size() + 1;
-        }
-        if (value.data.find_first_of(L"[]") != std::wstring::npos || (!value.data.empty() && value.data.front() == L'#'))
-            Fail(L"Guard only supports literal REG_SZ ownership values");
-        std::wstring root = value.key;
-        const std::wstring suffix = L"\\InprocServer32";
-        if (root.size() >= suffix.size() && Equal(root.substr(root.size() - suffix.size()), suffix)) root.resize(root.size() - suffix.size());
-        if (!slots.insert(Lower(value.key) + L"\n" + Lower(value.name)).second) Fail(L"Duplicate owned registry slot");
-        roots.insert(root); result.registry.push_back(std::move(value));
+        AddRegistryValue(result, roots, slots, {Record(row, 2), Record(row, 3), Record(row, 4), true}, folder);
     });
-    if (roots.size() != 7 || result.registry.size() != 23) Fail(L"Unexpected COM/menu ownership inventory");
-    result.roots.assign(roots.begin(), roots.end());
+    CompleteRegistry(result, roots);
     if (Table(database, L"RemoveRegistry") || Table(database, L"RemoveFile")) Fail(L"Destructive removal tables are not supported by this guard");
     return result;
+}
+struct PriorBaseline {
+    bool allowSameProduct = false;
+    std::vector<OwnedFile> files;
+    std::vector<PackageFile> components;
+    std::vector<RegistryValue> registry;
+};
+PriorBaseline ReadPriorBaseline(MSIHANDLE database, const std::wstring& product, const std::wstring& package) {
+    if (!Table(database, L"ImageGuardPrior") || !Table(database, L"ImageGuardPriorFile") || !Table(database, L"ImageGuardPriorRegistry"))
+        Fail(L"Required audited prior ownership baseline is missing");
+    PriorBaseline result; std::wstring id; int fileCount = 0, registryCount = 0;
+    Rows(database, L"SELECT `Id`, `ProductCode`, `PackageCode`, `AllowSameProduct`, `FileCount`, `RegistryCount` FROM `ImageGuardPrior`", [&](MSIHANDLE row) {
+        const auto baselineProduct = Record(row, 2), baselinePackage = Record(row, 3);
+        if (!Guid(baselineProduct) || !Guid(baselinePackage)) Fail(L"Invalid prior package identity");
+        if (!Equal(baselineProduct, product) || !Equal(baselinePackage, package)) return;
+        if (!id.empty()) Fail(L"Duplicate prior package ownership baseline");
+        id = Record(row, 1); const int allow = MsiRecordGetInteger(row, 4);
+        fileCount = MsiRecordGetInteger(row, 5); registryCount = MsiRecordGetInteger(row, 6);
+        if (id.empty() || (allow != 0 && allow != 1) || fileCount != 404 || registryCount != 23) Fail(L"Invalid prior ownership baseline counts or mode");
+        result.allowSameProduct = allow == 1;
+    });
+    if (id.empty()) Fail(L"This exact earlier package has not been audited for safe migration");
+    std::set<std::wstring> paths, components;
+    Rows(database, L"SELECT `PriorId`, `Path`, `Sha256`, `ComponentId` FROM `ImageGuardPriorFile`", [&](MSIHANDLE row) {
+        if (Record(row, 1) != id) return;
+        OwnedFile file{Slashes(Record(row, 2)), Lower(Record(row, 3))}; const auto component = Record(row, 4);
+        Relative(file.path);
+        if (!HashFormat(file.sha256) || !Guid(component) || !paths.insert(Lower(file.path)).second || !components.insert(Lower(component)).second)
+            Fail(L"Invalid prior file/component ownership inventory");
+        result.components.push_back({file.path, component}); result.files.push_back(std::move(file));
+    });
+    Rows(database, L"SELECT `PriorId`, `Root`, `Key`, `Name`, `Value` FROM `ImageGuardPriorRegistry`", [&](MSIHANDLE row) {
+        if (Record(row, 1) != id) return;
+        if (MsiRecordGetInteger(row, 2) != 2) Fail(L"Prior baseline must use authored HKLM registration");
+        result.registry.push_back({Record(row, 3), Record(row, 4), Record(row, 5), true});
+    });
+    if (result.files.size() != static_cast<size_t>(fileCount) || result.registry.size() != static_cast<size_t>(registryCount))
+        Fail(L"Prior ownership baseline is incomplete");
+    return result;
+}
+Manifest PriorManifest(const PriorBaseline& baseline, const std::wstring& folder) {
+    Manifest result; result.files = baseline.files; std::set<std::wstring> roots, slots;
+    for (const auto& value : baseline.registry) AddRegistryValue(result, roots, slots, value, folder);
+    CompleteRegistry(result, roots); return result;
 }
 void ValidateSid(const std::wstring& sid) {
     PSID value = nullptr;
@@ -474,25 +523,70 @@ Plan Deserialize(const std::wstring& input) {
     ValidateSid(plan.sid);
     return plan;
 }
-bool ProductInfo(const std::wstring& product, const wchar_t* property, std::wstring& output) {
-    DWORD size = 0;
-    const UINT first = MsiGetProductInfoExW(product.c_str(), nullptr, MSIINSTALLCONTEXT_MACHINE, property, L"", &size);
+template<typename Query> bool ProductInfoWithQuery(const wchar_t* property, std::wstring& output, Query query) {
+    output.clear(); DWORD length = 0;
+    const UINT first = query(nullptr, length);
     if (first == ERROR_UNKNOWN_PRODUCT) return false;
-    if (first != ERROR_MORE_DATA && first != ERROR_SUCCESS) Fail(L"Cannot inspect installed product identity");
-    std::vector<wchar_t> buffer(static_cast<size_t>(size) + 1);
-    DWORD capacity = static_cast<DWORD>(buffer.size());
-    if (MsiGetProductInfoExW(product.c_str(), nullptr, MSIINSTALLCONTEXT_MACHINE, property, buffer.data(), &capacity) != ERROR_SUCCESS) Fail(L"Cannot inspect installed product");
-    output.assign(buffer.data(), capacity); return true;
+    if (first != ERROR_MORE_DATA && first != ERROR_SUCCESS)
+        Fail(L"Cannot inspect installed product property " + std::wstring(property) + L" (Windows error " + std::to_wstring(first) + L", size query)");
+    if (length > MaxText) Fail(L"Installed product property is too large: " + std::wstring(property));
+    size_t capacity = static_cast<size_t>(length) + 1;
+    for (unsigned int attempt = 1; attempt <= 6; ++attempt) {
+        std::vector<wchar_t> buffer(capacity); DWORD actual = static_cast<DWORD>(capacity);
+        const UINT status = query(buffer.data(), actual);
+        if (status == ERROR_SUCCESS) {
+            if (actual >= buffer.size() || buffer[actual] != L'\0' || wcslen(buffer.data()) != actual)
+                Fail(L"Invalid installed product property length: " + std::wstring(property));
+            output.assign(buffer.data(), actual); return true;
+        }
+        // PackageCode may report its packed 32-character registry form during
+        // sizing, then require 38 characters for its expanded GUID. Retry only
+        // the documented insufficient-buffer result; all other failures stop.
+        if (status != ERROR_MORE_DATA)
+            Fail(L"Cannot inspect installed product property " + std::wstring(property) + L" (Windows error " + std::to_wstring(status) + L", read attempt " + std::to_wstring(attempt) + L")");
+        if (actual > MaxText) Fail(L"Installed product property is too large: " + std::wstring(property));
+        capacity = std::max(capacity * 2, static_cast<size_t>(actual) + 1);
+        if (capacity > MaxText + 1) Fail(L"Installed product property growth exceeded its limit: " + std::wstring(property));
+    }
+    Fail(L"Installed product property remained unstable: " + std::wstring(property) + L" (Windows error " + std::to_wstring(ERROR_MORE_DATA) + L")");
 }
-std::wstring InstalledFolder(MSIHANDLE database, const std::wstring& product) {
-    const auto files = PackageFiles(database);
+bool ProductInfo(const std::wstring& product, const wchar_t* property, std::wstring& output) {
+    return ProductInfoWithQuery(property, output, [&](wchar_t* buffer, DWORD& length) {
+        return MsiGetProductInfoExW(product.c_str(), nullptr, MSIINSTALLCONTEXT_MACHINE, property, buffer, &length);
+    });
+}
+void RequireMachineProduct(const std::wstring& product) {
+    size_t matches = 0;
+    for (DWORD index = 0; index < 16; ++index) {
+        wchar_t code[39]{}; wchar_t sid[256]{}; DWORD sidLength = 256; MSIINSTALLCONTEXT context = MSIINSTALLCONTEXT_NONE;
+        const UINT status = MsiEnumProductsExW(product.c_str(), nullptr, MSIINSTALLCONTEXT_ALL, index, code, &context, sid, &sidLength);
+        if (status == ERROR_NO_MORE_ITEMS) break;
+        if (status != ERROR_SUCCESS || index == 15 || context != MSIINSTALLCONTEXT_MACHINE || sidLength != 0 || !Equal(code, product))
+            Fail(L"Installed product context is ambiguous or cannot be established");
+        ++matches;
+    }
+    if (matches != 1) Fail(L"Exactly one per-machine product registration is required");
+}
+std::wstring CheckedComponentPath(INSTALLSTATE state, const std::vector<wchar_t>& buffer, DWORD length) {
+    if ((state != INSTALLSTATE_LOCAL && state != INSTALLSTATE_ABSENT) || !length || length >= buffer.size() ||
+        buffer[length] != L'\0' || wcslen(buffer.data()) != length)
+        Fail(L"Cannot establish installed component path (state " + std::to_wstring(state) + L", length " + std::to_wstring(length) + L")");
+    return std::wstring(buffer.data(), length);
+}
+std::wstring InstalledFolder(const std::vector<PackageFile>& files, const std::wstring& product) {
+    RequireMachineProduct(product);
     std::wstring result;
     for (const auto& file : files) {
+        // Explicitly validate the machine component before using the classic
+        // path API. On the tested Windows Installer 5.0 build, PathEx reports
+        // UNKNOWN even for unrelated, correctly registered machine products.
+        INSTALLSTATE registered = INSTALLSTATE_UNKNOWN;
+        const UINT status = MsiQueryComponentStateW(product.c_str(), nullptr, MSIINSTALLCONTEXT_MACHINE, file.component.c_str(), &registered);
+        if (status != ERROR_SUCCESS || registered != INSTALLSTATE_LOCAL)
+            Fail(L"Cannot establish installed machine component ownership: " + file.component + L" (error " + std::to_wstring(status) + L", state " + std::to_wstring(registered) + L")");
         std::vector<wchar_t> buffer(32768); DWORD capacity = static_cast<DWORD>(buffer.size());
-        const INSTALLSTATE state = MsiGetComponentPathExW(product.c_str(), file.component.c_str(), nullptr, MSIINSTALLCONTEXT_MACHINE, buffer.data(), &capacity);
-        if (state == INSTALLSTATE_UNKNOWN || state == INSTALLSTATE_INVALIDARG || state == INSTALLSTATE_BADCONFIG ||
-            state == INSTALLSTATE_MOREDATA || !capacity || capacity >= buffer.size()) Fail(L"Cannot establish installed component ownership");
-        const std::wstring installed(buffer.data(), capacity);
+        const INSTALLSTATE state = MsiGetComponentPathW(product.c_str(), file.component.c_str(), buffer.data(), &capacity);
+        const auto installed = CheckedComponentPath(state, buffer, capacity);
         const std::wstring suffix = L"\\" + file.path;
         if (installed.size() <= suffix.size() || !Equal(installed.substr(installed.size() - suffix.size()), suffix)) Fail(L"Installed component path differs from its ownership manifest");
         const auto folder = FullPath(installed.substr(0, installed.size() - suffix.size()));
@@ -517,7 +611,7 @@ void NewSlots(const Manifest& incoming, Manifest& prior) {
 }
 Plan Prepare(MSIHANDLE session) {
     MsiHandle database(MsiGetActiveDatabase(session));
-    if (!database.value || DatabaseProperty(database.value, L"ImageGuardSchema") != L"1") Fail(L"Unsupported package ownership schema");
+    if (!database.value || DatabaseProperty(database.value, L"ImageGuardSchema") != L"2") Fail(L"Unsupported package ownership schema");
     const auto product = DatabaseProperty(database.value, L"ProductCode");
     const auto upgrade = DatabaseProperty(database.value, L"UpgradeCode");
     const auto package = PackageCode(database.value);
@@ -528,20 +622,20 @@ Plan Prepare(MSIHANDLE session) {
     if (!Equal(tokenSid, plan.sid)) Fail(L"Custom-action token SID differs from Windows Installer UserSID: token=" + tokenSid + L" installer=" + plan.sid);
     // Removal never changes another user's HKCU registration.
     plan.checkUser = Property(session, L"REMOVE") != L"ALL";
-    auto incoming = ReadManifest(database.value, plan.folder, ReadFiles(database.value, L"ImageGuardFile"));
+    auto incoming = ReadManifest(database.value, plan.folder, ReadFiles(database.value));
     std::vector<std::wstring> related;
     for (DWORD i = 0; i < 32; ++i) {
         wchar_t code[39]{};
         const UINT status = MsiEnumRelatedProductsW(upgrade.c_str(), 0, i, code);
         if (status == ERROR_NO_MORE_ITEMS) break;
         if (status != ERROR_SUCCESS || i == 31) Fail(L"Cannot establish related product ownership");
-        std::wstring local;
-        if (!ProductInfo(code, INSTALLPROPERTY_LOCALPACKAGE, local)) Fail(L"A related product uses an unsupported installation context");
+        std::wstring registeredPackage;
+        if (!ProductInfo(code, INSTALLPROPERTY_PACKAGECODE, registeredPackage) || !Guid(registeredPackage)) Fail(L"A related product uses an unsupported installation context");
         related.emplace_back(code);
     }
     if (related.size() > 1) Fail(L"Multiple related installations require individual review");
-    std::wstring ownCache;
-    const bool ownInstalled = ProductInfo(product, INSTALLPROPERTY_LOCALPACKAGE, ownCache);
+    std::wstring ownPackage;
+    const bool ownInstalled = ProductInfo(product, INSTALLPROPERTY_PACKAGECODE, ownPackage);
     if (ownInstalled && (related.size() != 1 || !Equal(related.front(), product))) Fail(L"Installed product identity is inconsistent");
     if (related.empty()) {
         if (ownInstalled || !Property(session, L"WIX_UPGRADE_DETECTED").empty()) Fail(L"Unexpected upgrade identity");
@@ -551,33 +645,25 @@ Plan Prepare(MSIHANDLE session) {
     const bool maintenance = Equal(priorProduct, product);
     const auto detected = Property(session, L"WIX_UPGRADE_DETECTED");
     if ((!maintenance && !Equal(detected, priorProduct)) || (maintenance && !detected.empty())) Fail(L"Upgrade detection does not match the installed product");
-    std::wstring cache;
-    if (!ProductInfo(priorProduct, INSTALLPROPERTY_LOCALPACKAGE, cache) || cache.empty()) Fail(L"Installed ownership package is unavailable");
-    PlainAncestors(cache, false);
-    MsiHandle prior;
-    if (MsiOpenDatabaseW(cache.c_str(), MSIDBOPEN_READONLY, &prior.value) != ERROR_SUCCESS) Fail(L"Cannot open installed ownership package");
-    if (!Equal(DatabaseProperty(prior.value, L"ProductCode"), priorProduct) || !Equal(DatabaseProperty(prior.value, L"UpgradeCode"), upgrade))
-        Fail(L"Cached ownership package identity differs from the installed product");
-    const auto priorPackage = PackageCode(prior.value);
-    if (maintenance && !Equal(priorPackage, package)) Fail(L"The same ProductCode has a different PackageCode; use a new product version");
-    const auto folder = InstalledFolder(prior.value, priorProduct);
-    if (!Equal(folder, plan.folder)) Fail(L"Moving an existing installation is not supported; existing files were preserved");
-    std::vector<OwnedFile> priorFiles;
-    const auto schema = DatabaseProperty(prior.value, L"ImageGuardSchema");
-    if (schema == L"1") priorFiles = ReadFiles(prior.value, L"ImageGuardFile");
-    else {
-        if (!schema.empty() || maintenance || !Table(database.value, L"ImageGuardLegacy")) Fail(L"Unrecognized installed ownership schema");
-        size_t matches = 0;
-        Rows(database.value, L"SELECT `ProductCode`, `PackageCode` FROM `ImageGuardLegacy`", [&](MSIHANDLE row) {
-            const auto pinnedProduct = Record(row, 1), pinnedPackage = Record(row, 2);
-            if (!Guid(pinnedProduct) || !Guid(pinnedPackage)) Fail(L"Invalid legacy package pin");
-            if (Equal(pinnedProduct, priorProduct) && Equal(pinnedPackage, priorPackage)) ++matches;
-        });
-        if (matches != 1) Fail(L"This earlier package has not been audited for safe migration");
-        priorFiles = ReadFiles(database.value, L"ImageGuardLegacyFile");
+    std::wstring priorPackage;
+    if (!ProductInfo(priorProduct, INSTALLPROPERTY_PACKAGECODE, priorPackage) || !Guid(priorPackage)) Fail(L"Installed package identity is unavailable");
+    std::wstring folder;
+    if (maintenance && Equal(priorPackage, package)) {
+        // The active database is the exact installed package. Opening another
+        // MSI database inside a custom action is unsupported by Windows Installer.
+        folder = InstalledFolder(PackageFiles(database.value), priorProduct);
+        plan.manifest = std::move(incoming);
+    } else {
+        const auto baseline = ReadPriorBaseline(database.value, priorProduct, priorPackage);
+        if (maintenance && (!baseline.allowSameProduct || Property(session, L"REINSTALL") != L"ALL" ||
+            Lower(Property(session, L"REINSTALLMODE")).find(L'v') == std::wstring::npos || !Property(session, L"REMOVE").empty()))
+            Fail(L"The same ProductCode has a different PackageCode; only an explicitly audited recovery update is supported");
+        if (!maintenance && baseline.allowSameProduct) Fail(L"A recovery baseline cannot authorize a major upgrade");
+        folder = InstalledFolder(baseline.components, priorProduct);
+        plan.manifest = PriorManifest(baseline, folder);
+        NewSlots(incoming, plan.manifest);
     }
-    plan.manifest = ReadManifest(prior.value, folder, std::move(priorFiles));
-    if (!maintenance) NewSlots(incoming, plan.manifest);
+    if (!Equal(folder, plan.folder)) Fail(L"Moving an existing installation is not supported; existing files were preserved");
     return plan;
 }
 void Log(MSIHANDLE session, const std::wstring& message, INSTALLMESSAGE type = INSTALLMESSAGE_INFO) {

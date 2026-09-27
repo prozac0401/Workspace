@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([Parameter(Mandatory=$true)][string]$MsiPath, [string]$MetadataPath = '', [switch]$AllowRollbackTest)
+param([Parameter(Mandatory=$true)][string]$MsiPath, [string]$MetadataPath = '', [switch]$AllowRollbackTest, [switch]$AllowRecoveryUpdate)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 $MsiPath = (Resolve-Path -LiteralPath $MsiPath).Path
@@ -7,6 +7,7 @@ if (-not $MetadataPath) { $MetadataPath = Join-Path ([IO.Path]::GetDirectoryName
 $metadata = Get-Content -LiteralPath $MetadataPath -Encoding UTF8 -Raw | ConvertFrom-Json
 if ((Get-FileHash -LiteralPath $MsiPath -Algorithm SHA256).Hash -ne $metadata.msiSha256) { throw 'MSI does not match its build metadata.' }
 if ($metadata.rollbackTest -and -not $AllowRollbackTest) { throw 'This is an intentionally failing local test MSI, not the product installer.' }
+if ($metadata.recoveryUpdate -and -not $AllowRecoveryUpdate) { throw 'This local servicing package is not a public release installer.' }
 if ((Get-AuthenticodeSignature -LiteralPath $MsiPath).Status -ne 'NotSigned') { throw 'MSI must be unsigned.' }
 $installer = New-Object -ComObject WindowsInstaller.Installer
 $database = $installer.OpenDatabase($MsiPath, 0)
@@ -59,7 +60,7 @@ foreach ($row in $custom) {
     if ($row[0] -eq 'ImageGuardDeferred' -and [int]$row[1] -eq 11265 -and $row[2] -eq 'ImageGuard' -and $row[3] -eq 'ImageGuardDeferred') { continue }
     if (([int]$row[1] -band 63) -notin @(19, 51)) { throw "Unexpected executable custom action: $($row[0])" }
 }
-if ($properties.ImageGuardSchema -ne '1' -or $metadata.guardSchema -ne 1) { throw 'Missing supported guard schema.' }
+if ($properties.ImageGuardSchema -ne '2' -or $metadata.guardSchema -ne 2) { throw 'Missing supported guard schema.' }
 $sequence = @{}
 foreach ($row in (Query 'SELECT `Action`, `Condition`, `Sequence` FROM `InstallExecuteSequence`' 3)) { $sequence[$row[0]] = @{condition=$row[1]; number=[int]$row[2]} }
 if ($sequence.ImageGuardPreflight.condition -or $sequence.ImageGuardDeferred.condition) { throw 'Guard actions cannot be conditionally bypassed.' }
@@ -78,15 +79,46 @@ foreach ($row in $guardFiles) {
 }
 if ($guardExpected.Count -ne 0) { throw 'Duplicate or missing guard paths.' }
 $legacyExpected = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'baselines/0.1.1.json') -Encoding UTF8 -Raw | ConvertFrom-Json
-$legacyIdentity = Query 'SELECT `ProductCode`, `PackageCode` FROM `ImageGuardLegacy`' 2
-if ($legacyIdentity.Count -ne 1 -or $legacyIdentity[0][0] -ne $legacyExpected.productCode -or $legacyIdentity[0][1] -ne $legacyExpected.packageCode) { throw 'Legacy package identity is not pinned.' }
-$legacyFiles = Query 'SELECT `Path`, `Sha256` FROM `ImageGuardLegacyFile`' 2
-$legacyMap = @{}; foreach ($entry in $legacyExpected.files) { $legacyMap[$entry.path] = $entry.sha256 }
-foreach ($row in $legacyFiles) {
-    if (-not $legacyMap.ContainsKey($row[0]) -or $legacyMap[$row[0]] -ne $row[1]) { throw 'Legacy guard inventory differs from approved package.' }
-    $legacyMap.Remove($row[0])
+$priorRows = Query 'SELECT `Id`, `ProductCode`, `PackageCode`, `AllowSameProduct`, `FileCount`, `RegistryCount` FROM `ImageGuardPrior`' 6
+$priorFiles = Query 'SELECT `PriorId`, `Path`, `Sha256`, `ComponentId` FROM `ImageGuardPriorFile`' 4
+$priorRegistry = Query 'SELECT `PriorId`, `Root`, `Key`, `Name`, `Value` FROM `ImageGuardPriorRegistry`' 5
+$priorMap = @{}
+foreach ($prior in $metadata.priorPackages) {
+    if ($priorMap.ContainsKey($prior.id)) { throw 'Duplicate prior baseline metadata.' }
+    $priorMap[$prior.id] = $prior
 }
-if ($legacyMap.Count -ne 0) { throw 'Incomplete legacy guard inventory.' }
+if ($priorRows.Count -ne $priorMap.Count) { throw 'Prior baseline count mismatch.' }
+$legacyPins = 0; $servicingPins = 0; $expectedPriorFileCount = 0; $expectedPriorRegistryCount = 0
+foreach ($row in $priorRows) {
+    if (-not $priorMap.ContainsKey($row[0])) { throw 'Unexpected prior package baseline.' }
+    $prior = $priorMap[$row[0]]; $priorMap.Remove($row[0])
+    if ($row[1] -ne $prior.productCode -or $row[2] -ne $prior.packageCode -or [int]$row[3] -ne $prior.allowSameProduct -or [int]$row[4] -ne $prior.files.Count -or [int]$row[5] -ne $prior.registry.Count) { throw 'Prior package identity or resource counts differ from audited baseline.' }
+    if ($prior.productCode -eq $legacyExpected.productCode) {
+        if ($prior.packageCode -ne $legacyExpected.packageCode -or $prior.msiSha256 -ne $legacyExpected.msiSha256 -or $prior.baselineSha256 -ne (Get-FileHash -LiteralPath (Join-Path $PSScriptRoot 'baselines/0.1.1.json') -Algorithm SHA256).Hash) { throw 'Legacy package pin differs from audited source.' }
+        $legacyPins++
+    }
+    if ($prior.allowSameProduct -eq 1) {
+        if (-not $metadata.recoveryUpdate -or $prior.productCode -ne $metadata.productCode -or $prior.packageCode -ne '{E02D0EEC-5EF4-4BF1-85EF-20074416A568}' -or $prior.msiSha256 -ne 'DE666CC6115E0A459EFD1F75EBE6760EA58DA09E10E02CC669470E69AD41B092') { throw 'Unexpected same-product servicing authority.' }
+        $servicingPins++
+    } elseif ($prior.allowSameProduct -ne 0 -or $prior.productCode -eq $metadata.productCode) { throw 'Invalid servicing authority.' }
+    $fileMap = @{}; foreach ($entry in $prior.files) { if ($fileMap.ContainsKey($entry.path)) { throw 'Duplicate predecessor file.' }; $fileMap[$entry.path] = $entry }
+    foreach ($fileRow in @($priorFiles | Where-Object { $_[0] -eq $prior.id })) {
+        if (-not $fileMap.ContainsKey($fileRow[1])) { throw 'Unexpected predecessor file.' }
+        $entry = $fileMap[$fileRow[1]]; $fileMap.Remove($fileRow[1])
+        if ($entry.sha256 -ne $fileRow[2] -or $entry.componentId -ne $fileRow[3]) { throw 'Predecessor file hash/component differs from audit.' }
+    }
+    if ($fileMap.Count -ne 0) { throw 'Incomplete predecessor file ownership.' }
+    $regMap = @{}; foreach ($entry in $prior.registry) { $slot = $entry.key + '|' + $entry.name; if ($regMap.ContainsKey($slot)) { throw 'Duplicate predecessor registry value.' }; $regMap[$slot] = $entry }
+    foreach ($regRow in @($priorRegistry | Where-Object { $_[0] -eq $prior.id })) {
+        $slot = $regRow[2] + '|' + $regRow[3]
+        if (-not $regMap.ContainsKey($slot)) { throw 'Unexpected predecessor registry value.' }
+        $entry = $regMap[$slot]; $regMap.Remove($slot)
+        if ([int]$regRow[1] -ne 2 -or [int]$entry.root -ne 2 -or $entry.value -cne $regRow[4]) { throw 'Predecessor registry value differs from audit.' }
+    }
+    if ($regMap.Count -ne 0) { throw 'Incomplete predecessor registry ownership.' }
+    $expectedPriorFileCount += $prior.files.Count; $expectedPriorRegistryCount += $prior.registry.Count
+}
+if ($priorMap.Count -ne 0 -or $legacyPins -ne 1 -or $servicingPins -ne [int][bool]$metadata.recoveryUpdate -or $priorFiles.Count -ne $expectedPriorFileCount -or $priorRegistry.Count -ne $expectedPriorRegistryCount) { throw 'Incomplete or orphaned predecessor ownership tables.' }
 $binaryView = $database.OpenView('SELECT `Data` FROM `Binary` WHERE `Name` = ''ImageGuard''')
 try {
     [void]$binaryView.Execute(); $binaryRecord = $binaryView.Fetch()
@@ -100,6 +132,7 @@ try {
 } finally { [void]$binaryView.Close() }
 foreach ($row in $registry) { if ($row[2] -in @('*','-','+')) { throw 'Whole-key registry removal is forbidden.' } }
 if ($tableNames -contains 'RemoveFile' -and (Query 'SELECT `FileKey` FROM `RemoveFile`' 1).Count -gt 0) { throw 'Wildcard/extra removal rows are forbidden.' }
+if ($tableNames -contains 'RemoveRegistry' -and (Query 'SELECT `RemoveRegistry` FROM `RemoveRegistry`' 1).Count -gt 0) { throw 'Extra registry removal rows are forbidden.' }
 $components = Query 'SELECT `Attributes` FROM `Component`' 1
 if (@($components | Where-Object { ([int]$_[0] -band 256) -eq 0 }).Count -gt 0) { throw 'All components must use the x64 registry/filesystem view.' }
-[ordered]@{ status='PASS'; product=$properties.ProductName; version=$properties.ProductVersion; productCode=$properties.ProductCode; signature='NotSigned'; perMachine=$true; selfContainedFiles=$files.Count; embeddedCabinets=$media.Count; comVerbs=$commands.Count; executableCustomActions=2; preservationGuard='SHA256 files, exact registry values, immediate plus deferred'; guardSha256=$binaryHash; rollbackTest=[bool]$metadata.rollbackTest; explorerRestart='disabled'; sourceMsiSha256=$metadata.msiSha256; installLifecycle='NOT RUN by this verifier'; explorerUi='NOT RUN by this verifier' } | ConvertTo-Json
+[ordered]@{ status='PASS'; product=$properties.ProductName; version=$properties.ProductVersion; productCode=$properties.ProductCode; signature='NotSigned'; perMachine=$true; selfContainedFiles=$files.Count; embeddedCabinets=$media.Count; comVerbs=$commands.Count; executableCustomActions=2; preservationGuard='SHA256 files, exact registry values, immediate plus deferred'; guardSchema=2; priorPackages=$priorRows.Count; guardSha256=$binaryHash; rollbackTest=[bool]$metadata.rollbackTest; recoveryUpdate=[bool]$metadata.recoveryUpdate; explorerRestart='disabled'; sourceMsiSha256=$metadata.msiSha256; installLifecycle='NOT RUN by this verifier'; explorerUi='NOT RUN by this verifier' } | ConvertTo-Json

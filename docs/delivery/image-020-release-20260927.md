@@ -1,20 +1,52 @@
 # 그림 복사·저장 0.2.0 · 보존 보완과 정식 릴리스 작업 기록
 
-날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **사용자 등록 검사 수정 후보 제작·구조 확인 완료, 실제 보존 회귀 실행 미시작(UAC 취소) — 공개 전**
+날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **제품 정보 길이 처리 수정 후보·정적/제한 사전 검사 PASS, 최신 실제 실행 요청은 UAC 취소로 미시작 — 공개 전**
 
 적용: [v1.2 변경 계약](../tools/image-copy-save/ImageCopySave_Requirements_v1.2.md), [보존 설계 ADR-0024](../design/0024-image-msi-preservation.md), [공개 안내 ADR-0025](../design/0025-image-public-guide.md), [도구 정책](../policies/tools.md), [문서 정책](../policies/documentation.md).
 
 사용자는 기존 등록·외부 수정 파일 보존 문제를 해결하고 적용한 뒤 정식 릴리스까지 진행하도록 지시했다. 승인된 배포 형식은 Windows 11 x64용 자체 포함 무서명 MSI이며, 관리자 설치와 일반 사용자 실행을 분리한다. 서명 인증이나 회사 전체의 상용 배포 승인을 받았다는 뜻은 아니다.
 
+## 최신 후보 · 제품 정보 길이 처리 보완
+
+앞선 복구 갱신에서 PackageCode 조회가 요구한 버퍼 길이는 첫 조회 32자에서 후속 조회 38자로 바뀌었다. 이 실제 사례를 재현하고 길이가 바뀌면 상한과 횟수를 제한해 다시 조회하도록 수정했다. native 회귀는 **39 PASS / 0 FAIL**이다. 합성 등록 fixture 생성·정리를 포함하며 제품 등록 변경·설치는 하지 않았다.
+
+| 용도 | 파일·크기 | SHA-256 | 빌드 디렉터리 |
+|---|---|---|---|
+| 공개 대상 제품 후보 | ImageCopySave-0.2.0-x64.msi · 50,569,176 bytes | 82A72EB85F41D6DF29BC94EE57215991BA41BEF542717D81CCC0C850C5F5134B | artifacts/image-copy-save/msi/20260927T073556974Z-50f91399f1a740a98e502e6c8f35f1c7 |
+| 로컬 전용 복구 갱신 | ImageCopySave-0.2.0-x64.msi · 50,589,848 bytes | 2CFDEF33340E6057F166F3769CA2BED7BE28D6F4F5581D03C10A362C290DCE56 | artifacts/image-copy-save/msi/20260927T073840180Z-d9c9b2cdd2684e16bdec6147c76cb9e2 |
+| 제품 후보와 짝지은 고의 실패 롤백 | ImageCopySave-0.2.1-x64-ROLLBACK-TEST.msi · 50,589,868 bytes | CD4CEBBDC367659923E1C79F8D0ECA285DF75557F7DF7B373909E94BBC5534F2 | artifacts/image-copy-save/msi/20260927T073923904Z-005540799ba948729ba7c4ea190900c1 |
+
+세 패키지의 build-metadata.json·verification.json은 제작 및 정적 검사 PASS다. 각각 무서명·자체 포함 404파일·guard schema 2·실행형 검사 CA 2개를 확인했다. 복구/롤백 후보는 해당 허용 옵션을 지정한 로컬 시험 파일이며 공개 자산이 아니다. 각 guard/build-metadata.json의 native 결과는 39 PASS다.
+
+제품 빌드 디렉터리의 source-payload-verification.json은 07:40:18 UTC에 기존 사용자 확인을 받은 런타임 404파일의 동일성과 설치 소스 해시 8개의 일치를 확인했다. 이 결과를 실제 새 MSI 설치나 사용자 화면 시험으로 바꾸지 않는다.
+
+artifacts/image-copy-save/guard-packagecode-sizing-20260927-verified/의 actual-installed-readonly-probe.log·full-recovery-readonly-probe.log에서 실제 설치 PackageCode 조회, 404파일·23등록 값의 소유 확인, 전체 복구 Prepare·현재 사용자 검사·지연 계획 검사를 확인했다. 새 복구 후보 빌드 디렉터리의 full-recovery-readonly-probe.log도 PASS다. MsiOpenPackageEx의 IGNOREMACHINESTATE로 제한한 핸들을 사용하는 읽기 전용 검사이며 installerActionsRun=false, productRegistrationModified=false다. 정상 MSI 동작의 실제 인수를 대신하지 않는다.
+
+최신 실제 Run 요청은 07:42:11 UTC에 정상 UAC를 요청했으나 07:44:14 UTC에 Windows가 취소를 반환했다. artifacts/image-copy-save/msi-preservation-recovery/20260927T074158463Z-9b8bd542b99347d08278bf5172d6ae49/launch.json의 상태는 ELEVATION_NOT_STARTED, processId는 null이다. 이 후보로 복구 갱신·제거·보존 Suite·최종 설치가 시작되지 않았고, 기존 시험 설치는 제거 완료로 기록하지 않는다. 정식 Release와 공개 자산 게시는 여전히 미완료다.
+
 ## 변경한 범위
 
-MSI 안에 정적으로 링크한 native 검사 DLL과 파일별 SHA-256 소유 목록을 넣었다. PC 전체 HKLM과 설치를 실행한 사용자 HKCU의 두 COM 루트·다섯 메뉴 루트 및 기존 설치 폴더의 충돌을 검사하고, 유지보수에서는 설치된 제품의 캐시 MSI와 비교한다. 파일 본문 변경, 추가 NTFS 스트림, 재분석 지점·하드 링크, 알려진 등록 값·형식 변경은 보존하고 중단하는 대상이다. 추가한 파일이나 알 수 없는 값은 제거 대상으로 추가하지 않는다. 과거 0.1.1의 자동 이행은 검증한 ProductCode·PackageCode·404파일 해시에 고정한다.
+MSI 안에 정적으로 링크한 native 검사 DLL과 파일별 SHA-256 소유 목록을 넣었다. PC 전체 HKLM과 설치를 실행한 사용자 HKCU의 두 COM 루트·다섯 메뉴 루트 및 기존 설치 폴더의 충돌을 검사하고, 동일 패키지 유지보수에서는 현재 설치 DB와, 이전 패키지 갱신에서는 새 MSI에 내장한 감사된 이전 소유 목록과 비교한다. 파일 본문 변경, 추가 NTFS 스트림, 재분석 지점·하드 링크, 알려진 등록 값·형식 변경은 보존하고 중단하는 대상이다. 추가한 파일이나 알 수 없는 값은 제거 대상으로 추가하지 않는다. 과거 0.1.1의 자동 이행은 검증한 ProductCode·PackageCode·404파일 해시에 고정한다.
 
 읽기 전용 즉시 검사와 지연 검사를 추가했으며 실제 파일·등록 쓰기와 롤백은 Windows Installer가 수행한다. 마지막 검사 이후 임의의 관리자 프로그램이 동시에 바꾸는 자원까지 원자적으로 보존한다고 약속하지 않는다. 초기 업그레이드 제거 순서와 동시 관리자 변경 경계는 ADR-0024를 따른다. 일반 사용자에게 수동 등록·레지스트리 편집·스크립트 실행을 요구하지 않는다.
 
-이미지 엔진·helper·메뉴 런타임은 이번 MSI 보존 보완의 변경 대상이 아니다. 기존 PASS를 새 시험으로 합산하지 않고 아래 범위로 재사용한다. 최종 후보의 404개 런타임 파일을 실제 사용자 확인을 받은 0.1.1의 고정 목록과 대조해 모든 경로·SHA-256이 동일함을 확인했다. 최종 MSI 제작에 사용한 설치 소스 7개의 현재 SHA-256도 빌드 메타데이터와 모두 일치한다.
+이미지 엔진·helper·메뉴 런타임은 이번 MSI 보존 보완의 변경 대상이 아니다. 기존 PASS를 새 시험으로 합산하지 않고 아래 범위로 재사용한다. 05:35 UTC에 제작한 앞선 후보의 404개 런타임 파일을 실제 사용자 확인을 받은 0.1.1의 고정 목록과 대조해 모든 경로·SHA-256이 동일함을 확인했다. 당시 설치 소스 7개의 SHA-256도 해당 빌드 메타데이터와 모두 일치했다. 이후 아래 설치 API 보완으로 설치 소스가 변경됐으므로 이 일치 판정을 후속 후보에 그대로 적용하지 않는다.
 
-## 사용자 등록 검사 보완과 재제작 후보
+## 앞선 복구 중단과 설치 API 보완 이력
+
+06:57 UTC 후속 Run은 정상 UAC 승인 후 자식 프로세스가 실제로 시작됐다. 실패 시험 설치의 404개 파일·23개 등록 값을 다시 확인한 뒤, 원래 DE666CC6 후보 MSI로 정확한 시험 설치만 제거하려 했으나 ImageGuardPreflight에서 “Cannot establish installed component ownership”로 1603을 반환했다. InstallInitialize와 파일·등록 제거 작업 전에 중단됐고, 후속 깨끗한 상태 검사·새 보존 Suite·최종 설치는 실행하지 않았다. 이는 앞선 UAC 취소와 다른 실제 실행 실패다. 기록은 artifacts/image-copy-save/msi-preservation-recovery/20260927T065702167Z-66de6881b4a441d2a6db04ab0dae1d33/의 launch.json·recovery.json·fixture-remove.msiexec.log다.
+
+읽기 전용 조회에서 해당 제품의 MsiGetComponentPathExW는 CA 밖에서도 404개 모두 UNKNOWN(-1), 길이 인수 32768 유지, 빈 경로를 반환했다. 명시적 MACHINE 문맥의 MsiQueryComponentStateW는 404개 모두 LOCAL(3), MsiGetComponentPathW는 404개 모두 LOCAL(3)과 정확한 경로를 반환했다. 관계없는 제품 세 개의 대표 컴포넌트에서도 같은 차이를 확인했다. 경로 길이·CA 내부 문맥만의 문제나 Windows 자체 결함이 확정됐다고 설명하지 않는다.
+
+수정한 schema 2 guard는 PC 전체 제품·컴포넌트 등록을 명시적으로 확인한 뒤 기존 경로 API와 경로/길이 검사를 결합한다. Microsoft가 CA에서 금지한 MsiOpenDatabase 호출도 제거한다. 동일 패키지는 현재 설치 DB를, 이전 패키지는 빌드 때 읽기 전용으로 추출해 새 MSI에 내장한 ProductCode·PackageCode별 소유 목록을 사용한다. [ADR-0024](../design/0024-image-msi-preservation.md)에 공식 API 근거와 보존 경계를 반영했다.
+
+[추출기](../../tools/ImageCopySave/installer/export-ownership-baseline.ps1)는 0.1.1 및 DE666CC6 후보에서 각각 404개 파일·23개 REG_SZ 값을 내보냈다. 두 목록의 파일 경로/컴포넌트 GUID와 등록 값이 정확히 일치했다. 잘못된 MSI 감사 해시·파일 크기·참조 컴포넌트 GUID 세 입력은 거절했고 기존 출력은 보존했다. 저장소의 0.1.1 schema 2 목록과 로컬 전용 DE666CC6 목록을 구분하며, 감사 결과는 artifacts/image-copy-save/ownership-baselines/20260927T071405882Z-fe3b93ecf8dc461aac103884bbc26e79/export-audit.json에 보존한다. 설치·제품 등록 변경은 하지 않았다.
+
+구형 guard가 제거를 막는 이 정확한 로컬 시험 설치를 위해, 이전 PackageCode를 고정하고 보존 검사를 유지하는 same-ProductCode small update 복구 후보를 별도로 제작했다. 일반 공개 후보·고의 실패 롤백 후보와 구분한다. 복구 후보의 제작·정적 검사는 PASS지만 실제 복구 갱신은 아래처럼 중단했으며, 보존 Suite·최종 설치·공개 게시는 미완료다.
+
+07:28:19 UTC 요청은 정상 UAC 승인 후 프로세스 17576을 시작했고, 07:29:13 UTC에 service-exact-failed-fixture 단계를 실행했다. 사용한 로컬 복구 MSI의 SHA-256은 C82B8B850F8C0EA41019826D9D664DC17808E11F02B948064DF025A3955EAA84, PackageCode는 {56B1E94C-6580-4C27-84BA-F0F1A9E2D181}이다. 시작 전 기존 후보의 원래 PackageCode와 404파일·23등록 값은 일치했다. 그러나 ImageGuardPreflight가 “Cannot inspect installed product”로 1603을 반환해 InstallInitialize 이전에 중단됐다. 이전 06:57 제거의 컴포넌트 경로 오류와 다른 단계이며, 당시 제품 정보 두 번째 API 조회를 진단했고, 이후 확인한 길이 변경과 수정 결과는 위 최신 후보 절에서 구분한다. 기존 시험 설치는 제거되지 않았고 새 보존 Suite와 최종 설치는 실행하지 않았다. 실제 실행 기록은 artifacts/image-copy-save/msi-preservation-recovery/20260927T072806286Z-7b882eeca6ea40a48502100b8ab108bf/의 launch.json·recovery.json·service-exact-failed-fixture.msiexec.log에 보존한다.
+
+## 앞선 사용자 등록 검사 보완과 05:35 재제작 후보
 
 첫 실제 MSI 시험의 HKCU 차단 누락 이후 사용자 문맥 확인을 강화했다. 즉시 작업에서 실행 토큰 SID와 Windows Installer의 UserSID가 일치해야 하며, RegOpenCurrentUser로 연 실제 사용자 등록 경로와 캡처한 SID에 대응하는 Classes hive 경로를 독립적으로 검사한다. 지연 작업에서도 Windows Installer UserSID가 전달한 사용자와 일치하는지 확인한 뒤 같은 사용자 범위를 검사한다. 문맥이나 hive 확인에 실패하면 허용으로 추정하지 않고 중단한다.
 
@@ -33,11 +65,11 @@ MSI 안에 정적으로 링크한 native 검사 DLL과 파일별 SHA-256 소유 
 | native 보호 회귀 | 26 PASS / 0 FAIL. 별도 합성 레지스트리 fixture 생성·정리 확인, 제품 등록 변경·설치 없음 |
 | 제품·롤백 MSI 정적 검사 | 둘 다 PASS. 롤백 파일은 AllowRollbackTest를 명시한 검사이며 고의 실패 파일임을 유지 |
 | 첫 실패 설치의 복구 Inspect | PASS. 기존 후보 404파일·23등록 값 정확 일치, 알 수 없는 파일/값·현재 사용자 충돌·이름 있는 스트림·재분석 경로 0개 |
-| 수정 후보 실제 보존 Suite·최종 설치 | NOT RUN: 관리자 승인 요청이 취소되어 자식 프로세스가 시작되지 않음. Inspect·정적·native PASS를 실제 Suite PASS로 승격하지 않음 |
+| 해당 후보 실제 보존 Suite·최종 설치 | NOT RUN: 첫 요청은 UAC 취소, 후속 승인된 Run은 원래 시험 설치 제거의 guard 오류 1603에서 중단. Inspect·정적·native PASS를 실제 Suite PASS로 승격하지 않음 |
 
 26개 native 시험은 합성 사용자 등록을 실제로 만들고 정리하므로 registryModified=false로 설명하지 않는다. 기록의 registryFixtureCreated=true, registryFixtureCleaned=true, productRegistrationModified=false, installed=false를 구분한다. 실제 제품 MSI는 여전히 파일·등록 쓰기를 Windows Installer에 맡기는 읽기 전용 검사를 사용한다.
 
-복구 Inspect는 2026-09-27 05:39 UTC에 비상승으로 실행했다. 계획한 후속 순서는 정확히 일치하는 실패 시험 설치만 그 원래 MSI로 제거 → 깨끗한 설치 상태 확인 → 수정한 보존 Suite → 기본 위치 최종 설치다. 후속 Run은 05:40:57 UTC에 정상 UAC를 요청했으나 05:43:00 UTC에 Windows가 취소 결과를 반환했다. ELEVATION_NOT_STARTED이며 자식 프로세스 ID가 없고 제거·설치 단계는 실행되지 않았다. 실제 Suite와 최종 설치는 관리자 승인 후 재개해야 한다. 기록은 artifacts/image-copy-save/msi-preservation-recovery/20260927T054050047Z-c68d56cb99ef448086349c7a2251bb7c/launch.json에 보존한다.
+복구 Inspect는 2026-09-27 05:39 UTC에 비상승으로 실행했다. 계획한 후속 순서는 정확히 일치하는 실패 시험 설치만 그 원래 MSI로 제거 → 깨끗한 설치 상태 확인 → 수정한 보존 Suite → 기본 위치 최종 설치다. 후속 Run은 05:40:57 UTC에 정상 UAC를 요청했으나 05:43:00 UTC에 Windows가 취소 결과를 반환했다. ELEVATION_NOT_STARTED이며 자식 프로세스 ID가 없고 제거·설치 단계는 실행되지 않았다. 이 첫 시도의 기록은 artifacts/image-copy-save/msi-preservation-recovery/20260927T054050047Z-c68d56cb99ef448086349c7a2251bb7c/launch.json에 보존하며, 06:57 UTC 승인된 실제 후속 실행과 구분한다.
 
 
 등록 충돌 시험기 자체의 정리 경계도 보완했다. 생성 전 소유 정보를 기록하고 등록 생성·읽기 확인·MSI 호출을 하나의 try/finally에 포함했다. 읽기 확인 실패, 호출 실패, 추가 외부 값 보존, 외부에서 바꾼 시험 값 보존의 합성 HKCU 회귀 4개가 PASS다. 제품 등록과 MSI 설치는 실행하지 않았다. 결과와 실제 시험 소스 해시는 artifacts/image-copy-save/msi-preservation-development/registry-fixtures-result.json에 저장했다. 실행 UTC는 기록하지 않아 추정하지 않았으며 결과 저장 시각과 구분했다. 이 시험기 변경으로 다음 Run은 입력 해시를 다시 고정한다.
@@ -85,7 +117,7 @@ MSI 안에 정적으로 링크한 native 검사 DLL과 파일별 SHA-256 소유 
 
 ## 최종 인수·게시 전 채울 항목
 
-1. 위에 식별한 수정 후보의 HKCU 실패 수정과 실제 MSI 보존 회귀 재검증.
+1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 남은 항목은 정확한 실패 시험 설치의 안전한 복구와 HKCU 차단을 포함한 실제 MSI 보존 회귀 재검증이다.
 2. 새 설치 충돌, 외부 수정 파일·값·추가 스트림의 복구/업데이트/제거 차단, 누락 파일 복구, 알 수 없는 추가 파일·값·타사 메뉴·기본 연결 보존, 정상 수명주기와 새 설치/업데이트 실패 롤백 결과.
 3. 최종 설치 패키지의 대표 복사·저장을 확인하고 기존 사용자 확인과 런타임 결과를 재사용한다. 조건별 메뉴·창/탭·오류/취소의 미관찰 항목은 실제 NOT RUN 범위로 기록한다. 원래 AT 목록 전체를 이번 MSI 보존 수정의 새 반복 관문으로 만들지 않으며, 추가 후속 확인은 답변 도착 전 PASS로 기록하지 않는다.
 4. 공개용 릴리스 설명과 지원 제한 확정, 최종 자산의 해시 대조, 태그/소스 커밋·Release URL·draft/prerelease 상태·게시 시각.
@@ -99,6 +131,9 @@ Windows 10·ARM64·네트워크/가상 위치와 모든 Office·메일·메신�
 
 - 재제작 후보: 위 두 새 빌드 디렉터리의 build-metadata.json, guard/build-metadata.json, 패키지 검사 출력.
 - 복구 사전 확인: artifacts/image-copy-save/msi-preservation-recovery/20260927T053939025Z-f32a6f10489d479b913ccca6cad77586/inspection.json.
+- 승인된 복구의 제거 실패: artifacts/image-copy-save/msi-preservation-recovery/20260927T065702167Z-66de6881b4a441d2a6db04ab0dae1d33/recovery.json.
+- 제품 컴포넌트 API 비교: artifacts/image-copy-save/msi-preservation-development/component-api-readonly.json.
+- 관계없는 제품 대표 조회 비교: artifacts/image-copy-save/msi-preservation-development/reference-component-api-2026-09-27T07-09-43-713Z.json.
 - 첫 후보: 첫 후보 빌드 디렉터리의 build-metadata.json, guard/build-metadata.json, 패키지 검사 출력.
 - 업그레이드: artifacts/image-copy-save/msi-lifecycle/20260927T052035232Z-b48b0bdc9faf4a769b846f7883c4b56f/result.json.
 - 제거: artifacts/image-copy-save/msi-lifecycle/20260927T052144635Z-e492c8c85dcf455b983b259f825c749c/result.json.
@@ -106,5 +141,6 @@ Windows 10·ARM64·네트워크/가상 위치와 모든 Office·메일·메신�
 - 첫 후보 롤백 파일 구조: artifacts/image-copy-save/msi/20260927T051434216Z-732db584d2a54f4b90f7e965e82890f3/verification.json.
 - 재제작 후보 롤백 파일 구조: artifacts/image-copy-save/msi/20260927T053607328Z-b09fa73902d944d68d72d27d23b30613/verification.json.
 - 공개 안내 초안 검사: artifacts/image-public-guide-20260927/site. MkDocs strict 및 공개 20페이지+404·검색·사이트맵·로컬 링크 검사는 PASS이며 제품 인수를 뜻하지 않는다.
+- 최신 문서 검사: artifacts/release-readiness-20260927/docs-schema2-final-candidate/verification.json. 07:48 UTC 기준 MkDocs strict, 공개 20페이지+404, 로컬 링크·자산, 검색·사이트맵 공개 범위, 비공개 원본·자산 제외 검사가 PASS다. 실제 Release 게시나 MSI 보존 인수를 뜻하지 않는다.
 
 공개 범위에는 사용자 [설치·사용 안내](../tools/image-copy-save/guide.md)만 추가한다. 최종 배포용 설명은 로컬 artifacts/release-readiness-20260927/image-020-release-draft/에 준비하며 게시 전 검토 문구·미확정 필드는 제거하거나 실제 결과로 채운다.

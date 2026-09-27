@@ -1,6 +1,8 @@
 #include "Guard.cpp"
 #include <cstdio>
 #include <functional>
+#include <objbase.h>
+#pragma comment(lib, "ole32.lib")
 
 using namespace image_guard;
 static unsigned int passed = 0;
@@ -19,6 +21,48 @@ void WriteFixture(const std::wstring& path, const char* text, bool replace = fal
 }
 int wmain(int argc, wchar_t** argv) {
     try {
+        if (argc == 3 && std::wstring(argv[1]) == L"--inspect-recovery") {
+            if (FAILED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED))) Fail(L"Cannot initialize read-only MSI probe COM");
+            struct ComClose { ~ComClose() { CoUninitialize(); } } comClose;
+            MsiSetInternalUI(INSTALLUILEVEL_NONE, nullptr);
+            MsiHandle session;
+            // This documented restricted handle is incapable of changing
+            // machine state. No MSI action or embedded custom action is run.
+            const UINT opened = MsiOpenPackageExW(argv[2], MSIOPENPACKAGEFLAGS_IGNOREMACHINESTATE, &session.value);
+            if (opened != ERROR_SUCCESS) Fail(L"Cannot open restricted recovery probe package (Windows error " + std::to_wstring(opened) + L")");
+            MsiHandle database(MsiGetActiveDatabase(session.value));
+            const auto product = DatabaseProperty(database.value, L"ProductCode");
+            std::wstring package, location;
+            if (!ProductInfo(product, INSTALLPROPERTY_PACKAGECODE, package) || !Guid(package) ||
+                !ProductInfo(product, INSTALLPROPERTY_INSTALLLOCATION, location) || location.empty()) Fail(L"Read-only recovery product identity/location is unavailable");
+            const auto sid = UserSid();
+            for (const auto& property : std::vector<std::pair<std::wstring, std::wstring>>{{L"INSTALLFOLDER", FullPath(location)}, {L"REINSTALL", L"ALL"}, {L"REINSTALLMODE", L"vomus"}, {L"UserSID", sid}})
+                if (MsiSetPropertyW(session.value, property.first.c_str(), property.second.c_str()) != ERROR_SUCCESS) Fail(L"Cannot set restricted probe property");
+            const auto plan = Prepare(session.value);
+            InspectCurrentUser(plan); Inspect(plan);
+            const auto deferred = Deserialize(Serialize(plan)); Inspect(deferred);
+            wprintf(L"PASS complete restricted recovery preflight: PackageCode=%s files=%zu registry=%zu\n", package.c_str(), plan.manifest.files.size(), plan.manifest.registry.size());
+            wprintf(L"{\"status\":\"PASS\",\"files\":%zu,\"registry\":%zu,\"readOnly\":true,\"restrictedHandle\":true,\"installerActionsRun\":false,\"productRegistrationModified\":false}\n", plan.manifest.files.size(), plan.manifest.registry.size());
+            return 0;
+        }
+        if (argc == 3 && std::wstring(argv[1]) == L"--inspect-installed") {
+            // This standalone test process may open a database read-only. The
+            // production custom action only uses its active database handle.
+            MsiHandle database;
+            if (MsiOpenDatabaseW(argv[2], MSIDBOPEN_READONLY, &database.value) != ERROR_SUCCESS) Fail(L"Cannot open read-only probe MSI");
+            const auto product = DatabaseProperty(database.value, L"ProductCode");
+            std::wstring registeredPackage;
+            if (!ProductInfo(product, INSTALLPROPERTY_PACKAGECODE, registeredPackage) || !Equal(registeredPackage, PackageCode(database.value))) Fail(L"Installed PackageCode lookup differs from the exact probe MSI");
+            wprintf(L"PASS actual ProductInfo PackageCode: %s\n", registeredPackage.c_str());
+            const auto files = PackageFiles(database.value);
+            const auto folder = InstalledFolder(files, product);
+            Plan installed; installed.folder = folder; installed.sid = UserSid(); installed.checkUser = false;
+            installed.manifest = ReadManifest(database.value, folder, ReadFiles(database.value));
+            Inspect(installed);
+            wprintf(L"PASS actual installed machine resolver and ownership: %s (%zu files)\n", folder.c_str(), files.size());
+            wprintf(L"{\"status\":\"PASS\",\"files\":%zu,\"readOnly\":true,\"productRegistrationModified\":false}\n", files.size());
+            return 0;
+        }
         if (argc != 3 || std::wstring(argv[1]) != L"--fixtures") Fail(L"Usage: ImageCopySave.Guard.Tests.exe --fixtures <new-directory>");
         const auto root = FullPath(argv[2]); PlainAncestors(root, true);
         WinCheck(CreateDirectoryW(root.c_str(), nullptr) != FALSE, L"Fixture directory must be new");
@@ -59,6 +103,60 @@ int wmain(int argc, wchar_t** argv) {
             const auto alias = root + L"\\hardlink.bin"; WinCheck(CreateHardLinkW(alias.c_str(), path.c_str(), nullptr) != FALSE, L"Cannot create synthetic hardlink");
             Rejected([&] { FileHash(alias); });
             WinCheck(DeleteFileW(alias.c_str()) != FALSE, L"Cannot remove own synthetic hardlink");
+        });
+        Test(L"product PackageCode retries packed32 to expanded38 size", [&] {
+            unsigned int calls = 0; std::wstring value;
+            const std::wstring guid = L"{E02D0EEC-5EF4-4BF1-85EF-20074416A568}";
+            const bool found = ProductInfoWithQuery<std::function<UINT(wchar_t*, DWORD&)>>(L"PackageCode", value, [&](wchar_t* buffer, DWORD& length) -> UINT {
+                ++calls;
+                if (calls == 1) { if (buffer != nullptr) Fail(L"Expected a supported null size query"); length = 32; return ERROR_SUCCESS; }
+                if (calls == 2) { if (length != 33) Fail(L"Expected packed GUID buffer size"); wcscpy_s(buffer, length, L"CEE0D20E4FE51FB458FE027044615A86"); length = 38; return ERROR_MORE_DATA; }
+                if (length <= guid.size()) Fail(L"Expanded GUID buffer was not resized");
+                wcscpy_s(buffer, length, guid.c_str()); length = static_cast<DWORD>(guid.size()); return ERROR_SUCCESS;
+            });
+            if (!found || value != guid || calls != 3) Fail(L"Expanded canonical PackageCode was not obtained");
+        });
+        Test(L"initial unknown product remains absent", [&] {
+            std::wstring value = L"stale";
+            if (ProductInfoWithQuery<std::function<UINT(wchar_t*, DWORD&)>>(L"PackageCode", value, [](wchar_t*, DWORD&) -> UINT { return ERROR_UNKNOWN_PRODUCT; }) || !value.empty()) Fail(L"Unknown product was adopted");
+        });
+        Test(L"product disappearing between reads fails closed", [&] {
+            unsigned int calls = 0; std::wstring value;
+            Rejected([&] { ProductInfoWithQuery<std::function<UINT(wchar_t*, DWORD&)>>(L"PackageCode", value, [&](wchar_t*, DWORD& length) -> UINT { length = 32; return ++calls == 1 ? ERROR_SUCCESS : ERROR_UNKNOWN_PRODUCT; }); });
+        });
+        Test(L"product property access error is not retried", [&] {
+            unsigned int calls = 0; std::wstring value;
+            Rejected([&] { ProductInfoWithQuery<std::function<UINT(wchar_t*, DWORD&)>>(L"PackageCode", value, [&](wchar_t*, DWORD& length) -> UINT { length = 32; return ++calls == 1 ? ERROR_SUCCESS : ERROR_ACCESS_DENIED; }); });
+            if (calls != 2) Fail(L"Non-size error was retried");
+        });
+        Test(L"product property repeated growth is bounded", [&] {
+            unsigned int calls = 0; std::wstring value;
+            Rejected([&] { ProductInfoWithQuery<std::function<UINT(wchar_t*, DWORD&)>>(L"PackageCode", value, [&](wchar_t*, DWORD& length) -> UINT { ++calls; length = 32; return ERROR_MORE_DATA; }); });
+            if (calls != 7) Fail(L"Property retry limit was not enforced");
+        });
+        Test(L"registered missing component path remains repairable", [&] {
+            const std::wstring text = root + L"\\missing.dll"; std::vector<wchar_t> buffer(text.begin(), text.end()); buffer.push_back(L'\0');
+            if (CheckedComponentPath(INSTALLSTATE_ABSENT, buffer, static_cast<DWORD>(text.size())) != text) Fail(L"Missing component path changed");
+        });
+        Test(L"unknown component state fails closed", [&] { std::vector<wchar_t> buffer(32); Rejected([&] { CheckedComponentPath(INSTALLSTATE_UNKNOWN, buffer, 0); }); });
+        Test(L"invalid component returned length fails closed", [&] { std::vector<wchar_t> buffer(32); Rejected([&] { CheckedComponentPath(INSTALLSTATE_LOCAL, buffer, 32); }); });
+        Test(L"truncated component path fails closed", [&] { std::vector<wchar_t> buffer(32); buffer[0] = L'x'; Rejected([&] { CheckedComponentPath(INSTALLSTATE_LOCAL, buffer, 2); }); });
+        Test(L"audited default registry value expands install folder", [&] {
+            Manifest m; std::set<std::wstring> roots, slots;
+            AddRegistryValue(m, roots, slots, {L"Software\\Classes\\Fixture", L"", L"[INSTALLFOLDER]server.dll", true}, root);
+            if (m.registry.size() != 1 || !m.registry[0].name.empty() || m.registry[0].data != root + L"\\server.dll") Fail(L"Audited default value was not expanded exactly");
+        });
+        Test(L"audited registry duplicate fails closed", [&] {
+            Manifest m; std::set<std::wstring> roots, slots; RegistryValue v{L"Software\\Classes\\Fixture", L"", L"value", true};
+            AddRegistryValue(m, roots, slots, v, root); Rejected([&] { AddRegistryValue(m, roots, slots, v, root); });
+        });
+        Test(L"audited recursive key deletion authoring rejected", [&] {
+            Manifest m; std::set<std::wstring> roots, slots;
+            Rejected([&] { AddRegistryValue(m, roots, slots, {L"Software\\Classes\\Fixture", L"*", L"value", true}, root); });
+        });
+        Test(L"audited unsupported registry formatting rejected", [&] {
+            Manifest m; std::set<std::wstring> roots, slots;
+            Rejected([&] { AddRegistryValue(m, roots, slots, {L"Software\\Classes\\Fixture", L"", L"[OTHER]file.dll", true}, root); });
         });
         Plan serial = plan;
         for (unsigned int i = 0; i < 7; ++i) serial.manifest.roots.push_back(L"Software\\Classes\\Fixture" + std::to_wstring(i));

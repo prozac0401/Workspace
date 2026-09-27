@@ -11,13 +11,14 @@
     <Property Id="WINDOWSBUILD"><RegistrySearch Id="WindowsCurrentBuild" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Name="CurrentBuildNumber" Type="raw" Bitness="always64" /></Property>
     <Launch Condition="Installed OR (VersionNT64 AND WINDOWSBUILD &gt;= 22000)" Message="Windows 11 x64가 필요합니다. Windows 11의 기본 메뉴와 Windows 10 형식 메뉴를 지원합니다." />
     <!-- The guard only reads. Standard MSI actions own all writes and rollback. -->
-    <Property Id="ImageGuardSchema" Value="1" />
+    <Property Id="ImageGuardSchema" Value="2" />
     <Property Id="ImageGuardDeferred" Hidden="yes" />
     <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" />
     <Binary Id="ImageGuard" SourceFile="$(var.GuardDll)" />
     <CustomTableRef Id="ImageGuardFile" />
-    <CustomTableRef Id="ImageGuardLegacy" />
-    <CustomTableRef Id="ImageGuardLegacyFile" />
+    <CustomTableRef Id="ImageGuardPrior" />
+    <CustomTableRef Id="ImageGuardPriorFile" />
+    <CustomTableRef Id="ImageGuardPriorRegistry" />
     <CustomAction Id="ImageGuardPreflight" BinaryRef="ImageGuard" DllEntry="ImageGuardPreflight" Execute="immediate" Return="check" />
     <CustomAction Id="ImageGuardDeferred" BinaryRef="ImageGuard" DllEntry="ImageGuardDeferred" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" />
     <InstallExecuteSequence>

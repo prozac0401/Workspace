@@ -16,9 +16,17 @@ MSI의 Binary 테이블에 정적으로 링크한 x64 네이티브 검사 DLL을
 
 새 설치는 HKLM과 설치를 실행한 사용자의 HKCU에서 제품의 두 COM 루트·다섯 메뉴 루트를 확인하고, 해당 등록이나 설치 디렉터리가 이미 있으면 중단한다. 다른 사용자의 하이브를 열거나 변경하지 않는다. 유지보수는 MSI 내부의 파일별 SHA256와 Registry 테이블의 값 이름·형식·데이터를 기준으로 현재 상태를 비교한다. 기존 제품의 정상 설치 위치는 Windows Installer에 등록된 파일 구성 요소에서 확인한다. 값 또는 파일이 외부에서 변경됐거나 읽을 수 없으면 중단한다. 누락된 제품 파일·값은 복구할 수 있다. 소유 항목과 이름이 겹치지 않는 파일·값·다른 메뉴·기본 연결은 삭제 대상으로 추가하지 않는다. 재분석 지점을 통해 다른 위치로 우회하는 경로, 하드 링크, 제품 파일에 외부에서 추가한 이름 있는 데이터 스트림도 거절한다.
 
-업데이트는 제거할 기존 제품의 캐시 MSI 기준으로 먼저 검사한다. 검사 테이블이 없는 과거 0.1.1은 실제 검증한 ProductCode·PackageCode와 404개 파일 해시가 고정된 패키지만 자동 이행한다. 제품명·버전 또는 현재 파일이 비슷하다는 이유로 소유권을 추정하지 않는다. 알 수 없는 기존 패키지는 보존하며 중단한다.
+동일 패키지의 유지보수는 MsiGetActiveDatabase가 제공하는 현재 설치 데이터베이스만 읽는다. 업데이트할 이전 패키지는 빌드 시 감사한 소유 목록을 새 MSI의 ImageGuardPrior·ImageGuardPriorFile·ImageGuardPriorRegistry 테이블에 내장하고, 설치된 ProductCode·PackageCode가 정확히 일치할 때만 사용한다. 목록에는 404개 파일의 상대 경로·컴포넌트 GUID·SHA-256과 23개 등록 값의 루트·키·이름·원래 MSI 형식 문자열을 보존한다. MSI 실행 중 캐시 MSI를 MsiOpenDatabase로 열지 않는다. 제품명·버전 또는 현재 파일이 비슷하다는 이유로 소유권을 추정하지 않으며 알 수 없는 기존 패키지는 보존하고 중단한다.
 
 즉시 검사는 CostFinalize 이후, InstallInitialize와 기존 버전 제거 이전에 실행한다. 지연 검사는 기존 버전 제거 이후이면서 새 패키지의 첫 스크립트 작업 이전에 다시 실행한다. 두 검사에는 사용자 입력으로 생략하는 공개 속성을 두지 않는다. 현재 사용자 SID를 전달하여 시스템 권한 지연 작업에서도 올바른 사용자 등록을 확인한다.
+
+## 설치 API 보완과 감사 목록
+
+실제 시험 폴더에 설치된 첫 0.2.0 제거가 1603으로 중단돼 조회 API를 따로 확인했다. 이 PC에서는 Custom Action 밖에서도 MsiGetComponentPathExW가 404개 파일 모두 UNKNOWN(-1)과 빈 경로를 반환했다. 같은 제품·컴포넌트의 MsiQueryComponentStateW는 명시적 MACHINE 문맥에서 LOCAL(3), MsiGetComponentPathW는 LOCAL(3)과 정확한 경로를 반환했다. 관계없는 제품 세 개에서도 같은 Ex/기존 API 차이를 확인했으며, 특정 시험 폴더 길이·CA 문맥만의 원인으로 단정하지 않는다. 운영체제 내부 원인은 미확정이다. 수정 코드는 제품의 PC 전체 설치를 먼저 확인하고, 각 컴포넌트의 명시적 MACHINE 등록 상태와 기존 경로 API 결과·문자열 경계·상대 경로·공통 설치 루트를 함께 검사한다.
+
+별개로 MsiOpenDatabase는 Microsoft가 Custom Action에서 금지한 함수다. 따라서 캐시 MSI를 설치 도중 여는 설계를 제거하고, [빌드 전용 추출기](../../tools/ImageCopySave/installer/export-ownership-baseline.ps1)가 명시한 MSI 해시와 PASS 빌드 목록을 확인한 뒤 읽기 전용으로 감사 목록을 만든다. 파일별 경로·크기와 MSI의 컴포넌트 GUID/key path 관계를 대조하고, 정확한 제품 등록 23개 이외나 문자열 이외 형식·전체 키 삭제 행을 거절한다. 목록에는 로컬 절대 경로나 사용자 SID를 기록하지 않는다. [금지 함수 목록](https://learn.microsoft.com/en-us/windows/win32/msi/functions-not-for-use-in-custom-actions), [현재 설치 DB 읽기](https://learn.microsoft.com/en-us/windows/win32/api/msiquery/nf-msiquery-msigetactivedatabase)를 따른다.
+
+제거 자체가 구형 guard에서 막힌 로컬 시험 설치는 동일 ProductCode·새 PackageCode의 제한된 small update로 수정 guard를 먼저 적용하는 복구 후보를 별도로 만든다. 이 예외는 감사한 과거 ProductCode·PackageCode의 내장 목록과 명시적인 로컬 복구 빌드에서만 허용하며, REINSTALL=ALL·REINSTALLMODE의 v·REMOVE 없음 및 전체 보존 검사를 요구한다. 외부 변경 비교나 guard를 생략하지 않는다. 임의 maintenance transform 추가, 캐시 MSI 직접 편집, 등록/파일 직접 삭제로 복구하지 않는다. Windows Installer의 [small update](https://learn.microsoft.com/en-us/windows/win32/msi/small-updates)와 [재설치 갱신](https://learn.microsoft.com/en-us/windows/win32/msi/applying-small-updates-by-reinstalling-the-product) 경로를 사용하며, 복구 후보의 실제 통과는 별도 기록으로 확인한다.
 
 ## 검토한 대안
 
