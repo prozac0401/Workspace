@@ -1,12 +1,42 @@
 # 그림 복사·저장 0.2.0 · 보존 보완과 정식 릴리스 작업 기록
 
-날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **외부 진단으로 호스트의 HKCU 시험 데이터 격리 확인 — 기존 Suite FAIL 기록 보존, 전체 재검증·최종 설치·공개 미완료**
+날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **외부 보존 Suite 32/32·기본 위치 설치·탐색기 대표 복사/저장 PASS — 정식 공개 전**
 
 적용: [v1.2 변경 계약](../tools/image-copy-save/ImageCopySave_Requirements_v1.2.md), [보존 설계 ADR-0024](../design/0024-image-msi-preservation.md), [공개 안내 ADR-0025](../design/0025-image-public-guide.md), [도구 정책](../policies/tools.md), [문서 정책](../policies/documentation.md).
 
 사용자는 기존 등록·외부 수정 파일 보존 문제를 해결하고 적용한 뒤 정식 릴리스까지 진행하도록 지시했다. 승인된 배포 형식은 Windows 11 x64용 자체 포함 무서명 MSI이며, 관리자 설치와 일반 사용자 실행을 분리한다. 서명 인증이나 회사 전체의 상용 배포 승인을 받았다는 뜻은 아니다.
 
-## 최신 진단 · 외부 실행으로 시험 HKCU의 호스트 가상화 확인
+## 최신 제품 결과 · 외부 전체 보존 시험 32/32 PASS
+
+09:47:01~09:50:09 UTC 외부 호스트의 실제 Suite는 **32 PASS / 0 FAIL / 0 NOT RUN**이다. 대상 MSI는 공개 후보 82A72EB85F41D6DF29BC94EE57215991BA41BEF542717D81CCC0C850C5F5134B와 동일하다. 제품 소스나 MSI를 다시 바꾸지 않고 앱 호스트 밖에서 시험 자료를 생성·실행했다.
+
+| 실제 검증 범위 | 결과 |
+|---|---|
+| HKLM·HKCU 일곱 루트씩, 기존 빈 폴더·파일 충돌 | 16 PASS: 기대한 설치 차단 |
+| 새 설치 실패 롤백·정상 시험 설치 | 2 PASS |
+| 이전 설치의 수정 파일/등록 차단·알 수 없는 자료 보존·업데이트 실패 롤백 | 4 PASS |
+| 복구: 추가 스트림·수정 파일/등록·형식 변경 차단, 누락 파일 복원 | 5 PASS |
+| 제거: 추가 스트림·수정 파일/등록·형식 변경 차단, 알 수 없는 자료 보존 | 5 PASS |
+
+충돌 차단과 고의 실패 롤백 사례의 msiexec 1603은 해당 사례의 기대 결과이며, 정상 설치·업데이트·복구·제거는 0이다. 합성 등록은 EXACT_FIXTURE_CLEANED, 전체 정리는 EXACT_SYNTHETIC_FIXTURES_REMOVED_BUSINESS_FIXTURE_PRESERVED로 확인했다. businessFixturesDeleted=false, rebootRequired=false다. 이전 호스트 격리 조건의 FAIL 보고서는 고치지 않고 이 실제 재검증 결과와 함께 보존한다.
+
+근거: artifacts/image-copy-save/msi-preservation/20260927T094701542Z-2e4f093f9abf4988a5b53b3e5c51bcd0/result.json 및 사례별 로그. 최종 기본 설치는 아래 별도 실제 결과로 확인했으며 정식 게시 완료는 아직 주장하지 않는다.
+
+## 최신 설치 결과 · 전체 재개와 기본 위치 설치 PASS
+
+외부 continuation은 08:41에 남았던 정확한 시험 설치 제거 → 깨끗한 상태 확인 → 전체 보존 Suite → 최종 설치 전 깨끗한 상태 확인 → 기본 위치 최종 설치를 모두 PASS로 완료했다. launch는 COMPLETED, exitCode 0이며 continuation의 finalInstallAttempted=true다. 앞선 trial 잔류 상태는 그 당시 이력으로 유지하고 이번 제거 완료와 구분한다.
+
+09:50:30~09:50:42 UTC 최종 Install은 같은 82A72EB8… MSI로 **PASS, msiexec 0**이다. 기본 위치 C:\Program Files\Workspace\ImageCopySave와 제품 등록 23값을 확인했다. rebootRequired=false, explorerRestarted=false, userFilesDeleted=false다. 설치 결과를 신규 GUI 전체 검증이나 정식 공개 완료로 확대하지 않는다.
+
+로컬 근거: artifacts/image-copy-save/msi-preservation-development/normal-continuation-runs/20260927T094520179Z-0b8153e38bb04cce9337512f38dbde9d/의 continuation.json·launch.json, artifacts/image-copy-save/msi-lifecycle/20260927T095030651Z-4950c1cff7a2437581348696166cc45f/result.json.
+
+## 최종 설치본 대표 GUI 확인
+
+09:55:54 UTC 기본 설치본으로 실제 Explorer의 기존 클래식 직접 메뉴에서 그림으로 복사 → 복사한 그림 저장을 확인해 PASS했다. 150×150 합성 PNG의 22,500픽셀 차이는 0개였고 원본·출력 SHA-256은 C4A9281B384C4785705FAE1321F92FA7C738EBBB5C6C97D693A343A9FEF9C82A로 같았다. 저장 전후 클립보드 시퀀스 59→59와 PNG·DIBV5·Bitmap·DIB 형식을 유지했다. 메뉴 모드 변경과 Explorer 재시작은 없었다.
+
+출력 파일 존재는 확인했으나 저장 직후 최종 행이 선택됐는지는 NOT_CONFIRMED다. 이 결과는 기본 설치본의 대표 복사·저장 두 동작에 한정하며, Windows 11 기본 메뉴 경로 두 기능의 기존 사용자 확인 PASS와 별개다. 모든 형식·창/탭·외부 앱 확인이나 자동 선택 PASS로 확대하지 않는다. 로컬 근거: artifacts/image-copy-save/release-smoke/20260927T081952101Z-243c6cd1dfed4440a7a308c1233e8582/result.json.
+
+## 진단 이력 · 외부 실행으로 시험 HKCU의 호스트 가상화 확인
 
 09:11 UTC v1 진단과 09:20 UTC v2 진단은 정상 UAC 승인 후 실행해 진단 절차 PASS를 기록했다. 두 결과 모두 동일 사용자·64비트로 표시된 경로에서 실행 전후 native EXE에는 시험 표식이 보이지만 MSI custom action에는 보이지 않는 차이를 확인했다. v2는 제품 관련 경로와 별도 합성 경로 등 3개 시험 표식 모두에서 같은 차이를 재현했다. 이 PASS는 진단·보존 범위이며 제품 MSI의 충돌 차단 PASS가 아니다.
 
@@ -26,7 +56,7 @@ v2에서는 Environment 조회가 같고 Classes 하위 키 개수는 native 863
 | 현재 호스트에서 CheckOnly 사전 차단 | artifacts/image-copy-save/msi-preservation-development/normal-host-entry-20260927T093009734Z.json |
 | 외부 호스트 v2 실제 진단 PASS | artifacts/image-copy-save/msi-preservation-development/registry-context-v2-runs/20260927T093231652Z-17568e714e414cfda1d034583e56f6f2/diagnostic.json 및 전후 native/MSI 로그 |
 
-기존 제품 보존 Suite의 FAIL 보고서는 수정하지 않고 앱 호스트의 HKCU 격리 조건에서 얻은 결과로 분류한다. 진단 통과를 제품의 전체 보존 인수로 승격하지 않으며, 제품 후보 82A72EB8…와 생산 소스의 추가 변경 없이 외부 호스트에서 전체 Suite를 재검증할 준비 중이다. 최종 기본 설치·정식 Release·Pages 다운로드 게시는 실행하지 않았다. 원시 SID·환경 경로·호스트 manifest 원문은 공개 문서나 자산으로 옮기지 않는다.
+기존 제품 보존 Suite의 FAIL 보고서는 수정하지 않고 앱 호스트의 HKCU 격리 조건에서 얻은 결과로 분류한다. 진단 이후 제품 후보 82A72EB8…와 생산 소스의 추가 변경 없이 외부 호스트에서 전체 Suite를 재실행했고 위 최신 결과처럼 32개를 통과했다. 진단 PASS와 제품 실제 인수를 구분하며 최종 기본 설치·정식 게시 여부는 별도 기록한다. 원시 SID·환경 경로·호스트 manifest 원문은 공개 문서나 자산으로 옮기지 않는다.
 
 ## 제품 MSI 실제 판정 · 재개·제거 성공 후 HKCU 충돌 시험 재실패
 
@@ -189,9 +219,9 @@ MSI 안에 정적으로 링크한 native 검사 DLL과 파일별 SHA-256 소유 
 
 ## 최종 인수·게시 전 채울 항목
 
-1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 복구 갱신과 이전 시험 설치 제거는 완료했으나 새 Suite에서 HKCU 차단 실패가 재발했다. 호스트의 HKCU 시험 데이터 격리를 확인했으며, 남은 항목은 이번 새 시험 설치의 상태 확인과 외부 호스트에서의 실제 MSI 보존 회귀 재검증이다.
-2. 새 설치 충돌, 외부 수정 파일·값·추가 스트림의 복구/업데이트/제거 차단, 누락 파일 복구, 알 수 없는 추가 파일·값·타사 메뉴·기본 연결 보존, 정상 수명주기와 새 설치/업데이트 실패 롤백 결과.
-3. 최종 설치 패키지의 대표 복사·저장을 확인하고 기존 사용자 확인과 런타임 결과를 재사용한다. 조건별 메뉴·창/탭·오류/취소의 미관찰 항목은 실제 NOT RUN 범위로 기록한다. 원래 AT 목록 전체를 이번 MSI 보존 수정의 새 반복 관문으로 만들지 않으며, 추가 후속 확인은 답변 도착 전 PASS로 기록하지 않는다.
+1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 복구 갱신과 이전 시험 설치 제거는 완료했으나 새 Suite에서 HKCU 차단 실패가 재발했다. 호스트의 HKCU 시험 데이터 격리를 확인했고 외부 전체 Suite 32개를 통과했다. 기본 위치 최종 설치도 별도 실제 결과로 PASS를 확인했으며 공개 자산·Pages 결과는 아직 확인 전이다.
+2. 실제 보존 시험의 완료 범위와 수치는 위 32개 결과를 따른다. 미실행 GUI·다른 OS/앱 검증으로 확대하지 않는다.
+3. 최종 설치본의 대표 복사·저장은 위 GUI 확인으로 PASS다. 저장 후 최종 행 선택은 NOT_CONFIRMED이며 기존 기본 메뉴 사용자 확인과 런타임 결과를 별도로 재사용한다. 조건별 메뉴·창/탭·오류/취소의 미관찰 항목은 NOT RUN으로 유지하고 원래 AT 목록 전체를 이번 수정의 새 반복 관문으로 만들지 않는다.
 4. 공개용 릴리스 설명과 지원 제한 확정, 최종 자산의 해시 대조, 태그/소스 커밋·Release URL·draft/prerelease 상태·게시 시각.
 5. 최종 공개 안내의 배포 준비 문구 교체, MkDocs strict·공개 목록 검사·Pages Actions·실제 공개 URL/검색/자산 확인.
 
