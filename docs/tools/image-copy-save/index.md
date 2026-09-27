@@ -1,36 +1,36 @@
 # 그림 복사·저장 · 구현 대응 기록
 
-현재 설치 방침: 사용자가 관리자 설치를 승인했다. [ADR-0022](../../design/0022-image-admin-install.md)에 따른 관리자 무서명 등록·정리와 SYSTEM 진단 MSI 설치·제거, 비상승 사용자 등록은 PASS다. 제품 MSI와 새 메뉴 G0는 미완료다. 아래 비상승 0x80073D2B는 이전 조건의 이력이다.
-
-도구 ID: ImageCopySave · 명세 v1.1 · 상태: 개발 평가, G0 BLOCKED
+도구 ID: ImageCopySave · 현행 명세 v1.2 · 상태: 개발 평가, 클래식 직접 표시 일부·MSI 수명주기 시나리오 PASS, 전체 G0 미완료
 제품 책임: 도구 개발·검증 담당
 적용 정책: [추가 도구 개발 기준](../../policies/tools.md), [문서 작성 규칙](../../policies/documentation.md)
-현재 후속 결정: [무서명 MSI 관문](../../design/0021-image-unsigned-msi.md), [현재 사용자 시험](../../design/0020-image-current-session-tests.md). 실제 최신 결과는 [후속 작업 기록](../../delivery/backlog-followup-20260927.md)을 따릅니다.
-
-관련 ADR: [ADR-0016](../../design/0016-image-copy-save-direct-menu.md), 과거 [ADR-0015](../../design/0015-image-copy-save-g0.md)
+현재 결정: [공통 클래식 메뉴·무서명 관리자 MSI](../../design/0023-image-copy-save-classic-menu.md), [관리자 설치·일반 사용자 실행](../../design/0022-image-admin-install.md), [현재 사용자 시험](../../design/0020-image-current-session-tests.md)
 
 ## 사용자와 목적
 
-현재 폴더에 클립보드 그림을 저장하고, 선택한 그림 파일을 이미지 자체로 복사합니다. [원본 명세](ImageCopySave_Requirements_v1.0.md)를 그대로 보존하며, 사용자 승인 메뉴 위치 변경은 [v1.1](ImageCopySave_Requirements_v1.1.md)에 반영했습니다. 제품 완료를 이 기록으로 선언하지 않습니다.
+현재 폴더에 클립보드 그림을 저장하고, 선택한 그림 파일을 이미지 자체로 복사합니다. 현재 경로는 [v1.2 변경 계약](ImageCopySave_Requirements_v1.2.md)의 공통 클래식 메뉴입니다. Windows 11 기본 메뉴에서는 ‘더 많은 옵션 표시’ 뒤에, 클래식 직접 표시 모드에서는 바로 접근합니다. [v1.0 원본](ImageCopySave_Requirements_v1.0.md)과 [v1.1](ImageCopySave_Requirements_v1.1.md)은 당시 명세로 보존합니다.
 
-## 요구와 현재 경계
+## 요구와 현재 대응
 
-| 요구 | 구현·증거 | 남은 조건 |
+| 요구 | 후보·기존 증거 | 현행 후보에서 남은 조건 |
 |---|---|---|
-| MNU/G0 | [native IExplorerCommand 후보·근거](G0_Menu_Feasibility.md) | 실제 폴더 배경 첫 메뉴의 동적 숨김과 설치 실증 |
-| IMG/SAV | WIC 코덱·안전 상한·원자적 저장, 실제 helper clipboard→PNG 왕복 PASS | 실제 크기/픽셀 경계·ACL·격리 디스크 부족 PASS; Windows 11 통합·전체 payload/buffer 경계 미완료 |
-| CLP/CPY | native 즉시 게시·스냅샷·시퀀스 보호, 명시적 현재 사용자 시험 | Windows 11 현재 사용자 클립보드 23사례 PASS. 실제 새 Explorer 메뉴 통합은 구형 메뉴 고정 환경으로 미검증 |
-| DEP/M2/M3 | 관리자 unsigned sparse 등록·정리, SYSTEM 진단 MSI 설치·제거와 비상승 사용자 등록 PASS | 별도 서명 없는 자체 포함 제품 MSI 통합, 새 메뉴 G0·제품 설치 수명주기 미완료 |
+| MNU/G0 | 클래식 직접 표시에서 독립 저장, 비이미지·실제 파일 클립보드 완전 숨김과 실제 복사·저장 일부 PASS | [두 메뉴 모드별 매트릭스](G0_Menu_Feasibility.md)의 기본 새 메뉴 경로 NOT RUN. 0.1.0에서 반복 8회 통과. 0.1.1 재설치 후 9회차 재개 오류, UI 관찰 0건으로 20회 미완료 |
+| IMG/SAV | WIC 코덱·안전 상한·덮어쓰기 없는 저장. 이전 전체 시험 85 PASS / 0 FAIL / 1 NOT RUN | 변경 후 회귀와 실제 Explorer 폴더·탭·결과 확인. 로컬 전용 VHD 시험은 이전 실행도 NOT RUN |
+| CLP/CPY | 이전 후보의 현재 사용자 클립보드 23사례·Paint 연동 PASS. 새 클래식 직접 표시에서 PNG 실제 이미지 복사, PNG 두 개·TXT 선택 제외 PASS | JPEG/BMP·혼합·폴더 선택과 다른 외부 앱 지원은 별도 확인. 이전 수치를 새 후보 회귀 실행으로 표기하지 않음 |
+| DEP/M2/M3 | 무서명 MSI 0.1.0 설치·Repair, 0.1.1 업데이트·제거·깨끗한 상태의 실패 주입 롤백·재설치 PASS. 합성 PNG와 절차 후 시험 원본 3개 SHA-256 보존·재부팅 불필요 확인. 0.1.0 실제 런타임 비상승 PASS | 현재 0.1.1 설치 유지. 임의 외부 파일·타사 설정 보존 전체와 최종 정리 확인이 남음. 실제 업데이트 뒤 실행기의 결과 JSON 읽기 오류를 수정하고 잔여 단계 실행 완료 |
+| 시험 모드·복구 | 사용자가 임시 메뉴 모드 전환·원상복구 승인 | Inspect로 읽기만 수행, 실제 모드 전환·복구 NOT RUN. 제품 설치기는 사용자 메뉴 설정을 바꾸지 않음 |
+| OS 지원 | Windows 11 x64의 기본 메뉴와 클래식 직접 표시를 구분하여 시험 | 실제 Windows 10 OS는 별도 NOT RUN. 클래식 표시 모드만으로 OS 지원을 주장하지 않음 |
+
+이전 Windows 11 첫 메뉴·MSIX identity의 관리자/SYSTEM 등록 결과는 [당시 실행 기록](../../delivery/image-admin-install-20260927.md)에 보존합니다. native 직접 COM 시험과 진단 MSI 성공을 현행 제품 G0·MSI의 PASS로 변환하지 않습니다. 기존 엔진·Paint 수치는 [앞선 후속 기록](../../delivery/backlog-followup-20260927.md)의 범위로 한정합니다.
 
 ## 데이터·실패·동시 실행
 
-원본 이미지는 읽기 전용입니다. 저장은 별도 앱 소유 임시 파일을 만든 후 덮어쓰기 없는 이름 전환을 합니다. 이름 충돌·16개 병렬 저장·취소·실패 정리·원본 보호를 자동 검증했습니다. 정상 정리는 정확한 소유 파일 핸들만 사용하며 강제 종료 잔재의 패턴 일괄 삭제를 하지 않습니다. 외부 전송·기록 저장소·서비스·클립보드 감시 기능은 없습니다.
+원본 이미지는 읽기 전용입니다. 저장은 별도 앱 소유 임시 파일을 만든 후 덮어쓰기 없는 이름 전환을 합니다. 저장은 클립보드를 교체하지 않으며, 복사는 준비를 마친 뒤 게시하고 확인된 더 새로운 복사를 보호합니다. 정상 정리는 정확한 소유 파일만 대상으로 하고 강제 종료 잔재를 이름 패턴으로 일괄 삭제하지 않습니다. 외부 전송·기록 저장소·서비스·클립보드 감시 기능은 추가하지 않습니다.
 
 ## 설치·지원·검증
 
-요구를 충족하는 무서명 MSI 설치 패키지는 아직 없습니다. C#/.NET WPF의 명시적 Windows WIC 코덱으로 독립 엔진을 검증했고, native Shell DLL과 full MSIX 구성은 개정 G0 후보로 작성했습니다. 실제 탐색기 통합은 미검증입니다. 실제 실행한 OS 빌드를 제품 지원 인증으로 확대하지 않습니다.
+현재 채택한 설치 후보는 HKLM의 x64 COM·메뉴 등록을 MSI가 소유하는 방식입니다. 새 경로가 실제 G0·수명주기를 통과하면 MSIX/sparse identity와 사용자별 패키지 등록을 제품 설치 의존성에서 제외합니다. 설치·업데이트·제거는 정상 관리자 승인, 평소 Explorer/helper는 비상승 실행을 유지합니다. 인증서·개발자 모드·보안 정책을 바꾸지 않습니다.
 
-[개발 소스·빌드 안내](../../../tools/ImageCopySave/README.md), [44개 수용시험 및 실제 결과](../../../tools/ImageCopySave/TEST_RESULTS.md), [알려진 제한](../../../tools/ImageCopySave/KNOWN_LIMITATIONS.md), [설치·제거 현황](../../../tools/ImageCopySave/installer/README.md)에 구현과 미실행을 구분했습니다. 이 문서 및 개발 증거는 공개 사이트 대상이 아닙니다.
+수행한 설치 수명주기 시나리오와 클래식 직접 표시의 부분 성공을 두 메뉴 모드 전체 G0·제품 배포 승인으로 확대하지 않습니다. [개발 소스·빌드 안내](../../../tools/ImageCopySave/README.md), [44개 수용시험 기록](../../../tools/ImageCopySave/TEST_RESULTS.md), [알려진 제한](../../../tools/ImageCopySave/KNOWN_LIMITATIONS.md), [설치·제거 현황](../../../tools/ImageCopySave/installer/README.md)에서 구현·시험·미실행 범위를 구분합니다. 이 문서와 개발 증거는 공개 사이트 대상이 아닙니다.
 
 ## 변경 이력
 
@@ -45,3 +45,5 @@
 2026-09-25(KST) 추가 검증: 총77개 PASS, 실제 ACL·전용 VHD 디스크 부족·큰 이미지 경계·엔진4K 측정 추가. AT-19·26·31을 명시한 범위로 승격하여9 PASS/22 BLOCKED/13 NOT RUN입니다. 이번3개 임시 실행·artifact·브랜치도 정리했으며 제품 배포 판정은 변경하지 않았습니다.
 
 2026-09-25 위치 변경: 사용자 승인으로 v1.1과 ADR-0016를 작성하고 native DLL·직접 COM 시험 및 unsigned full MSIX 빌드를 추가했습니다. 실제 G0·M2 통합·M3 수명주기 완료와 구분합니다.
+
+2026-09-27 클래식 경로 변경: 사용자 승인에 따라 v1.2와 ADR-0023을 작성했습니다. 첫 Windows 11 메뉴 필수 조건을 공통 클래식 메뉴의 두 진입 모드로 대체하고, 무서명 관리자 MSI·일반 사용자 실행 및 원상복구 시험을 구분했습니다. 후속 기록에 0.1.0 설치·Repair, 0.1.1 업데이트·제거·설치 실패 롤백·재설치, 클래식 직접 표시의 부분 UI와 실제 파일 클립보드 숨김, 앞선 비상승 런타임 관찰을 반영했습니다. 클래식 반복은 0.1.0에서 8회 통과 후 0.1.1 재설치 뒤 9회차 재개 때 UI 도구 창 활성화 오류로 미완료이며 기본 새 메뉴 경로·모드 원상복구는 NOT RUN입니다. 이번에 메뉴 모드 자체를 바꾸지는 않았습니다. 0.1.1 재설치 이후 UI 관찰은 0건이며 앞선 메뉴 PASS는 0.1.0의 증거입니다.

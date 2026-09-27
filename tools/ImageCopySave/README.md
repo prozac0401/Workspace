@@ -1,17 +1,18 @@
-# 그림 복사·저장 · 로컬 통합 평가 후보
+# 그림 복사·저장 · 클래식 메뉴 통합 평가 후보
 
-현재 설치 방침: 사용자가 관리자 설치를 승인했다. [ADR-0022](../../docs/design/0022-image-admin-install.md)에 따른 관리자 무서명 등록·정리와 SYSTEM 진단 MSI 설치·제거, 비상승 사용자 등록은 PASS다. 제품 MSI와 새 메뉴 G0는 미완료다. 아래 비상승 0x80073D2B는 이전 조건의 이력이다.
+현재 요구는 **공통 클래식 메뉴**입니다. Windows 11 기본 메뉴에서는 ‘더 많은 옵션 표시’ 뒤에, Windows 10 스타일의 클래식 직접 표시 설정에서는 바로 ‘복사한 그림 저장’과 ‘그림으로 복사’에 접근합니다. 이미지가 없을 때 저장 항목을 완전히 숨기고 상주 감시기를 두지 않는 조건은 유지합니다.
 
-2026-09-27 후속: [무서명 MSI 등록 실증](../../docs/tools/image-copy-save/unsigned-msi-feasibility.md)의 앞선 비상승 시험은 0x80073D2B로 차단됐고, 이후 관리자·SYSTEM 경로는 통과했다. [현재 사용자 클립보드 시험 모드](../../docs/tools/image-copy-save/current-session-testing.md)를 별도로 추가했으며 실제 결과는 [후속 기록](../../docs/delivery/backlog-followup-20260927.md)을 따른다. 아래 과거 시험 수치는 당시 결과다.
+[ADR-0023](../../docs/design/0023-image-copy-save-classic-menu.md)에 따라 native IExplorerCommand·ExplorerCommandHandler의 HKLM 등록을 무서명 관리자 MSI가 관리하는 경로를 구현·검증합니다. 평소 Explorer/helper는 일반 사용자 권한으로 실행합니다. 2026-09-27 후속 중간 실기에서 클래식 직접 표시 모드의 독립 저장·비이미지 및 실제 파일 클립보드 완전 숨김·실제 PNG 저장과 이미지 복사, 무서명 자체 포함 MSI의 설치·Repair·업데이트·제거·설치 실패 롤백·재설치는 확인한 시나리오에서 PASS입니다. 앞선 0.1.0 실제 저장의 설치 helper·Explorer 비상승 실행도 확인했습니다. 현재 0.1.1 설치 상태지만 재설치 이후 UI 관찰은 0건입니다. 위 실제 메뉴 PASS는 0.1.0의 증거이며 두 모드 전체 G0는 **미완료**입니다. [현재 매트릭스](../../docs/tools/image-copy-save/G0_Menu_Feasibility.md)에 수행 범위와 로컬 근거를 구분했습니다.
 
-**탐색기 명령과 helper의 호출 상태·결과·비모달 안내를 연결했으나 G0는 BLOCKED입니다.** 관리자 unsigned sparse 등록·정리와 SYSTEM 진단 MSI·비상승 사용자 등록은 통과했습니다. 현재 PC의 구형 메뉴 고정 설정 때문에 새 메뉴 G0는 미완료입니다. 앞선 서명 full MSIX 평가에서는 서명 검증 PASS 후 신뢰 오류 `0x800B0109`로 설치가 거절됐으며, 두 시도 모두 잔여 등록은 없습니다. [설치 시도 기록](../../docs/delivery/image-copy-save-signing-20260927.md)을 확인하세요. 저장은 실제 폴더 배경의 첫 우클릭 메뉴를 대상으로 하며 이미지가 없을 때 완전히 숨기는 조건은 유지합니다. 일반 사용자용 출시 완료를 뜻하지 않습니다.
+이번 검증에서 사용자가 승인한 임시 메뉴 모드 전환은 종료 후 원상복구합니다. 제품 설치기는 사용자의 메뉴 모드를 바꾸지 않습니다. Windows 11의 클래식 직접 표시를 실제 Windows 10 OS 지원 인증으로 표기하지 않습니다.
 
-- [현재 요구명세 v1.1](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.1.md) · [메뉴 위치 결정](../../docs/design/0016-image-copy-save-direct-menu.md)
-- [원본 요구명세](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.0.md)
-- [G0 판정](G0_Menu_Feasibility.md) · [시험 결과 및 44개 수용시험](TEST_RESULTS.md) · [제한사항](KNOWN_LIMITATIONS.md)
-- [설치·제거 상태](installer/README.md)
-- [이 PC에서 마지막으로 확인하기](../../docs/tools/image-copy-save/local-verification.md) · [호출 상태·결과 연결 결정](../../docs/design/0017-image-copy-save-invocation.md)
-- [원격 클립보드 시험 실행 방법](../../docs/tools/image-copy-save/remote-testing.md)
+- [현재 요구명세 v1.2 변경 계약](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.2.md) · [현재 메뉴·설치 결정](../../docs/design/0023-image-copy-save-classic-menu.md)
+- [v1.0 원본](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.0.md) · [v1.1 당시 요구](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.1.md)
+- [현재 G0 매트릭스](G0_Menu_Feasibility.md) · [시험 결과 및 44개 수용시험](TEST_RESULTS.md) · [제한사항](KNOWN_LIMITATIONS.md)
+- [설치·제거 상태](installer/README.md) · [관리자 설치·일반 사용자 실행 결정](../../docs/design/0022-image-admin-install.md)
+- [호출 상태·결과 연결](../../docs/design/0017-image-copy-save-invocation.md) · [현재 사용자 클립보드 시험](../../docs/tools/image-copy-save/current-session-testing.md)
+
+앞선 첫 Windows 11 메뉴 후보의 관리자 unsigned sparse 등록·정리와 SYSTEM 진단 MSI·비상승 사용자 등록은 [당시 기록](../../docs/delivery/image-admin-install-20260927.md)에 보존합니다. 더 이전의 비상승 unsigned sparse 0x80073D2B와 signed full MSIX 신뢰 오류 0x800B0109도 당시 경로의 결과입니다. 이 오류를 새 클래식 경로의 현재 차단으로 재사용하지 않으며, 새 제품 MSI 완료나 상용 출시를 선언하지 않습니다.
 
 ## 구현 범위
 
@@ -35,9 +36,9 @@ Windows x64, .NET SDK 10.0.401 또는 global.json이 허용하는 패치가 필�
 
 개발용 자체 포함 실행 파일을 만들려면 `-PublishEvaluation`을 추가합니다. 출력은 `artifacts/image-copy-save/engine-evaluation`이며 사용자용 설치 패키지가 아닙니다. 원격 게시나 OS 메뉴 등록을 하지 않습니다.
 
-## native 메뉴와 평가 MSIX 빌드
+## native 빌드와 이전 MSIX 평가 도구
 
-C++ x64 빌드 도구와 Windows 11 SDK가 갖추어진 개발 환경에서 다음 순서로 실행합니다.
+C++ x64 빌드 도구와 Windows SDK가 갖추어진 개발 환경에서 native DLL을 빌드합니다. 아래 두 번째 명령의 full MSIX는 이전 첫 메뉴 후보의 평가 도구이며 새 클래식 제품 MSI의 설치 의존성이 아닙니다. 새 MSI의 빌드·설치 절차와 실제 상태는 [설치 안내](installer/README.md)에 기록합니다.
 
 ```powershell
 powershell.exe -NoProfile -NonInteractive -File ./tools/ImageCopySave/build/build-shell.ps1
@@ -46,7 +47,7 @@ powershell.exe -NoProfile -NonInteractive -STA -File ./tools/ImageCopySave/build
 
 첫 명령은 native DLL과 정책·직접 COM 시험 66개를 빌드/실행합니다. 두 번째 명령은 자체 포함 helper와 DLL을 unsigned full MSIX로 묶고 다시 풀어 내용·해시를 확인합니다. OS 등록·설치·서명·신뢰 변경은 수행하지 않습니다. 상세 의존성, 산출물, 신뢰된 패키지의 설치·제거 절차는 [패키징 안내](installer/README.md)에 있습니다.
 
-GetState는 호출한 보기의 로컬 폴더 문맥과 클립보드 지원 형식만 확인합니다. 실제 첫 메뉴의 표시/숨김·클립보드 갱신·Invoker 문맥은 직접 COM 시험으로 증명하지 않습니다. [native 구현 경계](source/ImageCopySave.Shell/README.md)를 확인하세요.
+GetState는 호출한 보기의 로컬 폴더 문맥과 클립보드 지원 형식만 확인합니다. 실제 클래식 메뉴 두 진입 모드의 표시/숨김·클립보드 갱신·Invoker 문맥은 직접 COM 시험으로 증명하지 않습니다. [native 구현 경계](source/ImageCopySave.Shell/README.md)를 확인하세요.
 
 ## 개발용 helper 실행
 
@@ -62,7 +63,11 @@ GetState는 호출한 보기의 로컬 폴더 문맥과 클립보드 지원 형�
 
 ## 다음 단계
 
-G0에서 개정 위치·동적 숨김·첫 메뉴·일반 사용자 설치를 실제 증명해야 M2 제품 통합과 M3 설치 수명주기를 완료할 수 있습니다. Invoke 시퀀스 전달, 같은 보기 선택, 비모달 진행·취소·오류 안내는 구현했으나 실제 Explorer에서의 통합 검증은 남아 있습니다. 무서명 MSI 요구를 충족하는 설치 경로 확보 후 일반 사용자 설치와 외부 앱 붙여넣기를 [PC 확인 절차](../../docs/tools/image-copy-save/local-verification.md)로 검증해야 합니다. unsigned MSIX 생성은 설치·제거 합격을 의미하지 않습니다. 현재 후속 작업은 원본 로컬 수정을 보존한 별도 worktree에서 진행하며 원격 CI·제품 게시는 수행하지 않았습니다. 아래 CI 내용은 이전 실행 이력입니다.
+개정 G0의 남은 시험은 기본 새 메뉴의 ‘더 많은 옵션 표시’ 경로, 두 모드의 20회 상태 전환과 복수 창·탭 문맥·피드백 전체입니다. 클래식 직접 표시는 0.1.0에서 8회 통과했으나 0.1.1 재설치 후 9회차 재개 시 UI 도구의 창 활성화 오류가 반복되어 20회 시험은 미완료입니다. 재설치 이후 추가 UI 관찰은 0건이며 payload 동일성으로 실기를 대신하지 않습니다. 이 도구 오류를 제품 메뉴 실패로 계상하지 않습니다. 이 모드에서 확인한 합성 8×8 PNG 저장·클립보드 불변, PNG 실제 이미지 복사, Explorer Ctrl+C의 파일 클립보드에서 저장 숨김·일반 Paste 유지를 그 범위의 근거로 유지합니다.
+
+제품 MSI 0.1.0 설치·손상 DLL Repair, 0.1.0→0.1.1 업데이트, 제거·깨끗한 상태의 의도된 설치 실패 롤백·0.1.1 재설치는 PASS입니다. 실패 주입 단계의 예상 exit 1603 뒤 제품 설치·등록이 남지 않았으며 나머지는 exit 0이었습니다. 모든 단계에 재부팅 요구와 Explorer 재시작이 없었고 합성 보존 PNG 해시를 유지했습니다. MSI 전체 절차 후 합성 시험 원본 3개의 SHA-256도 불변입니다. 현재 0.1.1 설치 상태이며 임의 외부 파일·타사 메뉴 보존 전체와 최종 정리는 남아 있습니다. 메뉴 설정은 Inspect로 읽기만 했으며 실제 전환은 하지 않았습니다. 기본 새 메뉴 모드 시험과 전환 후 복구 절차도 아직 NOT RUN입니다.
+
+최초 업그레이드 요청의 UAC 취소는 이후 실제 업데이트 PASS와 구분합니다. 그 실제 업데이트 뒤 시험 실행기가 UTF-8·빈 JSON 키가 있는 결과를 읽다가 중단된 이력을 보존했고, Dictionary 처리 수정과 실제 결과 읽기 회귀 PASS 후 나머지 3단계를 재승인하여 완료했습니다. 제품 업데이트 실패로 오기하지 않습니다. M2·M3 또는 제품 배포 가능 상태는 전체 인수 전이며 아래 로컬/CI 결과는 이전 후보의 실행 이력입니다.
 
 2026-09-25 당시 로컬 시험은 엔진/helper **62 PASS / 24 NOT RUN / 0 FAIL**, native **66 PASS / 0 FAIL**입니다. 격리 클립보드 23개는 station 생성 오류로, 전용 VHD 디스크 부족 1개는 로컬 실행 제외로 남았습니다. 사용자 클립보드는 변경하지 않았습니다. WPF 안내 화면 3종은 비표시 렌더링으로 확인했습니다. [이번 인계 기록](../../docs/delivery/image-copy-save-local-20260925.md)에 최종 산출물과 직접 확인할 단계를 모았습니다.
 

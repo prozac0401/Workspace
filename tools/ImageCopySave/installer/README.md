@@ -1,20 +1,69 @@
-# 로컬에서 패키지를 만들고 설치 시험하기
+# 무서명 MSI를 만들고 설치 시험하기
 
-현재 설치 방침: 사용자가 관리자 설치를 승인했다. [ADR-0022](../../../docs/design/0022-image-admin-install.md)에 따른 관리자 무서명 등록·정리와 SYSTEM 진단 MSI 설치·제거, 비상승 사용자 등록은 PASS다. 제품 MSI와 새 메뉴 G0는 미완료다. 아래 비상승 0x80073D2B는 이전 조건의 이력이다.
+도구: ImageCopySave · MSI 기본 버전: 0.1.1 · 상태: 내부 사용 후보 검증 중
 
-현재 배포 목표는 **별도 서명 없는 MSI**다. 일반 사용자 unsigned sparse 등록 실증은 0x80073D2B로 차단됐다. [현재 결정](../../../docs/design/0021-image-unsigned-msi.md)과 [실증 결과](../../../docs/tools/image-copy-save/unsigned-msi-feasibility.md)를 먼저 확인한다. 아래 full MSIX 서명·설치 절차는 이전 평가 경로의 기록이며 이번 MSI 작업의 필수 선행 조건이 아니다.
+책임: 도구 개발·검증 담당 · 적용 범위: Windows 11 x64
 
-도구: ImageCopySave · 패키지 기본 버전: 0.1.1.0 · 상태: 관리자·SYSTEM 등록 경로 PASS, 제품 MSI 통합 미완료
-책임: 도구 개발·검증 담당 · 적용 범위: Windows 11 x64 개발·검증 환경  
 작성일: 2026-09-25 · 최신 확인: 2026-09-27
 
-2026-09-27 기존 허용 인증서로 새 사본 서명과 SignTool 검증은 통과했으나, 실제 일반 사용자 설치는 `0x800B0109`로 거절됐습니다. 실패 후 현재 사용자 패키지 등록은 0개입니다. 신뢰 저장소는 변경하지 않았으며, [설치 시도 기록](../../../docs/delivery/image-copy-save-signing-20260927.md)은 이전 full MSIX 경로의 이력입니다. 비상승 unsigned sparse의 0x80073D2B는 이전 조건의 결과입니다. 관리자 등록과 진단 MSI의 설치·제거는 통과했으며 자체 포함 제품 MSI는 아직 제작하지 않았습니다.
+현재 제품은 **별도 서명 없는 자체 포함 MSI**로 설치합니다. 사용자가 승인한 설치 방식은 관리자 권한의 PC 전체 설치이며, 평소 그림 복사·저장은 일반 사용자로 실행합니다. 인증서 설치, 개발자 모드, PowerShell 실행, 수동 레지스트리 등록을 사용자에게 요구하지 않습니다. 설치·메뉴의 실제 확인 결과와 남은 제한은 [최신 검증 기록](../../../docs/delivery/image-classic-msi-20260927.md)을 따릅니다.
 
-native Shell DLL과 자체 포함 helper를 full MSIX로 묶습니다. 로컬 빌드부터 패키지 확인까지 Git, 가상환경, 원격 CI가 필요하지 않습니다. **서명과 실제 설치·메뉴 검증이 끝나지 않은 평가 후보입니다.** 패키지 생성 성공을 제품 출시 승인으로 표시하지 않습니다.
+메뉴의 목표 경로는 Windows 11 기본 모드에서 **우클릭 → 더 많은 옵션 표시**이며, Windows 10 형식 메뉴 모드에서는 우클릭 메뉴에서 바로 접근합니다. 클래식 직접 표시의 실제 동작은 확인했으며 기본 새 메뉴 경로는 검증 중입니다. 이 표현은 Windows 11의 두 메뉴 모드를 말하며 Windows 10 운영체제의 시험 완료를 뜻하지 않습니다. 설치 프로그램은 사용자의 메뉴 모드 설정을 바꾸지 않습니다.
 
-일반 사용자는 신뢰되는 설치 파일을 열어 설치하고 Windows 설정의 설치된 앱에서 제거하는 흐름을 사용해야 합니다. 아래 스크립트는 개발·검증 담당자용이며, 일반 사용자에게 수동 등록이나 개발자 모드를 요구하는 설치 대체물이 아닙니다.
+## 일반 사용자 설치·복구·제거
 
-## 관리자 무서명 등록과 진단 MSI
+`ImageCopySave-0.1.1-x64.msi`를 열고 설치를 선택한 뒤 Windows의 관리자 승인 창을 확인합니다. 설치 위치는 `Program Files\Workspace\ImageCopySave`입니다. 추가 런타임을 내려받지 않습니다.
+
+그림 파일 한 개를 우클릭해 **그림으로 복사**를 선택합니다. 복사한 그림을 파일로 만들려면 저장할 폴더 빈 공간을 우클릭해 **복사한 그림 저장**을 선택합니다. 텍스트나 빈 클립보드에서는 저장 항목이 숨겨집니다.
+
+같은 MSI를 다시 열면 복구 또는 제거를 선택할 수 있습니다. Windows 설정의 설치된 앱에서도 ImageCopySave를 제거할 수 있습니다. 제거는 설치한 프로그램 파일과 메뉴 등록을 대상으로 하며 저장한 PNG와 원본 그림을 삭제하지 않습니다.
+
+설치·복구·업데이트·제거는 Explorer를 자동 종료하거나 Windows를 자동 재시작하지 않습니다. Windows가 사용 중인 파일 때문에 재시작을 요청할 수 있습니다. 작업을 저장한 뒤 직접 재시작하고 완료 여부를 확인합니다. 검증 스크립트의 `3010`은 재시작 필요로 별도 기록하며 깨끗한 제거 PASS로 바꾸지 않습니다.
+
+## 제품 MSI 빌드와 정적 확인
+
+개발 PC에는 기존 .NET/native 빌드 도구와 WiX 4가 필요합니다. 스크립트가 도구를 자동 설치하지 않습니다. [build-msi.ps1](build-msi.ps1)은 `build-package.ps1`에서 이미 자체 포함 게시·파일 해시를 검증한 payload를 입력으로 사용하고 최신 native 빌드의 소스/DLL 해시를 검사합니다. 이전 Appx manifest와 로고는 제외하며 제품 DLL·helper와 .NET Desktop 런타임을 MSI에 전부 포함합니다. Appx 등록은 수행하지 않습니다.
+
+```powershell
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/build-msi.ps1 -Version 0.1.1
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/verify-msi.ps1 -MsiPath "<출력 MSI>"
+```
+
+출력은 실행별 `artifacts/image-copy-save/msi/<실행 ID>/` 아래에 생성됩니다. `build-metadata.json`에는 MSI SHA256, 서명 없음, ProductCode, 입력 파일 해시와 시험용 여부를 기록합니다. `verify-msi.ps1`은 MSI를 설치하지 않고 PC 전체 범위, 포함 파일, 두 COM 서버, 다섯 메뉴 등록, 내장 cabinet, 실행형 custom action 부재와 자동 종료 방지 설정을 확인합니다. 정적 확인을 실제 설치·Explorer 시험 PASS로 취급하지 않습니다.
+
+등록은 MSI의 기본 파일·레지스트리 기능으로 처리합니다. 별도 등록 실행 파일이나 설치 중 Appx/PowerShell custom action은 없습니다. `HKLM\Software\Classes`의 제품 소유 CLSID 두 개와 `Directory\Background\shell\Workspace.ImageCopySave.Save`, `SystemFileAssociations\.png|.jpg|.jpeg|.bmp\shell\Workspace.ImageCopySave.Copy`만 사용합니다. 기본 파일 연결과 다른 도구의 메뉴를 변경하지 않으며 모든 명령에 `NeverDefault`를 지정합니다.
+
+## 실제 설치 수명주기 시험
+
+아래는 개발·검증 담당자용이며 **한 번에 한 동작씩** 실행합니다. [invoke-msi-test.ps1](invoke-msi-test.ps1)은 정상 UAC 승인을 요청한 뒤 [test-msi-lifecycle.ps1](test-msi-lifecycle.ps1)을 실행합니다. 기존 설치나 같은 CLSID/메뉴 등록, 알 수 없는 설치 폴더가 있으면 최초 설치 시험을 시작하지 않습니다. 사용자별 등록이 PC 전체 등록을 가리는 경우도 중단합니다.
+
+```powershell
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/invoke-msi-test.ps1 -MsiPath "<0.1.0 시험 MSI>" -Action Install
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/invoke-msi-test.ps1 -MsiPath "<같은 MSI>" -Action Repair -DamageOwnedFile
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/invoke-msi-test.ps1 -MsiPath "<0.1.1 MSI>" -Action Upgrade -PreviousMetadata "<0.1.0 build-metadata.json>"
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/invoke-msi-test.ps1 -MsiPath "<0.1.1 MSI>" -Action Remove
+```
+
+[invoke-msi-final-sequence.ps1](invoke-msi-final-sequence.ps1)은 승인된 최종 후보의 시험을 한 번의 정상 UAC 아래 순차 실행할 때 사용합니다. `-MsiPath`에 0.1.1 제품 MSI, `-RollbackMsiPath`에 별도 실패 시험 MSI를 지정하면 제거 → 실패 롤백 → 재설치를 실행합니다. `-PreviousMetadata`에 검증된 0.1.0 메타데이터를 추가하면 업데이트를 먼저 수행합니다. 승인 전에 파일 해시를 고정하고 각 단계의 실제 결과를 확인하며, 실패나 재부팅 요구가 있으면 다음 단계로 넘어가지 않습니다. 일반 사용자 설치 명령이 아닌 개발 시험 절차입니다.
+
+복구 시험의 `-DamageOwnedFile`은 먼저 모든 설치 파일의 해시를 확인하고, 정확히 일치하는 `ImageCopySave.Engine.dll` 하나만 시험 기록 폴더에 백업한 뒤 제거합니다. 파일과 모든 조상의 junction·심볼릭 링크를 거절합니다. MSI 복구 후 모든 파일이 원래 해시로 돌아오는지 확인합니다. 실행 실패 시 대상 파일이 없을 때만 해시가 일치하는 백업을 복원하며, 이미 생성된 파일을 덮어쓰지 않습니다. [test-msi-recovery.ps1](test-msi-recovery.ps1)은 설치 없이 합성 파일로 이 복구 경계를 시험합니다.
+
+설치 시험은 합성 PNG의 해시도 보존합니다. 프로세스 강제 종료나 전원 차단은 스크립트의 복구 실행을 보장하지 않으므로, 그런 중단 후에는 기록된 설치 상태를 확인한 뒤 같은 MSI의 복구 또는 제거를 실행합니다. 설치 폴더를 재귀 삭제하지 않습니다.
+
+롤백은 별도의 실패 전용 MSI로 확인합니다. 제품 MSI에는 실패 주입 기능이 들어가지 않습니다.
+
+```powershell
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/build-msi.ps1 -Version 0.1.2 -RollbackTest
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/invoke-msi-test.ps1 -MsiPath "<ROLLBACK-TEST.msi>" -Action Rollback
+```
+
+실패 전용 MSI는 파일·레지스트리 작업을 실행한 뒤 오류를 발생시킵니다. Windows Installer의 롤백 후 제품 등록·파일·메뉴가 남지 않는지 확인합니다. 물리적인 전원 차단 시험을 대신했다고 기록하지 않습니다. 실제 결과는 `artifacts/image-copy-save/msi-lifecycle/<실행 ID>/result.json`과 MSI 로그에 남기며 공개 사이트에 포함하지 않습니다.
+
+## 이전 Appx 경로의 이력
+
+아래 절차는 Windows 11 첫 메뉴 배치를 검토하던 Appx/sparse 경로의 진단 기록입니다. 현재 classic 메뉴 제품 MSI의 필수 단계가 아닙니다. 일반 사용자 unsigned sparse 등록은 `0x80073D2B`, 과거 서명 full MSIX 설치는 `0x800B0109`로 차단됐습니다. 이후 관리자 unsigned sparse 등록·정리와 SYSTEM 진단 MSI·일반 사용자 등록 연결은 통과했습니다. 인증서와 보안 정책은 변경하지 않았습니다. [당시 서명 시험](../../../docs/delivery/image-copy-save-signing-20260927.md)과 [설치 권한 결정](../../../docs/design/0022-image-admin-install.md)을 이력으로 보존합니다.
+
+### 이전 관리자 무서명 등록과 진단 MSI
 
 [관리자 후속 결과](../../../docs/delivery/image-admin-install-20260927.md)는 unsigned sparse 관리자 등록·정리, SYSTEM staging/provisioning·제거, 별도 비상승 사용자 등록의 실제 PASS를 기록한다. 아래는 개발자용 진단이며 제품 설치 절차가 아니다. 외부 payload를 참조하는 진단 MSI를 다른 PC에 배포하지 않는다.
 
@@ -124,7 +173,7 @@ powershell.exe -NoProfile -File .\tools\ImageCopySave\installer\manage-install.p
 
 2026-09-25 로컬에서 PowerShell 구문 검사, 기존 unsigned 평가 MSIX의 identity/해시 읽기, unsigned 신뢰 검사 거절, 예상 Publisher 불일치 거절을 확인했습니다. 서명 실행, 인증서 신뢰 변경, 실제 설치·업데이트·제거는 실행하지 않았습니다. 최종 로컬 빌드 결과는 상위 [시험 결과](../TEST_RESULTS.md)를 따릅니다.
 
-- [원명세 v1.0](../../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.0.md) · [현재 명세 v1.1](../../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.1.md) · [추가 도구 개발 기준](../../../docs/policies/tools.md).
+- [원명세 v1.0](../../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.0.md) · [현재 변경 계약 v1.2](../../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.2.md) · [추가 도구 개발 기준](../../../docs/policies/tools.md).
 - [Microsoft: Explorer 메뉴와 패키지 등록](https://learn.microsoft.com/en-us/windows/apps/desktop/modernize/integrate-packaged-app-with-file-explorer).
 - [Microsoft: SignTool로 MSIX 서명](https://learn.microsoft.com/en-us/windows/msix/package/sign-app-package-using-signtool) · [서명·신뢰 조건](https://learn.microsoft.com/en-us/windows/msix/package/signing-package-overview).
 

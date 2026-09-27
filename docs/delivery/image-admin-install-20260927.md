@@ -1,6 +1,6 @@
 # 이미지 도구 · 관리자 무서명 설치 후속
 
-날짜: 2026-09-27 · 책임: 개발·검증 담당 · 상태: 관리자·SYSTEM 등록 경로 PASS, Explorer G0 및 제품 MSI 미완료
+날짜: 2026-09-27 · 책임: 개발·검증 담당 · 상태: 당시 관리자·SYSTEM 등록 경로 PASS. 후속 공통 메뉴·제품 MSI 결과는 [최신 기록](image-classic-msi-20260927.md)을 따른다.
 
 관련: [ADR-0022](../design/0022-image-admin-install.md), [앞선 순차 검증](backlog-followup-20260927.md), [G0 기록](../tools/image-copy-save/G0_Menu_Feasibility.md)
 

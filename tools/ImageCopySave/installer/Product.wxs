@@ -1,0 +1,80 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="ImageCopySave" Manufacturer="Workspace" Version="$(var.Version)" ProductCode="$(var.ProductCode)"
+           UpgradeCode="{78C90F77-8CC3-4B10-BA9A-00E84ADAF375}" Language="1042" Codepage="65001"
+           Scope="perMachine" InstallerVersion="500">
+    <SummaryInformation Description="그림 복사·저장 설치 파일" Manufacturer="Workspace" Codepage="949" />
+    <MajorUpgrade DowngradeErrorMessage="더 새로운 ImageCopySave가 설치되어 있습니다." Schedule="afterInstallInitialize" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+    <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" />
+    <Property Id="REBOOT" Value="ReallySuppress" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="WINDOWSBUILD"><RegistrySearch Id="WindowsCurrentBuild" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Name="CurrentBuildNumber" Type="raw" Bitness="always64" /></Property>
+    <Launch Condition="Installed OR (VersionNT64 AND WINDOWSBUILD &gt;= 22000)" Message="Windows 11 x64가 필요합니다. Windows 11의 기본 메뉴와 Windows 10 형식 메뉴를 지원합니다." />
+    <Property Id="EXISTING_SAVE_COM"><RegistrySearch Id="ExistingSaveCom" Root="HKLM" Key="Software\Classes\CLSID\{9C030D44-BBFA-48B7-BD63-53470C112830}\InprocServer32" Type="raw" Bitness="always64" /></Property>
+    <Property Id="EXISTING_COPY_COM"><RegistrySearch Id="ExistingCopyCom" Root="HKLM" Key="Software\Classes\CLSID\{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}\InprocServer32" Type="raw" Bitness="always64" /></Property>
+    <Launch Condition="Installed OR WIX_UPGRADE_DETECTED OR (NOT EXISTING_SAVE_COM AND NOT EXISTING_COPY_COM)" Message="같은 ImageCopySave 명령의 기존 등록을 발견했습니다. 기존 설치를 정상 제거한 뒤 다시 설치하세요." />
+    <Property Id="USER_SAVE_COM"><RegistrySearch Id="UserSaveCom" Root="HKCU" Key="Software\Classes\CLSID\{9C030D44-BBFA-48B7-BD63-53470C112830}\InprocServer32" Type="raw" Bitness="always64" /></Property>
+    <Property Id="USER_COPY_COM"><RegistrySearch Id="UserCopyCom" Root="HKCU" Key="Software\Classes\CLSID\{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}\InprocServer32" Type="raw" Bitness="always64" /></Property>
+    <Launch Condition="REMOVE OR (NOT USER_SAVE_COM AND NOT USER_COPY_COM)" Message="현재 사용자의 기존 ImageCopySave 등록이 이 설치를 가립니다. 해당 기존 설치를 먼저 정상 제거하세요." />
+    <StandardDirectory Id="ProgramFiles64Folder"><Directory Id="WorkspaceFolder" Name="Workspace"><Directory Id="INSTALLFOLDER" Name="ImageCopySave" /></Directory></StandardDirectory>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="SaveCom" Guid="{2B366C0F-452A-4601-8BB7-B13501859A41}" Bitness="always64">
+        <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{9C030D44-BBFA-48B7-BD63-53470C112830}\InprocServer32" Value="[INSTALLFOLDER]ImageCopySave.Shell.dll" Type="string" KeyPath="yes" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{9C030D44-BBFA-48B7-BD63-53470C112830}\InprocServer32" Name="ThreadingModel" Value="Apartment" Type="string" />
+      </Component>
+      <Component Id="CopyCom" Guid="{35AAB65E-8061-4C79-8A79-9F6435D6BD82}" Bitness="always64">
+        <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}\InprocServer32" Value="[INSTALLFOLDER]ImageCopySave.Shell.dll" Type="string" KeyPath="yes" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}\InprocServer32" Name="ThreadingModel" Value="Apartment" Type="string" />
+      </Component>
+      <Component Id="SaveMenu" Guid="{B427113A-2D39-411F-ACBE-A4B8F907F983}" Bitness="always64">
+        <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\Workspace.ImageCopySave.Save" Name="ExplorerCommandHandler" Value="{9C030D44-BBFA-48B7-BD63-53470C112830}" Type="string" KeyPath="yes" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\Workspace.ImageCopySave.Save" Name="MUIVerb" Value="복사한 그림 저장" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\Directory\Background\shell\Workspace.ImageCopySave.Save" Name="NeverDefault" Value="" Type="string" />
+      </Component>
+      <Component Id="CopyMenu" Guid="{3EE36957-E4AB-4BB9-A64D-CF08A8F4BBD0}" Bitness="always64">
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\Workspace.ImageCopySave.Copy" Name="ExplorerCommandHandler" Value="{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}" Type="string" KeyPath="yes" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\Workspace.ImageCopySave.Copy" Name="MUIVerb" Value="그림으로 복사" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\Workspace.ImageCopySave.Copy" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\Workspace.ImageCopySave.Copy" Name="NeverDefault" Value="" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\Workspace.ImageCopySave.Copy" Name="ExplorerCommandHandler" Value="{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\Workspace.ImageCopySave.Copy" Name="MUIVerb" Value="그림으로 복사" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\Workspace.ImageCopySave.Copy" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\Workspace.ImageCopySave.Copy" Name="NeverDefault" Value="" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\Workspace.ImageCopySave.Copy" Name="ExplorerCommandHandler" Value="{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\Workspace.ImageCopySave.Copy" Name="MUIVerb" Value="그림으로 복사" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\Workspace.ImageCopySave.Copy" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\Workspace.ImageCopySave.Copy" Name="NeverDefault" Value="" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\Workspace.ImageCopySave.Copy" Name="ExplorerCommandHandler" Value="{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\Workspace.ImageCopySave.Copy" Name="MUIVerb" Value="그림으로 복사" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\Workspace.ImageCopySave.Copy" Name="MultiSelectModel" Value="Single" Type="string" />
+        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\Workspace.ImageCopySave.Copy" Name="NeverDefault" Value="" Type="string" />
+      </Component>
+    </DirectoryRef>
+    <Feature Id="Product" Title="그림 복사·저장" Level="1"><ComponentGroupRef Id="ApplicationFiles" /><ComponentRef Id="SaveCom" /><ComponentRef Id="CopyCom" /><ComponentRef Id="SaveMenu" /><ComponentRef Id="CopyMenu" /></Feature>
+    <?if $(var.RollbackTest) = 1 ?>
+      <!-- Only a separately named local test MSI contains this deliberate failure. -->
+      <CustomAction Id="FailRollbackTest" Error="ImageCopySave local rollback test failure after installation work." />
+      <InstallExecuteSequence><Custom Action="FailRollbackTest" After="InstallExecute" Condition="NOT REMOVE" /></InstallExecuteSequence>
+    <?endif?>
+    <UI>
+      <TextStyle Id="DefaultFont" FaceName="Malgun Gothic" Size="9" />
+      <Property Id="DefaultUIFont" Value="DefaultFont" />
+      <Dialog Id="Welcome" Width="420" Height="270" Title="그림 복사·저장 설치">
+        <Control Id="Body" Type="Text" X="24" Y="26" Width="372" Height="162" Text="그림 파일을 이미지로 복사하고, 복사한 그림을 현재 폴더에 저장합니다.&#13;&#10;&#13;&#10;이 PC의 모든 사용자에게 설치하며 관리자 승인이 필요합니다.&#13;&#10;평소 사용에는 관리자 권한이 필요하지 않습니다.&#13;&#10;&#13;&#10;Windows 11: 우클릭 → 더 많은 옵션 표시&#13;&#10;Windows 10 형식 메뉴: 우클릭 메뉴에서 바로 사용&#13;&#10;그림이 없으면 저장 메뉴가 표시되지 않습니다." />
+        <Control Id="Install" Type="PushButton" X="230" Y="220" Width="76" Height="24" Default="yes" Text="설치"><Publish Event="EndDialog" Value="Return" /></Control>
+        <Control Id="Cancel" Type="PushButton" X="316" Y="220" Width="76" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>
+      </Dialog>
+      <Dialog Id="Maintenance" Width="420" Height="210" Title="그림 복사·저장 복구 또는 제거">
+        <Control Id="Body" Type="Text" X="24" Y="26" Width="372" Height="105" Text="프로그램 파일과 메뉴를 복구하거나 제거합니다.&#13;&#10;사용자가 저장한 그림과 원본 파일은 보존됩니다.&#13;&#10;탐색기를 강제로 종료하지 않습니다.&#13;&#10;Windows가 재시작을 요청하면 작업을 저장한 뒤 직접 재시작하세요." />
+        <Control Id="Repair" Type="PushButton" X="104" Y="157" Width="96" Height="24" Default="yes" Text="복구"><Publish Property="REINSTALL" Value="ALL" /><Publish Property="REINSTALLMODE" Value="amus" /><Publish Event="EndDialog" Value="Return" /></Control>
+        <Control Id="Remove" Type="PushButton" X="210" Y="157" Width="96" Height="24" Text="제거"><Publish Property="REMOVE" Value="ALL" /><Publish Event="EndDialog" Value="Return" /></Control>
+        <Control Id="Cancel" Type="PushButton" X="316" Y="157" Width="76" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>
+      </Dialog>
+      <Dialog Id="Complete" Width="420" Height="190" Title="그림 복사·저장">
+        <Control Id="Body" Type="Text" X="24" Y="26" Width="372" Height="103" Text="작업을 마쳤습니다.&#13;&#10;설치 후 탐색기 메뉴에서 사용할 수 있습니다.&#13;&#10;메뉴가 갱신되지 않으면 탐색기 창을 다시 열어 주세요.&#13;&#10;Windows가 재시작을 요청하면 작업을 저장한 뒤 직접 재시작하세요.&#13;&#10;기존 그림 파일은 보존됩니다." />
+        <Control Id="Close" Type="PushButton" X="316" Y="143" Width="76" Height="24" Default="yes" Cancel="yes" Text="닫기"><Publish Event="EndDialog" Value="Return" /></Control>
+      </Dialog>
+      <InstallUISequence><Show Dialog="Welcome" Before="Maintenance" Condition="NOT Installed" /><Show Dialog="Maintenance" Before="ExecuteAction" Condition="Installed AND NOT REMOVE AND NOT REINSTALL" /><Show Dialog="Complete" OnExit="success" /></InstallUISequence>
+    </UI>
+  </Package>
+</Wix>
