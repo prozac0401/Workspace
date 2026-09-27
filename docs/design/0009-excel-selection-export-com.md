@@ -8,7 +8,7 @@
 
 관련 요구사항·정책: [원작업지시](../tools/excel-selection-export/specification.md), [요구사항·인수 대응표](../tools/excel-selection-export/acceptance.md), [추가 도구 개발 기준](../policies/tools.md), [정책 문서 작성 규칙](../policies/documentation.md)
 
-대체·대체됨 관계: 없음. 명단대조기·FolderState의 기존 결정을 변경하지 않음.
+대체·대체됨 관계: 출력 생성 방식과 임시 데이터 경계는 [ADR-0018](0018-excel-selection-export-undo.md)에서 보완한다. 아래 본문은 2026-09-24의 결정이며, 명단대조기·FolderState의 기존 결정을 변경하지 않는다.
 
 ## 맥락
 
@@ -96,3 +96,5 @@ COM CLSID는 `{2A2A4B8C-6D6C-4E28-AB96-E34B9B4319A1}`, ProgID는 `Workspace.Exce
 - [Microsoft · 추가 기능 보안 설정](https://support.microsoft.com/en-US/Office/add-ins/view-manage-and-install-add-ins-for-excel-powerpoint-and-word), [RequireAddinSig 정책](https://support.microsoft.com/en-US/Office/resolve-warning-for-the-requireaddinsig-security-policy): 추가 기능 자체의 차단·신뢰 조건은 문서 VBA 허용 여부와 별도로 검사.
 
 2026-09-24: 최초 작성. 독립 COM 제품의 구현 방향과 현 PC 검증·전체 인수의 구분을 기록함.
+
+2026-09-26: 원본 Undo 손실 조사에 따라 출력 생성 분리를 결정한 [ADR-0018](0018-excel-selection-export-undo.md)와 연결했다. 당시 결정·검증 이력은 보존한다.

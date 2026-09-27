@@ -142,7 +142,7 @@ Excel 설정과 상태표시줄의 값·형식을 복원하는 기존 요구를 
 |---|---|
 | 요구사항·설정 경로·기본값·복구 조건·인수 기준 | 이 명세에 반영 |
 | R11 제품 코드·XLAM·설치 패키지 | 구현, 최종 XLAM의 실제 필수 검사, EXE·ZIP 제작 및 구성 검사 완료 |
-| R11 자동 기능 검사·실제 Excel·성능·설치 검증 | 빠른 검사 166개와 실제 Excel 필수 기능 PASS. 성능·실제 입력·설치 수명주기 등 분리한 항목은 [검증 기록](../../../tools/ExcelSmartListCompare/docs/RC11_TEST_REPORT.md) 참조 |
+| R11 자동 기능 검사·실제 Excel·성능·설치 검증 | 빠른 검사 166개와 실제 Excel 필수 기능 PASS. 배포 EXE 설치 후 사용자 절차 1~12·14번을 자동 검증하여 11개 PASS, 취소 안내·상태표시줄 항목 FAIL. 후속 12번은 R11 정상 완료 8개·보호 중단 1개와 보존을 확인하고 RC9·RC10을 같은 PC에서 비교. 설치 수명주기 반복은 요청에 따라 제외. [배포 후 상세 기록](../../../tools/ExcelSmartListCompare/docs/RC11_POST_RELEASE_VALIDATION_20260920.md), [성능 기록](../../../tools/ExcelSmartListCompare/docs/RC11_PERFORMANCE_20260920.md), [전체 검증 기록](../../../tools/ExcelSmartListCompare/docs/RC11_TEST_REPORT.md) 참조 |
 | R11 배포 | GitHub 자산 8개 게시, 공개 다운로드 해시 일치, Pages R11 안내 확인. [배포 기록](../../../tools/ExcelSmartListCompare/evidence/rc11/publication.json) 참조 |
 
 문서 빌드나 링크 검사는 R11 기능 검증을 대신하지 않는다. RC9·RC10의 당시 PASS·FAIL·PARTIAL·NOT_RUN과 전체 인수 판정은 해당 버전 기록으로 유지한다.
