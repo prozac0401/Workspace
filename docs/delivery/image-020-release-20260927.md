@@ -1,12 +1,34 @@
 # 그림 복사·저장 0.2.0 · 보존 보완과 정식 릴리스 작업 기록
 
-날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **재개·이전 시험 설치 제거 PASS, 새 보존 Suite의 HKCU 충돌 차단 FAIL — 최종 설치·공개 미실행**
+날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **외부 진단으로 호스트의 HKCU 시험 데이터 격리 확인 — 기존 Suite FAIL 기록 보존, 전체 재검증·최종 설치·공개 미완료**
 
 적용: [v1.2 변경 계약](../tools/image-copy-save/ImageCopySave_Requirements_v1.2.md), [보존 설계 ADR-0024](../design/0024-image-msi-preservation.md), [공개 안내 ADR-0025](../design/0025-image-public-guide.md), [도구 정책](../policies/tools.md), [문서 정책](../policies/documentation.md).
 
 사용자는 기존 등록·외부 수정 파일 보존 문제를 해결하고 적용한 뒤 정식 릴리스까지 진행하도록 지시했다. 승인된 배포 형식은 Windows 11 x64용 자체 포함 무서명 MSI이며, 관리자 설치와 일반 사용자 실행을 분리한다. 서명 인증이나 회사 전체의 상용 배포 승인을 받았다는 뜻은 아니다.
 
-## 최신 실제 결과 · 재개·제거 성공 후 HKCU 충돌 시험 재실패
+## 최신 진단 · 외부 실행으로 시험 HKCU의 호스트 가상화 확인
+
+09:11 UTC v1 진단과 09:20 UTC v2 진단은 정상 UAC 승인 후 실행해 진단 절차 PASS를 기록했다. 두 결과 모두 동일 사용자·64비트로 표시된 경로에서 실행 전후 native EXE에는 시험 표식이 보이지만 MSI custom action에는 보이지 않는 차이를 확인했다. v2는 제품 관련 경로와 별도 합성 경로 등 3개 시험 표식 모두에서 같은 차이를 재현했다. 이 PASS는 진단·보존 범위이며 제품 MSI의 충돌 차단 PASS가 아니다.
+
+v2에서는 Environment 조회가 같고 Classes 하위 키 개수는 native 863개·CA 862개였다. CA에 AcLayers가 로드되고 job 값이 CA 0·native 1인 차이도 관찰했다. AcLayers나 job 값 하나만으로 원인을 단정하지 않는다. 합성 등록 3개와 이번에 만든 상위 키를 정리했으며, 전후 기존 제품 404파일·23등록 값 불변과 진단 제품 미등록을 확인했다.
+
+부모 실행 경로를 읽기 전용으로 확인한 결과 ChatGPT.exe에는 MSIX package identity가 있고 그 아래 실행 도구들은 직접 package identity가 없어도 job 안에 있었다. 실제 호스트 manifest의 Windows 11 virtualization:RegistryWriteVirtualization 제외 목록은 Chrome NativeMessagingHosts 한 곳뿐이었다. Microsoft 문서는 Windows 11의 새 제외 목록 선언이 이전 desktop6 선언보다 우선하며, 가상화된 HKCU 쓰기는 앱별 영역에 남아 외부 앱에서 보이지 않는다고 설명한다. [공식 flexible virtualization 문서](https://learn.microsoft.com/en-us/windows/msix/desktop/flexible-virtualization).
+
+이 관찰과 실제 manifest·공식 동작을 근거로 호스트의 MSIX 레지스트리 가상화를 시험 HKCU 데이터가 MSI 작업과 분리된 원인으로 식별했다. 이어 사용자가 앱 밖에서 확인 명령을 시작하고 정상 UAC를 승인한 09:32 UTC 진단에서 이 차이를 확인했다. 실행 전 native·MSI custom action·실행 후 native가 모두 job 0이며, 세 시험 표식의 값이 모두 정확히 일치했다(읽기 관찰 수 15/9/15). 제품의 OpenPlainKey와 같은 경로도 모두 읽었다. 앱 호스트의 HKCU 쓰기 격리 때문에 앞선 시험 fixture가 MSI 작업에 보이지 않았음을 확인한 결과다.
+
+외부 진단은 PASS이며 합성 등록 3개와 이번에 생성한 상위 키를 정리했다. 기존 제품의 404파일·23등록 값은 전후 그대로이고 진단 제품도 등록되지 않았다. v3 진단은 빌드만 보존하고 실행하지 않았다. 앞서 normal wrapper의 CheckOnly는 현재 앱 job 안에서 STOPPED_BEFORE_UAC_NOT_EXTERNAL_HOST로 차단돼 UAC·MSI·합성 등록 생성이 시작되지 않았다. 이후 사용자가 Win+R에서 저장소 루트 artifacts/image-msi-check.cmd를 실행해 위 외부 진단을 완료했으며, CheckOnly와 외부 실제 결과를 구분한다.
+
+| 진단 근거 | 로컬 기록 |
+|---|---|
+| v1 실제 진단 PASS | artifacts/image-copy-save/msi-preservation-development/registry-context-runs/20260927T091128269Z-e9f6f113995a423f839eec371eb70310/diagnostic.json 및 comparison.json |
+| v2 실제 진단 PASS·3개 표식·보존 확인 | artifacts/image-copy-save/msi-preservation-development/registry-context-v2-runs/20260927T092004437Z-f40a67ccb44d4618b670a07861891ad5/diagnostic.json 및 전후 native/MSI 로그 |
+| 호스트 실행 문맥 | artifacts/image-copy-save/msi-preservation-development/probe-host-context-20260927T092535261Z.json |
+| 현재 호스트에서 CheckOnly 사전 차단 | artifacts/image-copy-save/msi-preservation-development/normal-host-entry-20260927T093009734Z.json |
+| 외부 호스트 v2 실제 진단 PASS | artifacts/image-copy-save/msi-preservation-development/registry-context-v2-runs/20260927T093231652Z-17568e714e414cfda1d034583e56f6f2/diagnostic.json 및 전후 native/MSI 로그 |
+
+기존 제품 보존 Suite의 FAIL 보고서는 수정하지 않고 앱 호스트의 HKCU 격리 조건에서 얻은 결과로 분류한다. 진단 통과를 제품의 전체 보존 인수로 승격하지 않으며, 제품 후보 82A72EB8…와 생산 소스의 추가 변경 없이 외부 호스트에서 전체 Suite를 재검증할 준비 중이다. 최종 기본 설치·정식 Release·Pages 다운로드 게시는 실행하지 않았다. 원시 SID·환경 경로·호스트 manifest 원문은 공개 문서나 자산으로 옮기지 않는다.
+
+## 제품 MSI 실제 판정 · 재개·제거 성공 후 HKCU 충돌 시험 재실패
 
 08:40:23 UTC 요청은 정상 UAC 승인을 받아 자식 프로세스 18988이 시작됐다. 0CF8D470… 재개 실행기는 완료된 Service를 반복하지 않고 수정 guard를 통해 이전 시험 설치를 제거했다. 제거는 즉시·지연 guard PASS, msiexec 0으로 완료됐고 뒤이은 깨끗한 설치 상태 Inspect도 PASS다. 앞선 3010 복구 갱신과 제한적 재개 절차가 실제 후속 제거까지 진행된 결과이며 전체 보존 Suite 통과와는 구분한다.
 
@@ -20,13 +42,13 @@
 
 새 Suite는 08:41:48 UTC에 시작해 08:42:06 UTC에 FAIL로 중단했다. 합성 HKCU 등록은 EXACT_FIXTURE_CLEANED로 정리됐지만 제품 82A72EB8…는 이번 새 Suite의 installed-product 폴더에 남아 있다. 이전 실패 시험 설치의 제거 성공을 새 시험 설치의 제거 완료로 해석하지 않는다. 실행기는 STOPPED_FOR_REVIEW_NO_AUTOMATIC_PRODUCT_REMOVAL을 유지하고 최종 기본 위치 설치를 시도하지 않았다.
 
-실제 로그의 사용자 문맥 일치, 7개 루트 검사 및 즉시·지연 guard PASS와 기대한 충돌 차단의 불일치를 조사 중이다. 제품 guard의 문제인지 시험 프로세스의 등록 가상화·뷰 차이인지 아직 확정하지 않았으며 사용자 업무 자료 손실을 관찰한 것으로 설명하지 않는다. native·정적 PASS와 재개 성공으로 이번 Suite FAIL을 대체하지 않는다. 후보 MSI·제품 소스와 공개 안내는 그대로이며 정식 공개는 실행하지 않았다.
+그 실행 직후에는 실제 로그의 사용자 문맥 일치, 7개 루트 검사 및 즉시·지연 guard PASS와 기대한 충돌 차단의 불일치를 조사했다. 당시 제품 guard와 시험 문맥 중 어느 쪽 원인인지 확정하지 않았고 후속 진단은 위에서 구분한다. 사용자 업무 자료 손실을 관찰한 것으로 설명하지 않는다. native·정적 PASS와 재개 성공으로 이번 Suite FAIL을 대체하지 않는다. 후보 MSI·제품 소스와 공개 안내는 그대로이며 정식 공개는 실행하지 않았다.
 
 로컬 근거: artifacts/image-copy-save/msi-preservation-recovery/20260927T084011285Z-dc8b5daf7b314b00bdb921778f7141d0/의 launch.json·recovery.json 및 단계 로그, artifacts/image-copy-save/msi-preservation/20260927T084148973Z-ff188992c090420794dc8f3b47277316/result.json 및 fresh-HKCU-root-0.msiexec.log. 원시 SID·등록 경로 진단은 이 문서에 복사하지 않는다.
 
 09:00 UTC 후속 진단은 UAC 승인 후 시작됐으나 native-before 결과 수집에서 중단됐다. MSI 동작은 0회, 제품 등록 변경은 없고 합성 등록은 EXACT_FIXTURE_CLEANED로 정리됐다. MSI custom action의 등록 문맥 진단은 아직 완료하지 않았으므로 이번 HKCU 실패의 원인을 확정하지 않는다. 로컬 근거: artifacts/image-copy-save/msi-preservation-development/registry-context-runs/20260927T085943091Z-e7de9c5c1fcd4f1e8584a84b378e9f31/diagnostic.json.
 
-결과 수집을 수정한 진단 실행기는 비상승·fixture 없는 수집 확인에서 PASS했다. 이후 09:03:05 UTC 정상 UAC 요청은 09:05:07 UTC 취소로 반환돼 자식 프로세스가 시작되지 않았고 진단 MSI도 실행하지 않았다. 사용자에게 가능한 재표시 시점을 물은 상태이며 실제 custom action 진단은 미완료다. 이 수집 확인을 제품 guard나 보존 Suite의 PASS로 바꾸지 않는다.
+결과 수집을 수정한 진단 실행기는 비상승·fixture 없는 수집 확인에서 PASS했다. 이후 09:03:05 UTC 정상 UAC 요청은 09:05:07 UTC 취소로 반환돼 자식 프로세스가 시작되지 않았고 진단 MSI도 실행하지 않았다. 당시 사용자에게 가능한 재표시 시점을 물었으며 그 요청에서는 실제 custom action 진단이 미실행이었다. 이후 승인된 진단 결과는 위 최신 절에서 구분한다. 이 수집 확인을 제품 guard나 보존 Suite의 PASS로 바꾸지 않는다.
 
 ## 앞선 실제 결과 · 승인 후 복구 갱신 완료와 3010 중단
 
@@ -167,7 +189,7 @@ MSI 안에 정적으로 링크한 native 검사 DLL과 파일별 SHA-256 소유 
 
 ## 최종 인수·게시 전 채울 항목
 
-1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 복구 갱신과 이전 시험 설치 제거는 완료했으나 새 Suite에서 HKCU 차단 실패가 재발했다. 남은 항목은 원인 확인·보완, 이번 새 시험 설치의 상태 확인과 실제 MSI 보존 회귀 재검증이다.
+1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 복구 갱신과 이전 시험 설치 제거는 완료했으나 새 Suite에서 HKCU 차단 실패가 재발했다. 호스트의 HKCU 시험 데이터 격리를 확인했으며, 남은 항목은 이번 새 시험 설치의 상태 확인과 외부 호스트에서의 실제 MSI 보존 회귀 재검증이다.
 2. 새 설치 충돌, 외부 수정 파일·값·추가 스트림의 복구/업데이트/제거 차단, 누락 파일 복구, 알 수 없는 추가 파일·값·타사 메뉴·기본 연결 보존, 정상 수명주기와 새 설치/업데이트 실패 롤백 결과.
 3. 최종 설치 패키지의 대표 복사·저장을 확인하고 기존 사용자 확인과 런타임 결과를 재사용한다. 조건별 메뉴·창/탭·오류/취소의 미관찰 항목은 실제 NOT RUN 범위로 기록한다. 원래 AT 목록 전체를 이번 MSI 보존 수정의 새 반복 관문으로 만들지 않으며, 추가 후속 확인은 답변 도착 전 PASS로 기록하지 않는다.
 4. 공개용 릴리스 설명과 지원 제한 확정, 최종 자산의 해시 대조, 태그/소스 커밋·Release URL·draft/prerelease 상태·게시 시각.
