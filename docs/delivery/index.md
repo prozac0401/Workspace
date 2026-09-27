@@ -1,6 +1,6 @@
 # 배포·검증 안내
 
-그림 복사·저장의 [0.2.0 보존 보완과 정식 릴리스 작업](image-020-release-20260927.md)에서 외부 호스트에서 같은 0.2.0 MSI의 전체 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**을 확인했습니다. HKLM·HKCU 충돌 차단, 외부 수정 보존, 복구·업데이트·제거와 실패 롤백을 통과했고 합성 시험 등록을 정리하며 업무 자료 역할의 fixture는 보존했습니다. 기본 위치 최종 설치도 msiexec 0으로 PASS했으며 재시작 요구와 Explorer 강제 재시작은 없었습니다. 기본 설치본의 실제 탐색기 복사·저장 대표 확인도 PASS했으며, 저장 후 최종 행 선택은 미확인입니다. [0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) 게시와 공개 MSI·체크섬 검증을 완료했습니다. Pages 안내 배포는 진행 중입니다.
+그림 복사·저장의 [0.2.0 보존 보완과 정식 릴리스 작업](image-020-release-20260927.md)에서 외부 호스트에서 같은 0.2.0 MSI의 전체 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**을 확인했습니다. HKLM·HKCU 충돌 차단, 외부 수정 보존, 복구·업데이트·제거와 실패 롤백을 통과했고 합성 시험 등록을 정리하며 업무 자료 역할의 fixture는 보존했습니다. 기본 위치 최종 설치도 msiexec 0으로 PASS했으며 재시작 요구와 Explorer 강제 재시작은 없었습니다. 기본 설치본의 실제 탐색기 복사·저장 대표 확인도 PASS했으며, 저장 후 최종 행 선택은 미확인입니다. [0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) 게시와 공개 MSI·체크섬 검증을 완료했습니다. Pages 안내 배포와 실제 공개 URL·검색·사이트맵 검증도 완료했습니다.
 
 현재 설치 안내와 버전별 검증 결과를 구분합니다. GitHub Release의 태그와 파일 해시를 기준으로 확인하세요.
 
@@ -42,4 +42,4 @@
 
 과거 기록은 당시 파일의 증거입니다. 현재 버전의 사용법이나 최신 시험 결과로 해석하지 않습니다. 초기 Excel 지시와 소스 압축본은 [원본 보존 폴더](../../tools/ExcelSmartListCompare/archive/README.md)에 있습니다.
 
-[보이는 칸 붙여넣기 단일 EXE](visible-cells-paste-single-20260927.md)는 실제 Excel 후속 확인을 마친 동일 파일을 게시했습니다. [항목별 릴리스 기록](backlog-releases-20260927.md)에서 설치 자산과 Pages 결과를 확인합니다. ImageCopySave의 이전 MSIX 초안은 과거 설치 신뢰 오류 기록입니다. 이전 무서명 관리자 MSI 0.1.1은 [설치·대표 클래식 메뉴 검증](image-classic-msi-20260927.md)을 완료한 범위가 있습니다. [당시 배포 준비 판정](image-release-readiness-20260927.md) 이후 보존 보호를 보완했으며, 0.2.0의 실제 인수와 정식 Release 게시 결과는 [후속 작업 기록](image-020-release-20260927.md)을 따릅니다. 공개 MSI 다운로드를 제공하며 Pages 안내는 배포 중입니다.
+[보이는 칸 붙여넣기 단일 EXE](visible-cells-paste-single-20260927.md)는 실제 Excel 후속 확인을 마친 동일 파일을 게시했습니다. [항목별 릴리스 기록](backlog-releases-20260927.md)에서 설치 자산과 Pages 결과를 확인합니다. ImageCopySave의 이전 MSIX 초안은 과거 설치 신뢰 오류 기록입니다. 이전 무서명 관리자 MSI 0.1.1은 [설치·대표 클래식 메뉴 검증](image-classic-msi-20260927.md)을 완료한 범위가 있습니다. [당시 배포 준비 판정](image-release-readiness-20260927.md) 이후 보존 보호를 보완했으며, 0.2.0의 실제 인수와 정식 Release 게시 결과는 [후속 작업 기록](image-020-release-20260927.md)을 따릅니다. 공개 MSI 다운로드와 Pages 설치·사용 안내를 제공하며 실제 공개 검증을 완료했습니다.

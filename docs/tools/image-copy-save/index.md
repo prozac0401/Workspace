@@ -2,7 +2,7 @@
 
 ## 2026-09-27 정식 릴리스
 
-[ImageCopySave 0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)를 게시하고 공개 MSI·체크섬을 확인했습니다. 기존·외부 수정 설치 자원 보존 보완은 같은 공개 MSI의 실제 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**으로 확인했습니다. 기본 위치 최종 설치와 클래식 직접 메뉴의 대표 그림 복사·저장도 PASS입니다. [최신 릴리스 기록](../../delivery/image-020-release-20260927.md)에 실제 결과와 앞선 배포 보류·실패 이력을 구분합니다. Pages 안내 배포 상태도 해당 릴리스 기록을 따릅니다.
+[ImageCopySave 0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)를 게시하고 공개 MSI·체크섬을 확인했습니다. 기존·외부 수정 설치 자원 보존 보완은 같은 공개 MSI의 실제 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**으로 확인했습니다. 기본 위치 최종 설치와 클래식 직접 메뉴의 대표 그림 복사·저장도 PASS입니다. [최신 릴리스 기록](../../delivery/image-020-release-20260927.md)에 실제 결과와 앞선 배포 보류·실패 이력을 구분합니다. Pages 설치·사용 안내 배포와 실제 공개 URL·검색·사이트맵 검증도 완료했습니다.
 
 Windows 11 기본 메뉴 경로의 두 기능은 기존 사용자 직접 확인 PASS입니다. 이번 0.2.0 기본 설치본의 클래식 직접 메뉴 확인은 별도 자동화 관찰이며, 150×150 PNG 복사·저장 왕복의 22,500픽셀 차이는 0개였습니다. 저장 후 최종 행 선택은 NOT_CONFIRMED입니다. 두 결과를 모든 조건별 숨김·창/탭·외부 앱 확인으로 확대하지 않습니다.
 
