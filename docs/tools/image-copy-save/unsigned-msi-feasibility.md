@@ -1,6 +1,6 @@
 # ImageCopySave · 무서명 MSI 선행 구현성 확인
 
-현재 설치 방침: 사용자가 관리자 설치를 승인했다. [ADR-0022](../../design/0022-image-admin-install.md)에 따른 관리자 무서명 등록·정리와 SYSTEM 진단 MSI 설치·제거, 비상승 사용자 등록은 PASS다. 제품 MSI와 새 메뉴 G0는 미완료다. 아래 비상승 0x80073D2B는 이전 조건의 이력이다.
+이 문서는 이전 sparse identity 경로의 구현성 시험 이력입니다. 현재 제품은 [v1.2 변경 계약](ImageCopySave_Requirements_v1.2.md)의 클래식 메뉴·무서명 관리자 MSI이며 [제품 MSI 실기](../../delivery/image-classic-msi-20260927.md)와 [최신 배포 준비 판정](../../delivery/image-release-readiness-20260927.md)을 따릅니다. 아래 비상승 0x80073D2B와 이후 관리자 진단 결과는 당시 조건의 이력으로 보존합니다.
 
 도구 ID: ImageCopySave · 상태: 아래는 비상승 시험 이력, 관리자·SYSTEM 경로는 후속 PASS
 날짜: 2026-09-27 · 책임: 개발·검증 담당

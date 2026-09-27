@@ -39,4 +39,4 @@
 
 과거 기록은 당시 파일의 증거입니다. 현재 버전의 사용법이나 최신 시험 결과로 해석하지 않습니다. 초기 Excel 지시와 소스 압축본은 [원본 보존 폴더](../../tools/ExcelSmartListCompare/archive/README.md)에 있습니다.
 
-[보이는 칸 붙여넣기 단일 EXE](visible-cells-paste-single-20260927.md)는 실제 Excel 후속 확인을 마친 동일 파일을 게시했습니다. [항목별 릴리스 기록](backlog-releases-20260927.md)에서 설치 자산과 Pages 결과를 확인합니다. ImageCopySave는 설치 신뢰 오류로 초안에만 보존하며 공개 다운로드 대상이 아닙니다.
+[보이는 칸 붙여넣기 단일 EXE](visible-cells-paste-single-20260927.md)는 실제 Excel 후속 확인을 마친 동일 파일을 게시했습니다. [항목별 릴리스 기록](backlog-releases-20260927.md)에서 설치 자산과 Pages 결과를 확인합니다. ImageCopySave의 이전 MSIX 초안은 과거 설치 신뢰 오류 기록입니다. 현재 후보는 무서명 관리자 MSI 0.1.1이며 [설치·대표 클래식 메뉴 검증](image-classic-msi-20260927.md)을 완료한 범위가 있습니다. [배포 준비 판정](image-release-readiness-20260927.md)의 일부 조건별 메뉴·창/탭·외부 수정 자원 보존 조건이 남아 공개 다운로드는 보류합니다.
