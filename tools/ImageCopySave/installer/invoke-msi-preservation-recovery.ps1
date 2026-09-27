@@ -6,6 +6,7 @@ param(
     [Parameter(Mandatory=$true)][string]$MsiPath,
     [Parameter(Mandatory=$true)][string]$RollbackMsiPath,
     [Parameter(Mandatory=$true)][string]$PreviousMetadata,
+    [string]$ServicedReport='',
     [ValidateSet('Inspect','Run')][string]$Action='Inspect',
     [switch]$RequestElevation,
     [switch]$Elevated,
@@ -47,7 +48,7 @@ if($Elevated){
     if((Hash $FrozenPlanPath) -ne $ExpectedPlanHash){throw 'Approved recovery plan changed before elevation.'}
     $frozen=Get-Content -LiteralPath $FrozenPlanPath -Raw -Encoding UTF8|ConvertFrom-Json
     if($frozen.schema -ne 1 -or $frozen.action -ne 'Run' -or $frozen.recoverySha256 -ne $recoveryHash -or $frozen.initiatingUserSid -ne $identity.User.Value){throw 'Recovery plan or initiating user differs from approval.'}
-    if($FailedReport -ne $frozen.failedReport -or $InstalledMsiPath -ne $frozen.installedMsi -or $RecoveryMsiPath -ne $frozen.recoveryMsi -or $MsiPath -ne $frozen.msi -or $RollbackMsiPath -ne $frozen.rollbackMsi -or $PreviousMetadata -ne $frozen.previousMetadata){throw 'Elevated recovery arguments differ from approval.'}
+    if($FailedReport -ne $frozen.failedReport -or $InstalledMsiPath -ne $frozen.installedMsi -or $RecoveryMsiPath -ne $frozen.recoveryMsi -or $MsiPath -ne $frozen.msi -or $RollbackMsiPath -ne $frozen.rollbackMsi -or $PreviousMetadata -ne $frozen.previousMetadata -or $ServicedReport -ne $frozen.servicedReport){throw 'Elevated recovery arguments differ from approval.'}
     foreach($source in $frozen.sources){$path=Artifact (Join-Path $root $source.path) 'tools/ImageCopySave/installer';if((Hash $path) -ne $source.sha256){throw 'Approved recovery script changed before elevation.'}}
 }elseif($FrozenPlanPath -or $ExpectedPlanHash -or $ExpectedRecoveryHash){throw 'Internal elevation arguments cannot be supplied to normal entry.'}
 $FailedReport=Artifact $FailedReport 'artifacts/image-copy-save/msi-preservation'
@@ -63,14 +64,35 @@ $legacyPinPath=Join-Path $PSScriptRoot 'baselines/0.1.1.json'
 $legacyPin=Get-Content -LiteralPath $legacyPinPath -Raw -Encoding UTF8|ConvertFrom-Json
 $verifier=Join-Path $PSScriptRoot 'verify-msi.ps1'
 $packageInspector=New-Object -ComObject WindowsInstaller.Installer
+function Release-OwnedCom([object]$Value) {
+    if($null -ne $Value -and [Runtime.InteropServices.Marshal]::IsComObject($Value)){
+        [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($Value)
+    }
+}
 function Package-Identity([string]$Path){
-    $db=$packageInspector.OpenDatabase($Path,0)
-    $view=$db.OpenView('SELECT `Property`, `Value` FROM `Property`')
-    $properties=@{}
-    try{[void]$view.Execute();while($record=$view.Fetch()){$properties[$record.StringData(1)]=$record.StringData(2)}}finally{[void]$view.Close()}
-    $summary=$db.SummaryInformation(0)
-    $packageCode=([Guid]([string]$summary.Property(9))).ToString('B').ToUpperInvariant()
-    return [pscustomobject]@{productCode=$properties.ProductCode;version=$properties.ProductVersion;packageCode=$packageCode}
+    $db=$null;$view=$null;$record=$null;$summary=$null
+    try{
+        $db=$packageInspector.OpenDatabase($Path,0)
+        $view=$db.OpenView('SELECT `Property`, `Value` FROM `Property`')
+        $properties=@{}
+        [void]$view.Execute()
+        while($record=$view.Fetch()){
+            try{$properties[$record.StringData(1)]=$record.StringData(2)}
+            finally{Release-OwnedCom $record;$record=$null}
+        }
+        $summary=$db.SummaryInformation(0)
+        $packageCode=([Guid]([string]$summary.Property(9))).ToString('B').ToUpperInvariant()
+        return [pscustomobject]@{productCode=$properties.ProductCode;version=$properties.ProductVersion;packageCode=$packageCode}
+    }finally{
+        try{Release-OwnedCom $summary}
+        finally{
+            try{Release-OwnedCom $record}
+            finally{
+                try{if($null -ne $view){try{[void]$view.Close()}finally{Release-OwnedCom $view}}}
+                finally{Release-OwnedCom $db}
+            }
+        }
+    }
 }
 function Read-Build([string]$Path,[bool]$IsRollback,[bool]$Legacy=$false,[bool]$IsRecovery=$false,[bool]$OriginalFixture=$false){
     $path=Artifact $Path 'artifacts/image-copy-save/msi'
@@ -139,11 +161,36 @@ $sourcePaths=@('tools/ImageCopySave/installer/invoke-msi-preservation-recovery.p
 $sourcePaths=@(($sourcePaths+$builderSourcePaths)|Select-Object -Unique)
 $sources=@($sourcePaths|ForEach-Object{[ordered]@{path=$_;sha256=(Hash (Join-Path $root $_))}})
 $artifacts=@($installed,$recoveryPackage,$product,$rollback,$previous|ForEach-Object{[ordered]@{path=$_.path;sha256=$_.sha256;metadataPath=$_.metadataPath;metadataSha256=$_.metadataSha256}})
+function Assert-ServicedEvidence([object]$Evidence,[string]$LogText){
+    if($Evidence.schema -ne 1 -or $Evidence.action -ne 'Run' -or $Evidence.status -ne 'STOPPED' -or -not $Evidence.elevated -or $Evidence.finalInstallAttempted -or $Evidence.unknownChangesDeleted -or $Evidence.explorerRestarted){throw 'Serviced evidence is not the reviewed stopped recovery run.'}
+    if($Evidence.failedReport -ne $FailedReport -or $Evidence.failedReportSha256 -ne $failureHash -or $Evidence.installedMsi -ne $installed.path -or $Evidence.installedMsiSha256 -ne $installed.sha256 -or $Evidence.recoveryMsi -ne $recoveryPackage.path -or $Evidence.recoveryMsiSha256 -ne $recoveryPackage.sha256 -or $Evidence.recoveryPackageCode -ne $recoveryPackage.packageCode -or $Evidence.msi -ne $product.path -or $Evidence.msiSha256 -ne $product.sha256 -or $Evidence.rollbackMsi -ne $rollback.path -or $Evidence.previousMetadata -ne $PreviousMetadata -or $Evidence.fixtureFolder -ne $fixtureFolder){throw 'Serviced evidence differs from the six exact recovery inputs.'}
+    if(@($Evidence.steps).Count -ne 1 -or $Evidence.stoppedAfter -ne 'service-exact-failed-fixture'){throw 'Serviced evidence contains an unexpected or later operation.'}
+    $step=$Evidence.steps[0]
+    if($step.name -ne 'service-exact-failed-fixture' -or $step.status -ne 'FAIL' -or $step.exitCode -ne 3010 -or $step.log -ne 'service-exact-failed-fixture.msiexec.log' -or $step.msiSha256 -ne $recoveryPackage.sha256 -or $step.packageCode -ne $recoveryPackage.packageCode){throw 'Serviced evidence does not record the exact completed update with exit 3010.'}
+    if($step.inspection.cachedPackageCode -ne $installed.packageCode -or $step.inspection.directory -ne $fixtureFolder -or $step.inspection.verifiedFiles -ne 404 -or $step.inspection.verifiedRegistryValues -ne 23){throw 'Servicing did not start from the exact audited original fixture.'}
+    if([regex]::Matches($LogText,'ImageCopySave ownership guard: PASS \(preflight\)').Count -ne 1 -or [regex]::Matches($LogText,'ImageCopySave ownership guard: PASS \(deferred recheck\)').Count -ne 1 -or $LogText -match 'ImageCopySave ownership guard: BLOCKED:' -or $LogText -notmatch '(?m)^.*: InstallFinalize\.[^\r\n]* 1\.\s*$' -or $LogText -notmatch 'MainEngineThread is returning 3010'){throw 'Servicing log does not prove both guard checks and completed installation.'}
+}
+$servicedEvidence=$null;$evidenceFiles=@()
+if($ServicedReport){
+    $ServicedReport=Artifact $ServicedReport 'artifacts/image-copy-save/msi-preservation-recovery'
+    if([IO.Path]::GetFileName($ServicedReport) -ne 'recovery.json' -or [IO.Path]::GetDirectoryName([IO.Path]::GetDirectoryName($ServicedReport)) -ne (Join-Path $root 'artifacts/image-copy-save/msi-preservation-recovery')){throw 'Expected a direct unique recovery result directory.'}
+    $servicedLog=Artifact (Join-Path ([IO.Path]::GetDirectoryName($ServicedReport)) 'service-exact-failed-fixture.msiexec.log') 'artifacts/image-copy-save/msi-preservation-recovery'
+    # This continuation is intentionally limited to the manually audited 3010
+    # run. Its original report remains FAIL/STOPPED and is never rewritten.
+    if((Hash $ServicedReport) -ne '58AC07A230681D3B0E00540D810A320588C1FA90068E86AA0F81817A2FB2F517' -or (Hash $servicedLog) -ne '21DF9E9B154A042C870FE028674CF88781675C757023A92A94A0FA3843FFA9E1'){throw 'Serviced report/log is not the exact reviewed 3010 evidence.'}
+    $serviced=Get-Content -LiteralPath $ServicedReport -Raw -Encoding UTF8|ConvertFrom-Json
+    $servicedText=Get-Content -LiteralPath $servicedLog -Raw
+    Assert-ServicedEvidence $serviced $servicedText
+    $evidenceFiles=@([ordered]@{path=$ServicedReport;sha256=(Hash $ServicedReport)},[ordered]@{path=$servicedLog;sha256=(Hash $servicedLog)})
+    $servicedEvidence=[ordered]@{report=$ServicedReport;reportSha256=$evidenceFiles[0].sha256;log=$servicedLog;logSha256=$evidenceFiles[1].sha256;exitCode=3010;completedGuardedServicing=$true;originalReportUnchanged=$true;serviceWillBeRepeated=$false}
+}
 function Assert-FrozenInputs {
     $expectedSources=$(if($Elevated){$frozen.sources}else{$sources})
     $expectedArtifacts=$(if($Elevated){$frozen.artifacts}else{$artifacts})
+    $expectedEvidence=$(if($Elevated){$frozen.evidenceFiles}else{$evidenceFiles})
     if((Hash $FailedReport) -ne $failureHash -or ($Elevated -and $failureHash -ne $frozen.failedReportSha256)){throw 'Failed-suite evidence changed; recovery stopped.'}
     foreach($source in $expectedSources){if((Hash (Join-Path $root $source.path)) -ne $source.sha256){throw 'Approved recovery dependency changed; next operation was not launched.'}}
+    foreach($evidence in $expectedEvidence){if((Hash $evidence.path) -ne $evidence.sha256){throw 'Approved serviced report/log changed; continuation stopped.'}}
     foreach($artifact in $expectedArtifacts){if((Hash $artifact.path) -ne $artifact.sha256 -or (Hash $artifact.metadataPath) -ne $artifact.metadataSha256){throw 'Approved package or metadata changed; next operation was not launched.'}}
 }
 if($Elevated){Assert-FrozenInputs;$output=Artifact ([IO.Path]::GetDirectoryName($FrozenPlanPath)) 'artifacts/image-copy-save/msi-preservation-recovery'}
@@ -166,8 +213,24 @@ function Existing-Products {
     return ,$rows
 }
 $installer=New-Object -ComObject WindowsInstaller.Installer
+$database=$null;$recoveryDatabase=$null
+try{
 $database=$installer.OpenDatabase($installed.path,0)
-function Query([string]$Sql,[int]$Columns,[object]$Db=$database){$view=$Db.OpenView($Sql);try{[void]$view.Execute();$rows=@();while($record=$view.Fetch()){$row=@();for($i=1;$i -le $Columns;$i++){$row+=$record.StringData($i)};$rows+=,$row};return ,$rows}finally{[void]$view.Close()}}
+function Query([string]$Sql,[int]$Columns,[object]$Db=$database){
+    # The caller owns Db; every view and fetched record belongs to this call.
+    $view=$null;$record=$null
+    try{
+        $view=$Db.OpenView($Sql);[void]$view.Execute();$rows=@()
+        while($record=$view.Fetch()){
+            try{$row=@();for($i=1;$i -le $Columns;$i++){$row+=$record.StringData($i)};$rows+=,$row}
+            finally{Release-OwnedCom $record;$record=$null}
+        }
+        return ,$rows
+    }finally{
+        try{Release-OwnedCom $record}
+        finally{if($null -ne $view){try{[void]$view.Close()}finally{Release-OwnedCom $view}}}
+    }
+}
 $expectedRegistry=@{}
 
 foreach($row in (Query 'SELECT `Root`, `Key`, `Name`, `Value` FROM `Registry`' 4)){
@@ -214,6 +277,12 @@ function Assert-RegistryInventory([object[]]$Rows){
 Assert-RegistryInventory @($recoveryPin.registry)
 $recoveryRegistry=@(foreach($row in (Query 'SELECT `Root`, `Key`, `Name`, `Value` FROM `Registry`' 4 $recoveryDatabase)){[pscustomobject]@{root=$row[0];key=$row[1];name=$row[2];value=$row[3]}})
 Assert-RegistryInventory $recoveryRegistry
+}finally{
+    # Finish reading source packages before any servicing/removal starts. Cached
+    # package reads in Package-Identity likewise release all COM handles locally.
+    try{Release-OwnedCom $recoveryDatabase;$recoveryDatabase=$null}
+    finally{Release-OwnedCom $database;$database=$null}
+}
 $expectedKeys=@{};foreach($path in $expectedRegistry.Keys){$expectedKeys[$path]=$true};foreach($path in $registryRoots){$expectedKeys[$path]=$true}
 function Assert-RegistryTree([string]$Path){
     if(-not $expectedKeys.ContainsKey($Path)){throw 'Unknown registry child exists; recovery did not change it.'}
@@ -264,6 +333,38 @@ function Assert-ExactFixture([object]$ExpectedPackage=$installed) {
     }
     return [ordered]@{productCode=$installed.metadata.productCode;version=$installed.metadata.version;expectedPackageCode=$ExpectedPackage.packageCode;cachedPackageCode=$cached.packageCode;directory=$fixtureFolder;verifiedFiles=$expectedFiles.Count;verifiedRegistryValues=23;unknownFiles=0;unknownRegistryValues=0;currentUserCollisions=0;namedStreams=0;reparsePaths=0}
 }
+function Normalize-PendingPath([string]$Value){
+    if(-not $Value){return ''}
+    $path=$Value.Replace('/','\') -replace '^(?:\*\d+|!)+',''
+    foreach($prefix in @('\??\','\\?\','\DosDevices\')){if($path.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){$path=$path.Substring($prefix.Length);break}}
+    if($path -notmatch '^[A-Za-z]:\\'){throw 'A pending rename target cannot be resolved as an absolute local DOS path; continuation stopped.'}
+    return [IO.Path]::GetFullPath($path).TrimEnd('\')
+}
+function Assert-PendingTargets([object[]]$Pairs,[string]$Cache,[string]$Folder,[string]$ObsoleteCache){
+    $cachePath=Normalize-PendingPath $Cache;$folderPath=Normalize-PendingPath $Folder
+    $obsoletePath=Normalize-PendingPath $ObsoleteCache;$oldDeletes=0
+    foreach($pair in $Pairs){
+        $source=Normalize-PendingPath ([string]$pair.source);$destination=Normalize-PendingPath ([string]$pair.destination)
+        foreach($path in @($source,$destination)){
+            if($path -and ($path -eq $cachePath -or $path.StartsWith(($cachePath+':'),[StringComparison]::OrdinalIgnoreCase) -or $path -eq $folderPath -or $path.StartsWith(($folderPath+'\'),[StringComparison]::OrdinalIgnoreCase) -or $path.StartsWith(($folderPath+':'),[StringComparison]::OrdinalIgnoreCase) -or $cachePath.StartsWith(($path+'\'),[StringComparison]::OrdinalIgnoreCase) -or $folderPath.StartsWith(($path+'\'),[StringComparison]::OrdinalIgnoreCase))){throw 'A pending rename/delete targets the current cached MSI or fixture product; continuation stopped without changing the queue.'}
+        }
+        if($source -eq $obsoletePath -and -not $destination){$oldDeletes++}
+    }
+    return [ordered]@{status='PASS';currentCachedMsi=$cachePath;totalPendingPairs=$Pairs.Count;obsoleteCacheDeletionPairs=$oldDeletes;unrelatedPendingPairs=($Pairs.Count-$oldDeletes);currentCacheTargets=0;fixtureTargets=0;queueModified=$false}
+}
+function Assert-PendingSafety {
+    $cache=[string]$packageInspector.ProductInfo($installed.metadata.productCode,'LocalPackage')
+    [void](Plain-Path $cache (Join-Path $env:windir 'Installer'))
+    $key=$machine.OpenSubKey('SYSTEM\CurrentControlSet\Control\Session Manager')
+    $pairs=@()
+    try{if($null -ne $key){foreach($name in @('PendingFileRenameOperations','PendingFileRenameOperations2')){
+        $items=$key.GetValue($name,$null,[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+        if($null -eq $items){continue}
+        if($key.GetValueKind($name) -ne [Microsoft.Win32.RegistryValueKind]::MultiString -or $items.Count % 2 -ne 0){throw 'Pending rename data is not a complete pair list; continuation stopped.'}
+        for($i=0;$i -lt $items.Count;$i+=2){$pairs+=[pscustomobject]@{source=[string]$items[$i];destination=[string]$items[$i+1]}}
+    }}}finally{if($null -ne $key){$key.Dispose()}}
+    return Assert-PendingTargets $pairs $cache $fixtureFolder (Join-Path $env:windir 'Installer/446ded.msi')
+}
 function Assert-FixtureRemoved {
     $remaining=Existing-Products
     if($remaining.Count){throw 'A product remains installed; later recovery steps were not run.'}
@@ -276,7 +377,7 @@ $jsonReader=New-Object System.Web.Script.Serialization.JavaScriptSerializer
 $jsonReader.MaxJsonLength=16777216
 $steps=New-Object 'System.Collections.Generic.List[object]'
 $reportPath=Join-Path $output $(if($Elevated){'recovery.json'}else{'inspection.json'})
-$report=[ordered]@{schema=1;status='RUNNING';action=$Action;elevated=[bool]$Elevated;startedUtc=[DateTime]::UtcNow.ToString('o');failedReport=$FailedReport;failedReportSha256=$failureHash;installedMsi=$installed.path;installedMsiSha256=$installed.sha256;recoveryMsi=$RecoveryMsiPath;recoveryMsiSha256=$recoveryPackage.sha256;recoveryPackageCode=$recoveryPackage.packageCode;fixtureFolder=$fixtureFolder;msi=$MsiPath;msiSha256=$product.sha256;rollbackMsi=$RollbackMsiPath;previousMetadata=$PreviousMetadata;steps=@();stoppedAfter=$null;explorerRestarted=$false;unknownChangesDeleted=$false;finalInstallAttempted=$false;buildConsistency=[ordered]@{schema=2;identicalFinalAndRollbackSourceFiles=$finalSourceProperties.Count;unchangedRuntimeFiles=@($installed.metadata.files).Count;priorBaselineArgumentsComparedSeparately=$true}}
+$report=[ordered]@{schema=1;status='RUNNING';action=$Action;elevated=[bool]$Elevated;startedUtc=[DateTime]::UtcNow.ToString('o');failedReport=$FailedReport;failedReportSha256=$failureHash;installedMsi=$installed.path;installedMsiSha256=$installed.sha256;recoveryMsi=$RecoveryMsiPath;recoveryMsiSha256=$recoveryPackage.sha256;recoveryPackageCode=$recoveryPackage.packageCode;fixtureFolder=$fixtureFolder;msi=$MsiPath;msiSha256=$product.sha256;rollbackMsi=$RollbackMsiPath;previousMetadata=$PreviousMetadata;steps=@();stoppedAfter=$null;explorerRestarted=$false;unknownChangesDeleted=$false;finalInstallAttempted=$false;servicedEvidence=$servicedEvidence;serviceAlreadyCompleted=[bool]$ServicedReport;historicalRebootRequired=[bool]$ServicedReport;buildConsistency=[ordered]@{schema=2;identicalFinalAndRollbackSourceFiles=$finalSourceProperties.Count;unchangedRuntimeFiles=@($installed.metadata.files).Count;priorBaselineArgumentsComparedSeparately=$true}}
 function Write-Report{$report.steps=@($steps.ToArray());[IO.File]::WriteAllText($reportPath,($report|ConvertTo-Json -Depth 15),$utf8)}
 function Run-Step([string]$Name,[string]$Script,[hashtable]$Arguments,[string]$Prefix,[string]$ResultBoundary){
     Assert-FrozenInputs
@@ -299,8 +400,9 @@ function Preservation([string]$Operation,[string]$Name){return Run-Step $Name (J
 function Invoke-FixtureMsi([ValidateSet('Service','Remove')][string]$Operation){
     $expected=$(if($Operation -eq 'Service'){$installed}else{$recoveryPackage})
     $inspection=Assert-ExactFixture $expected
+    $pendingInspection=$null;if($ServicedReport){$pendingInspection=Assert-PendingSafety}
     $name=$(if($Operation -eq 'Service'){'service-exact-failed-fixture'}else{'remove-corrected-fixture'})
-    $entry=[ordered]@{name=$name;status='RUNNING';startedUtc=[DateTime]::UtcNow.ToString('o');msiSha256=$recoveryPackage.sha256;packageCode=$recoveryPackage.packageCode;inspection=$inspection;exitCode=$null;log=$name+'.msiexec.log'}
+    $entry=[ordered]@{name=$name;status='RUNNING';startedUtc=[DateTime]::UtcNow.ToString('o');msiSha256=$recoveryPackage.sha256;packageCode=$recoveryPackage.packageCode;inspection=$inspection;pendingInspection=$pendingInspection;exitCode=$null;log=$name+'.msiexec.log'}
     $steps.Add($entry);$report.stoppedAfter=$entry.name;Write-Report
     $log=Join-Path $output $entry.log
     $info=New-Object Diagnostics.ProcessStartInfo
@@ -321,19 +423,23 @@ function Invoke-FixtureMsi([ValidateSet('Service','Remove')][string]$Operation){
 Write-Report
 try{
     $script:associationsBefore=Associations
-    $inspection=Assert-ExactFixture
+    $initialPackage=$(if($ServicedReport){$recoveryPackage}else{$installed})
+    $inspection=Assert-ExactFixture $initialPackage
     $report.fixtureInspection=$inspection
+    if($ServicedReport){$report.pendingInspection=Assert-PendingSafety}
     if(-not $Elevated){
         $report.plannedSequence=@('Service only the exact failed suite installation using the pinned corrected small update','Remove the serviced fixture through its corrected MSI ownership guard','Inspect clean installation state','Run the full rebuilt MSI preservation suite including legacy upgrade and rollback','Install the final rebuilt MSI at the default location')
+        if($ServicedReport){$report.plannedSequence=@($report.plannedSequence|Select-Object -Skip 1)}
         $report.status='PASS';Write-Report
         if($Action -eq 'Inspect'){return}
         if(-not $RequestElevation){throw 'Run requires -RequestElevation for one normal administrator approval. Inspect completed without changing installation.'}
         Assert-FrozenInputs
-        $plan=[ordered]@{schema=1;action='Run';createdUtc=[DateTime]::UtcNow.ToString('o');initiatingUserSid=$identity.User.Value;recoverySha256=$recoveryHash;failedReport=$FailedReport;failedReportSha256=$failureHash;installedMsi=$InstalledMsiPath;recoveryMsi=$RecoveryMsiPath;msi=$MsiPath;rollbackMsi=$RollbackMsiPath;previousMetadata=$PreviousMetadata;sources=$sources;artifacts=$artifacts;associations=$script:associationsBefore;fixtureInspection=$inspection;sequence=$report.plannedSequence}
+        $plan=[ordered]@{schema=1;action='Run';createdUtc=[DateTime]::UtcNow.ToString('o');initiatingUserSid=$identity.User.Value;recoverySha256=$recoveryHash;failedReport=$FailedReport;failedReportSha256=$failureHash;installedMsi=$InstalledMsiPath;recoveryMsi=$RecoveryMsiPath;msi=$MsiPath;rollbackMsi=$RollbackMsiPath;previousMetadata=$PreviousMetadata;servicedReport=$ServicedReport;servicedEvidence=$servicedEvidence;evidenceFiles=$evidenceFiles;sources=$sources;artifacts=$artifacts;associations=$script:associationsBefore;fixtureInspection=$inspection;sequence=$report.plannedSequence}
         $FrozenPlanPath=Join-Path $output 'approved-plan.json';[IO.File]::WriteAllText($FrozenPlanPath,($plan|ConvertTo-Json -Depth 12),$utf8);$planHash=Hash $FrozenPlanPath
         $launchPath=Join-Path $output 'launch.json';$launch=[ordered]@{status='REQUESTING_UAC';requestedUtc=[DateTime]::UtcNow.ToString('o');approvedPlan=$FrozenPlanPath;approvedPlanSha256=$planHash;processId=$null;exitCode=$null}
         [IO.File]::WriteAllText($launchPath,($launch|ConvertTo-Json -Depth 6),$utf8)
         $arguments=@('-NoLogo','-NoProfile','-NonInteractive','-File',$PSCommandPath,'-FailedReport',$FailedReport,'-InstalledMsiPath',$InstalledMsiPath,'-RecoveryMsiPath',$RecoveryMsiPath,'-MsiPath',$MsiPath,'-RollbackMsiPath',$RollbackMsiPath,'-PreviousMetadata',$PreviousMetadata,'-Action','Run','-Elevated','-FrozenPlanPath',$FrozenPlanPath,'-ExpectedPlanHash',$planHash,'-ExpectedRecoveryHash',$recoveryHash)
+        if($ServicedReport){$arguments+=@('-ServicedReport',$ServicedReport)}
         $quoted=@($arguments|ForEach-Object{if($_.Contains('"') -or $_ -match '[\r\n]' -or $_.EndsWith('\')){throw 'Ambiguous elevation argument.'};'"'+$_+'"'}) -join ' '
         $child=$null
         try{
@@ -346,7 +452,7 @@ try{
         return
     }
     if($script:associationsBefore -ne $frozen.associations){throw 'Image associations changed during approval; recovery preserved the new state and stopped.'}
-    Invoke-FixtureMsi 'Service'
+    if(-not $ServicedReport){Invoke-FixtureMsi 'Service'}
     Invoke-FixtureMsi 'Remove'
     $clean=Preservation 'Inspect' 'clean-inspect-after-fixture-removal'
     if(-not $clean['preflight']['canRunSuite']){throw 'Unknown state remains after fixture removal; no suite was attempted.'}
@@ -357,6 +463,6 @@ try{
     $report.finalInstallAttempted=$true;Write-Report
     $final=Run-Step 'final-default-install' (Join-Path $PSScriptRoot 'test-msi-lifecycle.ps1') @{MsiPath=$MsiPath;Action='Install'} 'Lifecycle result: ' 'artifacts/image-copy-save/msi-lifecycle'
     if($final['productCode'] -ne $product.metadata.productCode -or $final['exitCode'] -ne 0 -or -not $final['installedAfter']){throw 'Final installation identity or result differs.'}
-    $report.status='PASS';$report.finalState='Rebuilt final MSI installed at default location after full preservation suite; no pending reboot'
+    $report.status='PASS';$report.finalState='Rebuilt final MSI installed at default location after full preservation suite; no reboot was initiated'
 }catch{$report.status='STOPPED';$report.error=$_.Exception.Message;$report.recovery='No automatic removal, reinstall, direct registry cleanup, or file deletion was attempted after failure.';throw}
 finally{$report.finishedUtc=[DateTime]::UtcNow.ToString('o');Write-Report;$machine.Dispose();$user.Dispose();Write-Output "Preservation recovery result: $reportPath"}
