@@ -8,7 +8,7 @@
 
 현재 제품은 **별도 서명 없는 자체 포함 MSI**로 설치합니다. 사용자가 승인한 설치 방식은 관리자 권한의 PC 전체 설치이며, 평소 그림 복사·저장은 일반 사용자로 실행합니다. 인증서 설치, 개발자 모드, PowerShell 실행, 수동 레지스트리 등록을 일반 사용자에게 요구하지 않습니다. MSI에 포함한 native 보존 검사는 설치 자원을 읽어 비교하고 실제 쓰기·제거·롤백은 Windows Installer가 담당합니다.
 
-최신 제품·로컬 복구·롤백 후보의 제작·정적 검사와 native **39개 시험은 PASS**입니다. 실제 설치의 PackageCode·404파일·23등록 값을 확인하는 읽기 전용 검사와 전체 제한 복구 사전 검사도 PASS이며 설치 동작은 실행하지 않았습니다. **07:42 UTC의 최신 실제 Run 요청은 07:44 UTC UAC 취소로 자식 프로세스가 시작되지 않아 새 보존 Suite·최종 설치는 NOT RUN**입니다. 앞선 HKCU 차단 누락과 06:57 제거·07:29 복구 갱신의 1603 실패는 이력으로 유지합니다. [최신 0.2.0 기록](../../../docs/delivery/image-020-release-20260927.md)에 후보 해시·실제 결과·남은 항목을 구분하며 정적·제한 사전 검사 PASS를 실제 인수나 게시 완료로 설명하지 않습니다.
+최신 제품·로컬 복구·롤백 후보의 제작·정적 검사와 native **39개 시험은 PASS**입니다. 관리자 승인 후 실제 복구 갱신은 양쪽 guard PASS·InstallFinalize 완료·3010으로 끝났습니다. 후속 COM 해제 회귀 5개·재개 이력/예약 경로 회귀 27개와 현재 복구 설치 404파일·23등록 값의 Inspect도 PASS입니다. **08:28:59 UTC 재개 요청은 08:31:02 UTC UAC 취소로 자식 프로세스가 시작되지 않아 후속 제거·보존 Suite·최종 설치는 NOT RUN**입니다. 앞선 실패·취소와 3010 표시는 유지합니다. [최신 0.2.0 기록](../../../docs/delivery/image-020-release-20260927.md)에 준비 검사와 실제 결과를 구분하며 공개 게시는 아직 미완료입니다.
 
 메뉴는 Windows 11 기본 모드에서 **우클릭 → 더 많은 옵션 표시**, 클래식 직접 표시 모드에서는 우클릭 메뉴에서 바로 접근합니다. 기본 메뉴의 복사·저장 두 기능은 사용자 직접 확인 PASS이며, 기존 클래식 메뉴의 대표 결과도 유지합니다. 모든 조건별 숨김·창/탭 검증으로 확대하지 않습니다. Windows 10 형식 메뉴라는 표현은 Windows 11의 표시 모드를 뜻하며 Windows 10 OS 지원 인증이 아닙니다. 설치기는 메뉴 모드 설정을 바꾸지 않습니다.
 
@@ -55,7 +55,16 @@ powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/te
 
 [invoke-msi-preservation-sequence.ps1](invoke-msi-preservation-sequence.ps1)은 기존 검증 후보에서의 업데이트·제거, 격리된 보존 회귀, 최종 설치를 정상 UAC 승인 아래 순서대로 수행하는 시험기입니다. 기본 Inspect로 고정할 입력·파일 해시와 사전 조건을 확인하며 Run은 승인된 시험 순서에 한해 실행합니다. 단계가 실패하거나 재부팅이 필요하면 중단합니다. 시험기를 직접 사용하지 않는 일반 MSI에도 내장 보호가 적용되어야 하며, 시험기의 사전 확인을 제품 기능의 증거로 대체하지 않습니다.
 
-[invoke-msi-preservation-recovery.ps1](invoke-msi-preservation-recovery.ps1)은 실패 보고서가 가리키는 정확한 `artifacts/image-copy-save/msi-preservation/<실패 실행 ID>/installed-product`만 복구하는 개발자용 시험기입니다. 기본 `Inspect`는 제품·등록을 변경하지 않고 실패 보고서·고정한 MSI·설치 파일과 값의 일치를 확인합니다. 승인된 `Run`은 내장 감사 목록이 고정된 복구 갱신 → 수정 guard를 통한 시험 설치 제거 → 깨끗한 상태 확인 → 새 보존 회귀 → 최종 설치를 순서대로 실행합니다. 임의 설치 폴더나 레지스트리를 직접 정리하지 않으며 불일치·실패·재부팅 요구가 있으면 중단합니다. 이전 두 실제 시도는 각각 제거와 복구 갱신의 사전 검사에서 1603으로 중단됐습니다. 최신 후보의 제한된 읽기 전용 사전 검사는 PASS지만 07:42 요청은 UAC 취소로 자식 프로세스가 시작되지 않았으며 기존 시험 설치는 제거 완료 상태가 아닙니다.
+[invoke-msi-preservation-recovery.ps1](invoke-msi-preservation-recovery.ps1)은 실패 보고서가 가리키는 정확한 `artifacts/image-copy-save/msi-preservation/<실패 실행 ID>/installed-product`만 복구하는 개발자용 시험기입니다. 기본 `Inspect`는 제품·등록을 변경하지 않고 실패 보고서·고정한 MSI·설치 파일과 값의 일치를 확인합니다. 승인된 `Run`은 내장 감사 목록이 고정된 복구 갱신 → 수정 guard를 통한 시험 설치 제거 → 깨끗한 상태 확인 → 새 보존 회귀 → 최종 설치를 순서대로 실행합니다. 임의 설치 폴더나 레지스트리를 직접 정리하지 않으며 불일치·실패·재부팅 요구가 있으면 중단합니다.
+
+개발자용 `-ServicedReport`는 이미 완료된 복구 갱신을 반복하지 않고 제거부터 재개하는 제한 옵션입니다. 감사한 08:13 실행의 recovery.json·MSI 로그 해시, 원래 실패 이력과 모든 후보 입력을 고정하고, 양쪽 guard PASS·InstallFinalize 완료·3010 및 현재 복구 패키지의 404파일·23등록 값을 다시 확인합니다. 제품 폴더나 현재 캐시를 향한 예약 작업은 차단하며 기존 예약 목록은 수정하지 않습니다. 임의의 3010 결과를 통과시키는 옵션이나 일반 사용자 제거 방법이 아닙니다.
+
+```powershell
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/preservation-tests/test-recovery-resume.ps1 -ServicedReport "<감사한 08:13 실행의 recovery.json>"
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/invoke-msi-preservation-recovery.ps1 -FailedReport "<원래 실패 result.json>" -InstalledMsiPath "<원래 설치 MSI>" -RecoveryMsiPath "<고정 복구 MSI>" -MsiPath "<제품 후보 MSI>" -RollbackMsiPath "<짝지은 롤백 MSI>" -PreviousMetadata "<0.1.1 build-metadata.json>" -ServicedReport "<감사한 08:13 실행의 recovery.json>" -Action Inspect
+```
+
+첫 명령은 이력·예약 경로의 순수 회귀이며 MSI 동작과 등록 쓰기를 하지 않습니다. Inspect 통과 뒤 승인된 실제 재개에만 같은 입력으로 `-Action Run -RequestElevation`을 사용해 정상 UAC를 요청합니다. 3010 원래 기록을 그대로 보존하며, 이후 단계가 실패하면 다시 중단합니다. 현재 실제 상태는 위 작업 기록을 따릅니다.
 
 보존 회귀는 PC 전체 HKLM과 설치를 실행한 사용자의 HKCU 일곱 루트·설치 디렉터리 충돌, 수정 파일·값·추가 NTFS 스트림, 누락 파일 복구, 추가 파일·값·타사 등록·기본 연결 보존, 새 설치와 업데이트 실패 롤백을 대상으로 합니다. 시험 자료를 교체·정리하는 도우미는 [합성 primitive 시험](preservation-tests/test-fixture-primitives.ps1)으로 별도 확인합니다.
 

@@ -1,10 +1,38 @@
 # 그림 복사·저장 0.2.0 · 보존 보완과 정식 릴리스 작업 기록
 
-날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **제품 정보 길이 처리 수정 후보·정적/제한 사전 검사 PASS, 최신 실제 실행 요청은 UAC 취소로 미시작 — 공개 전**
+날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **실제 복구 갱신 완료(3010), 후속 재개 요청은 UAC 취소 — 시험 설치 제거·보존 Suite·최종 설치·공개 미완료**
 
 적용: [v1.2 변경 계약](../tools/image-copy-save/ImageCopySave_Requirements_v1.2.md), [보존 설계 ADR-0024](../design/0024-image-msi-preservation.md), [공개 안내 ADR-0025](../design/0025-image-public-guide.md), [도구 정책](../policies/tools.md), [문서 정책](../policies/documentation.md).
 
 사용자는 기존 등록·외부 수정 파일 보존 문제를 해결하고 적용한 뒤 정식 릴리스까지 진행하도록 지시했다. 승인된 배포 형식은 Windows 11 x64용 자체 포함 무서명 MSI이며, 관리자 설치와 일반 사용자 실행을 분리한다. 서명 인증이나 회사 전체의 상용 배포 승인을 받았다는 뜻은 아니다.
+
+## 최신 실제 결과 · 승인 후 복구 갱신 완료와 3010 중단
+
+08:13:32 UTC 요청은 정상 UAC 승인을 받았고 프로세스 18256이 시작됐다. 08:14:27 UTC에 정확한 실패 시험 설치의 복구 갱신을 실행했으며, 즉시·지연 guard가 모두 PASS하고 InstallFinalize가 반환 값 1로 완료됐다. msiexec 결과는 **3010(성공, 재시작 필요 표시)**이었다. 0만 후속 진행 조건으로 허용한 실행기는 이 단계를 FAIL, 전체를 STOPPED로 기록했지만, 실제 설치가 시작되지 않았거나 1603으로 실패한 경우와 구분한다.
+
+실제 설치 PackageCode는 기존 {E02D0EEC-5EF4-4BF1-85EF-20074416A568}에서 복구 후보의 {1ADCC104-A775-41C2-ABCC-11C1C5F601AA}로 바뀌었고 새 캐시 MSI가 등록됐다. 따라서 Service를 처음부터 반복하지 않고 이미 갱신된 정확한 시험 설치를 확인한 뒤 후속 제거 단계부터 재개하도록 준비한다. 이 실행에서 원래 시험 설치의 제거·새 보존 Suite·최종 설치는 수행하지 않았다. 3010을 재시작 요구 없는 exit 0이나 전체 수명주기 PASS로 바꾸지 않는다.
+
+08:16 UTC 읽기 전용 사후 확인은 **404파일·23등록 값 정확 일치**, 변경 파일·추가 파일·알 수 없는 값·현재 사용자 충돌·추가 스트림·재분석 경로 0개로 PASS다. 제품 폴더와 현재 캐시를 향한 예약 작업은 없고, 이전 캐시 삭제 예약 한 건을 확인했다. 관계없는 예약 작업의 경로·내용과 사용자 SID는 이 문서나 공개 자료에 옮기지 않는다. 검증 실행기의 캐시 DB COM 객체 해제 누락을 보완했고, 이미 성공한 Service를 반복하지 않고 제거부터 진행하는 제한적 재개 절차를 아래처럼 검증했다.
+
+공개 후보 82A72EB8…, 로컬 복구 2CFDEF33…, 짝지은 롤백 CD4CEBBD…의 파일은 아래 식별과 동일하며 이 후속 처리 때문에 다시 제작하지 않았다. 실제 보존 Suite·최종 설치·정식 공개는 아직 미완료다.
+
+로컬 근거: artifacts/image-copy-save/msi-preservation-recovery/20260927T081319737Z-387c5de048534882b8c6b2be30b7ffef/의 launch.json·recovery.json·service-exact-failed-fixture.msiexec.log, artifacts/image-copy-save/msi-preservation-development/fixture-after-servicing3010-2026-09-27T08-16-23-755Z.json, 같은 디렉터리의 cache-pending-after3010-2026-09-27T08-17-07-329Z.json. 원시 진단 파일은 로컬에만 보존한다.
+
+## 재개 준비 검증과 최신 UAC 취소
+
+COM 객체 해제 보완의 합성 MSI 파일 검사 5개가 PASS다. 반복 식별 조회, 쿼리 성공·예외 이후의 배타적 읽기 열기를 확인했으며 강제 GC·설치 캐시 열기·캐시 변경·설치·등록 변경은 하지 않았다. 당시 wrapper SHA-256은 B0AD5D5CC38EDDB31E6F1C6A6545B03E27B90AD9EFC06D7E5F3D83C3126C2703이다. 실제 캐시 잠금 원인의 단독 재현이나 MSI 수명주기 시험으로 확대하지 않는다.
+
+완료된 3010 이력과 예약 경로를 검사하는 재개 회귀는 **27 PASS**, MSI 동작 0회·등록 쓰기 0회다. 감사한 보고서·로그 및 후보 입력의 불일치, guard 근거 누락, 미완료 설치, 제품 폴더·현재 캐시를 향한 예약 작업을 거절한다. 이미 감사한 이전 캐시 삭제 예약과 관계없는 예약 작업은 수정하지 않는다. 이 검사의 wrapper SHA-256은 **0CF8D4706E81676171237D752B0AFEF36952F7D25AC50A70DA6CBB77C89C5F91**이다. 재개 실행기와 새 회귀 도구는 로컬 커밋 bfa19302c3db51ada7945d61a18459840ca80f07에 보존했다.
+
+08:27 UTC 실제 Inspect는 비상승·읽기 전용으로 PASS했다. 현재 복구 패키지의 404파일·23등록 값을 확인하고 serviceAlreadyCompleted=true, historicalRebootRequired=true를 유지한다. 계획은 완료된 Service를 반복하지 않고 수정 guard를 통한 시험 설치 제거 → 깨끗한 상태 확인 → 새 보존 Suite → 기본 위치 최종 설치다. 이 준비 과정은 기존 예약 목록이나 제품 등록을 수정하지 않았으며 native MSI 소스 8개와 위 후보 파일도 바꾸지 않았다.
+
+| 준비 근거 | 로컬 기록 |
+|---|---|
+| COM 해제 회귀 5 PASS | artifacts/image-copy-save/msi-preservation-development/com-handle-lifetime-2026-09-27T08-20-08-646Z/result.json |
+| 재개 이력·예약 경로 회귀 27 PASS | artifacts/image-copy-save/msi-preservation-development/resume-evidence-tests-2026-09-27T08-26-20-696Z.json |
+| 실제 재개 Inspect PASS | artifacts/image-copy-save/msi-preservation-recovery/20260927T082711859Z-b1672f4467494cbe9a921257c854f462/inspection.json |
+
+**최신 Run은 08:28:59 UTC에 정상 UAC를 요청했으나 08:31:02 UTC에 취소로 반환됐다.** 상태는 ELEVATION_NOT_STARTED, 자식 processId는 null이며 recovery.json은 생성되지 않았다. 앞서 승인받아 완료한 복구 갱신은 유지되지만 이번 제거·보존 Suite·최종 설치는 **NOT RUN**이다. 재표시 여부에 대한 사용자 응답을 기다리며, 준비 검사 PASS를 실제 완료나 게시 판정으로 바꾸지 않는다. 요청 기록은 artifacts/image-copy-save/msi-preservation-recovery/20260927T082847714Z-c3418056f74a4650bf9bca88c6ea06c8/launch.json이다.
 
 ## 최신 후보 · 제품 정보 길이 처리 보완
 
@@ -22,7 +50,7 @@
 
 artifacts/image-copy-save/guard-packagecode-sizing-20260927-verified/의 actual-installed-readonly-probe.log·full-recovery-readonly-probe.log에서 실제 설치 PackageCode 조회, 404파일·23등록 값의 소유 확인, 전체 복구 Prepare·현재 사용자 검사·지연 계획 검사를 확인했다. 새 복구 후보 빌드 디렉터리의 full-recovery-readonly-probe.log도 PASS다. MsiOpenPackageEx의 IGNOREMACHINESTATE로 제한한 핸들을 사용하는 읽기 전용 검사이며 installerActionsRun=false, productRegistrationModified=false다. 정상 MSI 동작의 실제 인수를 대신하지 않는다.
 
-최신 실제 Run 요청은 07:42:11 UTC에 정상 UAC를 요청했으나 07:44:14 UTC에 Windows가 취소를 반환했다. artifacts/image-copy-save/msi-preservation-recovery/20260927T074158463Z-9b8bd542b99347d08278bf5172d6ae49/launch.json의 상태는 ELEVATION_NOT_STARTED, processId는 null이다. 이 후보로 복구 갱신·제거·보존 Suite·최종 설치가 시작되지 않았고, 기존 시험 설치는 제거 완료로 기록하지 않는다. 정식 Release와 공개 자산 게시는 여전히 미완료다.
+앞선 실제 Run 요청은 07:42:11 UTC에 정상 UAC를 요청했으나 07:44:14 UTC에 Windows가 취소를 반환했다. artifacts/image-copy-save/msi-preservation-recovery/20260927T074158463Z-9b8bd542b99347d08278bf5172d6ae49/launch.json의 상태는 ELEVATION_NOT_STARTED, processId는 null이다. 그 요청에서는 복구 갱신·제거·보존 Suite·최종 설치가 시작되지 않았으며, 이후 승인된 실제 복구 갱신은 위 최신 결과와 구분한다. 정식 Release와 공개 자산 게시는 여전히 미완료다.
 
 ## 변경한 범위
 
@@ -117,7 +145,7 @@ MSI 안에 정적으로 링크한 native 검사 DLL과 파일별 SHA-256 소유 
 
 ## 최종 인수·게시 전 채울 항목
 
-1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 남은 항목은 정확한 실패 시험 설치의 안전한 복구와 HKCU 차단을 포함한 실제 MSI 보존 회귀 재검증이다.
+1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 복구 갱신은 완료했으며, 남은 항목은 갱신된 정확한 시험 설치의 안전한 제거와 HKCU 차단을 포함한 실제 MSI 보존 회귀 재검증이다.
 2. 새 설치 충돌, 외부 수정 파일·값·추가 스트림의 복구/업데이트/제거 차단, 누락 파일 복구, 알 수 없는 추가 파일·값·타사 메뉴·기본 연결 보존, 정상 수명주기와 새 설치/업데이트 실패 롤백 결과.
 3. 최종 설치 패키지의 대표 복사·저장을 확인하고 기존 사용자 확인과 런타임 결과를 재사용한다. 조건별 메뉴·창/탭·오류/취소의 미관찰 항목은 실제 NOT RUN 범위로 기록한다. 원래 AT 목록 전체를 이번 MSI 보존 수정의 새 반복 관문으로 만들지 않으며, 추가 후속 확인은 답변 도착 전 PASS로 기록하지 않는다.
 4. 공개용 릴리스 설명과 지원 제한 확정, 최종 자산의 해시 대조, 태그/소스 커밋·Release URL·draft/prerelease 상태·게시 시각.
