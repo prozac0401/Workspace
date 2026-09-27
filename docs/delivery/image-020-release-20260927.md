@@ -1,12 +1,34 @@
 # 그림 복사·저장 0.2.0 · 보존 보완과 정식 릴리스 작업 기록
 
-날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **실제 복구 갱신 완료(3010), 후속 재개 요청은 UAC 취소 — 시험 설치 제거·보존 Suite·최종 설치·공개 미완료**
+날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **재개·이전 시험 설치 제거 PASS, 새 보존 Suite의 HKCU 충돌 차단 FAIL — 최종 설치·공개 미실행**
 
 적용: [v1.2 변경 계약](../tools/image-copy-save/ImageCopySave_Requirements_v1.2.md), [보존 설계 ADR-0024](../design/0024-image-msi-preservation.md), [공개 안내 ADR-0025](../design/0025-image-public-guide.md), [도구 정책](../policies/tools.md), [문서 정책](../policies/documentation.md).
 
 사용자는 기존 등록·외부 수정 파일 보존 문제를 해결하고 적용한 뒤 정식 릴리스까지 진행하도록 지시했다. 승인된 배포 형식은 Windows 11 x64용 자체 포함 무서명 MSI이며, 관리자 설치와 일반 사용자 실행을 분리한다. 서명 인증이나 회사 전체의 상용 배포 승인을 받았다는 뜻은 아니다.
 
-## 최신 실제 결과 · 승인 후 복구 갱신 완료와 3010 중단
+## 최신 실제 결과 · 재개·제거 성공 후 HKCU 충돌 시험 재실패
+
+08:40:23 UTC 요청은 정상 UAC 승인을 받아 자식 프로세스 18988이 시작됐다. 0CF8D470… 재개 실행기는 완료된 Service를 반복하지 않고 수정 guard를 통해 이전 시험 설치를 제거했다. 제거는 즉시·지연 guard PASS, msiexec 0으로 완료됐고 뒤이은 깨끗한 설치 상태 Inspect도 PASS다. 앞선 3010 복구 갱신과 제한적 재개 절차가 실제 후속 제거까지 진행된 결과이며 전체 보존 Suite 통과와는 구분한다.
+
+| 이번 실제 단계 | 결과 |
+|---|---|
+| 이전 복구 시험 설치 제거 | PASS, msiexec 0, 즉시·지연 guard PASS |
+| 제거 후 깨끗한 상태 Inspect | PASS |
+| 새 후보 HKLM 루트 0~6 충돌 | 7 PASS, 각각 msiexec 1603으로 차단 |
+| 새 후보 HKCU 루트 0 충돌 | FAIL, 기대한 차단 대신 msiexec 0 |
+| 이후 보존 사례·최종 기본 설치 | NOT RUN, 첫 실패에서 중단 |
+
+새 Suite는 08:41:48 UTC에 시작해 08:42:06 UTC에 FAIL로 중단했다. 합성 HKCU 등록은 EXACT_FIXTURE_CLEANED로 정리됐지만 제품 82A72EB8…는 이번 새 Suite의 installed-product 폴더에 남아 있다. 이전 실패 시험 설치의 제거 성공을 새 시험 설치의 제거 완료로 해석하지 않는다. 실행기는 STOPPED_FOR_REVIEW_NO_AUTOMATIC_PRODUCT_REMOVAL을 유지하고 최종 기본 위치 설치를 시도하지 않았다.
+
+실제 로그의 사용자 문맥 일치, 7개 루트 검사 및 즉시·지연 guard PASS와 기대한 충돌 차단의 불일치를 조사 중이다. 제품 guard의 문제인지 시험 프로세스의 등록 가상화·뷰 차이인지 아직 확정하지 않았으며 사용자 업무 자료 손실을 관찰한 것으로 설명하지 않는다. native·정적 PASS와 재개 성공으로 이번 Suite FAIL을 대체하지 않는다. 후보 MSI·제품 소스와 공개 안내는 그대로이며 정식 공개는 실행하지 않았다.
+
+로컬 근거: artifacts/image-copy-save/msi-preservation-recovery/20260927T084011285Z-dc8b5daf7b314b00bdb921778f7141d0/의 launch.json·recovery.json 및 단계 로그, artifacts/image-copy-save/msi-preservation/20260927T084148973Z-ff188992c090420794dc8f3b47277316/result.json 및 fresh-HKCU-root-0.msiexec.log. 원시 SID·등록 경로 진단은 이 문서에 복사하지 않는다.
+
+09:00 UTC 후속 진단은 UAC 승인 후 시작됐으나 native-before 결과 수집에서 중단됐다. MSI 동작은 0회, 제품 등록 변경은 없고 합성 등록은 EXACT_FIXTURE_CLEANED로 정리됐다. MSI custom action의 등록 문맥 진단은 아직 완료하지 않았으므로 이번 HKCU 실패의 원인을 확정하지 않는다. 로컬 근거: artifacts/image-copy-save/msi-preservation-development/registry-context-runs/20260927T085943091Z-e7de9c5c1fcd4f1e8584a84b378e9f31/diagnostic.json.
+
+결과 수집을 수정한 진단 실행기는 비상승·fixture 없는 수집 확인에서 PASS했다. 이후 09:03:05 UTC 정상 UAC 요청은 09:05:07 UTC 취소로 반환돼 자식 프로세스가 시작되지 않았고 진단 MSI도 실행하지 않았다. 사용자에게 가능한 재표시 시점을 물은 상태이며 실제 custom action 진단은 미완료다. 이 수집 확인을 제품 guard나 보존 Suite의 PASS로 바꾸지 않는다.
+
+## 앞선 실제 결과 · 승인 후 복구 갱신 완료와 3010 중단
 
 08:13:32 UTC 요청은 정상 UAC 승인을 받았고 프로세스 18256이 시작됐다. 08:14:27 UTC에 정확한 실패 시험 설치의 복구 갱신을 실행했으며, 즉시·지연 guard가 모두 PASS하고 InstallFinalize가 반환 값 1로 완료됐다. msiexec 결과는 **3010(성공, 재시작 필요 표시)**이었다. 0만 후속 진행 조건으로 허용한 실행기는 이 단계를 FAIL, 전체를 STOPPED로 기록했지만, 실제 설치가 시작되지 않았거나 1603으로 실패한 경우와 구분한다.
 
@@ -18,7 +40,7 @@
 
 로컬 근거: artifacts/image-copy-save/msi-preservation-recovery/20260927T081319737Z-387c5de048534882b8c6b2be30b7ffef/의 launch.json·recovery.json·service-exact-failed-fixture.msiexec.log, artifacts/image-copy-save/msi-preservation-development/fixture-after-servicing3010-2026-09-27T08-16-23-755Z.json, 같은 디렉터리의 cache-pending-after3010-2026-09-27T08-17-07-329Z.json. 원시 진단 파일은 로컬에만 보존한다.
 
-## 재개 준비 검증과 최신 UAC 취소
+## 재개 준비 검증과 앞선 UAC 취소
 
 COM 객체 해제 보완의 합성 MSI 파일 검사 5개가 PASS다. 반복 식별 조회, 쿼리 성공·예외 이후의 배타적 읽기 열기를 확인했으며 강제 GC·설치 캐시 열기·캐시 변경·설치·등록 변경은 하지 않았다. 당시 wrapper SHA-256은 B0AD5D5CC38EDDB31E6F1C6A6545B03E27B90AD9EFC06D7E5F3D83C3126C2703이다. 실제 캐시 잠금 원인의 단독 재현이나 MSI 수명주기 시험으로 확대하지 않는다.
 
@@ -32,7 +54,7 @@ COM 객체 해제 보완의 합성 MSI 파일 검사 5개가 PASS다. 반복 식
 | 재개 이력·예약 경로 회귀 27 PASS | artifacts/image-copy-save/msi-preservation-development/resume-evidence-tests-2026-09-27T08-26-20-696Z.json |
 | 실제 재개 Inspect PASS | artifacts/image-copy-save/msi-preservation-recovery/20260927T082711859Z-b1672f4467494cbe9a921257c854f462/inspection.json |
 
-**최신 Run은 08:28:59 UTC에 정상 UAC를 요청했으나 08:31:02 UTC에 취소로 반환됐다.** 상태는 ELEVATION_NOT_STARTED, 자식 processId는 null이며 recovery.json은 생성되지 않았다. 앞서 승인받아 완료한 복구 갱신은 유지되지만 이번 제거·보존 Suite·최종 설치는 **NOT RUN**이다. 재표시 여부에 대한 사용자 응답을 기다리며, 준비 검사 PASS를 실제 완료나 게시 판정으로 바꾸지 않는다. 요청 기록은 artifacts/image-copy-save/msi-preservation-recovery/20260927T082847714Z-c3418056f74a4650bf9bca88c6ea06c8/launch.json이다.
+**앞선 Run은 08:28:59 UTC에 정상 UAC를 요청했으나 08:31:02 UTC에 취소로 반환됐다.** 상태는 ELEVATION_NOT_STARTED, 자식 processId는 null이며 recovery.json은 생성되지 않았다. 이 요청에서 제거·보존 Suite·최종 설치는 NOT RUN이었다. 이후 승인된 실제 재개는 위 최신 결과에서 구분한다. 요청 기록은 artifacts/image-copy-save/msi-preservation-recovery/20260927T082847714Z-c3418056f74a4650bf9bca88c6ea06c8/launch.json이다.
 
 ## 최신 후보 · 제품 정보 길이 처리 보완
 
@@ -145,7 +167,7 @@ MSI 안에 정적으로 링크한 native 검사 DLL과 파일별 SHA-256 소유 
 
 ## 최종 인수·게시 전 채울 항목
 
-1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 복구 갱신은 완료했으며, 남은 항목은 갱신된 정확한 시험 설치의 안전한 제거와 HKCU 차단을 포함한 실제 MSI 보존 회귀 재검증이다.
+1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 복구 갱신과 이전 시험 설치 제거는 완료했으나 새 Suite에서 HKCU 차단 실패가 재발했다. 남은 항목은 원인 확인·보완, 이번 새 시험 설치의 상태 확인과 실제 MSI 보존 회귀 재검증이다.
 2. 새 설치 충돌, 외부 수정 파일·값·추가 스트림의 복구/업데이트/제거 차단, 누락 파일 복구, 알 수 없는 추가 파일·값·타사 메뉴·기본 연결 보존, 정상 수명주기와 새 설치/업데이트 실패 롤백 결과.
 3. 최종 설치 패키지의 대표 복사·저장을 확인하고 기존 사용자 확인과 런타임 결과를 재사용한다. 조건별 메뉴·창/탭·오류/취소의 미관찰 항목은 실제 NOT RUN 범위로 기록한다. 원래 AT 목록 전체를 이번 MSI 보존 수정의 새 반복 관문으로 만들지 않으며, 추가 후속 확인은 답변 도착 전 PASS로 기록하지 않는다.
 4. 공개용 릴리스 설명과 지원 제한 확정, 최종 자산의 해시 대조, 태그/소스 커밋·Release URL·draft/prerelease 상태·게시 시각.
