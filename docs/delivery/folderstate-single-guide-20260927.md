@@ -1,6 +1,6 @@
 # FolderState 공개 안내 한 페이지 통합
 
-날짜: 2026-09-27 · 책임: 문서·배포 담당 · 상태: 안내 통합·로컬 검사 완료, main·Pages 반영 준비
+날짜: 2026-09-27 · 책임: 문서·배포 담당 · 상태: main·Pages 반영과 실제 공개 확인 완료
 
 ## 요청과 변경
 
@@ -22,4 +22,8 @@ MkDocs strict 빌드와 `scripts/check-site.py`를 통과했다. 공개 안내 1
 
 공개 18개 페이지마다 탐색 메뉴의 FolderState 링크가 한 개임을 확인했다. 이전 주소의 문단·기본 진입·알 수 없는 문단을 포함한 이동 18개 경우와 원래 사용 안내의 문단 주소 9개를 확인했다. 다운로드 링크 3개와 오류·명령 이름 37개의 보존을 대조했으며 `git diff --check`도 통과했다. 브라우저의 실제 모바일 조작 시험은 이 정적 HTML·이동 스크립트 검증과 구분한다.
 
-main 반영과 실제 Pages 배포 결과는 게시 후 기록한다. FolderState 제품 기능·MSI 재시험 결과로 집계하지 않는다.
+[9020c4c5ffa636010719aa444dd1413b8b850834](https://github.com/prozac0401/Workspace/commit/9020c4c5ffa636010719aa444dd1413b8b850834)을 원격 main에 반영했다. [Documentation 36323984656](https://github.com/prozac0401/Workspace/actions/runs/36323984656)의 빌드·배포가 성공했고, 함께 실행된 [Windows build and MSI 36323984710](https://github.com/prozac0401/Workspace/actions/runs/36323984710)의 시험·MSI 제작·구성 검사도 성공했다. 공개 설치 자산은 교체하지 않았다.
+
+실제 [FolderState 통합 안내](https://prozac0401.github.io/Workspace/tools/folderstate/)와 공개 18개 페이지의 메뉴에서 FolderState 링크 한 개를 확인했다. 이전 주소 두 개에서 받은 이동 문서로 문단·기본 진입 등 18개 경우를 다시 확인했다. 검색과 사이트맵은 공개 18개 경로만 포함한다. 기존 다운로드 링크 3개를 유지하며 공개 자산 8개는 HTTP 200, hook 원본·이번 배포 기록의 비공개 경로는 HTTP 404다.
+
+이번 PC에서 FolderState 설치·실제 UI 조작을 다시 시험한 작업은 아니다. 위 자동 CI와 문서·링크 검증을 별도로 기록한다.
