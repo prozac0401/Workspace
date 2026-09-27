@@ -1,10 +1,12 @@
 # 로컬에서 패키지를 만들고 설치 시험하기
 
-도구: ImageCopySave · 패키지 기본 버전: 0.1.1.0 · 상태: 평가 후보, 현재 PC 설치 신뢰 차단  
+현재 배포 목표는 **별도 서명 없는 MSI**다. 일반 사용자 unsigned sparse 등록 실증은 0x80073D2B로 차단됐다. [현재 결정](../../../docs/design/0021-image-unsigned-msi.md)과 [실증 결과](../../../docs/tools/image-copy-save/unsigned-msi-feasibility.md)를 먼저 확인한다. 아래 full MSIX 서명·설치 절차는 이전 평가 경로의 기록이며 이번 MSI 작업의 필수 선행 조건이 아니다.
+
+도구: ImageCopySave · 패키지 기본 버전: 0.1.1.0 · 상태: 평가 후보, 현재 무서명 sparse 등록 차단
 책임: 도구 개발·검증 담당 · 적용 범위: Windows 11 x64 개발·검증 환경  
 작성일: 2026-09-25 · 최신 확인: 2026-09-27
 
-2026-09-27 기존 허용 인증서로 새 사본 서명과 SignTool 검증은 통과했으나, 실제 일반 사용자 설치는 `0x800B0109`로 거절됐습니다. 실패 후 현재 사용자 패키지 등록은 0개입니다. 신뢰 저장소는 변경하지 않았으며, [설치 시도 기록](../../../docs/delivery/image-copy-save-signing-20260927.md)을 현재 상태로 따릅니다. 아래 2026-09-25의 미실행 기록은 당시 이력입니다.
+2026-09-27 기존 허용 인증서로 새 사본 서명과 SignTool 검증은 통과했으나, 실제 일반 사용자 설치는 `0x800B0109`로 거절됐습니다. 실패 후 현재 사용자 패키지 등록은 0개입니다. 신뢰 저장소는 변경하지 않았으며, [설치 시도 기록](../../../docs/delivery/image-copy-save-signing-20260927.md)은 이전 full MSIX 경로의 이력입니다. 현재 unsigned sparse 경로는 실행 활성화 제약 0x80073D2B로 차단됐으며 MSI는 아직 제작하지 않았습니다.
 
 native Shell DLL과 자체 포함 helper를 full MSIX로 묶습니다. 로컬 빌드부터 패키지 확인까지 Git, 가상환경, 원격 CI가 필요하지 않습니다. **서명과 실제 설치·메뉴 검증이 끝나지 않은 평가 후보입니다.** 패키지 생성 성공을 제품 출시 승인으로 표시하지 않습니다.
 
@@ -44,7 +46,11 @@ powershell.exe -NoLogo -NoProfile -STA -File .\tools\ImageCopySave\build\build-p
 
 패키징은 실행별 새 디렉터리를 사용합니다. 로그·진단은 로컬 산출물이며 공개 사이트에 올리지 않습니다. status=PASS는 기록에 표시된 검사 범위에 한정합니다. productionRelease=false, signing/installation/explorerG0=NOT RUN을 유지합니다.
 
-## 서명 주체와 신뢰 확인
+## 이전 full MSIX 평가 절차 — 현재 실행 지시 아님
+
+아래 서명·설치 절차는 과거 평가 경로의 재현 기록입니다. 현재 무서명 MSI 요구의 후속 작업으로 실행하지 않습니다.
+
+### 서명 주체와 신뢰 확인
 
 기본 Name=ImageCopySave.Evaluation과 Publisher=CN=ImageCopySave.Evaluation은 평가 시안입니다. 최종 배포 identity·서명 주체·조직 설치 허용은 미결정입니다. 인증서가 PC에 있다는 사실만으로 사용 권한이나 다른 PC에서의 신뢰가 확인되지는 않습니다.
 
@@ -71,7 +77,7 @@ powershell.exe -NoLogo -NoProfile -STA -File .\tools\ImageCopySave\build\build-p
 .\tools\ImageCopySave\installer\verify-package.ps1 -PackagePath 'D:\검증\signed.msix' -ExpectedPublisher 'CN=승인된 서명 주체' -RequireTrustedSignature -SignTool 'C:\승인된SDK\x64\SignTool.exe'
 ```
 
-## 설치·업데이트·제거 시험
+### 설치·업데이트·제거 시험
 
 신뢰된 서명 패키지를 일반 사용자 계정에서 열어 설치합니다. Windows가 인증서나 조직 정책 때문에 거절하면, 인증서/PC 관리 담당자가 허용 조건을 해결해야 합니다. unsigned 예외 설치, 개발자 모드 전환, 수동 DLL 등록, 레지스트리 수정으로 우회하지 않습니다.
 
@@ -88,7 +94,7 @@ powershell.exe -NoProfile -File .\tools\ImageCopySave\installer\manage-install.p
 
 실패하면 Windows의 오류와 현재 설치 identity·버전을 확인합니다. 자동 광범위 정리나 강제 다운그레이드는 하지 않습니다. 제거 후 재설치, 더 높은 버전으로 업데이트, 설치 중단/실패의 복구와 기존 사용자 PNG 보존은 실제 패키지로 별도 시험합니다.
 
-## 사용자가 PC에서 확인할 부분
+### 이전 경로의 PC 확인 항목
 
 1. 서명 인증서의 사용 권한과 이 PC의 패키지 신뢰·설치 허용 조건을 확인합니다. 조직이 관리하는 인증서는 담당자 결정이 필요합니다.
 2. 신뢰된 설치 파일을 일반 사용자로 열어 설치합니다. 원래 폴더의 첫 우클릭 메뉴에서 그림을 저장하고, 텍스트·빈 상태에서는 메뉴가 완전히 사라지는지 확인합니다. G0 정식 시험은 이미지→텍스트→빈 상태→이미지를 20회 반복합니다.

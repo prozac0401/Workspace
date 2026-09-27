@@ -1,5 +1,18 @@
 # 그림 복사·저장 · 검증 기록
 
+
+## 2026-09-27 현재 사용자 세션 재검증
+
+- 최종 현재 사용자 전체 시험: **85 PASS / 0 FAIL / 1 NOT RUN, 총 86개**, 일반 사용자 WinSta0\Default. clipboard 23개 모두 PASS. 실제 디스크 부족 1개는 일회용 CI 전용이라 로컬 미실행이며 종료 코드는 2다.
+- 모드 계약 7개와 native 정책·직접 COM 66개는 각각 PASS. 전체 86개에 더해 합산하지 않는다.
+- 종료 정리 검증을 강화한 중간 실행에서 watchdog의 중복 종료 요청 경합 1건이 발생했다. 시험기의 wait/fallback 순서를 수정한 뒤 해당 사례와 전체 시험을 재실행해 통과했다. 중간 실패 로그도 보존한다.
+- 그림판 실제 UI로 helper 종료 후 붙여넣기와 그림판 복사 → helper PNG 저장을 확인했다. 모든 외부 앱·투명도·Explorer G0의 통과를 의미하지 않는다.
+- 현재 unsigned sparse 등록은 0x80073D2B로 BLOCKED. MSI·실제 Explorer 메뉴·설치 수명주기는 NOT RUN. 아래 날짜별 signed full MSIX와 격리 실패 기록은 과거 이력이다.
+
+상세 범위와 로컬 증거 위치는 [후속 작업 기록](../../docs/delivery/backlog-followup-20260927.md)을 따른다.
+
+2026-09-27 현재 사용자 모드의 새 실행과 MSI 등록 실증은 [후속 작업 기록](../../docs/delivery/backlog-followup-20260927.md)을 따른다. 아래 격리·원격 시험 기록은 당시 문맥으로 보존하며 새 실행에 합산하지 않는다.
+
 기록일: 2026-09-27(KST) · 제품 판정: **G0 BLOCKED / 배포 불가** · v1.1 독립 메뉴 승인, 변경된 경로의 G0 실기 NOT RUN
 
 ## 현재 PC 서명·설치 시도 — 2026-09-27
@@ -12,12 +25,12 @@
 
 새 Git worktree·원격 CI 없이 현재 작업 폴더에서 수행했습니다. Invoke 기준값 전달, WinExe 비모달 진행·취소·결과, UTF-8 결과 연결과 같은 보기 선택 후보를 구현했습니다. [ADR-0017](../../docs/design/0017-image-copy-save-invocation.md)과 [PC 확인 절차](../../docs/tools/image-copy-save/local-verification.md)를 함께 확인합니다.
 
-- 최신 엔진/helper 자동시험: **62 PASS / 0 FAIL / 24 NOT RUN, 총 86개**. `artifacts/image-copy-save/helper-finish-results.json`. 기존 클립보드 21개와 새 Shell 경로 2개는 fresh private station 생성 오류 183으로 미실행, 전용 VHD 디스크 부족 1개는 로컬 실행 대상이 아니므로 미실행입니다. 사용자 클립보드로 대체하지 않았습니다.
+- 2026-09-25 엔진/helper 자동시험: **62 PASS / 0 FAIL / 24 NOT RUN, 총 86개**. `artifacts/image-copy-save/helper-finish-results.json`. 기존 클립보드 21개와 새 Shell 경로 2개는 fresh private station 생성 오류 183으로 미실행, 전용 VHD 디스크 부족 1개는 로컬 실행 대상이 아니므로 미실행입니다. 사용자 클립보드로 대체하지 않았습니다.
 - helper Release 빌드: 경고 0·오류 0. 프로토콜 거절, 완료/불확실/오류 메시지 분리, broken pipe에서도 Shell 저장 성공과 결과 경로 유지 시험은 PASS입니다.
 - WPF 진행·저장·오류 3종 비표시 렌더링과 육안 확인: PASS. `artifacts/image-copy-save/helper-feedback-render`. 실제 포커스·취소 버튼·앱 붙여넣기 검증은 아닙니다.
 - native DLL과 시험 실행 파일을 **로컬에서 새로 빌드**하고 **66 PASS / 0 FAIL**. MSVC 19.41.34123, SDK 10.0.26100.0, x64 static CRT, `/W4 /WX`와 linker `/WX`. `artifacts/image-copy-save/native-shell/shell-results.json`, `build-metadata.json`. 다른 폴더·중첩 경로·개행/NUL 결과 거절을 추가했습니다. 실제 Invoke·Explorer는 실행하지 않았습니다.
 - 로컬 도구는 고정 Microsoft payload SHA256, SDK NuGet author/repository 서명과 실행 파일 Authenticode를 확인해 `.tools/image-copy-save-native`에만 추출했습니다. 시스템 설치는 하지 않았습니다. 초기 컴파일의 Shell 헤더 누락과 링크의 OLDNAMES.lib 누락은 수정·보완한 뒤 재빌드에 통과했습니다.
-- 최신 패키지 생성·서명·설치 상태는 [이번 인계 기록](../../docs/delivery/image-copy-save-local-20260925.md)에 별도로 기록합니다. unsigned나 로컬 자체서명 평가 패키지를 상용 승인 릴리즈로 표시하지 않습니다.
+- 2026-09-25 패키지 생성·서명·설치 상태는 [당시 인계 기록](../../docs/delivery/image-copy-save-local-20260925.md)에 별도로 기록합니다. unsigned나 로컬 자체서명 평가 패키지를 상용 승인 릴리즈로 표시하지 않습니다.
 
 현재 G0·M2 실기·M3 설치 수명주기는 여전히 미완료입니다. 아래 과거 PASS는 당시 실행한 범위의 이력이며 새 Shell 통합 후보 전체의 인증으로 확장하지 않습니다.
 
@@ -67,7 +80,7 @@
 | 단계 | 상태 | 남은 조건 |
 |---|---|---|
 | M0/G0 | BLOCKED | v1.1 독립 메뉴 후보 로컬 빌드·정책/직접 COM 66개 PASS. 실제 등록·첫 메뉴·화면 증거 NOT RUN |
-| M1 | 최신 로컬 62 PASS / 24 NOT RUN | 과거 77 PASS와 새 보호 경로의 시험을 구분. 격리 clipboard·일반 사용자 외부 앱 미검증 |
+| M1 | 현재 결과는 [후속 기록](../../docs/delivery/backlog-followup-20260927.md) 참조 | 명시적 현재 사용자 clipboard 시험과 Paint 상호운용 확인. 전용 VHD·다른 외부 앱·Explorer 검증 범위는 구분 |
 | M2 | 구현 후보 완료, 실기 BLOCKED | Invoke 기준값·결과 연결·같은 보기 선택·비모달 UI 구현. G0·탭/포커스·취소 입력·외부 앱 붙여넣기 NOT RUN |
 | M3 | BLOCKED | 빌드·서명·설치/제거 절차 작성. 실제 서명·설치 상태는 인계 기록, 전체 수명주기·회귀 NOT RUN |
 
@@ -116,8 +129,8 @@ PASS는 표에 명시한 실제 실행 범위에 한정합니다. BLOCKED는 G0/
 | AT-37 | 설치된 Word/PowerPoint에 붙여넣기 | NOT RUN | Word/PowerPoint 버전/붙여넣기 NOT RUN |
 | AT-38 | 실제 사용하는 메일·메신저 본문에 붙여넣기 | NOT RUN | 메일/메신저 버전/붙여넣기 NOT RUN |
 | AT-39 | 메뉴 및 4K 이미지 반복 성능 측정 | NOT RUN | 4K 합성 gradient/alpha 엔진 Save/Read 2회 예열+10회 측정 P50/P95 기록 PASS. 실제 메뉴·helper/clipboard 전체 지연·탐색기 응답성 미실행 |
-| AT-40 | 설치·재설치·업데이트·제거 반복 | BLOCKED | 2026-09-27 서명 PASS, 최초 설치 신뢰 오류0x800B0109. 재설치·업데이트·제거 NOT RUN |
-| AT-41 | 일반 사용자 계정 설치/사용 | BLOCKED | 일반 사용자 설치 실제 FAIL(0x800B0109), 실패 후 등록0개. 신뢰 변경 없음 |
+| AT-40 | 설치·재설치·업데이트·제거 반복 | BLOCKED | 이전 full MSIX 서명 PASS 후 신뢰 오류0x800B0109. 현재 unsigned sparse 등록 0x80073D2B. MSI 재설치·업데이트·제거 NOT RUN |
+| AT-41 | 일반 사용자 계정 설치/사용 | BLOCKED | 현재 일반 사용자 unsigned sparse 등록 BLOCKED(0x80073D2B), 이전 signed full MSIX 설치 FAIL(0x800B0109). 잔여 등록0개, 신뢰 변경 없음 |
 | AT-42 | 앱 종료·Windows 로그인 후 프로세스/시작항목 점검 | BLOCKED | 감시기/서비스/시작 등록 구현 없음; 설치 후 로그인 점검 NOT RUN |
 | AT-43 | 원본/로그/네트워크 점검 | NOT RUN | 원본 보호·메타데이터 제거 및 손상 원본 실패 시 실제 helper 원시 stdout/stderr의 fixture 경로·텍스트·이미지 정보 비노출 PASS. 전체 설치 로그/네트워크 실측 NOT RUN |
 | AT-44 | 기존 복사·붙여넣기·기본 연결·다른 메뉴 회귀 | BLOCKED | 메뉴/기본 연결 미등록; 설치 전후 회귀 NOT RUN |

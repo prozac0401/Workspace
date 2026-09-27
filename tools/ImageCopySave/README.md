@@ -1,6 +1,8 @@
 # 그림 복사·저장 · 로컬 통합 평가 후보
 
-**탐색기 명령과 helper의 호출 상태·결과·비모달 안내를 연결했습니다. 현재 PC의 실제 MSIX 설치가 신뢰 오류로 차단되어 G0는 BLOCKED입니다.** 2026-09-27 기존 허용 인증서 서명은 통과했지만 설치는 `0x800B0109`로 거절됐고 현재 사용자 등록은 0개입니다. [설치 시도 기록](../../docs/delivery/image-copy-save-signing-20260927.md)을 확인하세요. 저장은 실제 폴더 배경의 첫 우클릭 메뉴를 대상으로 하며 이미지가 없을 때 완전히 숨기는 조건은 유지합니다. 일반 사용자용 출시 완료를 뜻하지 않습니다.
+2026-09-27 후속: [무서명 MSI 등록 실증](../../docs/tools/image-copy-save/unsigned-msi-feasibility.md)은 현재 일반 사용자 환경에서 0x80073D2B로 차단됐다. [현재 사용자 클립보드 시험 모드](../../docs/tools/image-copy-save/current-session-testing.md)를 별도로 추가했으며 실제 결과는 [후속 기록](../../docs/delivery/backlog-followup-20260927.md)을 따른다. 아래 과거 시험 수치는 당시 결과다.
+
+**탐색기 명령과 helper의 호출 상태·결과·비모달 안내를 연결했으나 G0는 BLOCKED입니다.** 현재 무서명 sparse 후보는 실행 활성화 제약 `0x80073D2B`로 등록이 거절됐습니다. 앞선 서명 full MSIX 평가에서는 서명 검증 PASS 후 신뢰 오류 `0x800B0109`로 설치가 거절됐으며, 두 시도 모두 잔여 등록은 없습니다. [설치 시도 기록](../../docs/delivery/image-copy-save-signing-20260927.md)을 확인하세요. 저장은 실제 폴더 배경의 첫 우클릭 메뉴를 대상으로 하며 이미지가 없을 때 완전히 숨기는 조건은 유지합니다. 일반 사용자용 출시 완료를 뜻하지 않습니다.
 
 - [현재 요구명세 v1.1](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.1.md) · [메뉴 위치 결정](../../docs/design/0016-image-copy-save-direct-menu.md)
 - [원본 요구명세](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.0.md)
@@ -46,7 +48,7 @@ GetState는 호출한 보기의 로컬 폴더 문맥과 클립보드 지원 형�
 
 ## 개발용 helper 실행
 
-아래는 엔진 재현용 명령이며 최종 사용자 UX를 대체하지 않습니다. `copy`는 실제 현재 사용자의 클립보드를 바꿉니다. `save`는 지정 폴더에 PNG를 만듭니다. 자동 시험은 별도 window station을 확보한 경우에만 클립보드를 바꾸며, 격리 생성에 실패하면 시험을 건너뛰고 이유를 남깁니다.
+아래는 엔진 재현용 명령이며 최종 사용자 UX를 대체하지 않습니다. `copy`는 실제 현재 사용자의 클립보드를 바꿉니다. `save`는 지정 폴더에 PNG를 만듭니다. 기본 격리 시험은 별도 window station 생성 실패 시 이유를 남기고 건너뛰며 자동 전환하지 않습니다. 명시적인 두 동의 옵션으로 현재 사용자 클립보드 시험을 별도 실행할 수 있습니다.
 
 ```powershell
 ./artifacts/image-copy-save/engine-evaluation/ImageCopySave.Helper.exe --probe-formats
@@ -58,9 +60,9 @@ GetState는 호출한 보기의 로컬 폴더 문맥과 클립보드 지원 형�
 
 ## 다음 단계
 
-G0에서 개정 위치·동적 숨김·첫 메뉴·일반 사용자 설치를 실제 증명해야 M2 제품 통합과 M3 설치 수명주기를 완료할 수 있습니다. Invoke 시퀀스 전달, 같은 보기 선택, 비모달 진행·취소·오류 안내는 구현했으나 실제 Explorer에서의 통합 검증은 남아 있습니다. 신뢰되는 서명과 일반 사용자 설치, 외부 앱 붙여넣기를 [PC 확인 절차](../../docs/tools/image-copy-save/local-verification.md)로 검증해야 합니다. unsigned MSIX 생성은 설치·제거 합격을 의미하지 않습니다. 새 Git 작업 트리·원격 CI·제품 게시 없이 현재 로컬 작업 폴더에서 진행했습니다. 아래 CI 내용은 이전 실행 이력입니다.
+G0에서 개정 위치·동적 숨김·첫 메뉴·일반 사용자 설치를 실제 증명해야 M2 제품 통합과 M3 설치 수명주기를 완료할 수 있습니다. Invoke 시퀀스 전달, 같은 보기 선택, 비모달 진행·취소·오류 안내는 구현했으나 실제 Explorer에서의 통합 검증은 남아 있습니다. 무서명 MSI 요구를 충족하는 설치 경로 확보 후 일반 사용자 설치와 외부 앱 붙여넣기를 [PC 확인 절차](../../docs/tools/image-copy-save/local-verification.md)로 검증해야 합니다. unsigned MSIX 생성은 설치·제거 합격을 의미하지 않습니다. 현재 후속 작업은 원본 로컬 수정을 보존한 별도 worktree에서 진행하며 원격 CI·제품 게시는 수행하지 않았습니다. 아래 CI 내용은 이전 실행 이력입니다.
 
-최신 로컬 시험은 엔진/helper **62 PASS / 24 NOT RUN / 0 FAIL**, native **66 PASS / 0 FAIL**입니다. 격리 클립보드 23개는 station 생성 오류로, 전용 VHD 디스크 부족 1개는 로컬 실행 제외로 남았습니다. 사용자 클립보드는 변경하지 않았습니다. WPF 안내 화면 3종은 비표시 렌더링으로 확인했습니다. [이번 인계 기록](../../docs/delivery/image-copy-save-local-20260925.md)에 최종 산출물과 직접 확인할 단계를 모았습니다.
+2026-09-25 당시 로컬 시험은 엔진/helper **62 PASS / 24 NOT RUN / 0 FAIL**, native **66 PASS / 0 FAIL**입니다. 격리 클립보드 23개는 station 생성 오류로, 전용 VHD 디스크 부족 1개는 로컬 실행 제외로 남았습니다. 사용자 클립보드는 변경하지 않았습니다. WPF 안내 화면 3종은 비표시 렌더링으로 확인했습니다. [이번 인계 기록](../../docs/delivery/image-copy-save-local-20260925.md)에 최종 산출물과 직접 확인할 단계를 모았습니다.
 
 ## Windows CI 검증 현황
 

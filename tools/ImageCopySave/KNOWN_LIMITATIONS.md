@@ -1,12 +1,14 @@
 # 알려진 제한과 미검증 항목
 
+현재 무서명 MSI 설치 경로는 Windows 11 23H2 일반 사용자에서 실행 활성화 거절 0x80073D2B로 차단됐다. [실증 결과](../../docs/tools/image-copy-save/unsigned-msi-feasibility.md). native183 격리 복구는 이번 필수 조건에서 제외하고 명시적 [현재 사용자 시험](../../docs/tools/image-copy-save/current-session-testing.md)으로 설치 독립 기능을 확인한다. 실제 Explorer G0와 최종 MSI 인수는 아직 통과하지 않았다.
+
 상태: 개발 평가 · 2026-09-27(KST) · **G0 BLOCKED, 배포 불가** · v1.1 독립 메뉴 위치 승인
 
-최신 설치 시도: 기존 허용 인증서로 사본 서명·SignTool 검증 PASS, 일반 사용자 Add-AppxPackage는 `0x800B0109` FAIL. 실패 후 등록 0개이며 신뢰 저장소를 변경하지 않았습니다. 설치 의존 실기는 계속 미실행입니다. [실제 기록](../../docs/delivery/image-copy-save-signing-20260927.md).
+이전 full MSIX 설치 시도: 기존 허용 인증서로 사본 서명·SignTool 검증 PASS, 일반 사용자 Add-AppxPackage는 `0x800B0109` FAIL. 실패 후 등록 0개이며 신뢰 저장소를 변경하지 않았습니다. 설치 의존 실기는 계속 미실행입니다. [실제 기록](../../docs/delivery/image-copy-save-signing-20260927.md).
 
 1. 사용자가 기본 ‘새로 만들기’ 내부 배치 조건을 해제했습니다. 현행 위치는 [v1.1 개정명세](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.1.md)의 실제 로컬 폴더 빈 공간에서 여는 Windows 11 첫 우클릭 메뉴 독립 명령 ‘복사한 그림 저장’입니다. 기본 New 내부의 조건부 표시를 입증하지 못한 내용은 v1.0 당시 조사 기록입니다. native 후보가 작성됐지만 변경된 위치의 G0 실제 메뉴·20회 표시/숨김 전환은 NOT RUN이며 M2·M3도 완료되지 않았습니다. 이미지가 없으면 ECS_HIDDEN 완전 숨김, 무상주, 회색 메뉴·더 많은 옵션 전용·수동 등록 금지와 기존 New 무변경 조건은 유지합니다.
-2. package identity 후보의 unsigned MSIX 정의와 제작·검사 스크립트가 있습니다. 최신0.1.1 로컬 패키지의 생성·압축 해제·408개 입력 파일 해시 검사를 통과했지만, 사용자용 설치·업데이트·제거 완료본으로 판정하지 않습니다. 일반 사용자 설치, 첫 우클릭 메뉴, 재설치 중복, 기존 연결·메뉴 회귀, 로그인 후 프로세스 확인이 필요합니다. 최신 서명·설치 상태는 [인계 기록](../../docs/delivery/image-copy-save-local-20260925.md)을 따릅니다. 사용자의 수동 등록, 인증서 신뢰·개발자 모드·조직 정책 변경으로 이 조건을 대신하지 않습니다.
-3. 이전 Windows Server 2025 관리자 CI의 77개 엔진/helper 시험과 63개 native 시험 PASS는 당시 소스의 결과입니다. 이번 통합 후보는 로컬에서 다시 빌드·시험하며 최신 수치와 미실행 이유는 [시험 결과](TEST_RESULTS.md)에 기록합니다. 격리 clipboard 생성에 실패한 시험은 사용자 클립보드로 대체하지 않습니다. native 시험은 Invoke·Explorer·등록·설치를 실행하지 않으므로 G0 또는 AT를 승격하는 근거가 아닙니다.
+2. package identity 후보의 unsigned MSIX 정의와 제작·검사 스크립트가 있습니다. 최신0.1.1 로컬 패키지의 생성·압축 해제·408개 입력 파일 해시 검사를 통과했지만, 사용자용 설치·업데이트·제거 완료본으로 판정하지 않습니다. 일반 사용자 설치, 첫 우클릭 메뉴, 재설치 중복, 기존 연결·메뉴 회귀, 로그인 후 프로세스 확인이 필요합니다. 현재 무서명 sparse 후보의 등록 차단은 [실증 기록](../../docs/tools/image-copy-save/unsigned-msi-feasibility.md)을 따릅니다. 사용자의 수동 등록, 인증서 신뢰·개발자 모드·조직 정책 변경으로 이 조건을 대신하지 않습니다.
+3. 이전 Windows Server 2025 관리자 CI의 77개 엔진/helper 시험과 63개 native 시험 PASS는 당시 소스의 결과입니다. 이번 통합 후보는 로컬에서 다시 빌드·시험하며 최신 수치와 미실행 이유는 [시험 결과](TEST_RESULTS.md)에 기록합니다. 기본 격리 모드는 생성 실패 시 자동 전환하지 않습니다. 명시적인 두 동의 옵션으로 현재 사용자 클립보드 모드를 별도 실행할 수 있습니다. native 시험은 Invoke·Explorer·등록·설치를 실행하지 않으므로 G0 또는 AT를 승격하는 근거가 아닙니다.
 4. 코덱은 .NET WPF가 제공하는 Windows WIC 기본 코덱을 명시적으로 선택합니다. native C++ IExplorerCommand/IObjectWithSite와 WinExe helper를 연결했습니다. GetState의 빠른 제외·느린 판정 위임, 호출 문맥 판정, 비모달 결과 안내·취소·같은 보기 선택을 구현했지만 실제 Explorer 연결·포커스 보존·취소 버튼 실기는 미검증입니다. WPF의 화면 비표시 렌더링은 실제 Windows 입력/포커스 시험이 아닙니다.
 5. PNG의 내장 ICC(명시적 sRGB ICC도 포함), 비표준 gamma/chromaticity, HDR 및 고비트·애니메이션은 거절합니다. 무프로파일/명시적 sRGB 화면 이미지 범위입니다. JPEG는 8비트 회색/3성분의 지원 프레임과 IFD0 방향만 처리합니다. CMYK·ICC·MPO는 거절합니다.
 6. PNG가 있으면 우선하며, bitmap 계열은 원래 게시된 형식이 합성 형식보다 앞서는 Windows 열거 순서를 따릅니다. 생산자가 독립 표현을 낮은 품질 순서로 게시하면 공개 API만으로 원본과 합성을 구별할 수 없어 그 순서를 따릅니다. BMP/DIB는 INFO40/V4/V5 헤더의 24/32비트 BI_RGB 또는 표준 마스크의 32비트 BI_BITFIELDS만 받습니다. 16비트·팔레트 BMP·RLE·비표준 마스크·색 프로파일은 거절합니다. 32비트 BI_RGB의 예약 바이트와 CF_BITMAP은 알파 계약이 없어 불투명 처리합니다. 투명도는 PNG 또는 명시적 알파가 있는 DIBV4/V5로 유지합니다.

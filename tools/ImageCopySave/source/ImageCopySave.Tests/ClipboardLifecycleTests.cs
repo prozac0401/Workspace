@@ -71,7 +71,7 @@ public static partial class ClipboardTests
 
         private static byte[] ReadRawFixture(uint format, int count)
         {
-            VerifyPrivateStation(ActiveStation);
+            VerifyTestContext(ActiveStation);
             Require(N.OpenClipboard(IntPtr.Zero), "inspect owned corrupt clipboard fixture");
             try
             {
@@ -137,7 +137,7 @@ public static partial class ClipboardTests
             string cancelName = "Local\\ImageCopySave-Cancel-" + Guid.NewGuid().ToString("N");
             using var cancel = new EventWaitHandle(false, EventResetMode.ManualReset, cancelName);
             using var worker = Product("--worker", "copy", source, cancelName,
-                sequence.ToString(CultureInfo.InvariantCulture), ActiveStation, "Test");
+                sequence.ToString(CultureInfo.InvariantCulture), ActiveStation, ActiveDesktop);
             preparation.WaitForBreak(worker);
             Check.That(!cancel.WaitOne(0), "In-flight cancellation was incorrectly presignaled.");
             Check.That(ClipboardEngine.CaptureSequence() == sequence, "Worker committed before the preparation barrier.");

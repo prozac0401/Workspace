@@ -9,7 +9,7 @@ using ImageCopySave.Engine;
 
 namespace ImageCopySave.Tests;
 
-/// <summary>All real clipboard mutations happen in a fresh, private noninteractive window station.</summary>
+/// <summary>Private isolation by default; the current user clipboard requires explicit acknowledged authorization.</summary>
 public static partial class ClipboardTests
 {
     private static readonly string[] Cases = ["metadata-only", "alpha-roundtrip", "newer-copy", "preparation-preserves", "snapshot-independent", "native-formats", "helper-exit", "lock-and-cancel", "delayed-rendering",
@@ -20,34 +20,84 @@ public static partial class ClipboardTests
     private static string TestExe => Path.Combine(AppContext.BaseDirectory, "ImageCopySave.Tests.exe");
     private static string ActiveStation = "";
     private static string WorkerDirectory = "";
+    private static string ActiveDesktop = "Test";
+    private static TestRunOptions? RunOptions;
+    private static bool UseCurrentClipboard;
+    private static string CoordinatorToken = "";
+    private static string? CoordinatorFailure;
+    internal static IReadOnlyList<string> CaseNames => Cases;
+    internal static object? CoordinatorEvidence { get; private set; }
+
+    internal static IDisposable? Configure(TestRunOptions options)
+    {
+        RunOptions = options;
+        UseCurrentClipboard = options.UseCurrentClipboard;
+        if (!UseCurrentClipboard) return null;
+        CurrentClipboardLease? lease = null;
+        try
+        {
+            lease = new CurrentClipboardLease();
+            CoordinatorToken = lease.Token;
+            ActiveStation = "WinSta0";
+            ActiveDesktop = "Default";
+            VerifyCurrentStation(); // Metadata only: never opens/reads/writes the clipboard.
+            CoordinatorEvidence = new { status = "acquired", station = ActiveStation, desktop = ActiveDesktop,
+                sessionId = Process.GetCurrentProcess().SessionId, mutex = CurrentClipboardLease.MutexName };
+            Console.WriteLine("CURRENT USER CLIPBOARD: acknowledged overwrite; serial execution; existing contents will not be backed up or restored.");
+            return lease;
+        }
+        catch (Exception error)
+        {
+            lease?.Dispose();
+            CoordinatorFailure = error.GetType().Name + ": " + error.Message;
+            CoordinatorEvidence = new { status = "NOT RUN", reason = CoordinatorFailure };
+            return null;
+        }
+    }
 
     public static void Register(Action<string, Action> test)
     {
-        foreach (string scenario in Cases)
-            test("clipboard isolated " + scenario, () => RunIsolated(scenario));
+        foreach (string scenario in Cases.Where(name => RunOptions?.ClipboardCase == null || RunOptions.ClipboardCase == name))
+            test((UseCurrentClipboard ? "clipboard current-session " : "clipboard isolated ") + scenario, () => RunScenario(scenario));
     }
 
-    private static void RunIsolated(string scenario)
+    private static void RunScenario(string scenario)
     {
+        if (CoordinatorFailure != null) throw new TestUnavailableException(CoordinatorFailure);
         // A missing product executable is a skipped prerequisite, never a simulated pass.
         if (scenario.StartsWith("product-", StringComparison.Ordinal)) HelperProcessTests.EnsureAvailable();
-        // The coordinator never reads, writes, saves, or restores the interactive clipboard.
+        // The coordinator never reads, saves or restores clipboard contents. Workers use only the selected context.
         string directory = Path.Combine(Path.GetTempPath(), "ImageCopySaveTests-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
         string result = Path.Combine(directory, "result.txt");
         try
         {
-            var start = new ProcessStartInfo(TestExe) { UseShellExecute = false, CreateNoWindow = true };
-            start.ArgumentList.Add("--clipboard-worker"); start.ArgumentList.Add(scenario); start.ArgumentList.Add(directory);
-            using Process child = Process.Start(start) ?? throw new IOException("Unable to start isolated clipboard worker.");
-            if (!child.WaitForExit(scenario.StartsWith("product-", StringComparison.Ordinal) ? 40000 : 20000))
+            if (UseCurrentClipboard)
             {
-                child.Kill(entireProcessTree: true); child.WaitForExit();
-                throw new TimeoutException("Isolated clipboard test exceeded its process deadline.");
+                // Start the real case directly on WinSta0\Default in an owned kill-on-close
+                // job. A coordinator crash closes the job and terminates its worker subtree.
+                using var child = Child("--clipboard-case-" + scenario, directory);
+                uint code = child.WaitForExit(scenario.StartsWith("product-", StringComparison.Ordinal) ? 40000u : 20000u);
+                string caseResult = Path.Combine(directory, "case.txt");
+                string text = File.Exists(caseResult) ? File.ReadAllText(caseResult) : "No worker result; native tests were not completed.";
+                if (code == 77) throw new TestUnavailableException(text);
+                Check.That(code == 0 && text.StartsWith("PASS ", StringComparison.Ordinal), text);
+                child.AssertNoSurvivingChildren();
             }
-            string text = File.Exists(result) ? File.ReadAllText(result) : "No worker result; native tests were not completed.";
-            if (child.ExitCode == 77) throw new TestUnavailableException(text);
-            Check.That(child.ExitCode == 0 && text.StartsWith("PASS ", StringComparison.Ordinal), text);
+            else
+            {
+                var start = new ProcessStartInfo(TestExe) { UseShellExecute = false, CreateNoWindow = true };
+                start.ArgumentList.Add("--clipboard-worker"); start.ArgumentList.Add(scenario); start.ArgumentList.Add(directory);
+                using Process child = Process.Start(start) ?? throw new IOException("Unable to start isolated clipboard worker.");
+                if (!child.WaitForExit(scenario.StartsWith("product-", StringComparison.Ordinal) ? 40000 : 20000))
+                {
+                    child.Kill(entireProcessTree: true); child.WaitForExit();
+                    throw new TimeoutException("Isolated clipboard test exceeded its process deadline.");
+                }
+                string text = File.Exists(result) ? File.ReadAllText(result) : "No worker result; native tests were not completed.";
+                if (child.ExitCode == 77) throw new TestUnavailableException(text);
+                Check.That(child.ExitCode == 0 && text.StartsWith("PASS ", StringComparison.Ordinal), text);
+            }
         }
         finally
         {
@@ -61,13 +111,23 @@ public static partial class ClipboardTests
 
     public static int? TryRunWorker(string[] args)
     {
-        if (args.Length != 3 || !args[0].StartsWith("--clipboard-", StringComparison.Ordinal)) return null;
+        if (args.Length == 0 || !(args[0] == "--clipboard-worker" || args[0].StartsWith("--clipboard-case-", StringComparison.Ordinal)
+            || args[0] is "--clipboard-publish" or "--clipboard-lock" or "--clipboard-delay" or "--clipboard-hang")) return null;
+        if (args.Length != 3 && args.Length != 7) return 64;
+        if (args.Length == 7)
+        {
+            if (args[0] == "--clipboard-worker" || args[3] != "--use-current-clipboard"
+                || args[4] != "--acknowledge-clipboard-overwrite" || args[5] != "--coordinator-token") return 64;
+            UseCurrentClipboard = true;
+            ActiveDesktop = "Default";
+            CoordinatorToken = args[6];
+        }
         WorkerDirectory = args[2];
         const string casePrefix = "--clipboard-case-";
         bool coordinator = args[0] == "--clipboard-worker";
         bool testCase = args[0].StartsWith(casePrefix, StringComparison.Ordinal);
         string output = Path.Combine(WorkerDirectory, coordinator ? "result.txt" : testCase ? "case.txt" : "child.txt");
-        bool preflight = coordinator || testCase;
+        bool preflight = true;
         try
         {
             if (coordinator)
@@ -93,14 +153,17 @@ public static partial class ClipboardTests
             else
             {
                 ActiveStation = args[1];
-                VerifyPrivateStation(ActiveStation); // Mandatory BEFORE every case/helper's clipboard access.
-                Check.That(ObjectName(N.GetThreadDesktop(N.GetCurrentThreadId())).Equals("Test", StringComparison.OrdinalIgnoreCase),
-                    "ABORT: private test desktop could not be verified; no clipboard access was authorized.");
+                VerifyTestContext(ActiveStation); // Mandatory BEFORE every case/helper's clipboard access.
+                Check.That(ObjectName(N.GetThreadDesktop(N.GetCurrentThreadId())).Equals(ActiveDesktop, StringComparison.OrdinalIgnoreCase),
+                    "ABORT: test desktop could not be verified; no clipboard access was authorized.");
+                if (UseCurrentClipboard) CurrentClipboardLease.VerifyWorkerAuthorization(CoordinatorToken);
                 preflight = false;
                 if (testCase)
                 {
                     RunCase(args[0][casePrefix.Length..]);
-                    File.WriteAllText(output, "PASS case; private noninteractive station and desktop verified");
+                    File.WriteAllText(output, UseCurrentClipboard
+                        ? "PASS case; acknowledged current-user WinSta0/Default context and coordinator verified"
+                        : "PASS case; private noninteractive station and desktop verified");
                     return 0;
                 }
                 switch (args[0])
@@ -264,10 +327,10 @@ public static partial class ClipboardTests
 
     private static void CheckImage(ImageData expected, ImageData actual, string context = "clipboard image")
     {
-        // Only generated fixtures reach this assertion, inside the verified private station.
+        // Fixtures are synthetic. Current-session failures must not dump another application's clipboard bytes.
         // Limit diagnostics even if a decoder unexpectedly returns a much larger buffer.
         string expectedPixels = Convert.ToHexString(expected.Bgra.AsSpan(0, Math.Min(expected.Bgra.Length, 64)));
-        string actualPixels = Convert.ToHexString(actual.Bgra.AsSpan(0, Math.Min(actual.Bgra.Length, 64)));
+        string actualPixels = UseCurrentClipboard ? "(omitted in current-session mode)" : Convert.ToHexString(actual.Bgra.AsSpan(0, Math.Min(actual.Bgra.Length, 64)));
         Check.That(actual.Width == expected.Width && actual.Height == expected.Height && actual.Bgra.SequenceEqual(expected.Bgra),
             $"{context}: expected {expected.Width}x{expected.Height} BGRA={expectedPixels}; actual {actual.Width}x{actual.Height} BGRA={actualPixels} (first 64 bytes).");
     }
@@ -297,7 +360,7 @@ public static partial class ClipboardTests
     }
     private static void SetRaw(params (uint Format, byte[] Data)[] formats)
     {
-        VerifyPrivateStation(ActiveStation);
+        VerifyTestContext(ActiveStation);
         using var owner = new TestWindow(); Require(N.OpenClipboard(owner.Handle), "open test clipboard");
         try
         {
@@ -381,7 +444,27 @@ public static partial class ClipboardTests
             Thread.Sleep(10);
         }
     }
-    private static NativeChild Child(string mode) => new(mode, ActiveStation, WorkerDirectory);
+    private static NativeChild Child(string mode, string? directory = null) => new(mode, ActiveStation, directory ?? WorkerDirectory);
+    private static string[] WorkerArguments(string mode, string station, string directory) => UseCurrentClipboard
+        ? [mode, station, directory, "--use-current-clipboard", "--acknowledge-clipboard-overwrite", "--coordinator-token", CoordinatorToken]
+        : [mode, station, directory];
+    internal static bool IsCurrentContext(string station, string desktop, bool visible) => visible
+        && station.Equals("WinSta0", StringComparison.OrdinalIgnoreCase)
+        && desktop.Equals("Default", StringComparison.OrdinalIgnoreCase);
+    private static void VerifyCurrentStation()
+    {
+        string station = ObjectName(N.GetProcessWindowStation());
+        string desktop = ObjectName(N.GetThreadDesktop(N.GetCurrentThreadId()));
+        Require(N.GetUserObjectFlags(N.GetProcessWindowStation(), 1, out N.UserObjectFlags flags, Marshal.SizeOf<N.UserObjectFlags>(), out _), "identify current station visibility");
+        Check.That(IsCurrentContext(station, desktop, (flags.Flags & 1) != 0),
+            "ABORT: current-session test requires the visible WinSta0/Default context; no clipboard access was authorized.");
+    }
+    private static void VerifyTestContext(string expected)
+    {
+        if (!UseCurrentClipboard) { VerifyPrivateStation(expected); return; }
+        Check.That(expected.Equals("WinSta0", StringComparison.OrdinalIgnoreCase), "ABORT: unexpected current-session station.");
+        VerifyCurrentStation();
+    }
     private static void Require(bool success, string operation) { if (!success) throw new Win32Exception(Marshal.GetLastWin32Error(), operation); }
     private static string ObjectName(IntPtr handle)
     {
@@ -455,13 +538,14 @@ public static partial class ClipboardTests
     {
         private N.ProcessInformation process;
         private IntPtr job;
+        private bool processAssignedToJob;
         private string? standardOutputPath, standardErrorPath;
         public NativeChild(string mode, string station, string directory)
-            : this(TestExe, new[] { mode, station, directory }, station) { }
+            : this(TestExe, WorkerArguments(mode, station, directory), station) { }
 
         public NativeChild(string executable, IReadOnlyList<string> arguments, string station, string? logDirectory = null)
         {
-            VerifyPrivateStation(station);
+            VerifyTestContext(station);
             Check.That(Path.IsPathFullyQualified(executable), "An absolute test executable path is required.");
             IntPtr input = IntPtr.Zero, output = IntPtr.Zero, error = IntPtr.Zero;
             try
@@ -474,7 +558,7 @@ public static partial class ClipboardTests
                 var limits = new N.JobExtendedLimitInformation
                 { Basic = new N.JobBasicLimitInformation { LimitFlags = 0x00002000 /* KILL_ON_JOB_CLOSE */ } };
                 Require(N.SetInformationJobObject(job, 9, ref limits, Marshal.SizeOf<N.JobExtendedLimitInformation>()), "configure owned child job");
-                var startup = new N.StartupInfo { Size = Marshal.SizeOf<N.StartupInfo>(), Desktop = station + "\\Test", Flags = 1, ShowWindow = 0 };
+                var startup = new N.StartupInfo { Size = Marshal.SizeOf<N.StartupInfo>(), Desktop = station + "\\" + ActiveDesktop, Flags = 1, ShowWindow = 0 };
                 if (logDirectory != null)
                 {
                     // Only the three temporary std handles are made inheritable. The
@@ -492,6 +576,7 @@ public static partial class ClipboardTests
                 Require(N.CreateProcess(executable, command, IntPtr.Zero, IntPtr.Zero, logDirectory != null, 0x08000004 /* NO_WINDOW | SUSPENDED */,
                     IntPtr.Zero, null, ref startup, out process), "launch isolated child");
                 Require(N.AssignProcessToJobObject(job, process.Process), "contain isolated child process tree");
+                processAssignedToJob = true;
                 Require(N.ResumeThread(process.Thread) != uint.MaxValue, "resume isolated child");
             }
             catch { Dispose(); throw; }
@@ -624,34 +709,110 @@ public static partial class ClipboardTests
                 : string.Join(" | ", summaries.Take(8)) + note;
         }
 
-        public void AssertNoSurvivingChildren()
+        private bool WaitForJobQuiescence(int milliseconds)
         {
             var time = Stopwatch.StartNew();
             do
             {
                 Require(N.QueryInformationJobObject(job, 1, out N.JobBasicAccountingInformation info,
                     Marshal.SizeOf<N.JobBasicAccountingInformation>(), IntPtr.Zero), "inspect owned child job");
-                if (info.ActiveProcesses == 0) return;
+                if (info.ActiveProcesses == 0) return true;
                 Thread.Sleep(10);
-            } while (time.ElapsedMilliseconds < 1500);
-            throw new InvalidOperationException("Product helper exited while a worker remained alive.");
+            } while (time.ElapsedMilliseconds < milliseconds);
+            return false;
         }
+
+        public void AssertNoSurvivingChildren()
+        {
+            if (!WaitForJobQuiescence(1500))
+                throw new InvalidOperationException("Product helper exited while a worker remained alive.");
+        }
+
         public void Dispose()
         {
-            // Terminate the whole owned subtree, including an unresponsive renderer or
-            // supervisor's worker. The noninheritable job handle is the final backstop.
-            if (job != IntPtr.Zero) N.TerminateJobObject(job, 125);
-            if (process.Process != IntPtr.Zero)
+            if (job == IntPtr.Zero && process.Process == IntPtr.Zero && process.Thread == IntPtr.Zero) return;
+            var errors = new List<string>();
+            void Attempt(string operation, Action action)
             {
-                if (N.WaitForSingleObject(process.Process, 0) != 0)
+                try { action(); }
+                catch (Exception error)
                 {
-                    N.TerminateProcess(process.Process, 125); // Also covers failed job assignment.
-                    N.WaitForSingleObject(process.Process, 2000);
+                    string native = error is Win32Exception win32 ? " native=" + win32.NativeErrorCode : "";
+                    errors.Add(operation + ": " + error.GetType().Name + native + ": " + error.Message);
                 }
-                N.CloseHandle(process.Process); process.Process = IntPtr.Zero;
             }
-            if (process.Thread != IntPtr.Zero) { N.CloseHandle(process.Thread); process.Thread = IntPtr.Zero; }
-            if (job != IntPtr.Zero) { N.CloseHandle(job); job = IntPtr.Zero; }
+            void CloseOwnedHandle(ref IntPtr handle, string operation)
+            {
+                IntPtr owned = handle;
+                handle = IntPtr.Zero;
+                if (owned != IntPtr.Zero) Attempt(operation, () => Require(N.CloseHandle(owned), operation));
+            }
+
+            try
+            {
+                // Job termination is asynchronous. A signaled direct process does not prove
+                // that its descendants have stopped using the shared clipboard.
+                bool jobTerminationSucceeded = false;
+                if (job != IntPtr.Zero)
+                    Attempt("terminate owned child job", () =>
+                    {
+                        jobTerminationSucceeded = N.TerminateJobObject(job, 125);
+                        Require(jobTerminationSucceeded, "terminate owned child job");
+                    });
+
+                if (process.Process != IntPtr.Zero)
+                {
+                    Attempt("confirm direct child exit", () =>
+                    {
+                        // Successful job termination already schedules every contained process
+                        // to exit. Calling TerminateProcess immediately can race that exit and
+                        // return ACCESS_DENIED while the process is still becoming signaled.
+                        uint wait = N.WaitForSingleObject(process.Process,
+                            processAssignedToJob && jobTerminationSucceeded ? 2000u : 0u);
+                        if (wait == 0) return;
+                        Require(wait == 258, "wait for direct child after job termination");
+
+                        // A timed-out child, or the suspended process left by failed job
+                        // assignment, still needs a direct termination attempt.
+                        bool terminated = N.TerminateProcess(process.Process, 125);
+                        int terminateError = terminated ? 0 : Marshal.GetLastWin32Error();
+                        wait = N.WaitForSingleObject(process.Process, 2000);
+                        // A failed terminate call is harmless only when actual exit is
+                        // subsequently confirmed. Never infer exit from ACCESS_DENIED.
+                        if (wait == 0) return;
+                        if (!terminated) throw new Win32Exception(terminateError, "terminate direct child");
+                        if (wait == 258) throw new TimeoutException("Direct child did not exit within the cleanup deadline.");
+                        Require(wait == 0, "confirm direct child exit after fallback termination");
+                    });
+                }
+
+                if (job != IntPtr.Zero)
+                    Attempt("confirm complete child job exit", () =>
+                    {
+                        if (!WaitForJobQuiescence(5000))
+                            throw new TimeoutException("Owned job still has active processes after the cleanup deadline.");
+                    });
+            }
+            finally
+            {
+                // Attempt every close even if termination/query/wait failed. Closing the
+                // noninheritable kill-on-close job remains the final containment backstop.
+                CloseOwnedHandle(ref process.Process, "close direct child handle");
+                CloseOwnedHandle(ref process.Thread, "close direct child thread handle");
+                CloseOwnedHandle(ref job, "close owned child job handle");
+            }
+
+            if (errors.Count == 0) return;
+            string reason = "Owned clipboard worker cleanup could not be confirmed. " + string.Join(" | ", errors);
+            if (UseCurrentClipboard)
+            {
+                CoordinatorFailure = reason;
+                if (RunOptions?.UseCurrentClipboard == true)
+                    CoordinatorEvidence = new { status = "cleanup-unconfirmed", reason,
+                        station = ActiveStation, desktop = ActiveDesktop,
+                        sessionId = Process.GetCurrentProcess().SessionId, mutex = CurrentClipboardLease.MutexName };
+            }
+            throw new IOException(reason);
         }
     }
 
@@ -709,10 +870,10 @@ public static partial class ClipboardTests
         [DllImport("kernel32.dll")] internal static extern uint GetCurrentThreadId();
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool GetUserObjectInformation(IntPtr handle, int index, StringBuilder buffer, int length, out int needed);
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool CreateProcess(string application, StringBuilder command, IntPtr processSecurity, IntPtr threadSecurity, [MarshalAs(UnmanagedType.Bool)] bool inherit, uint flags, IntPtr environment, string? directory, ref StartupInfo startup, out ProcessInformation process);
-        [DllImport("kernel32.dll")] internal static extern uint WaitForSingleObject(IntPtr handle, uint milliseconds);
+        [DllImport("kernel32.dll", SetLastError = true)] internal static extern uint WaitForSingleObject(IntPtr handle, uint milliseconds);
         [DllImport("kernel32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool GetExitCodeProcess(IntPtr process, out uint code);
-        [DllImport("kernel32.dll")] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool TerminateProcess(IntPtr process, uint code);
-        [DllImport("kernel32.dll")] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool CloseHandle(IntPtr handle);
+        [DllImport("kernel32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool TerminateProcess(IntPtr process, uint code);
+        [DllImport("kernel32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool CloseHandle(IntPtr handle);
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)] internal static extern ushort RegisterClass(ref WindowClass cls);
         [DllImport("user32.dll", CharSet = CharSet.Unicode)] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool UnregisterClass(string cls, IntPtr instance);
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] internal static extern IntPtr GetModuleHandle(string? name);

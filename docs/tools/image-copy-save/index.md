@@ -3,6 +3,8 @@
 도구 ID: ImageCopySave · 명세 v1.1 · 상태: 개발 평가, G0 BLOCKED
 제품 책임: 도구 개발·검증 담당
 적용 정책: [추가 도구 개발 기준](../../policies/tools.md), [문서 작성 규칙](../../policies/documentation.md)
+현재 후속 결정: [무서명 MSI 관문](../../design/0021-image-unsigned-msi.md), [현재 사용자 시험](../../design/0020-image-current-session-tests.md). 실제 최신 결과는 [후속 작업 기록](../../delivery/backlog-followup-20260927.md)을 따릅니다.
+
 관련 ADR: [ADR-0016](../../design/0016-image-copy-save-direct-menu.md), 과거 [ADR-0015](../../design/0015-image-copy-save-g0.md)
 
 ## 사용자와 목적
@@ -15,8 +17,8 @@
 |---|---|---|
 | MNU/G0 | [native IExplorerCommand 후보·근거](G0_Menu_Feasibility.md) | 실제 폴더 배경 첫 메뉴의 동적 숨김과 설치 실증 |
 | IMG/SAV | WIC 코덱·안전 상한·원자적 저장, 실제 helper clipboard→PNG 왕복 PASS | 실제 크기/픽셀 경계·ACL·격리 디스크 부족 PASS; Windows 11 통합·전체 payload/buffer 경계 미완료 |
-| CLP/CPY | native 즉시 게시·스냅샷·시퀀스 보호 소스 | Windows Server 관리자 CI에서 격리21개(실제 helper12개) PASS; Windows 11 제품 통합은 미검증 |
-| DEP/M2/M3 | full MSIX manifest·unsigned 평가 빌드 후보 | 신뢰 서명·일반 사용자 설치와 실제 메뉴, 호출 시점 sequence 전달·결과 선택·안내 UI 미완료 |
+| CLP/CPY | native 즉시 게시·스냅샷·시퀀스 보호, 명시적 현재 사용자 시험 | Windows 11 현재 사용자 클립보드 23사례 PASS. 실제 Explorer 통합은 설치 차단으로 미검증 |
+| DEP/M2/M3 | full MSIX 평가 payload 및 unsigned sparse 등록 probe | 별도 서명 없는 MSI 목표. 일반 사용자 등록 0x80073D2B로 차단, 실제 메뉴·최종 설치 수명주기 미실행 |
 
 ## 데이터·실패·동시 실행
 
@@ -24,7 +26,7 @@
 
 ## 설치·지원·검증
 
-신뢰되는 서명이 적용된 일반 사용자용 설치 패키지는 아직 없습니다. C#/.NET WPF의 명시적 Windows WIC 코덱으로 독립 엔진을 검증했고, native Shell DLL과 full MSIX 구성은 개정 G0 후보로 작성했습니다. 실제 탐색기 통합은 미검증입니다. 실제 실행한 OS 빌드를 제품 지원 인증으로 확대하지 않습니다.
+요구를 충족하는 무서명 MSI 설치 패키지는 아직 없습니다. C#/.NET WPF의 명시적 Windows WIC 코덱으로 독립 엔진을 검증했고, native Shell DLL과 full MSIX 구성은 개정 G0 후보로 작성했습니다. 실제 탐색기 통합은 미검증입니다. 실제 실행한 OS 빌드를 제품 지원 인증으로 확대하지 않습니다.
 
 [개발 소스·빌드 안내](../../../tools/ImageCopySave/README.md), [44개 수용시험 및 실제 결과](../../../tools/ImageCopySave/TEST_RESULTS.md), [알려진 제한](../../../tools/ImageCopySave/KNOWN_LIMITATIONS.md), [설치·제거 현황](../../../tools/ImageCopySave/installer/README.md)에 구현과 미실행을 구분했습니다. 이 문서 및 개발 증거는 공개 사이트 대상이 아닙니다.
 

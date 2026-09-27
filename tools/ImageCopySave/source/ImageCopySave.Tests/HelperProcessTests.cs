@@ -10,7 +10,7 @@ using ImageCopySave.Engine;
 
 namespace ImageCopySave.Tests;
 
-// Product-process cases share only the already verified private-station harness.
+// Product-process cases share only the already verified, explicitly selected clipboard context.
 // No case substitutes a test publisher for the actual product copy/save command.
 public static partial class ClipboardTests
 {
@@ -27,7 +27,7 @@ public static partial class ClipboardTests
 
         public static void Run(string scenario)
         {
-            VerifyPrivateStation(ActiveStation);
+            VerifyTestContext(ActiveStation);
             EnsureAvailable();
             string sources = OwnedDirectory("product-source");
             string saves = OwnedDirectory("product-save");
@@ -154,7 +154,7 @@ public static partial class ClipboardTests
             // A valid operation would succeed and overwrite the sentinel if the internal
             // context guard were ignored. No stderr-stage claim is made by this assertion.
             RunProductChecked(1, ["--worker", "copy", valid, cancelName, sequence.ToString(CultureInfo.InvariantCulture),
-                ActiveStation + "-deliberate-mismatch", "Test"],
+                ActiveStation + "-deliberate-mismatch", ActiveDesktop],
                 [valid, Path.GetFileName(valid), "product-invalid-preserve", Convert.ToHexString(validBytes), Convert.ToBase64String(validBytes)], validBytes);
             AssertSourceUnchanged(valid, validBytes);
             Check.That(ClipboardEngine.CaptureSequence() == sequence && ReadText() == "product-invalid-preserve",
@@ -274,7 +274,7 @@ public static partial class ClipboardTests
                 // This is the internal worker's already-requested cancellation contract,
                 // with a real lock holder. It is not a UI Ctrl+C or mid-commit cancellation test.
                 using var cancellation = new EventWaitHandle(true, EventResetMode.ManualReset, cancelName);
-                RunProduct(3, "--worker", "save", saves, cancelName, "0", ActiveStation, "Test");
+                RunProduct(3, "--worker", "save", saves, cancelName, "0", ActiveStation, ActiveDesktop);
                 AssertNoFiles(saves, "canceled internal product worker");
             }
             finally { File.WriteAllText(Path.Combine(WorkerDirectory, "stop.txt"), "stop"); }

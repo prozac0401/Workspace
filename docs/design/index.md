@@ -25,3 +25,7 @@
 - [ADR-0018 · 원본 Undo를 보존하는 출력 생성 분리](0018-excel-selection-export-undo.md)
 
 - [ADR-0019 · 공개 payload를 재사용하는 단일 설치 EXE](0019-visible-cells-paste-single-installer.md)
+
+- [ADR-0020 · 명시적으로 선택하는 현재 사용자 클립보드 시험](0020-image-current-session-tests.md)
+
+- [ADR-0021 · 이미지 도구 무서명 MSI와 설치 관문](0021-image-unsigned-msi.md)
