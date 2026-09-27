@@ -33,3 +33,7 @@
 - [ADR-0022 · 관리자 설치와 일반 사용자 실행](0022-image-admin-install.md)
 
 - [ADR-0023 · 공통 클래식 메뉴와 무서명 관리자 MSI](0023-image-copy-save-classic-menu.md) — 클래식 0.1.1 저장·복사와 MSI 시나리오 실증, 정량 반복 관문 제외, 설정 복원 PASS, 기본 메뉴 경로·안정성 원인 미확정
+
+- [ADR-0024 · MSI의 기존 상태 보존 검사](0024-image-msi-preservation.md) — 기존 등록·외부 변경 검사, 알려진 0.1.1 이행, 표준 MSI 롤백
+
+- [ADR-0025 · 그림 복사·저장의 공개 설치·사용 안내](0025-image-public-guide.md) — 정식 릴리스 요청에 따른 공개 범위 채택, 최종 MSI 검증·실제 게시 결과는 별도 기록

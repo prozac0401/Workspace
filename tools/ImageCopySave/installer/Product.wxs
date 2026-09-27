@@ -10,12 +10,20 @@
     <Property Id="ARPNOMODIFY" Value="1" />
     <Property Id="WINDOWSBUILD"><RegistrySearch Id="WindowsCurrentBuild" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Name="CurrentBuildNumber" Type="raw" Bitness="always64" /></Property>
     <Launch Condition="Installed OR (VersionNT64 AND WINDOWSBUILD &gt;= 22000)" Message="Windows 11 x64가 필요합니다. Windows 11의 기본 메뉴와 Windows 10 형식 메뉴를 지원합니다." />
-    <Property Id="EXISTING_SAVE_COM"><RegistrySearch Id="ExistingSaveCom" Root="HKLM" Key="Software\Classes\CLSID\{9C030D44-BBFA-48B7-BD63-53470C112830}\InprocServer32" Type="raw" Bitness="always64" /></Property>
-    <Property Id="EXISTING_COPY_COM"><RegistrySearch Id="ExistingCopyCom" Root="HKLM" Key="Software\Classes\CLSID\{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}\InprocServer32" Type="raw" Bitness="always64" /></Property>
-    <Launch Condition="Installed OR WIX_UPGRADE_DETECTED OR (NOT EXISTING_SAVE_COM AND NOT EXISTING_COPY_COM)" Message="같은 ImageCopySave 명령의 기존 등록을 발견했습니다. 기존 설치를 정상 제거한 뒤 다시 설치하세요." />
-    <Property Id="USER_SAVE_COM"><RegistrySearch Id="UserSaveCom" Root="HKCU" Key="Software\Classes\CLSID\{9C030D44-BBFA-48B7-BD63-53470C112830}\InprocServer32" Type="raw" Bitness="always64" /></Property>
-    <Property Id="USER_COPY_COM"><RegistrySearch Id="UserCopyCom" Root="HKCU" Key="Software\Classes\CLSID\{B481F5D0-A2B3-47D7-A139-B6C2F60B36DE}\InprocServer32" Type="raw" Bitness="always64" /></Property>
-    <Launch Condition="REMOVE OR (NOT USER_SAVE_COM AND NOT USER_COPY_COM)" Message="현재 사용자의 기존 ImageCopySave 등록이 이 설치를 가립니다. 해당 기존 설치를 먼저 정상 제거하세요." />
+    <!-- The guard only reads. Standard MSI actions own all writes and rollback. -->
+    <Property Id="ImageGuardSchema" Value="1" />
+    <Property Id="ImageGuardDeferred" Hidden="yes" />
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" />
+    <Binary Id="ImageGuard" SourceFile="$(var.GuardDll)" />
+    <CustomTableRef Id="ImageGuardFile" />
+    <CustomTableRef Id="ImageGuardLegacy" />
+    <CustomTableRef Id="ImageGuardLegacyFile" />
+    <CustomAction Id="ImageGuardPreflight" BinaryRef="ImageGuard" DllEntry="ImageGuardPreflight" Execute="immediate" Return="check" />
+    <CustomAction Id="ImageGuardDeferred" BinaryRef="ImageGuard" DllEntry="ImageGuardDeferred" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" />
+    <InstallExecuteSequence>
+      <Custom Action="ImageGuardPreflight" Before="InstallInitialize" />
+      <Custom Action="ImageGuardDeferred" After="RemoveExistingProducts" />
+    </InstallExecuteSequence>
     <StandardDirectory Id="ProgramFiles64Folder"><Directory Id="WorkspaceFolder" Name="Workspace"><Directory Id="INSTALLFOLDER" Name="ImageCopySave" /></Directory></StandardDirectory>
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="SaveCom" Guid="{2B366C0F-452A-4601-8BB7-B13501859A41}" Bitness="always64">
@@ -65,7 +73,7 @@
         <Control Id="Cancel" Type="PushButton" X="316" Y="220" Width="76" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>
       </Dialog>
       <Dialog Id="Maintenance" Width="420" Height="210" Title="그림 복사·저장 복구 또는 제거">
-        <Control Id="Body" Type="Text" X="24" Y="26" Width="372" Height="105" Text="프로그램 파일과 메뉴를 복구하거나 제거합니다.&#13;&#10;사용자가 저장한 그림과 원본 파일은 보존됩니다.&#13;&#10;탐색기를 강제로 종료하지 않습니다.&#13;&#10;Windows가 재시작을 요청하면 작업을 저장한 뒤 직접 재시작하세요." />
+        <Control Id="Body" Type="Text" X="24" Y="26" Width="372" Height="105" Text="프로그램 파일과 메뉴를 복구하거나 제거합니다.&#13;&#10;외부에서 변경한 파일·등록이 있으면 보존을 위해 중단합니다.&#13;&#10;사용자가 저장한 그림과 원본 파일은 보존됩니다.&#13;&#10;탐색기를 강제로 종료하지 않습니다.&#13;&#10;Windows가 재시작을 요청하면 작업을 저장한 뒤 직접 재시작하세요." />
         <Control Id="Repair" Type="PushButton" X="104" Y="157" Width="96" Height="24" Default="yes" Text="복구"><Publish Property="REINSTALL" Value="ALL" /><Publish Property="REINSTALLMODE" Value="amus" /><Publish Event="EndDialog" Value="Return" /></Control>
         <Control Id="Remove" Type="PushButton" X="210" Y="157" Width="96" Height="24" Text="제거"><Publish Property="REMOVE" Value="ALL" /><Publish Event="EndDialog" Value="Return" /></Control>
         <Control Id="Cancel" Type="PushButton" X="316" Y="157" Width="76" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>

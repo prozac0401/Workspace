@@ -19,6 +19,7 @@ public_routes = {
     'tools/bookmark/',
     'tools/excel-selection-export/', 'tools/file-list-to-excel/',
     'tools/visible-cells-paste/',
+    'tools/image-copy-save/guide/',
 }
 public_assets = {
     'assets/extra.css', 'assets/folderstate.png',

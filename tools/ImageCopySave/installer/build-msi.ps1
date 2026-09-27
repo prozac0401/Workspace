@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$PackageResult = '',
-    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '0.1.1',
+    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '0.2.0',
     [switch]$RollbackTest
 )
 $ErrorActionPreference = 'Stop'
@@ -72,7 +72,7 @@ $output = Owned-Path (Join-Path $root ('artifacts/image-copy-save/msi/' + $runId
 $productSource = Join-Path $output 'Product.wxs'
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Product.wxs') -Destination $productSource
 $installerSourceHashes = @{}
-foreach ($source in @('Product.wxs','build-msi.ps1')) { $installerSourceHashes[$source] = Sha (Join-Path $PSScriptRoot $source) }
+foreach ($source in @('Product.wxs','build-msi.ps1','verify-msi.ps1','build-guard.ps1','baselines/0.1.1.json') + @(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'guard') -File | ForEach-Object { 'guard/' + $_.Name })) { $installerSourceHashes[$source] = Sha (Join-Path $PSScriptRoot $source) }
 $stage = Join-Path $output 'payload'; [IO.Directory]::CreateDirectory($stage) | Out-Null
 $files = @(Plain-Files $payload | Sort-Object FullName)
 $expectedInventory = @{}
@@ -113,14 +113,38 @@ foreach ($entry in $inventory) {
 $lines.Add('</ComponentGroup></Fragment></Wix>')
 $filesWxs = Join-Path $output 'Files.wxs'
 [IO.File]::WriteAllLines($filesWxs, $lines, $utf8)
+
+# Immutable ownership inventories live inside the cached MSI, not in an editable installed file.
+$legacy = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'baselines/0.1.1.json') -Encoding UTF8 -Raw | ConvertFrom-Json
+if ($legacy.schema -ne 1 -or $legacy.files.Count -ne 404 -or $legacy.msiSha256 -ne '418C8774355A59EAEF16CE24A318F91B8D5F77D29B517808B3AA83B9A7A917F5') { throw 'Unrecognized legacy baseline.' }
+$guardWxs = Join-Path $output 'GuardTables.wxs'
+$guardLines = New-Object 'System.Collections.Generic.List[string]'
+$guardLines.Add('<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"><Fragment>')
+foreach ($table in @('ImageGuardFile','ImageGuardLegacyFile')) {
+    $guardLines.Add('<CustomTable Id="' + $table + '"><Column Id="Id" Type="string" Width="72" PrimaryKey="yes" /><Column Id="Path" Type="string" Width="255" /><Column Id="Sha256" Type="string" Width="64" />')
+    $entries = $(if ($table -eq 'ImageGuardFile') { $inventory.ToArray() } else { $legacy.files })
+    foreach ($entry in $entries) {
+        if ($entry.path.Length -gt 255 -or $entry.path -match '(^[/\\]|[:]|(^|[/\\])\.\.?([/\\]|$))' -or $entry.sha256 -notmatch '^[0-9A-Fa-f]{64}$') { throw 'Invalid guard inventory path or hash.' }
+        $guardLines.Add('<Row><Data Column="Id" Value="G_' + (Id $entry.path) + '" /><Data Column="Path" Value="' + (Xml $entry.path) + '" /><Data Column="Sha256" Value="' + $entry.sha256 + '" /></Row>')
+    }
+    $guardLines.Add('</CustomTable>')
+}
+$guardLines.Add('<CustomTable Id="ImageGuardLegacy"><Column Id="Id" Type="string" Width="72" PrimaryKey="yes" /><Column Id="ProductCode" Type="string" Width="38" /><Column Id="PackageCode" Type="string" Width="38" /><Row><Data Column="Id" Value="Legacy011" /><Data Column="ProductCode" Value="' + $legacy.productCode + '" /><Data Column="PackageCode" Value="' + $legacy.packageCode + '" /></Row></CustomTable>')
+$guardLines.Add('</Fragment></Wix>')
+[IO.File]::WriteAllLines($guardWxs, $guardLines, $utf8)
+$guardOutput = Join-Path $output 'guard'
+Run (Join-Path $env:windir 'System32/WindowsPowerShell/v1.0/powershell.exe') @('-NoLogo','-NoProfile','-NonInteractive','-File',(Join-Path $PSScriptRoot 'build-guard.ps1'),'-OutputDirectory',$guardOutput) 'guard-build.log'
+$guardDll = Join-Path $guardOutput 'ImageCopySave.Guard.dll'
+if (-not (Test-Path -LiteralPath $guardDll -PathType Leaf)) { throw 'Missing compiled preservation guard.' }
+
 $productCode = '{' + ([Guid]::ParseExact((Id ('ImageCopySave.Product.' + $Version + $(if ($RollbackTest) { '.RollbackTest' } else { '' }))), 'N')).ToString().ToUpperInvariant() + '}'
 $name = 'ImageCopySave-' + $Version + '-x64' + $(if ($RollbackTest) { '-ROLLBACK-TEST' } else { '' }) + '.msi'
 $msi = Join-Path $output $name
 $wix = Join-Path $root '.tools/wix/wix.exe'
-Run $wix @('build',$productSource,$filesWxs,'-arch','x64','-d',"Version=$Version",'-d',"ProductCode=$productCode",'-d',"RollbackTest=$([int][bool]$RollbackTest)",'-pdbtype','none','-o',$msi) 'wix-build.log'
+Run $wix @('build',$productSource,$filesWxs,$guardWxs,'-arch','x64','-d',"Version=$Version",'-d',"GuardDll=$guardDll",'-d',"ProductCode=$productCode",'-d',"RollbackTest=$([int][bool]$RollbackTest)",'-pdbtype','none','-o',$msi) 'wix-build.log'
 if ((Get-AuthenticodeSignature -LiteralPath $msi).Status -ne 'NotSigned') { throw 'The MSI must remain unsigned.' }
-$metadata = [ordered]@{ status='PASS'; productionRelease=$false; artifactKind='unsigned-self-contained-msi'; version=$Version; productCode=$productCode; upgradeCode='{78C90F77-8CC3-4B10-BA9A-00E84ADAF375}'; msi=$msi; msiSha256=(Sha $msi); signatureStatus='NotSigned'; payloadEmbedded=$true; registration='HKLM classic IExplorerCommand'; installScope='perMachine'; runtimeElevation=$false; rollbackTest=[bool]$RollbackTest; files=@($inventory.ToArray()); nativeDllSha256=$native.dllSha256; priorVerifiedPackageResult=$PackageResult; sourceHashes=@{} }
-foreach ($source in @('Product.wxs','build-msi.ps1','verify-msi.ps1')) { if (Test-Path -LiteralPath (Join-Path $PSScriptRoot $source)) { $metadata.sourceHashes[$source] = Sha (Join-Path $PSScriptRoot $source) } }
+$metadata = [ordered]@{ status='PASS'; productionRelease=$false; artifactKind='unsigned-self-contained-msi'; version=$Version; productCode=$productCode; upgradeCode='{78C90F77-8CC3-4B10-BA9A-00E84ADAF375}'; msi=$msi; msiSha256=(Sha $msi); signatureStatus='NotSigned'; payloadEmbedded=$true; registration='HKLM classic IExplorerCommand'; installScope='perMachine'; runtimeElevation=$false; rollbackTest=[bool]$RollbackTest; files=@($inventory.ToArray()); nativeDllSha256=$native.dllSha256; guardDllSha256=(Sha $guardDll); guardSchema=1; legacyBaselineSha256=(Sha (Join-Path $PSScriptRoot 'baselines/0.1.1.json')); priorVerifiedPackageResult=$PackageResult; sourceHashes=@{} }
+foreach ($source in $installerSourceHashes.Keys) { if (Test-Path -LiteralPath (Join-Path $PSScriptRoot $source)) { $metadata.sourceHashes[$source] = Sha (Join-Path $PSScriptRoot $source) } }
 foreach ($source in $installerSourceHashes.Keys) { if ($installerSourceHashes[$source] -ne $metadata.sourceHashes[$source]) { throw 'Installer sources changed during the build. Rebuild before using this artifact.' } }
 [IO.File]::WriteAllText((Join-Path $output 'build-metadata.json'), ($metadata | ConvertTo-Json -Depth 8), $utf8)
 Write-Output "Self-contained unsigned MSI: $msi"

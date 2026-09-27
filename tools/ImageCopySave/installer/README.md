@@ -1,20 +1,22 @@
 # 무서명 MSI를 만들고 설치 시험하기
 
-도구: ImageCopySave · MSI 기본 버전: 0.1.1 · 상태: 내부 사용 후보 검증 중
+도구: ImageCopySave · MSI 기본 버전: 0.2.0 · 상태: 보존 보완·정식 릴리스 인수 진행 중
 
 책임: 도구 개발·검증 담당 · 적용 범위: Windows 11 x64
 
 작성일: 2026-09-25 · 최신 확인: 2026-09-27
 
-현재 제품은 **별도 서명 없는 자체 포함 MSI**로 설치합니다. 사용자가 승인한 설치 방식은 관리자 권한의 PC 전체 설치이며, 평소 그림 복사·저장은 일반 사용자로 실행합니다. 인증서 설치, 개발자 모드, PowerShell 실행, 수동 레지스트리 등록을 사용자에게 요구하지 않습니다. 설치·메뉴의 실제 확인 결과와 남은 제한은 [최신 검증 기록](../../../docs/delivery/image-classic-msi-20260927.md)을 따릅니다.
+현재 제품은 **별도 서명 없는 자체 포함 MSI**로 설치합니다. 사용자가 승인한 설치 방식은 관리자 권한의 PC 전체 설치이며, 평소 그림 복사·저장은 일반 사용자로 실행합니다. 인증서 설치, 개발자 모드, PowerShell 실행, 수동 레지스트리 등록을 일반 사용자에게 요구하지 않습니다. MSI에 포함한 native 보존 검사는 설치 자원을 읽어 비교하고 실제 쓰기·제거·롤백은 Windows Installer가 담당합니다.
 
-메뉴의 목표 경로는 Windows 11 기본 모드에서 **우클릭 → 더 많은 옵션 표시**이며, Windows 10 형식 메뉴 모드에서는 우클릭 메뉴에서 바로 접근합니다. 최종 설치한 0.1.1의 클래식 직접 표시에서 실제 PNG 저장과 이미지 복사를 확인했습니다. 기본 새 메뉴 경로는 아직 미확인이며 설정 전환 후 클래식 메뉴가 보였다는 사실을 통과로 계산하지 않습니다. 이 표현은 Windows 11의 두 메뉴 모드를 말하며 Windows 10 운영체제의 시험 완료를 뜻하지 않습니다. 설치 프로그램은 사용자의 메뉴 모드 설정을 바꾸지 않습니다.
+0.2.0 첫 후보의 구조·native 보호 회귀, 실제 0.1.1→0.2.0 업그레이드·제거와 HKLM 충돌 일곱 사례는 PASS입니다. HKCU 루트 충돌에서 예상한 설치 거절이 발생하지 않아 첫 회귀를 중단했습니다. **사용자 등록 검사를 보완한 후보의 제작·구조 검사와 native 26개 시험은 통과했으나, 관리자 승인 요청 취소로 실제 보존 회귀는 NOT RUN**입니다. 아래 절차가 있다는 사실을 최종 인수나 게시 완료로 설명하지 않습니다. [최신 0.2.0 기록](../../../docs/delivery/image-020-release-20260927.md)에 후보 해시·실제 결과·남은 항목을 구분합니다.
 
-이번 후보는 실제 설치·누락 파일 복구·0.1.1 업데이트·제거·고의 실패 롤백·재설치를 통과했으며 각 설치 단계에서 Explorer를 종료하지 않았습니다. 이후 별도로 승인받은 메뉴 모드 시험에서는 Explorer를 다시 시작하고 기존 Workspace 경로를 복원했습니다. 메뉴 설정은 시험 후 원래 키·값·형식·Owner/Group/DACL을 보존해 복구했습니다. 시험 중 일시적인 Explorer 무응답은 원인 미확정으로 기록하며 제품 또는 자동화 도구의 원인으로 단정하지 않습니다. 현재 지원 판정은 위 최신 검증 기록을 확인합니다.
+메뉴는 Windows 11 기본 모드에서 **우클릭 → 더 많은 옵션 표시**, 클래식 직접 표시 모드에서는 우클릭 메뉴에서 바로 접근합니다. 기본 메뉴의 복사·저장 두 기능은 사용자 직접 확인 PASS이며, 기존 클래식 메뉴의 대표 결과도 유지합니다. 모든 조건별 숨김·창/탭 검증으로 확대하지 않습니다. Windows 10 형식 메뉴라는 표현은 Windows 11의 표시 모드를 뜻하며 Windows 10 OS 지원 인증이 아닙니다. 설치기는 메뉴 모드 설정을 바꾸지 않습니다.
+
+이전 0.1.1의 설치·누락 파일 복구·업데이트·제거·고의 실패 롤백·재설치 및 승인된 시험용 메뉴 설정 복구는 [당시 기록](../../../docs/delivery/image-classic-msi-20260927.md)으로 보존합니다. 과거 일시적인 Explorer 무응답은 원인 미확정입니다. 새 보호 기능이 이전 시험에 포함되어 있었다고 해석하지 않습니다.
 
 ## 일반 사용자 설치·복구·제거
 
-`ImageCopySave-0.1.1-x64.msi`를 열고 설치를 선택한 뒤 Windows의 관리자 승인 창을 확인합니다. 설치 위치는 `Program Files\Workspace\ImageCopySave`입니다. 추가 런타임을 내려받지 않습니다.
+최종 검증 후 제공되는 `ImageCopySave-0.2.0-x64.msi`를 열고 설치를 선택한 뒤 Windows의 관리자 승인 창을 확인합니다. 설치 위치는 `Program Files\Workspace\ImageCopySave`입니다. 추가 런타임을 내려받지 않습니다.
 
 그림 파일 한 개를 우클릭해 **그림으로 복사**를 선택합니다. 복사한 그림을 파일로 만들려면 저장할 폴더 빈 공간을 우클릭해 **복사한 그림 저장**을 선택합니다. 텍스트나 빈 클립보드에서는 저장 항목이 숨겨집니다.
 
@@ -27,15 +29,31 @@
 개발 PC에는 기존 .NET/native 빌드 도구와 WiX 4가 필요합니다. 스크립트가 도구를 자동 설치하지 않습니다. [build-msi.ps1](build-msi.ps1)은 `build-package.ps1`에서 이미 자체 포함 게시·파일 해시를 검증한 payload를 입력으로 사용하고 최신 native 빌드의 소스/DLL 해시를 검사합니다. 이전 Appx manifest와 로고는 제외하며 제품 DLL·helper와 .NET Desktop 런타임을 MSI에 전부 포함합니다. Appx 등록은 수행하지 않습니다.
 
 ```powershell
-powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/build-msi.ps1 -Version 0.1.1
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/build-msi.ps1 -Version 0.2.0
 powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/verify-msi.ps1 -MsiPath "<출력 MSI>"
 ```
 
-출력은 실행별 `artifacts/image-copy-save/msi/<실행 ID>/` 아래에 생성됩니다. `build-metadata.json`에는 MSI SHA256, 서명 없음, ProductCode, 입력 파일 해시와 시험용 여부를 기록합니다. `verify-msi.ps1`은 MSI를 설치하지 않고 PC 전체 범위, 포함 파일, 두 COM 서버, 다섯 메뉴 등록, 내장 cabinet, 실행형 custom action 부재와 자동 종료 방지 설정을 확인합니다. 정적 확인을 실제 설치·Explorer 시험 PASS로 취급하지 않습니다.
+출력은 실행별 `artifacts/image-copy-save/msi/<실행 ID>/` 아래에 생성됩니다. `build-metadata.json`에는 MSI SHA256, 서명 없음, ProductCode, 입력 파일 해시와 시험용 여부를 기록합니다. `verify-msi.ps1`은 MSI를 설치하지 않고 PC 전체 범위, 포함 파일, 두 COM 서버, 다섯 메뉴 등록, 내장 cabinet, native 검사 custom action 두 개의 바이너리·실행 순서·소유 목록과 자동 종료 방지 설정을 확인합니다. 정적 확인을 실제 설치·Explorer 시험 PASS로 취급하지 않습니다.
 
-등록은 MSI의 기본 파일·레지스트리 기능으로 처리합니다. 별도 등록 실행 파일이나 설치 중 Appx/PowerShell custom action은 없습니다. `HKLM\Software\Classes`의 제품 소유 CLSID 두 개와 `Directory\Background\shell\Workspace.ImageCopySave.Save`, `SystemFileAssociations\.png|.jpg|.jpeg|.bmp\shell\Workspace.ImageCopySave.Copy`만 사용합니다. 기본 파일 연결과 다른 도구의 메뉴를 변경하지 않으며 모든 명령에 `NeverDefault`를 지정합니다.
+[build-guard.ps1](build-guard.ps1)은 정적으로 링크한 x64 보호 DLL과 합성 native 시험을 빌드합니다. DLL은 MSI Binary 테이블에 내장하며 설치된 프로그램 파일을 검사 실행 파일로 신뢰하지 않습니다. [보존 설계](../../../docs/design/0024-image-msi-preservation.md)의 즉시·지연 검사가 비교를 수행하고, 등록은 MSI의 기본 파일·레지스트리 기능으로 처리합니다. 별도 등록 실행 파일이나 설치 중 Appx/PowerShell custom action은 없습니다. `HKLM\Software\Classes`의 제품 소유 CLSID 두 개와 `Directory\Background\shell\Workspace.ImageCopySave.Save`, `SystemFileAssociations\.png|.jpg|.jpeg|.bmp\shell\Workspace.ImageCopySave.Copy`만 사용합니다. 기본 파일 연결과 다른 도구의 메뉴를 변경하지 않으며 모든 명령에 `NeverDefault`를 지정합니다.
 
-## 실제 설치 수명주기 시험
+## 0.2.0 보존 회귀와 실제 설치 수명주기
+
+[test-msi-preservation.ps1](test-msi-preservation.ps1)의 기본 Inspect는 기존 설치·등록·시험 폴더 충돌을 읽어 확인합니다. Suite는 사전 검사를 통과한 뒤 전용 artifacts 디렉터리와 정확히 소유한 합성 등록만 사용합니다. 실패 시 다음 사례를 실행하거나 제품을 자동 제거하지 않고 검토를 위해 중단합니다. 업무 폴더와 기존 사용자 등록을 시험 자료로 사용하지 않습니다.
+
+```powershell
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/test-msi-preservation.ps1 -MsiPath "<0.2.0 후보 MSI>" -Action Inspect
+```
+
+[invoke-msi-preservation-sequence.ps1](invoke-msi-preservation-sequence.ps1)은 기존 검증 후보에서의 업데이트·제거, 격리된 보존 회귀, 최종 설치를 정상 UAC 승인 아래 순서대로 수행하는 시험기입니다. 기본 Inspect로 고정할 입력·파일 해시와 사전 조건을 확인하며 Run은 승인된 시험 순서에 한해 실행합니다. 단계가 실패하거나 재부팅이 필요하면 중단합니다. 시험기를 직접 사용하지 않는 일반 MSI에도 내장 보호가 적용되어야 하며, 시험기의 사전 확인을 제품 기능의 증거로 대체하지 않습니다.
+
+[invoke-msi-preservation-recovery.ps1](invoke-msi-preservation-recovery.ps1)은 실패 보고서가 가리키는 정확한 `artifacts/image-copy-save/msi-preservation/<실패 실행 ID>/installed-product`만 복구하는 개발자용 시험기입니다. 기본 `Inspect`는 제품·등록을 변경하지 않고 실패 보고서·원래 MSI·설치 파일과 값의 일치를 확인합니다. 승인된 `Run`만 그 원래 MSI를 통해 해당 시험 설치를 제거한 뒤 수정 후보의 보존 회귀와 최종 설치를 순서대로 실행합니다. 임의 설치 폴더나 레지스트리를 직접 정리하지 않으며, 불일치·실패·재부팅 요구가 있으면 중단합니다. 이번 복구 Inspect는 PASS였지만 UAC 취소로 Run의 자식 프로세스는 시작되지 않았습니다.
+
+보존 회귀는 PC 전체 HKLM과 설치를 실행한 사용자의 HKCU 일곱 루트·설치 디렉터리 충돌, 수정 파일·값·추가 NTFS 스트림, 누락 파일 복구, 추가 파일·값·타사 등록·기본 연결 보존, 새 설치와 업데이트 실패 롤백을 대상으로 합니다. 시험 자료를 교체·정리하는 도우미는 [합성 primitive 시험](preservation-tests/test-fixture-primitives.ps1)으로 별도 확인합니다.
+
+### 이전 0.1.x 수명주기 재현 절차
+
+아래 버전별 예시는 앞선 0.1.x 시험을 재현하는 개발 절차입니다. 해당 PASS를 0.2.0의 새 보호 결과로 합산하지 않습니다.
 
 아래는 개발·검증 담당자용이며 **한 번에 한 동작씩** 실행합니다. [invoke-msi-test.ps1](invoke-msi-test.ps1)은 정상 UAC 승인을 요청한 뒤 [test-msi-lifecycle.ps1](test-msi-lifecycle.ps1)을 실행합니다. 기존 설치나 같은 CLSID/메뉴 등록, 알 수 없는 설치 폴더가 있으면 최초 설치 시험을 시작하지 않습니다. 사용자별 등록이 PC 전체 등록을 가리는 경우도 중단합니다.
 
@@ -55,7 +73,7 @@ powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/in
 롤백은 별도의 실패 전용 MSI로 확인합니다. 제품 MSI에는 실패 주입 기능이 들어가지 않습니다.
 
 ```powershell
-powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/build-msi.ps1 -Version 0.1.2 -RollbackTest
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/build-msi.ps1 -Version 0.2.1 -RollbackTest
 powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/invoke-msi-test.ps1 -MsiPath "<ROLLBACK-TEST.msi>" -Action Rollback
 ```
 
