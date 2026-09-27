@@ -1,6 +1,6 @@
 # 업무 책갈피 0.2.5 안내·Pages 반영
 
-날짜: 2026-09-27 · 책임: 문서·배포 담당 · 상태: 게시 준비
+날짜: 2026-09-27 · 책임: 문서·배포 담당 · 상태: Pages 게시·실제 URL 확인 완료
 
 ## 대상과 변경
 
@@ -28,3 +28,12 @@ GitHub API에서 v0.2.5의 draft=false, prerelease=true와 2026-09-27T03:58:36Z 
 [그림 도구 배포 준비](image-release-readiness-20260927.md)의 소스·문서 반영과 제품 공개 보류를 구분한다. 그림 도구의 기본 메뉴 두 기능은 사용자 직접 확인으로 기록했지만 설치 자원 보존과 나머지 인수 항목은 미완료다.
 
 로컬 원시 네트워크 결과와 빌드 로그는 artifacts/release-readiness-20260927 아래에 보존하며 사이트에 넣지 않는다. 실제 main·Documentation 실행·공개 URL 결과는 게시 후 이 기록에 추가한다.
+
+## 실제 게시 결과
+
+- 콘텐츠 커밋: [f4dd510](https://github.com/prozac0401/Workspace/commit/f4dd510d0f2258ba53c2e5486698f6a048f941b1). 이전 로컬 MSI 구현4커밋과 그림 도구 준비 판정, 업무 책갈피 안내를 순차 커밋으로 main에 반영했다.
+- [Documentation 실행](https://github.com/prozac0401/Workspace/actions/runs/36294541024): completed / success.
+- 실제 공개19페이지 모두 HTTP200. 홈과 업무 책갈피 페이지에0.2.5가 표시되며 MSI·ZIP 링크, 제목 편집, 첫 실행 스티커 모드·크기 변경 안내를 확인했다.
+- ImageCopySave 안내, 이번 그림 도구 준비 기록과 업무 책갈피 게시 기록의 Pages 경로는 HTTP404로 제외됐다.
+- 업무 책갈피 제품 파일은 기존 공개 자산을 연결했고 변경하지 않았다. ImageCopySave 검토용 MSI는 로컬에만 보존하고 공개 릴리스에 추가하지 않았다.
+- 이 후속 커밋은 Pages에서 제외되는 게시 기록만 갱신한다. 공개 콘텐츠와 다운로드 파일은 변경하지 않는다.
