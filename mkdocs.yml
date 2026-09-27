@@ -15,8 +15,6 @@ exclude_docs: |
   !/policies/folder-workflow.md
   !/policies/work-efficiency.md
   !/tools/folderstate/index.md
-  !/tools/folderstate/installation.md
-  !/tools/folderstate/troubleshooting.md
   !/tools/excel-list-compare/index.md
   !/tools/bookmark/index.md
   !/tools/excel-selection-export/index.md
@@ -66,6 +64,8 @@ plugins:
   - search:
       lang: [ko, en]
       separator: '[\s\-·/]+'
+hooks:
+  - docs/hooks/folderstate_redirects.py
 markdown_extensions:
   - admonition
   - attr_list
@@ -92,9 +92,7 @@ nav:
       - 파일 이름과 메일 정리: policies/files-email.md
       - 끝난 업무 보관과 자료 보호: policies/archive-security.md
   - 프로그램 받기:
-      - FolderState 설치·업데이트·제거: tools/folderstate/installation.md
-      - FolderState 사용하기: tools/folderstate/index.md
-      - FolderState 문제 해결: tools/folderstate/troubleshooting.md
+      - FolderState 설치·사용: tools/folderstate/index.md
       - Excel 명단 비교 설치·사용: tools/excel-list-compare/index.md
       - 업무 책갈피 설치·사용: tools/bookmark/index.md
       - 선택범위 내보내기 설치·사용: tools/excel-selection-export/index.md

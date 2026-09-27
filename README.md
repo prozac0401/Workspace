@@ -4,7 +4,7 @@
 
 [지금 할 일 찾기](docs/quick-reference.md)에서 자신의 상황을 골라 보세요. 처음 사용한다면 [업무 하나로 시작하기](docs/getting-started.md)를 따라 하면 됩니다. 반복하는 업무는 복사용 기본 폴더를 만들어 두고 새 업무를 시작할 때 복사해 씁니다. 업무가 끝나면 그 폴더를 통째로 보관합니다.
 
-- **[FolderState 설치·사용](docs/tools/folderstate/installation.md)**: Windows 폴더 아이콘으로 업무 진행 상태를 표시합니다.
+- **[FolderState 설치·사용](docs/tools/folderstate/index.md)**: Windows 폴더 아이콘으로 업무 진행 상태를 표시합니다.
 - **[Excel 명단 비교 설치·사용](docs/tools/excel-list-compare/index.md)**: 두 목록에서 다른 값과 중복된 값을 찾습니다.
 - **[선택범위 내보내기 설치·사용](docs/tools/excel-selection-export/index.md)**: 설치 후 Excel 시작 시 메뉴가 준비되며, 보이는 셀과 수식 결과를 새 통합문서로 만듭니다.
 - **[File List to Excel 설치·사용](docs/tools/file-list-to-excel/index.md)**: 탐색기에서 파일·폴더를 우클릭해 목록과 중복 검사 결과를 Excel로 만듭니다.
@@ -27,7 +27,7 @@ File List to Excel v1.2.0의 설치·복구·제거와 이전 버전 업그레�
 
 | 프로그램 | 설치 파일 | 확인할 내용 |
 |---|---|---|
-| FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·업데이트·제거](docs/tools/folderstate/installation.md) |
+| FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·사용](docs/tools/folderstate/index.md) |
 | Excel 명단 비교 0.2.0 R12 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
 | 선택범위 내보내기 0.1.0-rc.10 평가판 | [Excel x64용 EXE](https://github.com/prozac0401/Workspace/releases/download/excel-selection-export-v0.1.0-rc.10/ExcelSelectionExport-0.1.0-rc.10-x64-Setup.exe) · [x86용·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.10) | [설치·사용·알려진 제한](docs/tools/excel-selection-export/index.md) |
 | File List to Excel 1.2.0 | [Windows x64 MSI](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [배포 자료](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) | [설치·사용 안내](docs/tools/file-list-to-excel/index.md) |

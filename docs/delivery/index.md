@@ -8,7 +8,7 @@
 
 | 도구 | 설치·사용 안내 | 배포와 검증 기록 |
 |---|---|---|
-| FolderState 0.1.3 RC1 | [설치](../tools/folderstate/installation.md) · [사용](../tools/folderstate/index.md) | [공개 MSI 수명주기](folderstate-lifecycle-20260926.md) · [2026-09-20 게시](releases-20260920.md) · [사용성 시험](folderstate-usability-20260919.md) |
+| FolderState 0.1.3 RC1 | [설치·사용·문제 해결](../tools/folderstate/index.md) | [공개 MSI 수명주기](folderstate-lifecycle-20260926.md) · [2026-09-20 게시](releases-20260920.md) · [사용성 시험](folderstate-usability-20260919.md) |
 | Excel 명단 비교 0.2.0 R12 | [설치·사용](../tools/excel-list-compare/index.md) | [R12 제작·배포 기록](../../tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md) · [테스트 미실행 결정](../../tools/ExcelSmartListCompare/docs/ADR-0020-R12-wording-release.md) |
 | 선택범위 내보내기 0.1.0-rc.10 평가판 | [설치·사용](../tools/excel-selection-export/index.md) | [rc.10 Undo 검증](excel-selection-export-undo-20260926.md) · [후속 게시](backlog-releases-20260927.md) |
 | File List to Excel 1.2.0 | [설치·사용](../tools/file-list-to-excel/index.md) | [원본 릴리스](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) · [Workspace 소개 게시](excel-tools-publication-20260924.md) |

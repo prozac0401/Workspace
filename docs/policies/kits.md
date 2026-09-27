@@ -116,4 +116,4 @@ FolderState는 일을 시작하거나 끝낸 시점을 자동으로 알아내지
     | 완료 | `done` |
     | 확인 필요 | `issue` |
 
-    FolderState를 사용하는 `MASTER`의 단계 폴더에는 `todo`만 저장합니다. 다른 상태 값은 실제 업무의 복사본에서 사용합니다. 상태 표시를 쓰지 않는 `MASTER`는 상태 파일 없이 유지할 수 있습니다. 자세한 명령어는 [문제 해결과 명령어](../tools/folderstate/troubleshooting.md)를 보세요.
+    FolderState를 사용하는 `MASTER`의 단계 폴더에는 `todo`만 저장합니다. 다른 상태 값은 실제 업무의 복사본에서 사용합니다. 상태 표시를 쓰지 않는 `MASTER`는 상태 파일 없이 유지할 수 있습니다. 자세한 명령어는 [문제 해결과 명령어](../tools/folderstate/index.md#cli)를 보세요.

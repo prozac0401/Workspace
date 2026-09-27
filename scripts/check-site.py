@@ -13,13 +13,16 @@ public_routes = {
     'policies/workspace/', 'policies/kits/', 'policies/files-email/',
     'policies/archive-security/', 'policies/decisions/', 'policies/folder-workflow/',
     'policies/work-efficiency/',
-    'tools/folderstate/', 'tools/folderstate/installation/',
-    'tools/folderstate/troubleshooting/',
+    'tools/folderstate/',
     'tools/excel-list-compare/',
     'tools/bookmark/',
     'tools/excel-selection-export/', 'tools/file-list-to-excel/',
     'tools/visible-cells-paste/',
     'tools/image-copy-save/guide/',
+}
+public_redirects = {
+    'tools/folderstate/installation/': '../#installation',
+    'tools/folderstate/troubleshooting/': '../#troubleshooting',
 }
 public_assets = {
     'assets/extra.css', 'assets/folderstate.png',
@@ -35,16 +38,24 @@ site = Path(sys.argv[1] if len(sys.argv) > 1 else 'site').resolve()
 docs = Path(__file__).resolve().parent.parent / 'docs'
 class Links(HTMLParser):
     def __init__(self):
-        super().__init__(); self.links = []
+        super().__init__(); self.links = []; self.ids = set()
+        self.canonical = None; self.refresh = None; self.noindex = False
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if attrs.get('id'): self.ids.add(attrs['id'])
+        if tag == 'link' and attrs.get('rel') == 'canonical':
+            self.canonical = attrs.get('href')
+        if tag == 'meta' and attrs.get('http-equiv', '').lower() == 'refresh':
+            self.refresh = attrs.get('content')
+        if tag == 'meta' and attrs.get('name') == 'robots':
+            self.noindex = attrs.get('content') == 'noindex'
         for key in ('href', 'src'):
             if attrs.get(key): self.links.append(attrs[key])
 
 errors = []
 pages = list(site.rglob('*.html'))
 if not pages: raise SystemExit('No generated pages.')
-expected_pages = {route + 'index.html' for route in public_routes} | {'404.html'}
+expected_pages = {route + 'index.html' for route in public_routes | public_redirects.keys()} | {'404.html'}
 actual_pages = {page.relative_to(site).as_posix() for page in pages}
 for unexpected in sorted(actual_pages - expected_pages):
     errors.append(f'Non-public HTML was generated: {unexpected}')
@@ -59,6 +70,22 @@ for source in docs.rglob('*'):
         errors.append(f'Non-public source asset was copied: {relative}')
 for asset in sorted(public_assets):
     if not (site / asset).is_file(): errors.append(f'Missing public asset: {asset}')
+
+for route, destination in public_redirects.items():
+    redirect = site / route / 'index.html'
+    if not redirect.is_file(): continue
+    parser = Links(); parser.feed(redirect.read_text(encoding='utf-8'))
+    if (parser.canonical != destination or parser.refresh != f'0; url={destination}'
+            or not parser.noindex or destination not in parser.links):
+        errors.append(f'Invalid legacy redirect: {route}')
+    target = urlsplit(destination)
+    target_file = redirect.parent / target.path / 'index.html'
+    if not target_file.is_file():
+        errors.append(f'Missing redirect destination: {route} -> {destination}')
+    else:
+        target_parser = Links(); target_parser.feed(target_file.read_text(encoding='utf-8'))
+        if target.fragment not in target_parser.ids:
+            errors.append(f'Missing redirect section: {route} -> {destination}')
 
 def route_from_url(url):
     parsed = urlsplit(url)
@@ -109,5 +136,6 @@ for page in pages:
         if target.is_dir(): target = target / 'index.html'
         if not target.exists(): errors.append(f'{page.relative_to(site)} -> {link}')
 if errors: raise SystemExit('\n'.join(errors))
-print(f'PASS {len(public_routes)} public pages + 404; search and sitemap contain only public routes; '
+print(f'PASS {len(public_routes)} public pages + {len(public_redirects)} legacy redirects + 404; '
+      'search and sitemap contain only public routes; '
       'non-public source assets excluded; local routes and assets resolve.')

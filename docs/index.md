@@ -44,7 +44,7 @@ hide:
 
 | 하고 싶은 일 | 프로그램과 설치 안내 |
 |---|---|
-| 폴더에 업무 진행 상태를 표시하고 싶어요 | **[FolderState 0.1.3 RC1 받기](tools/folderstate/installation.md)** — 폴더를 고르고 현재 상태를 누르세요. |
+| 폴더에 업무 진행 상태를 표시하고 싶어요 | **[FolderState 0.1.3 RC1 받기](tools/folderstate/index.md)** — 폴더를 고르고 현재 상태를 누르세요. |
 | Excel의 두 목록에서 값과 개수의 차이를 찾고 싶어요 | **[Excel 명단 비교 R12 받기](tools/excel-list-compare/index.md)** — 첫 번째 목록을 담고 두 번째 목록을 선택해 비교하세요. |
 | Excel에서 보이는 셀만 새 파일로 만들고 싶어요 | **[선택범위 내보내기 0.1.0-rc.10 평가판 받기](tools/excel-selection-export/index.md)** — 한 번 설치한 뒤 셀을 우클릭해 보이는 행·열과 수식 결과를 새 통합문서로 만드세요. |
 | 탐색기의 파일 목록을 정리하거나 같은 파일을 찾고 싶어요 | **[File List to Excel 1.2.0 받기](tools/file-list-to-excel/index.md)** — 파일·폴더를 우클릭해 목록이나 중복 검사 결과를 Excel로 여세요. |
@@ -213,6 +213,6 @@ FolderState 0.1.3 RC1은 폴더 확인과 아이콘 위치 적용을 분리합�
 </div>
 
 !!! info "회사 기준을 먼저 확인하세요"
-    이 업무 안내는 **제안 단계**입니다. 회사에서 허용한 저장 위치와 자료 보관 기간, 기준으로 쓸 원본, 백업 방법은 [회사에서 정할 항목](policies/decisions.md)을 참고해 결정하세요. 상태를 바꾸거나 업무를 끝내도 되는지는 담당자가 확인합니다. 프로그램별 배포 상태와 사용 환경·제한은 [FolderState 설치 안내](tools/folderstate/installation.md), [Excel 명단 비교 안내](tools/excel-list-compare/index.md), [업무 책갈피 안내](tools/bookmark/index.md), [선택범위 내보내기 안내](tools/excel-selection-export/index.md), [File List to Excel 안내](tools/file-list-to-excel/index.md), [그림 복사·저장 안내](tools/image-copy-save/guide.md)를 보세요.
+    이 업무 안내는 **제안 단계**입니다. 회사에서 허용한 저장 위치와 자료 보관 기간, 기준으로 쓸 원본, 백업 방법은 [회사에서 정할 항목](policies/decisions.md)을 참고해 결정하세요. 상태를 바꾸거나 업무를 끝내도 되는지는 담당자가 확인합니다. 프로그램별 배포 상태와 사용 환경·제한은 [FolderState 설치 안내](tools/folderstate/index.md), [Excel 명단 비교 안내](tools/excel-list-compare/index.md), [업무 책갈피 안내](tools/bookmark/index.md), [선택범위 내보내기 안내](tools/excel-selection-export/index.md), [File List to Excel 안내](tools/file-list-to-excel/index.md), [그림 복사·저장 안내](tools/image-copy-save/guide.md)를 보세요.
 
 </div>
