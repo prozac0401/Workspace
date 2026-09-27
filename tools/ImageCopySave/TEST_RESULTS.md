@@ -7,7 +7,7 @@
 - 모드 계약 7개와 native 정책·직접 COM 66개는 각각 PASS. 전체 86개에 더해 합산하지 않는다.
 - 종료 정리 검증을 강화한 중간 실행에서 watchdog의 중복 종료 요청 경합 1건이 발생했다. 시험기의 wait/fallback 순서를 수정한 뒤 해당 사례와 전체 시험을 재실행해 통과했다. 중간 실패 로그도 보존한다.
 - 그림판 실제 UI로 helper 종료 후 붙여넣기와 그림판 복사 → helper PNG 저장을 확인했다. 모든 외부 앱·투명도·Explorer G0의 통과를 의미하지 않는다.
-- 현재 unsigned sparse 등록은 0x80073D2B로 BLOCKED. MSI·실제 Explorer 메뉴·설치 수명주기는 NOT RUN. 아래 날짜별 signed full MSIX와 격리 실패 기록은 과거 이력이다.
+- 이후 관리자 unsigned sparse 등록·정리와 SYSTEM 진단 MSI 설치·제거는 PASS. SYSTEM 준비 후 비상승 사용자 등록도 PASS다. 현재 PC의 구형 메뉴 고정 설정으로 새 메뉴 G0는 미검증이며, 자체 포함 제품 MSI·업데이트·중단 복구는 NOT RUN이다. [관리자 후속 결과](../../docs/delivery/image-admin-install-20260927.md). 아래 signed full MSIX·비상승 설치·격리 실패는 당시 이력이다.
 
 상세 범위와 로컬 증거 위치는 [후속 작업 기록](../../docs/delivery/backlog-followup-20260927.md)을 따른다.
 

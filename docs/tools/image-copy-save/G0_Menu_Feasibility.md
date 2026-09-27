@@ -1,20 +1,22 @@
 # 그림 복사·저장 · G0 메뉴 구현성 검증
 
 도구 ID: ImageCopySave  
-기록 버전: 0.6 · 2026-09-27  
+기록 버전: 0.7 · 2026-09-27
 기준: [ImageCopySave-REQ-1.1](ImageCopySave_Requirements_v1.1.md)  
-기록 상태: 검토 · G0 **BLOCKED** · Windows 11 탐색기 실기 **NOT RUN**  
+기록 상태: 검토 · G0 **BLOCKED** · 구형 메뉴 관찰, 새 메뉴 인수 **NOT RUN**
 책임: 도구 개발·검증 담당  
 적용 정책: [추가 도구 개발 기준](../../policies/tools.md), [정책 문서 작성 규칙](../../policies/documentation.md)  
 관련 결정: [ADR-0016](../../design/0016-image-copy-save-direct-menu.md) · 과거 [ADR-0015](../../design/0015-image-copy-save-g0.md)
 
 ## 현재 판정 — v1.1
 
-2026-09-27 기존 허용 인증서로 사본 서명·SignTool 검증은 PASS였으나, 일반 사용자 MSIX 설치는 `0x800B0109`로 거절됐다. 실패 후 현재 사용자 패키지 등록은 0개다. 신뢰 저장소를 변경하지 않았으며 실제 메뉴·수명주기는 계속 미실행이다. [실행 근거](../../delivery/image-copy-save-signing-20260927.md).
+사용자가 [ADR-0022](../../design/0022-image-admin-install.md)로 관리자 설치를 허용했다. 무서명 sparse 관리자 등록·정리, 진단 MSI의 SYSTEM 준비·프로비저닝·정리와 비상승 사용자 등록이 PASS다. 현재 Explorer는 구형 메뉴로 고정되어 새 메뉴의 표시·숨김을 관찰하지 못했다. 기존 설정은 보존했고 임시 등록과 시험 창은 정리했다. [최신 실행 근거](../../delivery/image-admin-install-20260927.md).
+
+앞선 signed full MSIX의 `0x800B0109`와 비상승 unsigned sparse의 `0x80073D2B`는 이전 설치 조건의 이력이다. 관리자 설치의 현재 차단 사유가 아니다.
 
 사용자가 기본 ‘새로 만들기’ 내부 위치 조건을 해제했다. 저장 명령은 실제 로컬 폴더 배경의 Windows 11 첫 우클릭 메뉴에 별도 명령으로 제공하는 후보를 구현했다. 이미지가 없을 때 완전히 숨김, 상주 감시 없음, 레거시 메뉴에만 두지 않음, 설치기가 등록을 담당한다는 나머지 조건은 유지한다. [v1.0 원문](ImageCopySave_Requirements_v1.0.md)은 변경하지 않았다.
 
-**기존 ShellNew 연결 방식 미확정은 개정 요구의 차단 사유에서 제외했다. 현재는 native IExplorerCommand와 full MSIX 후보를 실제 Windows 11에 신뢰되는 사용자별 패키지로 설치하고 메뉴 동작을 입증하지 못해 G0를 통과시키지 않는다.** DLL 직접 호출이나 MSIX 생성은 실제 메뉴 검증을 대체하지 않는다. M2 사용자 동작·결과 선택·오류 안내와 M3 수명주기도 완료 전이다.
+**기존 ShellNew 연결 방식 미확정과 비상승 설치 거절은 현재 차단 사유에서 제외했다. 새 메뉴에서 native IExplorerCommand의 실제 표시·숨김을 입증하지 못해 G0를 통과시키지 않는다.** DLL 직접 호출이나 진단 MSI 성공은 실제 메뉴 검증을 대체하지 않는다. M2 사용자 동작·결과 선택·오류 안내와 M3 제품 수명주기도 완료 전이다.
 
 ## 구현한 후보와 검증 범위
 
@@ -22,7 +24,7 @@
 - GetState의 빠른 호출에서는 간단한 제외만 판정하고 추가 작업이 필요하면 E_PENDING을 반환한다. 느린 호출에서 경로·형식 메타데이터를 확인한다. Save는 PNG/DIBV5/DIB/BITMAP 형식이 없거나 조회가 불확실하면 ECS_HIDDEN을 유지한다. 픽셀 디코딩·파일 생성·클립보드 데이터 읽기는 상태 조회에 없다.
 - 실제 고정 로컬 볼륨의 일반 경로만 취급한다. UNC, SUBST, 가상 문맥, reparse/recall 경로와 예약 장치 이름은 숨긴다. 이 보수적인 경계가 실제 Windows 11 문맥에서 맞는지 실기로 확인해야 한다.
 - Invoke는 호출 시점 sequence와 원래 보기를 고정하고 동일 패키지 루트의 helper를 실행한다. 현재 station/desktop을 명시하며 탐색기에서 이미지 처리 완료를 기다리지 않는다. 잠금 안에서 기준값을 확인하고 결과 통신·같은 보기 선택·비모달 진행/취소·오류 UI를 연결했다. [ADR-0017](../../design/0017-image-copy-save-invocation.md)의 구현 계약이며 실제 Explorer 실기를 통과했다는 뜻은 아니다.
-- full MSIX manifest는 native COM STA surrogate와 Directory\Background 저장 / 단일 파일 복사 등록을 선언한다. 앱 ID와 게시자 이름은 평가용 제안이며 최종 서명·신뢰 조건은 미결정이다.
+- full MSIX manifest는 native COM STA surrogate와 Directory\Background 저장 / 단일 파일 복사 등록을 선언한다. 앱 ID와 게시자 이름은 평가용 제안이다. 이후 unsigned sparse 관리자 설치 조건은 ADR-0022로 결정했고, 자체 포함 제품 MSI identity는 통합 단계에서 고정한다.
 
 공식 근거: [패키지의 Explorer 명령 통합](https://learn.microsoft.com/en-us/windows/apps/desktop/modernize/integrate-packaged-app-with-file-explorer), [GetState 빠른/느린 호출 계약](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-iexplorercommand-getstate), [패키지 manifest 구성](https://learn.microsoft.com/en-us/windows/msix/desktop/desktop-to-uwp-manual-conversion). 확인일: 2026-09-25. 이 근거는 구현 후보의 API 계약이며 이 제품의 실제 표시 성공 증거가 아니다.
 
@@ -32,14 +34,16 @@
 | native DLL 로컬 빌드·순수 정책/직접 COM 66개 | 최신 로컬66개 PASS / 0 FAIL. clipboard/Invoke/OS 등록·Explorer 미실행 |
 | unsigned full MSIX pack/unpack·구조 검사 | 최신0.1.1 로컬 PASS, 입력408개 해시 일치. 서명·설치 성공을 의미하지 않음 |
 | 기존 인증서 서명·SignTool 검증 | PASS, 현재 PC의 실제 MSIX 설치 허용을 보장하지 않음 |
-| 일반 사용자 최초 설치 | FAIL / 0x800B0109, 실패 후 등록0개 |
-| Windows 11 메뉴·Invoke·재설치/업데이트/제거 | BLOCKED / NOT RUN |
+| 이전 signed MSIX 일반 사용자 설치 | FAIL / 0x800B0109, 당시 실패 후 등록0개 |
+| 관리자 unsigned sparse 등록·정리 | PASS, 전체 사용자·프로비저닝 잔여0개 |
+| SYSTEM 진단 MSI 설치·제거 / 비상승 사용자 등록 | PASS, 제품 MSI 수명주기와 구분 |
+| Windows 11 새 메뉴·Invoke / 제품 재설치·업데이트·제거 | BLOCKED / NOT RUN |
 
 이전 후보는 도구 누락으로 CI에서 빌드했으나, 이번에는 Microsoft 고정 payload와 SDK NuGet 서명을 검증해 저장소의 `.tools`에 추출하고 로컬에서 빌드했다. 새 Git worktree·원격 CI는 사용하지 않았다. 시스템 개발 도구 설치나 인증서 신뢰 변경은 하지 않았다. 최신 서명·설치 상태와 산출물은 [로컬 인계 기록](../../delivery/image-copy-save-local-20260925.md)에 별도로 기록한다. 제품의 실제 메뉴 PASS와 빌드 PASS는 구분한다.
 
 ## 개정 G0의 남은 실기
 
-신뢰되는 서명의 패키지와 격리된 Windows 11 일반 사용자 시험 환경이 필요하다. unsigned 파일을 관리자 우회 설치하거나 사용자에게 DLL 수동 등록을 요구하는 방식은 제품 설치 검증으로 인정하지 않는다. 재부팅 자체는 서명·신뢰·미완성 통합 동작을 해결하지 않는다.
+사용자가 선택한 현재 사용자 환경과 정상 관리자 승인 설치 경로를 사용한다. 별도 서명은 요구하지 않는다. 현재 PC의 구형 메뉴 고정 설정 처리 후 새 메뉴 실기가 필요하다. 사용자에게 DLL 수동 등록을 요구하지 않으며, 등록 성공이나 Explorer 재시작 자체를 G0 통과로 판정하지 않는다.
 
 | 순서 | 확인과 보존할 증거 | 현재 상태 | 관련 수용시험 |
 |---|---|---|---|
@@ -48,7 +52,7 @@
 | 3 | 회색·유령·빈 앱 메뉴·불필요한 구분선 부재 | NOT RUN | AT-07, AT-08 |
 | 4 | 메뉴 진입의 형식 조회만 수행, 디코딩·파일 생성·클립보드 변경 없음 | NOT RUN | AT-10 |
 | 5 | 두 창·두 탭·지원 밖 문맥의 정확한 대상, 감시/반복 등록/Explorer 재시작 없음 | NOT RUN | AT-11, AT-12, AT-42 |
-| 6 | 일반 사용자 설치·재설치·업데이트·제거, PNG 연결·타사 메뉴 보존 | NOT RUN | AT-40, AT-41, AT-44 |
+| 6 | 관리자 승인 제품 설치·재설치·업데이트·제거와 일반 사용자 실행, PNG 연결·타사 메뉴 보존 | 제품 MSI NOT RUN; 진단 MSI 설치·제거 PASS | AT-40, AT-41, AT-44 |
 
 구현/시험 명령은 [소스 안내](../../../tools/ImageCopySave/README.md), [패키징·설치 현황](../../../tools/ImageCopySave/installer/README.md), [수용시험 기록](../../../tools/ImageCopySave/TEST_RESULTS.md)에 연결한다.
 

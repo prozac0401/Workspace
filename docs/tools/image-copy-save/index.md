@@ -1,5 +1,7 @@
 # 그림 복사·저장 · 구현 대응 기록
 
+현재 설치 방침: 사용자가 관리자 설치를 승인했다. [ADR-0022](../../design/0022-image-admin-install.md)에 따른 관리자 무서명 등록·정리와 SYSTEM 진단 MSI 설치·제거, 비상승 사용자 등록은 PASS다. 제품 MSI와 새 메뉴 G0는 미완료다. 아래 비상승 0x80073D2B는 이전 조건의 이력이다.
+
 도구 ID: ImageCopySave · 명세 v1.1 · 상태: 개발 평가, G0 BLOCKED
 제품 책임: 도구 개발·검증 담당
 적용 정책: [추가 도구 개발 기준](../../policies/tools.md), [문서 작성 규칙](../../policies/documentation.md)
@@ -17,8 +19,8 @@
 |---|---|---|
 | MNU/G0 | [native IExplorerCommand 후보·근거](G0_Menu_Feasibility.md) | 실제 폴더 배경 첫 메뉴의 동적 숨김과 설치 실증 |
 | IMG/SAV | WIC 코덱·안전 상한·원자적 저장, 실제 helper clipboard→PNG 왕복 PASS | 실제 크기/픽셀 경계·ACL·격리 디스크 부족 PASS; Windows 11 통합·전체 payload/buffer 경계 미완료 |
-| CLP/CPY | native 즉시 게시·스냅샷·시퀀스 보호, 명시적 현재 사용자 시험 | Windows 11 현재 사용자 클립보드 23사례 PASS. 실제 Explorer 통합은 설치 차단으로 미검증 |
-| DEP/M2/M3 | full MSIX 평가 payload 및 unsigned sparse 등록 probe | 별도 서명 없는 MSI 목표. 일반 사용자 등록 0x80073D2B로 차단, 실제 메뉴·최종 설치 수명주기 미실행 |
+| CLP/CPY | native 즉시 게시·스냅샷·시퀀스 보호, 명시적 현재 사용자 시험 | Windows 11 현재 사용자 클립보드 23사례 PASS. 실제 새 Explorer 메뉴 통합은 구형 메뉴 고정 환경으로 미검증 |
+| DEP/M2/M3 | 관리자 unsigned sparse 등록·정리, SYSTEM 진단 MSI 설치·제거와 비상승 사용자 등록 PASS | 별도 서명 없는 자체 포함 제품 MSI 통합, 새 메뉴 G0·제품 설치 수명주기 미완료 |
 
 ## 데이터·실패·동시 실행
 

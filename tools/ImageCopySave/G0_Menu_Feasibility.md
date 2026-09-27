@@ -1,6 +1,6 @@
 # G0 메뉴 구현성 검증
 
-현재 기준: [개정 명세 v1.1](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.1.md). G0 **BLOCKED**, Windows 11 탐색기 실기 **NOT RUN**.
+현재 기준: [개정 명세 v1.1](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.1.md). G0 **BLOCKED**, 관리자·SYSTEM 등록 경로 PASS, 구형 메뉴 관찰·새 메뉴 실기 **NOT RUN**.
 
 사용자 승인으로 ‘새로 만들기’ 내부 위치 조건을 해제했습니다. 실제 폴더 배경의 첫 우클릭 메뉴를 대상으로 native IExplorerCommand 및 full MSIX 후보를 구현했으며, 실제 설치·표시·숨김은 아직 검증하지 않았습니다.
 

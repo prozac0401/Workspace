@@ -29,3 +29,5 @@
 - [ADR-0020 · 명시적으로 선택하는 현재 사용자 클립보드 시험](0020-image-current-session-tests.md)
 
 - [ADR-0021 · 이미지 도구 무서명 MSI와 설치 관문](0021-image-unsigned-msi.md)
+
+- [ADR-0022 · 관리자 설치와 일반 사용자 실행](0022-image-admin-install.md)

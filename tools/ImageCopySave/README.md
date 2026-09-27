@@ -1,8 +1,10 @@
 # 그림 복사·저장 · 로컬 통합 평가 후보
 
-2026-09-27 후속: [무서명 MSI 등록 실증](../../docs/tools/image-copy-save/unsigned-msi-feasibility.md)은 현재 일반 사용자 환경에서 0x80073D2B로 차단됐다. [현재 사용자 클립보드 시험 모드](../../docs/tools/image-copy-save/current-session-testing.md)를 별도로 추가했으며 실제 결과는 [후속 기록](../../docs/delivery/backlog-followup-20260927.md)을 따른다. 아래 과거 시험 수치는 당시 결과다.
+현재 설치 방침: 사용자가 관리자 설치를 승인했다. [ADR-0022](../../docs/design/0022-image-admin-install.md)에 따른 관리자 무서명 등록·정리와 SYSTEM 진단 MSI 설치·제거, 비상승 사용자 등록은 PASS다. 제품 MSI와 새 메뉴 G0는 미완료다. 아래 비상승 0x80073D2B는 이전 조건의 이력이다.
 
-**탐색기 명령과 helper의 호출 상태·결과·비모달 안내를 연결했으나 G0는 BLOCKED입니다.** 현재 무서명 sparse 후보는 실행 활성화 제약 `0x80073D2B`로 등록이 거절됐습니다. 앞선 서명 full MSIX 평가에서는 서명 검증 PASS 후 신뢰 오류 `0x800B0109`로 설치가 거절됐으며, 두 시도 모두 잔여 등록은 없습니다. [설치 시도 기록](../../docs/delivery/image-copy-save-signing-20260927.md)을 확인하세요. 저장은 실제 폴더 배경의 첫 우클릭 메뉴를 대상으로 하며 이미지가 없을 때 완전히 숨기는 조건은 유지합니다. 일반 사용자용 출시 완료를 뜻하지 않습니다.
+2026-09-27 후속: [무서명 MSI 등록 실증](../../docs/tools/image-copy-save/unsigned-msi-feasibility.md)의 앞선 비상승 시험은 0x80073D2B로 차단됐고, 이후 관리자·SYSTEM 경로는 통과했다. [현재 사용자 클립보드 시험 모드](../../docs/tools/image-copy-save/current-session-testing.md)를 별도로 추가했으며 실제 결과는 [후속 기록](../../docs/delivery/backlog-followup-20260927.md)을 따른다. 아래 과거 시험 수치는 당시 결과다.
+
+**탐색기 명령과 helper의 호출 상태·결과·비모달 안내를 연결했으나 G0는 BLOCKED입니다.** 관리자 unsigned sparse 등록·정리와 SYSTEM 진단 MSI·비상승 사용자 등록은 통과했습니다. 현재 PC의 구형 메뉴 고정 설정 때문에 새 메뉴 G0는 미완료입니다. 앞선 서명 full MSIX 평가에서는 서명 검증 PASS 후 신뢰 오류 `0x800B0109`로 설치가 거절됐으며, 두 시도 모두 잔여 등록은 없습니다. [설치 시도 기록](../../docs/delivery/image-copy-save-signing-20260927.md)을 확인하세요. 저장은 실제 폴더 배경의 첫 우클릭 메뉴를 대상으로 하며 이미지가 없을 때 완전히 숨기는 조건은 유지합니다. 일반 사용자용 출시 완료를 뜻하지 않습니다.
 
 - [현재 요구명세 v1.1](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.1.md) · [메뉴 위치 결정](../../docs/design/0016-image-copy-save-direct-menu.md)
 - [원본 요구명세](../../docs/tools/image-copy-save/ImageCopySave_Requirements_v1.0.md)

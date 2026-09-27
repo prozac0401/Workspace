@@ -1,18 +1,34 @@
 # 로컬에서 패키지를 만들고 설치 시험하기
 
+현재 설치 방침: 사용자가 관리자 설치를 승인했다. [ADR-0022](../../../docs/design/0022-image-admin-install.md)에 따른 관리자 무서명 등록·정리와 SYSTEM 진단 MSI 설치·제거, 비상승 사용자 등록은 PASS다. 제품 MSI와 새 메뉴 G0는 미완료다. 아래 비상승 0x80073D2B는 이전 조건의 이력이다.
+
 현재 배포 목표는 **별도 서명 없는 MSI**다. 일반 사용자 unsigned sparse 등록 실증은 0x80073D2B로 차단됐다. [현재 결정](../../../docs/design/0021-image-unsigned-msi.md)과 [실증 결과](../../../docs/tools/image-copy-save/unsigned-msi-feasibility.md)를 먼저 확인한다. 아래 full MSIX 서명·설치 절차는 이전 평가 경로의 기록이며 이번 MSI 작업의 필수 선행 조건이 아니다.
 
-도구: ImageCopySave · 패키지 기본 버전: 0.1.1.0 · 상태: 평가 후보, 현재 무서명 sparse 등록 차단
+도구: ImageCopySave · 패키지 기본 버전: 0.1.1.0 · 상태: 관리자·SYSTEM 등록 경로 PASS, 제품 MSI 통합 미완료
 책임: 도구 개발·검증 담당 · 적용 범위: Windows 11 x64 개발·검증 환경  
 작성일: 2026-09-25 · 최신 확인: 2026-09-27
 
-2026-09-27 기존 허용 인증서로 새 사본 서명과 SignTool 검증은 통과했으나, 실제 일반 사용자 설치는 `0x800B0109`로 거절됐습니다. 실패 후 현재 사용자 패키지 등록은 0개입니다. 신뢰 저장소는 변경하지 않았으며, [설치 시도 기록](../../../docs/delivery/image-copy-save-signing-20260927.md)은 이전 full MSIX 경로의 이력입니다. 현재 unsigned sparse 경로는 실행 활성화 제약 0x80073D2B로 차단됐으며 MSI는 아직 제작하지 않았습니다.
+2026-09-27 기존 허용 인증서로 새 사본 서명과 SignTool 검증은 통과했으나, 실제 일반 사용자 설치는 `0x800B0109`로 거절됐습니다. 실패 후 현재 사용자 패키지 등록은 0개입니다. 신뢰 저장소는 변경하지 않았으며, [설치 시도 기록](../../../docs/delivery/image-copy-save-signing-20260927.md)은 이전 full MSIX 경로의 이력입니다. 비상승 unsigned sparse의 0x80073D2B는 이전 조건의 결과입니다. 관리자 등록과 진단 MSI의 설치·제거는 통과했으며 자체 포함 제품 MSI는 아직 제작하지 않았습니다.
 
 native Shell DLL과 자체 포함 helper를 full MSIX로 묶습니다. 로컬 빌드부터 패키지 확인까지 Git, 가상환경, 원격 CI가 필요하지 않습니다. **서명과 실제 설치·메뉴 검증이 끝나지 않은 평가 후보입니다.** 패키지 생성 성공을 제품 출시 승인으로 표시하지 않습니다.
 
 일반 사용자는 신뢰되는 설치 파일을 열어 설치하고 Windows 설정의 설치된 앱에서 제거하는 흐름을 사용해야 합니다. 아래 스크립트는 개발·검증 담당자용이며, 일반 사용자에게 수동 등록이나 개발자 모드를 요구하는 설치 대체물이 아닙니다.
 
-## 로컬 빌드
+## 관리자 무서명 등록과 진단 MSI
+
+[관리자 후속 결과](../../../docs/delivery/image-admin-install-20260927.md)는 unsigned sparse 관리자 등록·정리, SYSTEM staging/provisioning·제거, 별도 비상승 사용자 등록의 실제 PASS를 기록한다. 아래는 개발자용 진단이며 제품 설치 절차가 아니다. 외부 payload를 참조하는 진단 MSI를 다른 PC에 배포하지 않는다.
+
+```powershell
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/invoke-admin-probe.ps1 -ExternalLocation "<이 작업 트리 artifacts 아래 staging>" -MakeAppx "<기존 SDK x64 MakeAppx.exe>"
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/build-msi-context-probe.ps1 -ProbePackage "<위 시험에서 생성된 unsigned probe msix>" -ExternalLocation "<같은 staging>"
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/test-msi-context.ps1 -Msi "<생성된 진단 MSI>" -OutputDirectory "<생성된 실행 디렉터리>"
+```
+
+마지막 명령은 정상 UAC 승인 후 설치·진단·정리·MSI 제거까지 순차 실행한다. 기존 제품/시험 등록이나 probe 설치 디렉터리가 있으면 시작하지 않는다. 시험 기록에는 관리자 등록과 SYSTEM 동작을 구분한다. Explorer 설정·인증서·실행 정책을 변경하지 않는다.
+
+일반 사용자 등록 연계 시험은 빌드에 -WaitForUserRegistration을 지정한다. system-probe.log의 AWAITING_ORDINARY_USER를 확인한 뒤 **비상승** 세션에서 생성된 MsiContextProbe.exe --register-user "<실행 디렉터리의 ordinary-user.log>"를 실행한다. system-probe.log.complete 파일을 만들면 정리하며, 신호가 없어도 120초 후 정리한다. 이 신호 파일은 명령이나 입력 경로로 해석하지 않는다. 중단·전원 차단 시 finally를 보장하지 않으므로 진단을 강제 종료하지 않는다. 다음 실행은 잔여 등록을 자동 인수하지 않는다.
+
+## 이전 full MSIX 로컬 빌드
 
 개발 PC에는 .NET SDK 10.0.401 또는 global.json이 허용하는 패치, MSVC C++ x64 컴파일러·헤더·desktop 라이브러리, Windows 11 SDK 10.0.22000.0 이상의 헤더·라이브러리·x64 MakeAppx가 필요합니다. 최종 패키지는 .NET 및 Windows Desktop 런타임을 자체 포함합니다.
 

@@ -1,0 +1,22 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <!-- Local feasibility artifact, not the product MSI. -->
+  <Package Name="ImageCopySave MSI Context Probe" Manufacturer="Workspace" Version="0.0.1"
+           ProductCode="{68BEBBEE-6A90-4B1E-AE54-89B45A381065}" UpgradeCode="{65263B37-F69B-4FA3-96A3-763D76247F29}"
+           Scope="perMachine" InstallerVersion="500">
+    <MediaTemplate EmbedCab="yes" />
+    <Launch Condition="VersionNT64" Message="Windows x64 is required." />
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="WorkspaceProbeRoot" Name="Workspace">
+        <Directory Id="PROBEDIR" Name="ImageCopySave.MsiContextProbe">
+          <Component Id="ProbeScript" Guid="{2FD6466C-8115-455A-9DBC-6A237AB1A535}">
+            <File Id="ProbeExecutable" Source="$(var.ProbeExecutable)" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+    <Feature Id="Probe" Level="1"><ComponentRef Id="ProbeScript" /></Feature>
+    <CustomAction Id="ProbeMachineDeployment" FileRef="ProbeExecutable" Execute="deferred" Impersonate="no" Return="check"
+      ExeCommand="&quot;$(var.ProbePackage)&quot; &quot;$(var.Payload)&quot; &quot;$(var.PackageHash)&quot; &quot;$(var.ResultPath)&quot; $(var.WaitArgument)" />
+    <InstallExecuteSequence><Custom Action="ProbeMachineDeployment" After="InstallFiles" Condition="NOT Installed" /></InstallExecuteSequence>
+  </Package>
+</Wix>

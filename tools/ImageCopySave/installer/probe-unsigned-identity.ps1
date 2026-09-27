@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)][ValidateNotNullOrEmpty()][string]$ExternalLocation,
-    [string]$MakeAppx = ''
+    [string]$MakeAppx = '',
+    [ValidateSet('OrdinaryUser', 'Administrator')][string]$RegistrationContext = 'OrdinaryUser',
+    [ValidateRange(0, 900)][int]$ExplorerWindowSeconds = 0
 )
 # This is a short-lived registration feasibility probe, not a product installer.
 $ErrorActionPreference = 'Stop'
@@ -33,11 +35,29 @@ function Assert-PlainArtifactPath([string]$Path) {
 }
 function Get-ImageRegistrations {
     # Deliberately includes older and probe identities to prevent duplicate COM CLSIDs.
+    if ($RegistrationContext -eq 'Administrator') {
+        return @(Get-AppxPackage -AllUsers -Name 'ImageCopySave*' -ErrorAction Stop)
+    }
     @(Get-AppxPackage -Name 'ImageCopySave*' -ErrorAction Stop)
+}
+function Get-ImageProvisioningInventory {
+    # Query the deployment service directly. DISM can fail opening its servicing
+    # registry even when the caller has a confirmed elevated token.
+    $manager = New-Object Windows.Management.Deployment.PackageManager
+    foreach ($package in $manager.FindProvisionedPackages()) {
+        [pscustomobject]@{ DisplayName = $package.Id.Name; PackageName = $package.Id.FullName; PackageFamilyName = $package.Id.FamilyName }
+    }
+}
+function Get-ImageProvisioning {
+    if ($RegistrationContext -eq 'Administrator') {
+        return @(Get-ImageProvisioningInventory | Where-Object { $_.DisplayName -like 'ImageCopySave*' })
+    }
+    return @()
 }
 function Assert-NoImageRegistration {
     $existing = @(Get-ImageRegistrations)
     if ($existing.Count -ne 0) { throw 'An ImageCopySave registration already exists for this user. No registration or removal was attempted.' }
+    if (@(Get-ImageProvisioning).Count -ne 0) { throw 'Existing ImageCopySave machine provisioning must be preserved.' }
     foreach ($clsid in @($saveClsid, $copyClsid)) {
         foreach ($hive in @('HKCU:', 'HKLM:')) {
             if (Test-Path -LiteralPath "$hive\Software\Classes\CLSID\{$clsid}") { throw "An existing COM registration owns CLSID $clsid. No registration was attempted." }
@@ -71,6 +91,9 @@ $result = [ordered]@{
     identity = $probeName; publisher = $probePublisher; version = $probeVersion; architecture = 'x64'
     securityChanged = $false; securitySettingsChangedByProbe = $false
     certificateMutation = $false; developerModeMutation = $false; policyMutation = $false; elevated = $null
+    registrationContext = $RegistrationContext
+    explorerWindowSeconds = $ExplorerWindowSeconds
+    registrationQueryScope = $(if ($RegistrationContext -eq 'Administrator') { 'all-users-and-provisioning' } else { 'current-user' })
     payloadModified = $false; explorerRestarted = $false; explorerG0 = 'NOT RUN'; productionRelease = $false
     registrationAttempted = $false; expectedPackageFullName = $null; remainingRegistrations = @()
 }
@@ -86,7 +109,15 @@ try {
     if (-not [Environment]::Is64BitProcess -or [Environment]::OSVersion.Version.Build -lt 22000 -or [Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'X64') { throw 'The probe requires Windows 11 x64 and a 64-bit PowerShell process.' }
     $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     $result.elevated = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    if ($result.elevated) { throw 'Run the probe in a non-elevated ordinary-user session. No elevation is requested.' }
+    if ($RegistrationContext -eq 'Administrator' -and -not $result.elevated) { throw 'Administrator probe requires a UAC-approved elevated session.' }
+    if ($RegistrationContext -eq 'OrdinaryUser' -and $result.elevated) { throw 'OrdinaryUser probe must run without elevation.' }
+    if ($result.elevated) {
+        $null = [Windows.Management.Deployment.PackageManager, Windows.Management.Deployment, ContentType = WindowsRuntime]
+        $null = [Windows.Management.Deployment.DeploymentResult, Windows.Management.Deployment, ContentType = WindowsRuntime]
+        $null = [Windows.Management.Deployment.DeploymentProgress, Windows.Management.Deployment, ContentType = WindowsRuntime]
+        Add-Type -AssemblyName System.Runtime.WindowsRuntime
+        $result.provisioningQuery = 'PackageManager.FindProvisionedPackages'
+    }
     $os = Get-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
     $result.os = [ordered]@{ build = $os.CurrentBuild; updateBuildRevision = $os.UBR; displayVersion = $os.DisplayVersion; processArchitecture = 'x64' }
     $appxCommand = Get-Command Add-AppxPackage -ErrorAction Stop
@@ -217,7 +248,7 @@ namespace ImageCopySaveProbe {
         if ((Get-FileHash -LiteralPath (Join-Path $external $inputFile.path) -Algorithm SHA256).Hash -cne $inputFile.sha256) { throw 'External payload changed before registration.' }
     }
     Assert-NoImageRegistration
-    $result.stage = 'register-current-user'
+    $result.stage = $(if ($result.elevated) { 'register-elevated-unsigned' } else { 'register-current-user' })
     $result.registrationAttempted = $true
     $attempted = $true
     Write-ProbeResult
@@ -239,9 +270,21 @@ namespace ImageCopySaveProbe {
     if ($null -eq $registrationError) {
         $registered = @(Get-ImageRegistrations)
         if ($registered.Count -ne 1 -or $registered[0].PackageFullName -cne $expectedFullName -or $registered[0].Name -cne $probeName -or $registered[0].Publisher -cne $probePublisher -or [version]$registered[0].Version -ne [version]$probeVersion -or [string]$registered[0].Architecture -ine 'X64' -or [string]$registered[0].Status -ne 'Ok') { throw 'Registration did not produce exactly the expected healthy package identity.' }
-        $result.registeredPackage = $registered[0] | Select-Object Name, Publisher, Version, Architecture, PackageFullName, Status, InstallLocation, IsDevelopmentMode
+        $result.registeredPackage = $registered[0] | Select-Object Name, Publisher, Version, Architecture, PackageFullName, Status, InstallLocation, IsDevelopmentMode, PackageUserInformation
         $result.registration = 'PASS'
         $result.status = 'PASS'
+        if ($ExplorerWindowSeconds -gt 0) {
+            # Only a bounded stop signal is accepted, never commands or paths.
+            $result.stage = 'awaiting-explorer-evidence'
+            $result.explorerG0 = 'IN PROGRESS - external ordinary-user UI verification'
+            $result.explorerStopFile = Join-Path $runDirectory 'complete-explorer.signal'
+            $deadline = [DateTime]::UtcNow.AddSeconds($ExplorerWindowSeconds)
+            $result.explorerDeadlineUtc = $deadline.ToString('o')
+            Write-ProbeResult
+            while ([DateTime]::UtcNow -lt $deadline -and -not (Test-Path -LiteralPath $result.explorerStopFile)) { Start-Sleep -Milliseconds 500 }
+            $result.explorerG0 = 'External evidence required; not inferred from registration'
+            $result.explorerWindowEnded = $(if ([DateTime]::UtcNow -ge $deadline) { 'timeout' } else { 'completion-signal' })
+        }
     }
 } catch {
     $result.status = 'FAIL'
@@ -250,16 +293,36 @@ namespace ImageCopySaveProbe {
     if ($attempted) {
         $result.stage = 'cleanup-owned-identity'
         try {
+            $provisioned = @(Get-ImageProvisioning)
+            foreach ($entry in $provisioned) {
+                if ($entry.PackageName -cne $expectedFullName -or $entry.DisplayName -cne $probeName) { throw 'Unexpected provisioning detected; no unrelated provisioning removed.' }
+                $manager = New-Object Windows.Management.Deployment.PackageManager
+                $operation = $manager.DeprovisionPackageForAllUsersAsync($entry.PackageFamilyName)
+                $asTask = @([System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object {
+                    $_.Name -eq 'AsTask' -and $_.IsGenericMethod -and $_.GetParameters().Count -eq 1 -and
+                    $_.GetParameters()[0].ParameterType.Name -eq 'IAsyncOperationWithProgress`2'
+                })[0].MakeGenericMethod([Windows.Management.Deployment.DeploymentResult], [Windows.Management.Deployment.DeploymentProgress])
+                $task = $asTask.Invoke($null, @($operation))
+                $deployment = $task.GetAwaiter().GetResult()
+                if ($null -ne $deployment.ExtendedErrorCode -and $deployment.ExtendedErrorCode.HResult -ne 0) { throw $deployment.ExtendedErrorCode }
+                $result.removedProvisioning = $expectedFullName
+            }
             $currentPackages = @(Get-ImageRegistrations)
             $owned = @($currentPackages | Where-Object { $_.PackageFullName -ceq $expectedFullName -and $_.Name -ceq $probeName -and $_.Publisher -ceq $probePublisher -and [version]$_.Version -eq [version]$probeVersion -and [string]$_.Architecture -ieq 'X64' })
             if ($owned.Count -gt 1) { throw 'Duplicate exact identities found; no ambiguous removal was attempted.' }
             if ($owned.Count -eq 1) {
-                Remove-AppxPackage -Package $expectedFullName -ErrorAction Stop
+                if ($RegistrationContext -eq 'Administrator') {
+                    Remove-AppxPackage -Package $expectedFullName -AllUsers -ErrorAction Stop
+                } else {
+                    Remove-AppxPackage -Package $expectedFullName -ErrorAction Stop
+                }
                 $result.removedPackageFullName = $expectedFullName
             }
             $remaining = @(Get-ImageRegistrations)
             $result.remainingRegistrations = @($remaining | Select-Object Name, Publisher, Version, PackageFullName)
             if ($remaining.Count -ne 0) { throw 'An ImageCopySave identity remains; only this run exact identity may be removed automatically.' }
+            $result.remainingProvisioning = @(Get-ImageProvisioning | Select-Object DisplayName, PackageName)
+            if ($result.remainingProvisioning.Count -ne 0) { throw 'ImageCopySave provisioning remains after probe cleanup.' }
             $result.cleanup = 'PASS'
             $result.noRegistrationAfterProbe = $true
         } catch {

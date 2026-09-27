@@ -1,11 +1,15 @@
 # ImageCopySave · 무서명 MSI 선행 구현성 확인
 
-도구 ID: ImageCopySave · 상태: 일반 사용자 무서명 sparse 등록 BLOCKED, 후속 등록 없음 확인 PASS
+현재 설치 방침: 사용자가 관리자 설치를 승인했다. [ADR-0022](../../design/0022-image-admin-install.md)에 따른 관리자 무서명 등록·정리와 SYSTEM 진단 MSI 설치·제거, 비상승 사용자 등록은 PASS다. 제품 MSI와 새 메뉴 G0는 미완료다. 아래 비상승 0x80073D2B는 이전 조건의 이력이다.
+
+도구 ID: ImageCopySave · 상태: 아래는 비상승 시험 이력, 관리자·SYSTEM 경로는 후속 PASS
 날짜: 2026-09-27 · 책임: 개발·검증 담당
 적용 정책: [추가 도구 개발 기준](../../policies/tools.md), [정책 문서 작성 규칙](../../policies/documentation.md)
 관련 요구: [v1.1 명세](ImageCopySave_Requirements_v1.1.md) DEP-01~08·MNU-01~06, [ADR-0016](../../design/0016-image-copy-save-direct-menu.md)
 
 ## 목적과 범위
+
+현재 결과는 [관리자 설치 후속](../../delivery/image-admin-install-20260927.md)을 따른다. 관리자 등록·정리, 진단 MSI의 SYSTEM 준비·프로비저닝·정리, 별도 비상승 사용자 등록을 통과했다. 최초 비상승 시험의 목적·오류·실행 증거는 아래에 보존한다.
 
 사용자는 별도 서명 없는 MSI 패키징을 결정했다. MSI 자체의 무서명 제작과 Windows 11 첫 메뉴에 필요한 package identity 등록은 서로 다른 조건이다. MSI 제작 전에 **인증서·개발자 모드·보안 정책을 변경하지 않고 일반 사용자로 무서명 identity를 등록할 수 있는가**를 확인한다. MSI 선택은 사용자 결정이며, 아래 sparse 무서명 경로는 아직 채택하거나 배포 가능하다고 판정하지 않은 시험 후보다.
 
