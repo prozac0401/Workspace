@@ -32,7 +32,7 @@ File List to Excel v1.2.0의 설치·복구·제거와 이전 버전 업그레�
 | 선택범위 내보내기 0.1.0-rc.10 평가판 | [Excel x64용 EXE](https://github.com/prozac0401/Workspace/releases/download/excel-selection-export-v0.1.0-rc.10/ExcelSelectionExport-0.1.0-rc.10-x64-Setup.exe) · [x86용·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.10) | [설치·사용·알려진 제한](docs/tools/excel-selection-export/index.md) |
 | File List to Excel 1.2.0 | [Windows x64 MSI](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [배포 자료](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) | [설치·사용 안내](docs/tools/file-list-to-excel/index.md) |
 | 업무 책갈피 0.2.5 평가판 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.5/WorkBookmark-0.2.5-win-x64.msi) · [평가판 배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.5) | [설치·사용 안내](docs/tools/bookmark/index.md) |
-| 그림 복사·저장 0.2.0 · 배포 준비 | [Windows x64 MSI · 게시 예정](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.0/ImageCopySave-0.2.0-x64.msi) · [릴리스 안내 · 게시 예정](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) | [설치·사용·기존 자료 보존](docs/tools/image-copy-save/guide.md) |
+| 그림 복사·저장 0.2.0 | [Windows x64 MSI](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.0/ImageCopySave-0.2.0-x64.msi) · [릴리스 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) | [설치·사용·기존 자료 보존](docs/tools/image-copy-save/guide.md) |
 | 보이는 칸 붙여넣기 0.1.1 | [Windows 단일 설치 EXE](https://github.com/prozac0401/Workspace/releases/download/visible-cells-paste-v0.1.1-setup.1/VisibleCellsPaste-0.1.1-Setup.exe) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1) | [설치·사용 안내](docs/tools/visible-cells-paste/index.md) |
 
 Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 제작 당시 사용자 요청에 따라 전체 테스트는 생략했으며, 이후 합성 대표 비교·정상 종료·공존 보존만 확인했습니다. 당시 결정은 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 현재 안내하는 설치 파일에는 코드 서명이 없습니다.
@@ -41,11 +41,11 @@ Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확
 
 현재 배포·검증 결과와 과거 기록은 [배포·검증 안내](docs/delivery/index.md)에서 구분해 확인하세요.
 
-## 그림 복사·저장 배포 준비
+## 그림 복사·저장 0.2.0
 
 [그림 복사·저장](docs/tools/image-copy-save/guide.md)은 Windows 11 x64의 로컬 그림 파일을 이미지로 복사하고, 복사한 이미지를 현재 폴더에 PNG로 저장합니다. 기본 메뉴에서는 **더 많은 옵션 표시**, 클래식 직접 메뉴에서는 해당 명령을 바로 사용합니다. 설치·유지보수는 관리자 승인, 평소 실행은 일반 사용자 권한을 사용하며 자체 포함 MSI에는 코드 서명이 없습니다.
 
-기존 0.1.1의 두 기능은 기본 메뉴 경로에서 사용자 확인을 받았습니다. 외부 변경을 보존하는 0.2.0 MSI 보완과 최종 검증·자산 게시를 진행 중입니다. 위 0.2.0 링크는 게시 예정 주소이며 현재 배포 완료를 뜻하지 않습니다. [종전 후보의 준비 판정](docs/delivery/image-release-readiness-20260927.md)과 최종 릴리스의 실제 검증 결과를 구분합니다.
+기존 등록·외부 수정 파일을 보존하는 MSI 검증 32개와 기본 설치본의 대표 복사·저장을 확인하고 정식 릴리스를 게시했습니다. Windows 11 기본 메뉴의 기존 사용자 확인과 이번 검증 범위는 [릴리스 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)와 [실제 배포 기록](docs/delivery/image-020-release-20260927.md)에서 구분합니다.
 
 ## 개발자가 프로그램을 만드는 방법
 

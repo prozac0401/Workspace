@@ -4,7 +4,7 @@
 
 외부 호스트에서 공개 후보 SHA-256 82A72EB85F41D6DF29BC94EE57215991BA41BEF542717D81CCC0C850C5F5134B의 실제 Suite **32 PASS / 0 FAIL / 0 NOT RUN**을 확인했습니다. HKLM·HKCU 등록 충돌과 폴더/파일 충돌 16개, 새 설치 롤백·정상 설치 2개, 업데이트 4개, 복구 5개, 제거 5개를 통과했습니다. 외부 수정 파일·값·추가 스트림·등록 형식을 차단하고 누락 파일 복구와 알 수 없는 추가 자료 보존을 확인한 범위입니다.
 
-합성 등록을 정확히 정리했고 업무 자료 역할의 fixture는 보존했습니다. 재시작 요구는 없었습니다. 09:50:30~09:50:42 UTC 같은 MSI의 기본 위치 최종 Install도 PASS(msiexec 0, 재시작 요구·Explorer 강제 재시작 없음)입니다. 전체 continuation은 이전 시험 설치 제거와 전후 clean Inspect를 포함해 PASS했습니다. 최종 설치 근거는 artifacts/image-copy-save/msi-lifecycle/20260927T095030651Z-4950c1cff7a2437581348696166cc45f/result.json입니다. 정식 게시는 아직 미완료입니다. 로컬 결과는 artifacts/image-copy-save/msi-preservation/20260927T094701542Z-2e4f093f9abf4988a5b53b3e5c51bcd0/result.json이며 [최신 작업 기록](../../docs/delivery/image-020-release-20260927.md)에 항목별 범위를 남깁니다.
+합성 등록을 정확히 정리했고 업무 자료 역할의 fixture는 보존했습니다. 재시작 요구는 없었습니다. 09:50:30~09:50:42 UTC 같은 MSI의 기본 위치 최종 Install도 PASS(msiexec 0, 재시작 요구·Explorer 강제 재시작 없음)입니다. 전체 continuation은 이전 시험 설치 제거와 전후 clean Inspect를 포함해 PASS했습니다. 최종 설치 근거는 artifacts/image-copy-save/msi-lifecycle/20260927T095030651Z-4950c1cff7a2437581348696166cc45f/result.json입니다. [0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) 게시와 공개 MSI·체크섬 검증을 완료했습니다. Pages 안내 배포는 진행 중입니다. 로컬 결과는 artifacts/image-copy-save/msi-preservation/20260927T094701542Z-2e4f093f9abf4988a5b53b3e5c51bcd0/result.json이며 [최신 작업 기록](../../docs/delivery/image-020-release-20260927.md)에 항목별 범위를 남깁니다.
 
 앞선 HKCU FAIL 보고서는 앱 호스트의 시험 등록 격리 조건에서 얻은 이력으로 보존합니다. 09:32 외부 진단으로 같은 등록을 native와 MSI 작업에서 읽는 것을 확인한 뒤 동일 제품을 외부에서 재검증했습니다. 과거 보고서를 PASS로 다시 쓰지 않습니다.
 

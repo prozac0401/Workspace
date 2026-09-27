@@ -1,10 +1,21 @@
 # 그림 복사·저장 0.2.0 · 보존 보완과 정식 릴리스 작업 기록
 
-날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **외부 보존 Suite 32/32·기본 위치 설치·탐색기 대표 복사/저장 PASS — 정식 공개 전**
+날짜: 2026-09-27 · 책임: 도구 개발·검증 담당 · 상태: **정식 Release 게시·공개 자산 검증 완료 — Pages 안내 배포 진행 중**
 
 적용: [v1.2 변경 계약](../tools/image-copy-save/ImageCopySave_Requirements_v1.2.md), [보존 설계 ADR-0024](../design/0024-image-msi-preservation.md), [공개 안내 ADR-0025](../design/0025-image-public-guide.md), [도구 정책](../policies/tools.md), [문서 정책](../policies/documentation.md).
 
 사용자는 기존 등록·외부 수정 파일 보존 문제를 해결하고 적용한 뒤 정식 릴리스까지 진행하도록 지시했다. 승인된 배포 형식은 Windows 11 x64용 자체 포함 무서명 MSI이며, 관리자 설치와 일반 사용자 실행을 분리한다. 서명 인증이나 회사 전체의 상용 배포 승인을 받았다는 뜻은 아니다.
+
+## 정식 Release 게시와 공개 자산 확인
+
+[image-copy-save-v0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)를 2026-09-27 09:58:56 UTC에 게시했다. releaseId=397594542, draft=false, prerelease=false이며 태그 소스 커밋은 fe621a449a3e6c681c86166a0d8eb88580bb9564다. 제품 보존 시험 32개·기본 위치 설치·대표 탐색기 복사/저장을 확인한 같은 MSI를 게시했다.
+
+| 공개 자산 | 바이트 | SHA-256 |
+|---|---:|---|
+| [ImageCopySave-0.2.0-x64.msi](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.0/ImageCopySave-0.2.0-x64.msi) | 50,569,176 | 82A72EB85F41D6DF29BC94EE57215991BA41BEF542717D81CCC0C850C5F5134B |
+| [SHA256SUMS.txt](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.0/SHA256SUMS.txt) | 94 | 327C1CD262007A7E088D828AFB777222773B32C5D663E94FC54C94CA073483C5 |
+
+09:59:12~09:59:19 UTC 비인증 공개 GET에서 두 자산 모두 HTTP 200이며 MSI 크기·SHA-256과 체크섬 내용을 검증했다. 복구/롤백 MSI·원시 로그·SID·개인 경로는 공개 자산에 포함하지 않았다. Pages 안내 배포는 아직 진행 중이며 실제 배포 결과·공개 안내 URL 확인은 후속 기록으로 남긴다. 로컬 근거: artifacts/release-readiness-20260927/image-020-release-draft/public-release-verification.json.
 
 ## 최신 제품 결과 · 외부 전체 보존 시험 32/32 PASS
 
@@ -20,7 +31,7 @@
 
 충돌 차단과 고의 실패 롤백 사례의 msiexec 1603은 해당 사례의 기대 결과이며, 정상 설치·업데이트·복구·제거는 0이다. 합성 등록은 EXACT_FIXTURE_CLEANED, 전체 정리는 EXACT_SYNTHETIC_FIXTURES_REMOVED_BUSINESS_FIXTURE_PRESERVED로 확인했다. businessFixturesDeleted=false, rebootRequired=false다. 이전 호스트 격리 조건의 FAIL 보고서는 고치지 않고 이 실제 재검증 결과와 함께 보존한다.
 
-근거: artifacts/image-copy-save/msi-preservation/20260927T094701542Z-2e4f093f9abf4988a5b53b3e5c51bcd0/result.json 및 사례별 로그. 최종 기본 설치는 아래 별도 실제 결과로 확인했으며 정식 게시 완료는 아직 주장하지 않는다.
+근거: artifacts/image-copy-save/msi-preservation/20260927T094701542Z-2e4f093f9abf4988a5b53b3e5c51bcd0/result.json 및 사례별 로그. 최종 기본 설치와 Release 게시는 별도 실제 결과로 위·아래에 구분한다.
 
 ## 최신 설치 결과 · 전체 재개와 기본 위치 설치 PASS
 
@@ -219,10 +230,10 @@ MSI 안에 정적으로 링크한 native 검사 DLL과 파일별 SHA-256 소유 
 
 ## 최종 인수·게시 전 채울 항목
 
-1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 복구 갱신과 이전 시험 설치 제거는 완료했으나 새 Suite에서 HKCU 차단 실패가 재발했다. 호스트의 HKCU 시험 데이터 격리를 확인했고 외부 전체 Suite 32개를 통과했다. 기본 위치 최종 설치도 별도 실제 결과로 PASS를 확인했으며 공개 자산·Pages 결과는 아직 확인 전이다.
+1. 설치 API·감사 목록 방식을 반영한 새 복구/제품/롤백 후보의 제작·식별·정적 검사는 완료했다. 복구 갱신과 이전 시험 설치 제거는 완료했으나 새 Suite에서 HKCU 차단 실패가 재발했다. 호스트의 HKCU 시험 데이터 격리를 확인했고 외부 전체 Suite 32개를 통과했다. 기본 위치 최종 설치도 별도 실제 결과로 PASS를 확인했으며 공개 Release 자산 검증은 완료했으며 Pages 결과는 아직 확인 전이다.
 2. 실제 보존 시험의 완료 범위와 수치는 위 32개 결과를 따른다. 미실행 GUI·다른 OS/앱 검증으로 확대하지 않는다.
 3. 최종 설치본의 대표 복사·저장은 위 GUI 확인으로 PASS다. 저장 후 최종 행 선택은 NOT_CONFIRMED이며 기존 기본 메뉴 사용자 확인과 런타임 결과를 별도로 재사용한다. 조건별 메뉴·창/탭·오류/취소의 미관찰 항목은 NOT RUN으로 유지하고 원래 AT 목록 전체를 이번 수정의 새 반복 관문으로 만들지 않는다.
-4. 공개용 릴리스 설명과 지원 제한 확정, 최종 자산의 해시 대조, 태그/소스 커밋·Release URL·draft/prerelease 상태·게시 시각.
+4. 공개용 릴리스 설명·지원 제한과 Release 자산 검증은 완료했다. 태그/소스 커밋·Release URL·draft/prerelease 상태·게시 시각은 위 게시 기록을 따른다.
 5. 최종 공개 안내의 배포 준비 문구 교체, MkDocs strict·공개 목록 검사·Pages Actions·실제 공개 URL/검색/자산 확인.
 
 Windows 10·ARM64·네트워크/가상 위치와 모든 Office·메일·메신저를 이번 Windows 11 로컬 지원 결과에 포함하지 않는다. 새 MSI 보존 회귀가 미완료인 상태를 제한사항 문구만으로 통과 처리하지 않는다. 기존 사용자 확인과 실제 런타임 근거를 보존하며, 확인하지 않은 GUI 항목을 전체 G0·44개 AT 완료로 표기하지 않는다.

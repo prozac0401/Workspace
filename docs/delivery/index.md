@@ -1,6 +1,6 @@
 # 배포·검증 안내
 
-그림 복사·저장의 [0.2.0 보존 보완과 정식 릴리스 작업](image-020-release-20260927.md)에서 외부 호스트에서 같은 0.2.0 MSI의 전체 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**을 확인했습니다. HKLM·HKCU 충돌 차단, 외부 수정 보존, 복구·업데이트·제거와 실패 롤백을 통과했고 합성 시험 등록을 정리하며 업무 자료 역할의 fixture는 보존했습니다. 기본 위치 최종 설치도 msiexec 0으로 PASS했으며 재시작 요구와 Explorer 강제 재시작은 없었습니다. 기본 설치본의 실제 탐색기 복사·저장 대표 확인도 PASS했으며, 저장 후 최종 행 선택은 미확인입니다. 정식 게시는 아직 미완료입니다.
+그림 복사·저장의 [0.2.0 보존 보완과 정식 릴리스 작업](image-020-release-20260927.md)에서 외부 호스트에서 같은 0.2.0 MSI의 전체 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**을 확인했습니다. HKLM·HKCU 충돌 차단, 외부 수정 보존, 복구·업데이트·제거와 실패 롤백을 통과했고 합성 시험 등록을 정리하며 업무 자료 역할의 fixture는 보존했습니다. 기본 위치 최종 설치도 msiexec 0으로 PASS했으며 재시작 요구와 Explorer 강제 재시작은 없었습니다. 기본 설치본의 실제 탐색기 복사·저장 대표 확인도 PASS했으며, 저장 후 최종 행 선택은 미확인입니다. [0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) 게시와 공개 MSI·체크섬 검증을 완료했습니다. Pages 안내 배포는 진행 중입니다.
 
 현재 설치 안내와 버전별 검증 결과를 구분합니다. GitHub Release의 태그와 파일 해시를 기준으로 확인하세요.
 
@@ -14,6 +14,7 @@
 | File List to Excel 1.2.0 | [설치·사용](../tools/file-list-to-excel/index.md) | [원본 릴리스](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) · [Workspace 소개 게시](excel-tools-publication-20260924.md) |
 | 보이는 칸 붙여넣기 0.1.1 | [설치·사용](../tools/visible-cells-paste/index.md) | [설치·검증](../../tools/VisibleCellsPaste/docs/install-security.md) · [단일 EXE 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1) |
 | 업무 책갈피 0.2.5 평가판 | [설치·사용](../tools/bookmark/index.md) | [0.2.5 안내 반영](bookmark-025-publication-20260927.md) · [이전 수명주기](bookmark-lifecycle-20260927.md) · [BookMark 릴리스](https://github.com/prozac0401/BookMark/releases/tag/v0.2.5) |
+| 그림 복사·저장 0.2.0 | [설치·사용 안내](../tools/image-copy-save/guide.md) | [정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) · [보존·설치·게시 기록](image-020-release-20260927.md) |
 
 현재 안내하는 설치 파일은 서명되지 않았습니다. 선택범위 내보내기는 전체 인수 미완료인 평가판이며 알려진 실패와 미실행 시험은 실제 평가 기록에 남깁니다. File List to Excel은 별도 저장소의 v1.2.0과 선택형 Excel 파일 복사를 안내합니다. FolderState는 사전 릴리스이며, Excel R12는 사용자 요청으로 기능 테스트를 생략한 문구 교정 배포입니다. 업무 책갈피 0.2.5 평가판은 BookMark 저장소에서 MSI·ZIP으로 배포합니다. BookMark 0.2.5 릴리스 기록에 따르면 관련 자동93검사와 합성 화면100% 11개·150% 5개를 확인했으며 실제 마우스·한글 IME·다중 모니터 등은 미검증입니다. 이전 버전의 설치 수명주기 결과를 이번 버전 실기로 합산하지 않습니다. 제품의 자동검사·패키지 확인과 Workspace 문서 검증은 위 배포 기록에서 구분합니다. 파일 게시와 상용 인수 승인을 구분합니다.
 
@@ -41,4 +42,4 @@
 
 과거 기록은 당시 파일의 증거입니다. 현재 버전의 사용법이나 최신 시험 결과로 해석하지 않습니다. 초기 Excel 지시와 소스 압축본은 [원본 보존 폴더](../../tools/ExcelSmartListCompare/archive/README.md)에 있습니다.
 
-[보이는 칸 붙여넣기 단일 EXE](visible-cells-paste-single-20260927.md)는 실제 Excel 후속 확인을 마친 동일 파일을 게시했습니다. [항목별 릴리스 기록](backlog-releases-20260927.md)에서 설치 자산과 Pages 결과를 확인합니다. ImageCopySave의 이전 MSIX 초안은 과거 설치 신뢰 오류 기록입니다. 이전 무서명 관리자 MSI 0.1.1은 [설치·대표 클래식 메뉴 검증](image-classic-msi-20260927.md)을 완료한 범위가 있습니다. [당시 배포 준비 판정](image-release-readiness-20260927.md) 이후 보존 보호를 보완했으며, 현재 0.2.0 후보의 실제 인수와 게시 여부는 [후속 작업 기록](image-020-release-20260927.md)을 따릅니다. 공개 다운로드는 아직 보류합니다.
+[보이는 칸 붙여넣기 단일 EXE](visible-cells-paste-single-20260927.md)는 실제 Excel 후속 확인을 마친 동일 파일을 게시했습니다. [항목별 릴리스 기록](backlog-releases-20260927.md)에서 설치 자산과 Pages 결과를 확인합니다. ImageCopySave의 이전 MSIX 초안은 과거 설치 신뢰 오류 기록입니다. 이전 무서명 관리자 MSI 0.1.1은 [설치·대표 클래식 메뉴 검증](image-classic-msi-20260927.md)을 완료한 범위가 있습니다. [당시 배포 준비 판정](image-release-readiness-20260927.md) 이후 보존 보호를 보완했으며, 0.2.0의 실제 인수와 정식 Release 게시 결과는 [후속 작업 기록](image-020-release-20260927.md)을 따릅니다. 공개 MSI 다운로드를 제공하며 Pages 안내는 배포 중입니다.

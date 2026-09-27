@@ -1,6 +1,8 @@
 # ADR-0024 · ImageCopySave MSI의 기존 상태 보존 검사
 
-상태: 채택, 실제 패키지 수용시험 진행 중  
+상태: 채택, 0.2.0 실제 보존 시험 32개 PASS·정식 Release 게시
+
+
 날짜: 2026-09-27  
 결정 담당: 도구 개발·검증 담당  
 관련 요구사항·정책: [요구명세 v1.2](../tools/image-copy-save/ImageCopySave_Requirements_v1.2.md)의 DEP-06·AT-40, [추가 도구 개발 기준](../policies/tools.md)  
@@ -48,5 +50,11 @@ MSI의 Binary 테이블에 정적으로 링크한 x64 네이티브 검사 DLL을
 ## 검증
 
 필수 확인: 새 설치의 디렉터리·HKLM/HKCU 일곱 등록 충돌, 외부 변경 파일·값·형식의 복구/업데이트/제거 차단, 누락 파일 복구, 알 수 없는 추가 파일·값 보존, 기본 연결·타사 메뉴 보존, 새 설치 실패와 업데이트 실패 롤백, 정상 설치·업데이트·제거·재설치. 단위 검사와 실제 MSI 결과를 구분하며 미실행을 PASS로 바꾸지 않는다.
+
+2026-09-27 최종 공개 MSI(82A72EB85F41D6DF29BC94EE57215991BA41BEF542717D81CCC0C850C5F5134B)의 외부 전체 보존 Suite는 **32 PASS / 0 FAIL / 0 NOT RUN**이다. HKLM·HKCU 각각 일곱 루트와 기존 디렉터리·파일 충돌 16개, 새 설치 실패 롤백·정상 시험 설치 2개, 이전 설치의 외부 수정 차단·알 수 없는 자료 보존·업데이트 실패 롤백 4개, 복구 5개, 제거 5개를 확인했다. 복구·제거 검사는 추가 데이터 스트림·수정 파일·등록 데이터/형식 변경 차단과 누락 파일 복구 또는 알 수 없는 자료 보존을 포함한다. 실제 DEP-06·AT-40의 검증 범위는 이 32개 사례이며 임의의 모든 외부 변경·동시 편집을 시험했다는 뜻은 아니다.
+
+합성 등록 정리와 업무 자료 역할의 fixture 보존을 확인했고, 같은 MSI의 기본 위치 최종 설치는 msiexec 0으로 PASS했다. 새 Suite와 최종 설치는 재시작 요구·Explorer 강제 재시작이 없었다. native 39 PASS와 정적 패키지 PASS는 실제 Suite와 별도 근거로 유지한다. 앞선 앱 호스트의 HKCU 쓰기 격리로 MSI가 시험 fixture를 읽지 못한 실패는 외부 호스트에서 진단·재검증했으며, 해당 이력을 삭제하거나 최초 실행의 PASS로 바꾸지 않는다.
+
+[0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)는 2026-09-27 09:58:56 UTC에 게시했고 공개 MSI·체크섬이 검증 후보와 일치했다. 최종 기본 설치본의 클래식 직접 메뉴 대표 복사·저장도 PASS지만, 기본 메뉴 두 기능의 기존 사용자 직접 확인과 별도 결과다. 저장 후 최종 행 선택은 NOT_CONFIRMED이며 전체 GUI·다른 OS/앱 지원으로 확대하지 않는다. 실제 결과·후보 식별·복구 이력과 Pages 안내 배포 상태는 [릴리스 작업 기록](../delivery/image-020-release-20260927.md)을 따른다.
 
 공식 근거: [Microsoft의 RemoveExistingProducts 순서](https://learn.microsoft.com/en-us/windows/win32/msi/removeexistingproducts-action), [ICE63](https://learn.microsoft.com/en-us/windows/win32/msi/ice63), [사용자 지정 작업의 실행 순서](https://learn.microsoft.com/en-us/windows/win32/msi/sequencing-custom-actions), [지연 작업의 보안 문맥](https://learn.microsoft.com/en-us/windows/win32/msi/custom-action-security). 실제 보존 동작은 이 문서의 인용만으로 입증하지 않고 패키지 시험으로 확인한다.
