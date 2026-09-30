@@ -12,7 +12,7 @@
 
 ## 사용자 PC 조작이 필요한 다음 단계
 
-현재 후속 후보는 제품 0.1.0 / protocol 2다. 로컬 MSI·SHA256SUMS는 `artifacts/download-version-manager/0.1.0-evaluation-followup-20260930/`에 있다. 이전 protocol 1 후보와 섞지 않는다. 자동 installer 시험은 설치를 정리했으므로 평가 MSI를 설치한 뒤 시작 메뉴의 설치 마무리 안내를 사용한다.
+현재 확인한 후보는 main `38640f518de0c25b52798e3d9ddd03b23d83f689`의 제품 0.1.0 / protocol 2 CI 평가 MSI다. [CI 36724339153](https://github.com/prozac0401/Workspace/actions/runs/36724339153)의 MSI·SHA256SUMS를 `artifacts/download-version-manager/windows-continuation-20260930/ci-36724339153/0.1.0-evaluation/`에 내려받았으며 실제 MSI SHA-256은 `4e4d26dc64e2fea0e6b323af036f7c195d4f1dd3e7178907209537e8d32bb7d8`이다. 현재 PC에서 사용자가 승인한 전용 설치·직접 Host 확인·공식 제거는 PASS이고 시험 설치는 정리했다. 이전 `0.1.0-evaluation-followup-20260930/`과 protocol 1 후보는 과거 증거로 보존하며 파일을 혼용하지 않는다. 실제 평가 MSI 설치·확장 활성화는 해당 작업의 사용자 승인을 확인하고 시작 메뉴의 설치 마무리 안내를 사용한다.
 
 1. Chrome와 Edge에 각각 로그인하지 않는 평가 profile을 만들고 기존 업무 profile과 구분한다. 시험 다운로드는 `artifacts/download-version-manager/browser-manual/Chrome` 또는 `Edge`처럼 분리한 합성 폴더에 저장한다.
 2. 각 브라우저의 공식 확장 관리 화면에서 개발 모드와 압축 풀린 확장 로드를 선택하고 설치된 `extension` 폴더를 활성화한다. 기업 정책이 차단하면 정책을 바꾸지 않고 그 상태를 기록한다.
@@ -46,3 +46,5 @@ SDK 위치가 자동 검색되지 않으면 상위 빌드에 `--msvc`, `--sdk`, 
 Linux에서는 `python tools/DownloadVersionManager/tests/integration/installer_faults_test.py`로 가짜 lifecycle 의존성의 증거 기록·중단 흐름만 시험할 수 있다. Windows MSI 실행, registry rollback, 재설치 성공을 검증하지 않는다. 이 회귀시험은 Windows 상위 빌드에도 포함한다.
 
 Windows 11 잔류 원인 비교에는 실패 지점별 aggregate 결과, `post-publication-deferred-state.json`과 `post-InstallExecute-immediate-state.json`, 각 state의 `work` 아래 해당 실패·재설치의 `.log`/`-exit.json`, Windows build·표준 사용자/권한 수준 및 실제 MSI SHA-256이 필요하다. 기존 기록은 access denied(5)와 1638을 보고했지만 원본 로그 없이 권한 문제의 원인이나 제품 수정 방향을 확정하지 않는다. 상세 로그와 절대 로컬 경로는 private 진단으로 보관하고 공개 사이트/Release에 올리지 않는다. raw log의 CI 업로드를 자동 확대하지 않는다.
+
+이번 인계 조사에서는 과거 두 late-failure state의 MSI SHA-256과 현재 같은 경로 파일이 불일치했다. 기록한 원본 파일을 확보하거나 새 후보·새 출력·별도 승인으로 시험을 설계하기 전에는 기존 경로 MSI를 원본으로 재실행하지 않는다. 현재 진단 token을 과거 실패 실행 권한으로 간주하지 않는다. 원본/현재 파일 지문과 `.log`/exit JSON 사본은 비공개 artifact로 보존하고 [후속 결과](../../TEST_RESULTS.md)를 따른다.

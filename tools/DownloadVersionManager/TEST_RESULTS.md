@@ -1,5 +1,29 @@
 # DownloadVersionManager · 실제 시험 기록
 
+## Windows 인계 후속 확인 · 2026-09-30
+
+기준 소스는 [main 38640f518de0c25b52798e3d9ddd03b23d83f689](https://github.com/prozac0401/Workspace/commit/38640f518de0c25b52798e3d9ddd03b23d83f689)다. 최신 원격 포함 여부를 확인하고 별도 작업 트리에서 진행했다. 원래 main의 미커밋 작업과 이전 산출물을 보존했으며 반영된 패치를 다시 적용하지 않았다. 2026-10-01 사용자 요청에 따라 이 검증·실기 안내 기록을 별도 브랜치에 commit·push해 원격 검토할 수 있게 반영한다.
+
+| 확인 범위 | 실제 결과와 한계 |
+|---|---|
+| [Windows CI 36724339153](https://github.com/prozac0401/Workspace/actions/runs/36724339153)와 artifact | **PASS**: Windows job success, ZIP digest·MSI checksum·build manifest 소스 일치 |
+| 해당 CI의 자동시험 증거 | Host **82 PASS**, 확장 **40 PASS**, native lifecycle **15 PASS**, late-failure **10 PASS / 0 FAIL**. Windows Server 2025 범위이며 현재 PC에서 전수 재실행하지 않음 |
+| Windows 11 현재 PC preflight | **PASS**: 관련 제품·HKCU/HKLM 양쪽 view의 Native Host default·확인한 소유 Host 파일 부재 |
+| 사용자 승인한 CI 후보 설치·직접 Host·공식 제거 | **5 PASS / 0 FAIL / 0 NOT RUN**: install/uninstall exit 0, 설치된 payload 13개 hash 일치, Host 0.1.0 / protocol 2, 양쪽 HKCU 등록, 합성 다운로드·History·무관한 파일 보존 |
+| 설치 중·제거 후 제품 presence | **PASS**: native process·Run/RunOnce·service·scheduled task 이름 매치 모두 0. 활성화된 browser idle gate와 구분 |
+| 과거 Win11 두 late-failure의 원본 로그·state | **기존 FAIL 유지**: 제품 등록 rollback 실패와 재설치 1638 확인. preserve fixture 6개 hash는 PASS |
+| 과거 실패 주입 MSI 원본 식별 | **불일치 / 재현 차단**: 각 state의 SHA-256과 현재 같은 경로 MSI가 다름. 조사한 이전 MSI 14개에서 기록한 원본 hash를 찾지 못함 |
+| 실제 Chrome·Edge handshake/E2E·worker 복원·활성화 후 idle | **NOT RUN**: 평가 profile·확장 미활성화. 연결된 제어 surface는 기존 Edge profile뿐이고 Chrome 및 native UI 제어가 없음 |
+| 깨끗한 Win11 표준 사용자 late-failure 비교 | **NOT RUN**: 별도 환경·실행 승인과 실패 MSI 원본 식별 필요 |
+| 문서 strict·공개 범위·로컬 링크 | **PASS**: 공개 페이지 19개 + redirect 2개 + 404, 비공개 진단 제외 |
+| singleDistribution / installerFailureRecovery / stable | **FAIL / FAIL / BLOCKED** 유지. 최신 MSI checksum으로 gate 실행해 차단 확인 (예상 exit 1) |
+
+새 후보는 CI artifact 11102247940의 무서명 0.1.0 / protocol 2 MSI다. SHA-256은 `4e4d26dc64e2fea0e6b323af036f7c195d4f1dd3e7178907209537e8d32bb7d8`이며 `artifacts/download-version-manager/windows-continuation-20260930/ci-36724339153/0.1.0-evaluation/`에 별도로 보관한다. 이전 local 후보와 혼용하지 않는다. 정확한 시험 제품만 공식 MSI API로 제거했고 최종 preflight는 PASS다. 브라우저 확장 활성화와 실패 주입 재시험은 이번 설치·제거 승인 범위에 포함하지 않았다.
+
+현재 진단은 Windows build 22631.6199, token 비상승·integrity RID 8192, restricted/AppContainer false다. 과거 실패 MSI의 실행 token이나 보안 descriptor는 확보되지 않았다. 로그에서 Installer-managed product/SourceList/UpgradeCodes rollback의 system error 5와 rollback error skip을 확인했지만 정확한 원인은 미확정이다. MSI WindowsBuild 호환성 속성을 실제 Windows patch build로 사용하지 않았으며 Installer 내부 registry·OS 권한을 수정하지 않았다.
+
+원본 state·실패/재설치 log·exit JSON의 비공개 사본과 hash, 현재 경로 MSI의 별도 지문, 후보 설치·제거 증거는 `artifacts/download-version-manager/windows-continuation-20260930/`에 보관한다. 원본 지문이 불일치하는 파일로 과거 실패를 다시 시험하지 않았다. 상세 결과는 [후속 delivery 기록](../../docs/delivery/download-version-manager-followup-20260930.md)을 따른다.
+
 ## Linux 후속 수정 · 2026-09-30
 
 기준 소스는 main `c9a5b7084ebb6b7b612cc9301199641cdef2eda8`이다. 아래는 cloud Linux에서의 소스 수정·준비 검증이며 새 Windows MSI를 제작하거나 기존 Windows 인수 결과를 바꾸지 않았다.
