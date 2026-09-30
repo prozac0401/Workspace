@@ -1,5 +1,7 @@
 # 설계 결정 목록
 
+- [ADR-0026 · 다운로드 이벤트와 단발 Native Host](0026-download-version-manager.md) — 신규 객체 이름 승계, 변경 내용 History, 무상주·per-user MSI와 스토어 배포 관문
+
 | ID | 결정 | 상태 |
 |---|---|---|
 | [ADR-0001](0001-engine.md) | 고정 메타데이터와 복원 가능한 최소 개입 엔진 | 구현에 채택 |

@@ -1,5 +1,7 @@
 # 배포·검증 안내
 
+DownloadVersionManager 0.1.0은 공개 릴리스 전의 [평가 후보 기록](download-version-manager-evaluation-20260930.md)입니다. 단일 MSI 후보와 자동시험을 만들었으며 브라우저 스토어 배포·활성화와 실제 E2E는 별도 관문입니다. 기존 도구의 출시 판정을 변경하지 않습니다.
+
 그림 복사·저장의 [0.2.0 보존 보완과 정식 릴리스 작업](image-020-release-20260927.md)에서 외부 호스트에서 같은 0.2.0 MSI의 전체 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**을 확인했습니다. HKLM·HKCU 충돌 차단, 외부 수정 보존, 복구·업데이트·제거와 실패 롤백을 통과했고 합성 시험 등록을 정리하며 업무 자료 역할의 fixture는 보존했습니다. 기본 위치 최종 설치도 msiexec 0으로 PASS했으며 재시작 요구와 Explorer 강제 재시작은 없었습니다. 기본 설치본의 실제 탐색기 복사·저장 대표 확인도 PASS했으며, 저장 후 최종 행 선택은 미확인입니다. [0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) 게시와 공개 MSI·체크섬 검증을 완료했습니다. Pages 안내 배포와 실제 공개 URL·검색·사이트맵 검증도 완료했습니다.
 
 현재 설치 안내와 버전별 검증 결과를 구분합니다. GitHub Release의 태그와 파일 해시를 기준으로 확인하세요.

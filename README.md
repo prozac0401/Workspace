@@ -49,6 +49,8 @@ Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확
 
 ## 개발자가 프로그램을 만드는 방법
 
+DownloadVersionManager 0.1.0 [평가 안내](docs/tools/download-version-manager/index.md)를 추가했습니다. 브라우저 완료 이벤트와 단발 Native Host로 최신 파일의 이름을 유지하고, 다른 내용의 이전 파일만 History에 보관합니다. 공개 릴리스는 미게시이며 완전 자동 통합 설치 관문은 미충족입니다. [소스·제작 방법](tools/DownloadVersionManager/README.md)과 [검증 기록](tools/DownloadVersionManager/TEST_RESULTS.md)을 구분해 확인하세요.
+
 FolderState는 C# / .NET 10 / WPF로 만들었습니다. 아래 명령은 Windows 11 x64에서 실행합니다. .NET SDK 버전은 `global.json`을 따릅니다. 각 도구의 현재 확인 범위는 [배포·검증 안내](docs/delivery/index.md)를 참고하세요.
 
 ```powershell

@@ -19,6 +19,7 @@ public_routes = {
     'tools/excel-selection-export/', 'tools/file-list-to-excel/',
     'tools/visible-cells-paste/',
     'tools/image-copy-save/guide/',
+    'tools/download-version-manager/',
 }
 public_redirects = {
     'tools/folderstate/installation/': '../#installation',
