@@ -114,3 +114,22 @@ test('MV3 source has no native port, content scripts, timers or suffix reverse r
   const source=await readFile(new URL('../../extension/worker.mjs',import.meta.url),'utf8')+await readFile(new URL('../../extension/controller.mjs',import.meta.url),'utf8');
   assert.doesNotMatch(source,/\.connectNative\s*\(|setInterval\s*\(|setTimeout\s*\(|chrome\.alarms|removeFile\s*\(/);
 });
+
+test('connection check is diagnostic and does not enable download processing', async () => {
+  const f=fixture(); await f.determine(1,'a.pdf'); await f.finish(1,'a (1).pdf');
+  assert.deepEqual(f.calls.map(c=>c.request.operation),['process']);
+  await f.control.handshake();
+  await f.determine(2,'a.pdf'); await f.finish(2,'a (2).pdf');
+  assert.deepEqual(f.calls.map(c=>c.request.operation),['process','ping','process']);
+});
+test('setup and popup explain activation separately from diagnostic connection check', async () => {
+  const popup=await readFile(new URL('../../extension/popup.html',import.meta.url),'utf8');
+  const setup=await readFile(new URL('../../installer/setup.html',import.meta.url),'utf8');
+  const source=await readFile(new URL('../../extension/popup.mjs',import.meta.url),'utf8');
+  for (const page of [popup,setup]) {
+    assert.match(page,/활성화하면 새 다운로드부터 자동 정리/);
+    assert.match(page,/연결 확인.*진단/);
+  }
+  assert.doesNotMatch(popup,/연결 확인이 끝나야/);
+  assert.doesNotMatch(source,/다음 다운로드부터 정리합니다/);
+});

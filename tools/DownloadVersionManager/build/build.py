@@ -110,6 +110,7 @@ END
     if not node: raise RuntimeError('Node.js required for extension tests.')
     command([sys.executable, PRODUCT / 'tests/integration/gates_test.py'], REPO, log=out / 'release-gate-tests.log')
     command([sys.executable, PRODUCT / 'tests/integration/fixture_test.py'], REPO, log=out / 'fixture-tests.log')
+    command([sys.executable, PRODUCT / 'tests/integration/installer_faults_test.py'], REPO, log=out / 'installer-fault-evidence-tests.log')
     if args.package_only:
         previous = json.loads((out / 'build-manifest.json').read_text('utf-8'))
         for source in list((PRODUCT / 'source').glob('*')) + list((PRODUCT / 'extension').glob('*')):

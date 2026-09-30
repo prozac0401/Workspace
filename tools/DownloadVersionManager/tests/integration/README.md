@@ -16,7 +16,7 @@
 
 1. Chrome와 Edge에 각각 로그인하지 않는 평가 profile을 만들고 기존 업무 profile과 구분한다. 시험 다운로드는 `artifacts/download-version-manager/browser-manual/Chrome` 또는 `Edge`처럼 분리한 합성 폴더에 저장한다.
 2. 각 브라우저의 공식 확장 관리 화면에서 개발 모드와 압축 풀린 확장 로드를 선택하고 설치된 `extension` 폴더를 활성화한다. 기업 정책이 차단하면 정책을 바꾸지 않고 그 상태를 기록한다.
-3. 양쪽 확장의 설치 연결 확인에서 Host 0.1.0 / protocol 2 연결을 확인한다. MSI 등록/직접 ping만으로 이 단계 PASS를 대신하지 않는다.
+3. 확장을 활성화하면 새 다운로드부터 자동 처리를 시도한다. 설치 연결 확인은 활성화 스위치가 아닌 진단이다. 시험 다운로드 전 양쪽 확장의 설치 연결 확인에서 Host 0.1.0 / protocol 2 연결을 확인한다. MSI 등록/직접 ping만으로 이 단계 PASS를 대신하지 않는다.
 4. loopback fixture의 first → same → changed → locked를 각 브라우저에서 실행한다. 신규 객체의 file ID와 시간, 원래 이름, History 내용, 잠금 오류 알림을 기록한다. 원래 `(1)`/`(2)` 이름과 worker suspend도 확인한다. 잠금·snapshot·fixture 서버는 명시적인 시험 동안만 실행하는 개발 helper이며 제품에 설치하지 않는다.
 
 확장 활성화 뒤의 HTTP 다운로드와 파일 검사는 이어서 진행할 수 있다. 깨끗한 Windows 11 표준 사용자에서 제품 게시 후 실패 복구를 비교하려면 별도 PC/VM 준비가 필요하다. 현재 PC에서는 해당 실패를 이미 재현했고 공식 제거로 자기 시험 등록을 정리했다. [TEST_RESULTS](../../TEST_RESULTS.md)의 FAIL을 실기 준비만으로 PASS로 변경하지 않는다.
@@ -38,3 +38,11 @@ python tools/DownloadVersionManager/tests/integration/installer.py cleanup --out
 SDK 위치가 자동 검색되지 않으면 상위 빌드에 `--msvc`, `--sdk`, `--wix`를 명시한다. 버전 0.1.1과 rollback MSI는 실기 fixture이며 사용자 설치 asset으로 배포하지 않는다. `installer.py`는 Windows Installer 공식 API를 별도 제한 시간 자식 프로세스에서 호출한다. CLI·UI·깨끗한 VM 결과를 대신했다고 확대하지 않는다. 로그에는 로컬 설치 경로가 포함되므로 공개 사이트에 복사하지 않는다.
 
 `--lifecycle-packages`는 제품 게시 전, 게시 후 deferred, InstallExecute 후 immediate 실패 fixture를 만든다. `installer_faults.py --production <MSI> --late <late-test-MSI> --postexecute <postexecute-test-MSI> --output <결과.json>`은 두 늦은 실패를 별도로 시험한다. preflight 뒤 이 시험이 만든 정확한 제품 등록만 공식 MSI 제거로 정리하고, 복구 실패는 exit 1로 보고한다. `resources.py --only-gib`는 이미 통과한 10/100 MiB를 반복하지 않고 선택적 1 GiB만 측정한다.
+
+## 실패 증거 보존과 Linux에서 가능한 준비
+
+`installer_faults.py`는 진행 중인 trial도 aggregate 결과에 기록한다. 파일/Native 등록 rollback 검증이나 보존 fixture 검증이 실패하면 해당 단계의 FAIL과 중단 상태를 남기고 즉시 멈춘다. 기존 설치·예상하지 않은 제품 등록은 자동 제거하지 않는다. 중단된 trial의 `cleaned`/`finished`를 확인하지 않은 채 다음 설치를 시도하지 않는다. timeout은 NOT RUN이며 복구 PASS가 아니다.
+
+Linux에서는 `python tools/DownloadVersionManager/tests/integration/installer_faults_test.py`로 가짜 lifecycle 의존성의 증거 기록·중단 흐름만 시험할 수 있다. Windows MSI 실행, registry rollback, 재설치 성공을 검증하지 않는다. 이 회귀시험은 Windows 상위 빌드에도 포함한다.
+
+Windows 11 잔류 원인 비교에는 실패 지점별 aggregate 결과, `post-publication-deferred-state.json`과 `post-InstallExecute-immediate-state.json`, 각 state의 `work` 아래 해당 실패·재설치의 `.log`/`-exit.json`, Windows build·표준 사용자/권한 수준 및 실제 MSI SHA-256이 필요하다. 기존 기록은 access denied(5)와 1638을 보고했지만 원본 로그 없이 권한 문제의 원인이나 제품 수정 방향을 확정하지 않는다. 상세 로그와 절대 로컬 경로는 private 진단으로 보관하고 공개 사이트/Release에 올리지 않는다. raw log의 CI 업로드를 자동 확대하지 않는다.

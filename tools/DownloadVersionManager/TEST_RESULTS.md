@@ -1,5 +1,17 @@
 # DownloadVersionManager · 실제 시험 기록
 
+## Linux 후속 수정 · 2026-09-30
+
+기준 소스는 main `c9a5b7084ebb6b7b612cc9301199641cdef2eda8`이다. 아래는 cloud Linux에서의 소스 수정·준비 검증이며 새 Windows MSI를 제작하거나 기존 Windows 인수 결과를 바꾸지 않았다.
+
+- 확장 활성화가 자동 처리 시작점이고 ‘설치 연결 확인’은 진단뿐임을 확인했다. 팝업과 설치 마무리의 잘못된 시작 조건 안내를 바로잡았다. 진단 전후 모두 process 요청을 보내는 동작 회귀시험과 안내 회귀시험을 추가했다.
+- late-failure harness에서 파일/Native 등록 보존 검증이 실패하면 FAIL 기록 전에 중단해 개별 state에 PASS만 남고 aggregate 결과가 없을 수 있음을 합성 lifecycle으로 재현했다. 중단한 trial과 실패 단계를 즉시 보존하고 예상 밖 실패 뒤에는 재설치·강제 정리 없이 멈추도록 증거 기록을 보완했다. 제품의 MSI rollback 동작을 고친 것은 아니다.
+- Node 24.19.0 / Python 3.12.14에서 확장 **40 PASS**, late-failure 증거/중단 회귀시험 **10 PASS**, loopback fixture **3 PASS**, release gate **4 PASS**. 새 증거 회귀시험을 수정 전 harness에 적용하면 **2 PASS / 8 FAIL**로 누락을 재현했다. Windows Host·MSI·Chrome/Edge native integration은 이번 실행에서 **NOT RUN**이다.
+- 문서 `mkdocs build --strict`와 `scripts/check-site.py`는 **PASS**다. 정적 팝업·설치 안내의 클라우드 브라우저 렌더링 시도는 loopback URL의 `ERR_BLOCKED_BY_CLIENT`로 **NOT RUN**이다. 소스/문구 검사를 실제 확장 UI·handshake 시험으로 간주하지 않는다.
+- 상세 Win11 MSI 로그는 이 checkout에 없다. access denied(5)/재설치 1638 원인을 확정하거나 해결했다고 표시하지 않는다. 필요한 로컬 증거와 재실행 전 확인은 [integration 안내](tests/integration/README.md)를 따른다. 기존 `installerFailureRecovery` FAIL과 stable 차단은 유지한다.
+
+로컬 로그는 `artifacts/download-version-manager/linux-followup-20260930/`에 보관한다. 소스 변경은 기존 MSI에 반영되지 않았으므로 다음 Windows 빌드·패키지 검증 뒤 후보를 다시 식별해야 한다.
+
 ## 후속 평가 · protocol 2 · 2026-09-30
 
 최신 코드의 결과는 이 후속 기록을 기준으로 합니다. 아래 최초 protocol 1 기록과 이전 artifact는 당시 근거로 보존합니다. 새 출력은 `artifacts/download-version-manager/0.1.0-evaluation-followup-20260930/`이며 이전 MSI를 덮어쓰지 않았습니다.
