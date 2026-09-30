@@ -29,6 +29,12 @@ Host 시험은 target 부재/존재, 한글·Unicode·공백·여러 점·무확
 
 Extension 시험은 첫/중복/완료·중단/취소/실패·동시 완료, 원래 `(1)`·`(2)` 이름, controller 재생성으로 worker suspend/resume 모델링, stale 정리, Host 미설치/error·protocol/version mismatch, 알 수 없는 처리 재실행 방지와 success 무알림을 확인했습니다. suffix를 역추론해 원래 이름을 만드는 코드는 없습니다.
 
+## 후속 시험 · 확장 없이 요청 순서 역전 재현
+
+2026-09-30 후속 질문에 따라 production Host와 고유 합성 폴더로 한 사례를 추가 확인했습니다. 기존 61개 시험을 반복하지 않았습니다. A가 먼저 완료되고 B가 나중에 완료된 상황을 모델링하되 Native 요청은 B → A 순으로 전달했습니다. 최종 target은 예상한 B가 아닌 A여서 **최신 완료본 순서 FAIL을 실제 재현**했습니다. 초기본·A·B의 세 내용은 모두 남아 **데이터 보존 PASS**입니다.
+
+실제 browser E2E가 아닌 native 요청 시뮬레이션입니다. 실행한 소스 기준은 `a4a9c5b1a27bbe3e2e632d331f809970862e642b`, Host는 기존 검증 production binary입니다. 근거는 `artifacts/download-version-manager/0.1.0-evaluation/followup-order-c0034e8022ff47528f83400aa0d220c7/result.json`에 보존합니다. 기존 자동시험 PASS와 이 추가 인수 FAIL을 합쳐 전체 성공으로 표시하지 않습니다. 확장 활성화와 무관하게 수정·회귀시험을 진행할 수 있는 항목입니다.
+
 ## 실제 installer lifecycle
 
 최종 MSI의 fresh install → 동일 버전 repair → 소유 파일 하나 누락 repair → 동일 버전 재실행 → 외부 수정 파일/Native Host default 보호 → 0.1.1 시험 upgrade → uninstall → 트랜잭션 실패 주입 → 0.1.0 reinstall → 시험 설치 제거를 수행했습니다. **14개 기록 PASS**, 정상 설치 작업 exit 0, 보호 거절·고의 실패 exit 1603(예상값)입니다. 시험용 0.1.1은 사용자 릴리즈가 아닙니다.
