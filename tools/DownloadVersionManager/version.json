@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "protocolVersion": 1,
+  "protocolVersion": 2,
   "channel": "evaluation",
   "nativeHostName": "com.workspace.download_version_manager",
   "developmentExtensionId": "knahdnpoplcleaoklikjmgpocealjogc"

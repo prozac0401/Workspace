@@ -8,9 +8,9 @@
 
 ## 목적과 데이터 경계
 
-확정 목표는 Chrome/Edge를 통해 가장 최근에 다운로드한 신규 파일 자체가 원래 logical filename을 갖도록 하는 것이다. byte-for-byte 다른 이전 내용만 해당 parent의 `_history`에 보존하며 idle Windows native process는 0개여야 한다. 현재 구현은 동일 target을 안전하게 직렬화하지만 동시 완료의 최종본을 mutex 처리 순서로 정한다. 브라우저 전체 완료 시각 순서를 보장하지 못하는 차이는 아래 지원 제한과 검증 기록에 남기며 목표를 충족했다고 확대하지 않는다.
+확정 목표는 Chrome/Edge를 통해 가장 최근에 다운로드한 신규 파일 자체가 원래 logical filename을 갖도록 하는 것이다. byte-for-byte 다른 이전 내용만 해당 parent의 `_history`에 보존하며 idle Windows native process는 0개여야 한다. 후속 구현은 같은 target의 mutex 안에서 브라우저 완료 시각과 실제 file ID를 비교해 지연된 이전 요청이 최신본을 바꾸지 않도록 한다. 같은 완료 시각은 두 객체를 보존하고 중단한다. 실제 Chrome/Edge 시각 계약은 미검증이며 [ADR-0027](../../design/0027-download-completion-order.md)과 후속 검증 기록으로 구분한다.
 
-Host가 읽는 대상은 요청의 신규 파일과 같은 parent의 기존 target 기본 데이터 스트림 둘뿐이다. 쓸 수 있는 대상은 이 두 객체의 이름·시간, 새 History directory와 충돌 없는 이전 객체의 이름이다. parent ancestor는 reparse 검사와 이름 이동 차단을 위해 핸들로 확보하되 자식들을 열거하지 않는다. 기존 사용자 History·다른 문서·폴더·브라우저 profile 설정은 소유하지 않는다.
+Host가 읽는 대상은 요청의 신규 파일과 같은 parent의 기존 target 기본 데이터 스트림 둘뿐이다. 쓸 수 있는 대상은 이 두 객체의 이름·시간, 새 History directory와 충돌 없는 이전 객체의 이름이다. parent ancestor는 reparse 검사와 이름 이동 차단을 위해 핸들로 확보하되 자식들을 열거하지 않는다. HKCU에는 target당 경로 hash로 찾는 138-byte 완료 순서 기능 상태만 갱신하며 경로 원문·URL·문서 내용·내용 hash를 기록하지 않는다. 기존 사용자 History·다른 문서·폴더·브라우저 profile 설정은 소유하지 않는다.
 
 | 요구 ID | 확정 행동 | 완료 기준·시험 |
 |---|---|---|
@@ -22,9 +22,9 @@ Host가 읽는 대상은 요청의 신규 파일과 같은 parent의 기존 targ
 | REQ-DVM-006 | 이동 실패 rollback, 두 객체 모두 유실 금지 | 실제 잠금/ACL, rename/rollback 실패 주입, 강제 중단 보존 |
 | REQ-DVM-007 | 대상별 프로세스 간 직렬화 | 동일 target 2/8/16개·서로 다른 target·Chrome/Edge 역할 시뮬레이션 |
 | REQ-DVM-008 | Native Messaging 입력·origin·경로 경계 | 64 KiB frame 상한, future protocol·malformed/duplicate JSON·장치/ADS/traversal 거절 |
-| REQ-DVM-009 | metadata 최소·suspend 복원·종료 후 정리 | storage.local ID/name/at/stage만, 성공/실패/중단 cleanup, 7일 stale |
+| REQ-DVM-009 | metadata 최소·suspend 복원·종료 후 정리 | storage.local ID/name/token/at/stage만, 성공/실패/중단 cleanup, 7일 stale |
 | REQ-DVM-010 | 정상 성공 조용히, 필요한 오류만 짧게 | 잠금·복구 실패/불확실 단계 구분, stack trace 없음 |
-| REQ-DVM-011 | 제품 버전 하나와 protocol 별도 | Extension/Host/MSI 0.1.0, protocolVersion 1 |
+| REQ-DVM-011 | 제품 버전 하나와 protocol 별도 | Extension/Host/MSI 0.1.0, protocolVersion 2 |
 | REQ-DVM-012 | 단일 설치 asset, 공식 Chrome/Edge 배포 | MSI 하나, 실제 extension 활성화·handshake; 개발용 load는 평가 fallback |
 | REQ-DVM-013 | 사용자별 설치·제거·History 보존 | HKCU, LocalAppData, lifecycle·외부 파일/등록 보호 |
 | REQ-DVM-014 | 실제 Chrome와 Edge 대표 E2E | first/same/changed/locked, 계약 filename·worker suspension |
@@ -41,6 +41,6 @@ Host는 두 객체를 읽기/DELETE access로 열고 write/delete sharing을 거
 
 ## 지원 후보와 관문
 
-Windows 11 x64, 고정 로컬 NTFS, 현재 Chrome/Edge가 검증 대상이다. Windows 10/ARM64/모든 조직 정책/네트워크/클라우드/대소문자 구분 NTFS를 인증하지 않는다. 같은 이름의 여러 완료 요청은 파괴적으로 겹치지 않고 mutex 처리 순서가 최종 순서다. 브라우저 전체 완료 시각의 영구 high-water 기록은 v0.1에 없으며 엄격한 완료 시각 순서 보장은 별도 제한이다.
+Windows 11 x64, 고정 로컬 NTFS, 현재 Chrome/Edge가 검증 대상이다. Windows 10/ARM64/모든 조직 정책/네트워크/클라우드/대소문자 구분 NTFS를 인증하지 않는다. 같은 이름의 여러 완료 요청은 파괴적으로 겹치지 않고 완료 시각이 더 늦은 객체가 원래 이름을 갖는다. 늦게 전달된 이전 요청은 byte-for-byte 다를 때만 History에 보존한다. 같은 millisecond의 선후, 시계 역행, 손상된 상태와 실제 브라우저 API 계약은 별도 제한·검증 관문이다.
 
 스토어 미게시로 개발용 확장 활성화가 필요한 MSI는 완전 자동 단일 설치 요구를 충족하지 않는다. stable `download-version-manager-v0.1.0` 태그·릴리즈를 차단한다. 실제 수행과 미실행의 대응은 [시험 기록](../../../tools/DownloadVersionManager/TEST_RESULTS.md), [배포 기록](../../delivery/download-version-manager-evaluation-20260930.md)에서 관리한다.

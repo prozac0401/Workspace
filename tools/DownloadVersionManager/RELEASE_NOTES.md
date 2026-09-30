@@ -8,6 +8,6 @@ Chrome·Edge MV3 확장이 현재 다운로드의 원래 이름을 기록하고 
 
 Windows 11 x64·고정 로컬 NTFS에서 Host 61개, controller 29개, release gate 4개, loopback fixture 3개와 최종 native installer lifecycle 14개 기록을 통과했습니다. 설치 파일의 SHA-256을 검사했습니다. 실제 Chrome·Edge filename contract/E2E·Native handshake·활성화된 확장의 idle은 NOT RUN입니다. native 독립 snapshot은 0이며 실행 후 모두 종료했습니다.
 
-지원 인증하지 않은 범위는 Windows 10·ARM64·네트워크/클라우드 경로·모든 기업 정책과 다운로드 방식입니다. 동시 완료는 mutex 처리 순서이며 전체 browser 완료 시각 정렬을 보장하지 않습니다. 전원 장애 자동 복구·restore UI·기존 suffix 일괄 정리·telemetry·cloud upload·background update는 없습니다. MSI 제품 게시 후 실패의 앞선 시험에서 제품 등록 롤백 실패가 관찰돼 모든 실패 지점의 복구를 인증하지 않습니다. [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md)와 [실제 시험 기록](TEST_RESULTS.md)을 먼저 확인하세요.
+지원 인증하지 않은 범위는 Windows 10·ARM64·네트워크/클라우드 경로·모든 기업 정책과 다운로드 방식입니다. 동시 요청은 브라우저 완료 시각·파일 객체 ID로 최신본을 유지합니다. 같은 millisecond의 두 완료와 시계 역행은 제한이며 실제 브라우저 contract는 미검증입니다. 전원 장애 자동 복구·restore UI·기존 suffix 일괄 정리·telemetry·cloud upload·background update는 없습니다. MSI 제품 게시 후 실패의 앞선 시험에서 제품 등록 롤백 실패가 관찰돼 모든 실패 지점의 복구를 인증하지 않습니다. [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md)와 [실제 시험 기록](TEST_RESULTS.md)을 먼저 확인하세요.
 
 제거는 프로그램 파일과 자기 Native Host 등록만 대상으로 하며 다운로드·History를 보존합니다. 각 브라우저의 확장은 사용자가 제거합니다. stable tag `download-version-manager-v0.1.0`은 모든 실제 인수·단일 배포 관문을 통과한 경우에만 사용합니다.

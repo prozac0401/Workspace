@@ -55,7 +55,9 @@ def build(args):
     spec = json.loads((PRODUCT / 'version.json').read_text('utf-8'))
     version = args.version or spec['version']
     if len(version.split('.')) != 3 or any(not x.isdecimal() for x in version.split('.')): raise ValueError('Invalid version')
-    out = REPO / 'artifacts/download-version-manager' / (version + '-evaluation')
+    output_root = REPO / 'artifacts/download-version-manager'
+    out = pathlib.Path(args.output_dir).resolve() if args.output_dir else output_root / (version + '-evaluation')
+    if out == output_root.resolve() or not out.is_relative_to(output_root.resolve()): raise RuntimeError('Output must be a dedicated directory under artifacts/download-version-manager.')
     out.mkdir(parents=True, exist_ok=True)
     build_dir = out / 'build'; build_dir.mkdir(exist_ok=True)
     manifest = json.loads((PRODUCT / 'extension/manifest.json').read_text('utf-8'))
@@ -102,7 +104,7 @@ END
         location = build_dir / ('test' if testing else 'production'); location.mkdir(exist_ok=True)
         binary = location / ('DownloadVersionHost.Tests.exe' if testing else 'DownloadVersionHost.exe')
         if not args.package_only:
-            command([cl] + common + (['/DDVM_TESTING'] if testing else []) + ['/Fe' + str(binary), PRODUCT / 'source/host.cpp', PRODUCT / 'source/engine.cpp', build_dir / 'host.res'] + link + ['/SUBSYSTEM:WINDOWS', 'bcrypt.lib', 'shell32.lib'], location, env, build_dir / ('test-compile.log' if testing else 'host-compile.log'))
+            command([cl] + common + (['/DDVM_TESTING'] if testing else []) + ['/Fe' + str(binary), PRODUCT / 'source/host.cpp', PRODUCT / 'source/engine.cpp', build_dir / 'host.res'] + link + ['/SUBSYSTEM:WINDOWS', 'bcrypt.lib', 'shell32.lib', 'advapi32.lib'], location, env, build_dir / ('test-compile.log' if testing else 'host-compile.log'))
         binaries['test' if testing else 'host'] = binary
     node = args.node or shutil.which('node')
     if not node: raise RuntimeError('Node.js required for extension tests.')
@@ -159,21 +161,24 @@ END
     if not wix: raise RuntimeError('WiX 4 required; pass --wix. CI installs WiX locally.')
     msi = out / f'DownloadVersionManager-{version}-x64.msi'
     product_code = '{' + str(uuid.uuid5(uuid.NAMESPACE_URL, 'dvm/evaluation/' + version)).upper() + '}'
-    def package(target, rollback=False):
-        command([wix, 'build', '-arch', 'x64', '-d', 'Version=' + version, '-d', 'ProductCode=' + product_code, '-d', 'GuardDll=' + str(guard), '-d', 'RollbackGuardDll=' + str(rollback_guard), '-d', 'InventorySha256=' + sha(stage / 'ownership.tsv'), '-d', 'RollbackTest=' + ('1' if rollback else '0'), '-o', target, PRODUCT / 'installer/Product.wxs', build_dir / 'Files.wxs'], REPO, log=out / ('rollback-msi.log' if rollback else 'msi-build.log'))
+    def package(target, rollback=0):
+        command([wix, 'build', '-arch', 'x64', '-d', 'Version=' + version, '-d', 'ProductCode=' + product_code, '-d', 'GuardDll=' + str(guard), '-d', 'RollbackGuardDll=' + str(rollback_guard), '-d', 'InventorySha256=' + sha(stage / 'ownership.tsv'), '-d', 'RollbackTest=' + str(rollback), '-o', target, PRODUCT / 'installer/Product.wxs', build_dir / 'Files.wxs'], REPO, log=out / (f'rollback-{rollback}-msi.log' if rollback else 'msi-build.log'))
     package(msi)
-    if args.lifecycle_packages: package(out / 'DownloadVersionManager-rollback-test.msi', True)
+    if args.lifecycle_packages:
+        package(out / 'DownloadVersionManager-rollback-test.msi', 1)
+        package(out / 'DownloadVersionManager-late-rollback-test.msi', 2)
+        package(out / 'DownloadVersionManager-postexecute-rollback-test.msi', 3)
     command([sys.executable, PRODUCT / 'build/verify.py', '--msi', msi, '--payload', stage, '--version', version, '--output', out / 'package-verification.json'], REPO, log=out / 'package-verification.log')
     (out / 'SHA256SUMS.txt').write_text(sha(msi) + '  ' + msi.name + '\n', 'ascii')
     source_files = sorted(p for p in PRODUCT.rglob('*') if p.is_file() and '__pycache__' not in p.parts)
-    metadata = {'version': version, 'protocolVersion': 1, 'channel': 'evaluation', 'signed': False, 'compiler': str(msvc), 'sdk': sdkver, 'architecture': 'x64', 'runtime': 'static CRT / Windows APIs', 'installer': msi.name, 'sha256': sha(msi), 'hostSha256': sha(binaries['host']), 'automaticTestsPassed': report['failed'] == 0 and report['notRun'] == 0, 'sources': {p.relative_to(PRODUCT).as_posix(): sha(p) for p in source_files}, 'interactiveGates': 'NOT RUN by build; separate browser and installer evidence required'}
+    metadata = {'version': version, 'protocolVersion': spec['protocolVersion'], 'channel': 'evaluation', 'signed': False, 'compiler': str(msvc), 'sdk': sdkver, 'architecture': 'x64', 'runtime': 'static CRT / Windows APIs', 'installer': msi.name, 'sha256': sha(msi), 'hostSha256': sha(binaries['host']), 'automaticTestsPassed': report['failed'] == 0 and report['notRun'] == 0, 'sources': {p.relative_to(PRODUCT).as_posix(): sha(p) for p in source_files}, 'interactiveGates': 'NOT RUN by build; separate browser and installer evidence required'}
     (out / 'build-manifest.json').write_text(json.dumps(metadata, indent=2) + '\n', 'utf-8')
     print(f'Evaluation package built and verified: {msi}')
     return out
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    for name in ['msvc', 'sdk', 'wix', 'node', 'version']: parser.add_argument('--' + name)
+    for name in ['msvc', 'sdk', 'wix', 'node', 'version', 'output-dir']: parser.add_argument('--' + name)
     parser.add_argument('--lifecycle-packages', action='store_true')
     parser.add_argument('--package-only', action='store_true', help='Reuse unchanged tested host/extension, rebuild and verify installer only')
     build(parser.parse_args())

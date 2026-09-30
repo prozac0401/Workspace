@@ -1,6 +1,6 @@
 """Fail closed: never equate a missing, failed or skipped gate with PASS."""
 import argparse, hashlib, json, pathlib, sys
-GATES=['host','extension','chromeContract','edgeContract','chromeE2E','edgeE2E','sameContent','changedHistory','lockedPreservation','completionOrder','idleZero','installerLifecycle','nativeHandshake','singleDistribution','limitations','checksum']
+GATES=['host','extension','chromeContract','edgeContract','chromeE2E','edgeE2E','sameContent','changedHistory','lockedPreservation','completionOrder','idleZero','installerLifecycle','installerFailureRecovery','nativeHandshake','singleDistribution','limitations','checksum']
 def evaluate(evidence):
     failures={key:evidence.get('gates',{}).get(key,'NOT RUN') for key in GATES if evidence.get('gates',{}).get(key)!='PASS'}
     if evidence.get('channel')!='stable': failures['channel']=evidence.get('channel','missing')

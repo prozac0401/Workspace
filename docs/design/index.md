@@ -1,5 +1,7 @@
 # 설계 결정 목록
 
+- [ADR-0027 · 완료 시각과 파일 객체로 최신 다운로드를 유지](0027-download-completion-order.md) — 역순 요청·브라우저 ID 충돌·중단 복구, protocol 2와 최소 HKCU 순서 상태
+
 - [ADR-0026 · 다운로드 이벤트와 단발 Native Host](0026-download-version-manager.md) — 신규 객체 이름 승계, 변경 내용 History, 무상주·per-user MSI와 스토어 배포 관문
 
 | ID | 결정 | 상태 |

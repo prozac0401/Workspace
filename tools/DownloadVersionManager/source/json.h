@@ -94,7 +94,7 @@ public:
                     }
                     if (begin==p || (p-begin>1 && s[begin]=='0')) fail();
                 }
-                r.emplace(key,std::move(v)); if (r.size()>8) fail();
+                r.emplace(key,std::move(v)); if (r.size()>10) fail();
             } while (take(','));
             if (!take('}')) fail();
         }

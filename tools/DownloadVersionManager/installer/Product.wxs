@@ -28,10 +28,19 @@
       </Component>
     </Directory></StandardDirectory>
     <Feature Id="Product" Title="DownloadVersionManager" Level="1"><ComponentGroupRef Id="Payload" /><ComponentRef Id="Registration" /><ComponentRef Id="SetupShortcut" /></Feature>
-    <?if $(var.RollbackTest) = 1 ?>
+    <?if $(var.RollbackTest) != 0 ?>
     <Binary Id="RollbackFixture" SourceFile="$(var.RollbackGuardDll)" />
+    <?if $(var.RollbackTest) = 3 ?>
+    <CustomAction Id="FailRollbackTest" BinaryRef="RollbackFixture" DllEntry="DvmFailRollbackTest" Execute="immediate" Return="check" />
+    <InstallExecuteSequence><Custom Action="FailRollbackTest" After="InstallExecute" Condition="NOT REMOVE" /></InstallExecuteSequence>
+    <?else?>
     <CustomAction Id="FailRollbackTest" BinaryRef="RollbackFixture" DllEntry="DvmFailRollbackTest" Execute="deferred" Impersonate="yes" Return="check" />
+    <?if $(var.RollbackTest) = 2 ?>
+    <InstallExecuteSequence><Custom Action="FailRollbackTest" After="PublishProduct" Condition="NOT REMOVE" /></InstallExecuteSequence>
+    <?else?>
     <InstallExecuteSequence><Custom Action="FailRollbackTest" After="WriteRegistryValues" Condition="NOT REMOVE" /></InstallExecuteSequence>
+    <?endif?>
+    <?endif?>
     <?endif?>
     <UI>
       <TextStyle Id="DefaultFont" FaceName="Malgun Gothic" Size="9" /><Property Id="DefaultUIFont" Value="DefaultFont" />

@@ -17,6 +17,8 @@ Chrome/Edge의 Manifest V3 확장이 원래 이름을 다운로드 결정 이벤
 
 크기를 먼저 비교하고 같을 때만 64 KiB 버퍼로 SHA-256을 계산합니다. Office/PDF 의미를 해석하지 않습니다. 신규 파일 ID와 파일 시간을 유지하는 이름 이동을 사용합니다. 내용이 다른 이전 파일의 timestamp는 History로 옮기는 로컬 시각입니다. 같은 초에는 `_001`, `_002`를 붙이고 확장자는 유지합니다.
 
+동시에 완료된 요청이 순서를 바꿔 도착해도 브라우저의 완료 시각이 더 늦은 객체를 유지합니다. 늦게 도착한 이전 다운로드는 내용이 다르면 History에 보존하고 같으면 제거합니다. 완료 시각이 같은 두 파일은 선후를 추측하지 않고 둘 다 보존한 뒤 알립니다. 실제 Chrome/Edge의 완료 시각 계약은 실기 검증이 남아 있습니다.
+
 ## 설치·제거
 
 평가용 설치 파일은 `DownloadVersionManager-0.1.0-x64.msi` 하나입니다. 외부 런타임이나 관리자 권한 없이 `%LOCALAPPDATA%\Programs\DownloadVersionManager`와 HKCU Chrome/Edge NativeMessagingHosts에 설치하도록 구성했습니다. 실행 파일은 서명하지 않았습니다.
@@ -24,6 +26,8 @@ Chrome/Edge의 Manifest V3 확장이 원래 이름을 다운로드 결정 이벤
 설치 후 시작 메뉴의 **DownloadVersionManager 설치 마무리**에서 공식 개발용 확장 불러오기를 따라 `extension` 폴더를 선택합니다. 각 브라우저의 확장에서 **설치 연결 확인**을 누릅니다. 스토어 검토·게시 전의 평가용 fallback이며 일반 PC에서 완전 자동 단일 설치 요구를 충족하지 않습니다. 기업 정책을 변경하거나 보안을 우회하지 않습니다.
 
 제거는 Windows의 설치된 앱에서 진행하고 확장은 각 브라우저에서 제거합니다. 프로그램 파일과 자기 Native Host 등록만 제거합니다. 다운로드 파일과 History는 사용자 데이터이며 설치 소유 자원이 아닙니다. 브라우저를 강제로 종료하거나 Explorer를 재시작하지 않습니다.
+
+대상별 최소 순서 기록은 제거·재설치 사이에 지연 요청이 최신본을 바꾸지 않도록 HKCU에 보존합니다. 파일 내용이나 경로 원문을 저장하지 않으며 정상 성공 로그가 아닙니다.
 
 ## 실패와 복구
 
@@ -35,7 +39,7 @@ Chrome/Edge의 Manifest V3 확장이 원래 이름을 다운로드 결정 이벤
 
 Native Host는 요청 한 번만 처리합니다. startup·서비스·tray·watcher·polling·자동 업데이트 daemon이 없습니다. 다운로드를 처리하지 않는 동안 제품 native process 목표는 0개입니다. 확장에도 keepalive나 장기 native connection이 없습니다.
 
-파일 내용·hash·telemetry를 외부로 보내거나 장기 보관하지 않습니다. 다운로드 ID별 원래 이름·시각·처리 단계만 브라우저 로컬 storage에 임시 보관합니다. 처리 후 지우고 7일 지난 metadata는 다음 이벤트에서 정리합니다. 오류는 경로 없는 최근 상태 하나만 남깁니다. 정상 성공 로그는 만들지 않습니다.
+파일 내용·내용 hash·telemetry를 외부로 보내거나 장기 보관하지 않습니다. 다운로드 ID별 원래 이름·시각·임의 식별자·처리 단계만 브라우저 로컬 storage에 임시 보관합니다. 처리 후 지우고 7일 지난 metadata는 다음 이벤트에서 정리합니다. 오류는 경로 없는 최근 상태 하나만 남깁니다. 정상 성공 로그는 만들지 않습니다. Host는 HKCU에 target당 138-byte 완료 순서 상태만 갱신합니다. 값 이름은 대상 경로의 hash이고 값에는 시각·객체 ID·임의 식별자·무결성 checksum만 있으며 경로 원문·URL·내용 hash는 없습니다.
 
 ## 개발
 
@@ -47,4 +51,4 @@ python tools/DownloadVersionManager/build/build.py --msvc <MSVC-root> --sdk <SDK
 
 Windows x64 MSVC·Windows SDK·WiX 4·Python 3.12+·Node 22+가 제작용으로 필요합니다. 최종 사용자에게는 필요하지 않습니다. 상위 빌드는 production/test Host 분리, host/extension/protocol 시험, 자원 측정, MSI 생성·행정 추출·구조/파일 hash 검사와 SHA256SUMS 생성을 연결합니다. 실제 브라우저와 installer lifecycle은 별도 실기 관문입니다.
 
-구조: `source` Host, `extension` 공통 MV3, `tests/host`, `tests/extension`, `tests/integration`, `build`, `installer`. [명세](../../docs/tools/download-version-manager/specification.md) · [ADR-0026](../../docs/design/0026-download-version-manager.md) · [제작·CI 범위](CI_SCOPE.md) · [변경 이력](CHANGELOG.md).
+구조: `source` Host, `extension` 공통 MV3, `tests/host`, `tests/extension`, `tests/integration`, `build`, `installer`. [명세](../../docs/tools/download-version-manager/specification.md) · [ADR-0026](../../docs/design/0026-download-version-manager.md) · [ADR-0027](../../docs/design/0027-download-completion-order.md) · [제작·CI 범위](CI_SCOPE.md) · [변경 이력](CHANGELOG.md). 제품 버전 0.1.0, Native Messaging protocol 2.

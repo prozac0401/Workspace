@@ -17,7 +17,7 @@ bool write(const std::string& s) {
     while (at<s.size()) { if (!WriteFile(GetStdHandle(STD_OUTPUT_HANDLE),s.data()+at,static_cast<DWORD>(s.size()-at),&got,nullptr) || !got) return false; at+=got; } return true;
 }
 std::string response(const dvm::Result& r) {
-    return "{\"protocolVersion\":1,\"version\":" + dvm::quote(DVM_VERSION) + ",\"ok\":" + (r.ok ? "true" : "false") +
+    return "{\"protocolVersion\":2,\"version\":" + dvm::quote(DVM_VERSION) + ",\"ok\":" + (r.ok ? "true" : "false") +
         ",\"status\":"+dvm::quote(r.status)+",\"changed\":"+(r.changed ? "true" : "false")+
         ",\"win32Error\":"+std::to_string(r.error)+",\"rollbackError\":"+std::to_string(r.rollbackError)+
         ",\"hashBytes\":"+std::to_string(r.hashBytes)+",\"compareMicroseconds\":"+std::to_string(r.compareMicroseconds)+
@@ -38,16 +38,16 @@ int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {
         const auto fields=dvm::Json(input).parse();
         auto number=[&](const wchar_t* key) { const auto it=fields.find(key); if (it==fields.end() || !it->second.number) throw std::runtime_error("invalid_request"); return it->second.integer; };
         auto text=[&](const wchar_t* key) { const auto it=fields.find(key); if (it==fields.end() || it->second.number) throw std::runtime_error("invalid_request"); return it->second.text; };
-        if (number(L"protocolVersion")!=1) { result.status=L"protocol_mismatch"; write(response(result)); return 1; }
+        if (number(L"protocolVersion")!=2) { result.status=L"protocol_mismatch"; write(response(result)); return 1; }
         const auto op=text(L"operation");
         if (op==L"ping" && fields.size()==2) { result.ok=true; result.status=L"ready"; }
         else if (op==L"process") {
-            std::set<std::wstring> allowedFields{L"protocolVersion",L"operation",L"newPath",L"logicalName",L"downloadId"};
+            std::set<std::wstring> allowedFields{L"protocolVersion",L"operation",L"newPath",L"logicalName",L"downloadId",L"completedAt",L"requestToken"};
 #ifdef DVM_TESTING
             allowedFields.insert(L"_fault"); allowedFields.insert(L"_timestamp");
 #endif
             for (const auto& f:fields) if (!allowedFields.count(f.first)) throw std::runtime_error("invalid_request");
-            const dvm::Request request{text(L"newPath"),text(L"logicalName"),number(L"downloadId")};
+            const dvm::Request request{text(L"newPath"),text(L"logicalName"),number(L"downloadId"),number(L"completedAt"),text(L"requestToken")};
 #ifdef DVM_TESTING
             dvm::TestHooks hooks;
             if (fields.count(L"_fault")) hooks.fault=text(L"_fault");

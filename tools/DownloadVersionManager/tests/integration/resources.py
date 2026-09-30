@@ -34,23 +34,26 @@ def measure(host,request):
         response=json.loads(output[4:]); assert response['ok'],response
         return {'wallMilliseconds':round(elapsed,3),'processLifetimeMilliseconds':round((filetime(exited)-filetime(created))/10000,3),'peakWorkingSetBytes':memory.PeakWorkingSetSize,'compareMicroseconds':response['compareMicroseconds'],'hashBytes':response['hashBytes'],'exited':True}
 def run(args):
+    sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'host'))
+    from run import request, cleanup_order_values
     root=pathlib.Path(args.output).resolve().parent/('resource-fixtures-'+uuid.uuid4().hex); root.mkdir()
     host=pathlib.Path(args.host)
     assert processes()==[], 'Unexpected existing host process; do not terminate it.'
-    startup=[measure(host,{'protocolVersion':1,'operation':'ping'}) for _ in range(10)]
+    startup=[] if args.only_gib else [measure(host,{'protocolVersion':2,'operation':'ping'}) for _ in range(10)]
     samples={}
-    for mib in [10,100]+([1024] if args.gib else []):
+    for mib in ([1024] if args.only_gib else [10,100]+([1024] if args.gib else [])):
         d=root/str(mib); d.mkdir(); target=d/'report.bin'; new=d/'incoming.bin'
         block=b'x'*(1024*1024)
         for p in [target,new]:
             with p.open('wb') as stream:
                 for _ in range(mib): stream.write(block)
-        sample=measure(host,{'protocolVersion':1,'operation':'process','downloadId':mib,'logicalName':'report.bin','newPath':str(new)})
+        sample=measure(host,request(new,'report.bin',downloadId=mib))
         assert sample['hashBytes']==2*mib*1024*1024
         assert not (d/'_history').exists() and not new.exists()
         samples[str(mib)+'MiB']=sample
     idle=processes(); assert idle==[]
-    results={'environment':{'windowsBuild':sys.getwindowsversion().build,'python':sys.version.split()[0],'architecture':'x64','volume':'local NTFS','cache':'OS cache not flushed; fresh-process startup, not reboot cold-disk measurement'},'executableBytes':host.stat().st_size,'startup':startup,'startupMedianWallMilliseconds':round(statistics.median(s['wallMilliseconds'] for s in startup),3),'hashSamples':samples,'idleNativeProcesses':len(idle),'allExited':True,'oneGiB':'RUN' if args.gib else 'NOT RUN (optional)','servicesTrayWatcherPolling':'No product entries in MSI; installer lifecycle records actual installation checks'}
+    cleanup_order_values()
+    results={'environment':{'windowsBuild':sys.getwindowsversion().build,'python':sys.version.split()[0],'architecture':'x64','volume':'local NTFS','cache':'OS cache not flushed; fresh-process startup, not reboot cold-disk measurement'},'executableBytes':host.stat().st_size,'startup':startup,'startupMedianWallMilliseconds':round(statistics.median(s['wallMilliseconds'] for s in startup),3) if startup else None,'hashSamples':samples,'idleNativeProcesses':len(idle),'allExited':True,'oneGiB':'RUN' if args.gib or args.only_gib else 'NOT RUN (optional)','servicesTrayWatcherPolling':'No product entries in MSI; installer lifecycle records actual installation checks'}
     pathlib.Path(args.output).write_text(json.dumps(results,indent=2)+'\n','utf-8'); print(json.dumps(results,indent=2))
 if __name__=='__main__':
-    p=argparse.ArgumentParser(); p.add_argument('--host',required=True); p.add_argument('--output',required=True); p.add_argument('--gib',action='store_true'); run(p.parse_args())
+    p=argparse.ArgumentParser(); p.add_argument('--host',required=True); p.add_argument('--output',required=True); p.add_argument('--gib',action='store_true'); p.add_argument('--only-gib',action='store_true'); run(p.parse_args())

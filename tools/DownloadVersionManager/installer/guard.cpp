@@ -107,8 +107,8 @@ extern "C" __declspec(dllexport) UINT __stdcall DvmPreflight(MSIHANDLE m) noexce
     }
 }
 #ifdef DVM_INSTALLER_TESTING
-// Isolated lifecycle fixture only. Fail inside the transaction after payload and
-// native registration writes, before Windows Installer publishes the product.
+// Isolated lifecycle fixtures only: selectable early, post-publication deferred,
+// and post-InstallExecute immediate failure. Never linked into the user package.
 extern "C" __declspec(dllexport) UINT __stdcall DvmFailRollbackTest(MSIHANDLE) noexcept {
     return ERROR_INSTALL_FAILURE;
 }

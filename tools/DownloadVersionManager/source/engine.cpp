@@ -127,12 +127,89 @@ std::array<unsigned char,32> digest(HANDLE h,uint64_t& count) {
     for (;;) { if (!ReadFile(h,buf.data(),static_cast<DWORD>(buf.size()),&n,nullptr)) fail(L"hash_failed"); if (!n) break; hash.add(buf.data(),n); count+=n; }
     return hash.finish();
 }
-std::wstring mutexName(const std::wstring& p) {
+std::wstring targetKey(const std::wstring& p) {
     Hasher hash; const auto bytes=utf8(lower(p)); hash.add(reinterpret_cast<const unsigned char*>(bytes.data()),static_cast<DWORD>(bytes.size()));
-    const auto d=hash.finish(); std::wstring r=L"Global\\Workspace.DownloadVersionManager.v1.";
+    const auto d=hash.finish(); std::wstring r;
     for (const auto b:d) { r+=L"0123456789abcdef"[b>>4]; r+=L"0123456789abcdef"[b&15]; }
     return r;
 }
+struct Completion {
+    bool present=false; FILE_ID_INFO object{}; uint64_t at=0; std::array<unsigned char,16> token{};
+};
+bool sameObject(const FILE_ID_INFO& a,const FILE_ID_INFO& b) {
+    return a.VolumeSerialNumber==b.VolumeSerialNumber && !memcmp(a.FileId.Identifier,b.FileId.Identifier,16);
+}
+FILE_ID_INFO objectId(HANDLE h) {
+    FILE_ID_INFO id{}; if (!GetFileInformationByHandleEx(h,FileIdInfo,&id,sizeof(id))) fail(L"file_info_failed"); return id;
+}
+Completion completion(const Request& request,HANDLE h) {
+    if (!request.completedAt || request.completedAt>253402300799999ULL || request.requestToken.size()!=32) fail(L"invalid_request",ERROR_INVALID_DATA);
+    Completion r; r.present=true; r.at=request.completedAt; r.object=objectId(h);
+    for (size_t i=0;i<32;++i) {
+        const auto c=request.requestToken[i]; const int n=c>=L'0' && c<=L'9' ? c-L'0' : c>=L'a' && c<=L'f' ? c-L'a'+10 : -1;
+        if (n<0) fail(L"invalid_request",ERROR_INVALID_DATA);
+        r.token[i/2]|=static_cast<unsigned char>(n << (i%2 ? 0 : 4));
+    }
+    return r;
+}
+// A single bounded registry value contains the previous committed object and
+// the prepared incoming object. Write it before touching either file. After a
+// process interruption the target's actual file ID selects the committed record.
+// No paths, content digests, URLs or per-download success log are stored.
+class OrderStore {
+    HKEY key=nullptr; std::wstring name;
+    static constexpr size_t Payload=106, Length=Payload+32;
+    std::array<Completion,2> records{};
+    static std::array<unsigned char,32> checksum(const unsigned char* bytes) {
+        Hasher h; h.add(bytes,static_cast<DWORD>(Payload)); return h.finish();
+    }
+public:
+    explicit OrderStore(const std::wstring& target) : name(targetKey(target)) {
+        DWORD disposition=0;
+        auto e=RegCreateKeyExW(HKEY_CURRENT_USER,L"Software\\Workspace\\DownloadVersionManager\\CompletionOrder",0,nullptr,0,KEY_QUERY_VALUE|KEY_SET_VALUE|KEY_WOW64_64KEY,nullptr,&key,&disposition);
+        if (e) fail(L"order_state_unavailable",e);
+        std::array<unsigned char,Length> bytes{}; DWORD type=0,n=static_cast<DWORD>(bytes.size());
+        e=RegQueryValueExW(key,name.c_str(),nullptr,&type,bytes.data(),&n);
+        if (e==ERROR_FILE_NOT_FOUND) return;
+        if (e || type!=REG_BINARY || n!=Length || memcmp(bytes.data(),"DVMO\x01\0\0\0",8) ||
+            memcmp(checksum(bytes.data()).data(),bytes.data()+Payload,32)) {
+            RegCloseKey(key); key=nullptr; fail(L"order_state_invalid",e ? e : ERROR_INVALID_DATA);
+        }
+        size_t at=8;
+        for (auto& r:records) {
+            const auto present=bytes[at++]; r.present=present==1;
+            memcpy(&r.object.VolumeSerialNumber,bytes.data()+at,8); at+=8;
+            memcpy(r.object.FileId.Identifier,bytes.data()+at,16); at+=16;
+            memcpy(&r.at,bytes.data()+at,8); at+=8;
+            memcpy(r.token.data(),bytes.data()+at,16); at+=16;
+            if (present>1 || (r.present && (!r.at || r.at>253402300799999ULL))) {
+                RegCloseKey(key); key=nullptr; fail(L"order_state_invalid",ERROR_INVALID_DATA);
+            }
+        }
+    }
+    ~OrderStore() { if (key) RegCloseKey(key); }
+    Completion current(const FILE_ID_INFO* id,const Completion& incoming) const {
+        if (id) for (int i=1;i>=0;--i) if (records[i].present && sameObject(records[i].object,*id)) return records[i];
+        // A detached prepared state is not silently discarded for a delayed
+        // request. A genuinely later completion can safely establish a new head.
+        for (const auto& r:records) if (r.present && incoming.at<=r.at &&
+            !(incoming.at==r.at && incoming.token==r.token && sameObject(incoming.object,r.object))) fail(L"order_state_uncertain",ERROR_INVALID_DATA);
+        return {};
+    }
+    void prepare(const Completion& previous,const Completion& incoming) {
+        std::array<unsigned char,Length> bytes{}; memcpy(bytes.data(),"DVMO\x01\0\0\0",8); size_t at=8;
+        for (const auto& r:std::array<Completion,2>{previous,incoming}) {
+            bytes[at++]=r.present ? 1 : 0;
+            memcpy(bytes.data()+at,&r.object.VolumeSerialNumber,8); at+=8;
+            memcpy(bytes.data()+at,r.object.FileId.Identifier,16); at+=16;
+            memcpy(bytes.data()+at,&r.at,8); at+=8;
+            memcpy(bytes.data()+at,r.token.data(),16); at+=16;
+        }
+        const auto digest=checksum(bytes.data()); memcpy(bytes.data()+Payload,digest.data(),digest.size());
+        const auto e=RegSetValueExW(key,name.c_str(),0,REG_BINARY,bytes.data(),static_cast<DWORD>(bytes.size()));
+        if (e) fail(L"order_state_unavailable",e);
+    }
+};
 DWORD rename(HANDLE h,const std::wstring& destination) {
     const auto p=native(destination); const auto bytes=p.size()*sizeof(wchar_t);
     // Avoid allocation failures between the two moves. All accepted native paths
@@ -163,25 +240,55 @@ Result process(const Request& request
     Result r; r.newPath=request.newPath;
     try {
         component(request.logicalName); const auto input=canonical(request.newPath);
-        r.oldPath.reserve(32768);
+        r.oldPath.reserve(32768); r.newPath.reserve(32768); r.targetPath.reserve(32768);
         const auto parent=input.substr(0,(std::max)(size_t(3),input.rfind(L'\\'))); Parents parents(parent);
         const auto newer=join(parents.path,input.substr(input.rfind(L'\\')+1));
         const auto target=join(parents.path,request.logicalName); r.newPath=newer; r.targetPath=target;
-        Mutex lock(mutexName(target));
+        Mutex lock(L"Global\\Workspace.DownloadVersionManager.v1."+targetKey(target));
         auto n=file(newer,true);
         if (!equal(finalPath(n.v),newer)) fail(L"path_changed",ERROR_INVALID_NAME);
         const auto ni=info(n.v);
-        if (equal(newer,target)) { r.ok=true; r.status=L"already_current"; return r; }
+        const auto incoming=completion(request,n.v);
+        const bool atTarget=equal(newer,target);
         std::unique_ptr<Handle> old;
-        try { old=std::make_unique<Handle>(file(target,false)); }
+        try { if (!atTarget) old=std::make_unique<Handle>(file(target,false)); }
         catch (const Error& e) { if (e.status!=L"target_missing") throw; }
+        FILE_ID_INFO targetId{};
+        if (atTarget) targetId=incoming.object;
+        else if (old) {
+            if (!equal(finalPath(old->v),target)) fail(L"path_changed",ERROR_INVALID_NAME);
+            targetId=objectId(old->v);
+        }
+        OrderStore order(target);
+        const auto previous=order.current(atTarget || old ? &targetId : nullptr,incoming);
+        if (previous.present && previous.token==incoming.token &&
+            (!sameObject(previous.object,incoming.object) || previous.at!=incoming.at)) fail(L"request_token_reused",ERROR_INVALID_DATA);
+        if (previous.present && previous.at==incoming.at && previous.token!=incoming.token) fail(L"completion_order_ambiguous",ERROR_INVALID_DATA);
+        const bool stale=previous.present && incoming.at<previous.at;
+        if (atTarget) {
+            if (!stale) order.prepare(previous,incoming);
+            r.ok=true; r.status=L"already_current"; return r;
+        }
         bool same=false;
         if (old) {
-            if (!equal(finalPath(old->v),target)) fail(L"path_changed",ERROR_INVALID_NAME);
             const auto oi=info(old->v);
             LARGE_INTEGER freq{},start{},end{}; QueryPerformanceFrequency(&freq); QueryPerformanceCounter(&start);
             if (size(oi)==size(ni)) { const auto a=digest(old->v,r.hashBytes); const auto b=digest(n.v,r.hashBytes); same=a==b; }
             QueryPerformanceCounter(&end); r.compareMicroseconds=static_cast<uint64_t>((end.QuadPart-start.QuadPart)*1000000/freq.QuadPart);
+        }
+        if (stale && same) {
+            FILE_DISPOSITION_INFO disp{}; disp.DeleteFile=TRUE;
+            if (!SetFileInformationByHandle(n.v,FileDispositionInfo,&disp,sizeof(disp))) fail(L"permission_denied");
+            r.ok=true; r.changed=true; r.status=L"superseded_same_content"; r.newPath=target; return r;
+        }
+        if (!stale) {
+#ifdef DVM_TESTING
+            if (hooks.fault==L"order_write") fail(L"order_state_unavailable",ERROR_ACCESS_DENIED);
+#endif
+            order.prepare(previous,incoming);
+#ifdef DVM_TESTING
+            if (hooks.fault==L"crash_after_order_prepare") TerminateProcess(GetCurrentProcess(),77);
+#endif
         }
         std::unique_ptr<Parents> historyLease;
         if (old) {
@@ -208,7 +315,7 @@ Result process(const Request& request
 #ifdef DVM_TESTING
                     if (hooks.fault==L"old_move") e=ERROR_ACCESS_DENIED; else
 #endif
-                    e=rename(old->v,dest);
+                    e=rename(stale ? n.v : old->v,dest);
                     if (!e) { r.oldPath=dest; r.changed=true; break; }
                     if (e!=ERROR_FILE_EXISTS && e!=ERROR_ALREADY_EXISTS) fail(e==ERROR_ACCESS_DENIED ? L"permission_denied" : L"history_move_failed",e);
                 }
@@ -218,6 +325,7 @@ Result process(const Request& request
                 const auto e=rename(old->v,dest); if (e) fail(L"rename_failed",e); r.oldPath=dest; r.changed=true;
             }
         }
+        if (stale) { r.ok=true; r.status=L"superseded_archived"; r.newPath=r.oldPath; return r; }
 #ifdef DVM_TESTING
         if (hooks.fault==L"crash_after_old_move") TerminateProcess(GetCurrentProcess(),77);
         if (hooks.fault==L"pause_after_old_move") Sleep(1500); // Test binary only; never in the distributed host.
@@ -239,6 +347,9 @@ Result process(const Request& request
             }
             return r;
         }
+#ifdef DVM_TESTING
+        if (hooks.fault==L"crash_after_new_move") TerminateProcess(GetCurrentProcess(),77);
+#endif
         r.changed=true; r.ok=true; r.newPath=target;
         r.status=old ? same ? L"same_content_replaced" : L"changed_content_replaced" : L"renamed";
         // Restore the incoming object's times after rename (including NTFS name

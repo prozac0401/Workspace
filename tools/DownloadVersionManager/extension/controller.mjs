@@ -1,5 +1,5 @@
 export const HOST = 'com.workspace.download_version_manager';
-export const PROTOCOL = 1;
+export const PROTOCOL = 2;
 const PREFIX = 'dvm.download.';
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const KEY = id => PREFIX + id;
@@ -15,6 +15,11 @@ const notices = {
   version_mismatch: '프로그램과 확장의 버전이 다릅니다. 같은 버전의 설치 파일을 사용해 주세요.',
   uncertain: '다운로드 정리 결과를 확인하지 못했습니다. 파일을 직접 확인해 주세요.',
   filename_override: '선택한 파일 이름을 보존했습니다. 이 다운로드는 자동 정리하지 않았습니다.',
+  completion_time_missing: '다운로드 완료 시각을 확인하지 못해 파일을 그대로 보존했습니다.',
+  completion_order_ambiguous: '다운로드 완료 시각이 같아 최신 파일을 정하지 못했습니다. 두 파일을 그대로 보존했습니다.',
+  order_state_uncertain: '이전 다운로드 처리 상태를 확인하지 못해 파일을 그대로 보존했습니다.',
+  order_state_invalid: '다운로드 순서 기록을 확인하지 못해 파일을 그대로 보존했습니다.',
+  order_state_unavailable: '다운로드 순서를 안전하게 기록하지 못해 파일을 그대로 보존했습니다.',
 };
 export function logicalFilename(tentative) {
   if (typeof tentative !== 'string' || !tentative) throw Error('filename_missing');
@@ -32,7 +37,7 @@ export function belongsToLogical(actual, logical) {
   const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp('^' + escape(logical.slice(0, split)) + ' \\([1-9][0-9]*\\)' + escape(logical.slice(split)) + '$', 'i').test(name);
 }
-export function createController(api, now = Date.now) {
+export function createController(api, now = Date.now, token = () => crypto.randomUUID().replaceAll('-', '')) {
   const determining = new Map();
   const completing = new Map();
   const version = api.runtime.getManifest().version;
@@ -63,7 +68,7 @@ export function createController(api, now = Date.now) {
     const work = (async () => {
       try {
         const logicalName = logicalFilename(item.filename);
-        await api.storage.local.set({[KEY(item.id)]: {logicalName, at: now(), stage: 'ready'}});
+        await api.storage.local.set({[KEY(item.id)]: {logicalName, requestToken: token(), at: now(), stage: 'ready'}});
         once({filename: logicalName, conflictAction: 'uniquify'});
       } catch { once(); }
     })();
@@ -83,8 +88,11 @@ export function createController(api, now = Date.now) {
       if (!item || item.state !== 'complete') return;
       if (item.danger && !['safe', 'accepted'].includes(item.danger)) return;
       if (!/^[a-z]:\\/i.test(item.filename) || !belongsToLogical(item.filename, record.logicalName)) throw Error('filename_override');
+      const completedAt = typeof item.endTime === 'string' ? Date.parse(item.endTime) : NaN;
+      if (!Number.isSafeInteger(completedAt) || completedAt <= 0 || completedAt > 253402300799999) throw Error('completion_time_missing');
+      if (!/^[0-9a-f]{32}$/.test(record.requestToken ?? '')) throw Error('uncertain');
       await api.storage.local.set({[key]: {...record, stage: 'processing'}});
-      const result = await native({protocolVersion: PROTOCOL, operation: 'process', downloadId: id, logicalName: record.logicalName, newPath: item.filename});
+      const result = await native({protocolVersion: PROTOCOL, operation: 'process', downloadId: id, completedAt, requestToken: record.requestToken, logicalName: record.logicalName, newPath: item.filename});
       if (!result.ok || ['cleanup_required', 'metadata_warning'].includes(result.status)) await notify(result.status);
     } catch (error) { await notify(error.message in notices ? error.message : 'uncertain'); }
     finally { await api.storage.local.remove(key).catch(() => {}); }

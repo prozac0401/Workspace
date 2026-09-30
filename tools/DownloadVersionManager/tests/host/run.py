@@ -1,12 +1,24 @@
 """Real Windows subprocess/NTFS tests. All writes are under owned fixtures."""
 from __future__ import annotations
-import argparse, concurrent.futures, ctypes as C, hashlib, json, os, pathlib, re, struct, subprocess, sys, time, traceback, uuid
+import argparse, concurrent.futures, ctypes as C, hashlib, itertools, json, os, pathlib, re, struct, subprocess, sys, time, traceback, uuid, winreg
 from ctypes import wintypes as W
 
 K = C.WinDLL('kernel32', use_last_error=True)
 K.CreateFileW.argtypes=[W.LPCWSTR,W.DWORD,W.DWORD,W.LPVOID,W.DWORD,W.DWORD,W.HANDLE]; K.CreateFileW.restype=W.HANDLE
 K.CloseHandle.argtypes=[W.HANDLE]
 ORIGIN='chrome-extension://knahdnpoplcleaoklikjmgpocealjogc/'
+ORDER_KEY=r'Software\Workspace\DownloadVersionManager\CompletionOrder'
+OWNED_ORDER_VALUES=set()
+REQUEST_TIME=itertools.count(time.time_ns()//1000000)
+
+def order_name(path,name): return hashlib.sha256(str(pathlib.Path(path).parent/name).lower().encode('utf8')).hexdigest()
+def cleanup_order_values():
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,ORDER_KEY,0,winreg.KEY_SET_VALUE|winreg.KEY_WOW64_64KEY) as key:
+            for name in OWNED_ORDER_VALUES:
+                try: winreg.DeleteValue(key,name)
+                except FileNotFoundError: pass
+    except FileNotFoundError: pass
 
 def frame(value):
     data=json.dumps(value,ensure_ascii=False,separators=(',',':')).encode('utf-8'); return struct.pack('<I',len(data))+data
@@ -19,7 +31,15 @@ def invoke(exe, value, origin=ORIGIN, raw=None):
     return json.loads(p.stdout[4:]),p.returncode
 
 def request(path,name='보고서.xlsx',**extra):
-    return {'protocolVersion':1,'operation':'process','downloadId':1,'logicalName':name,'newPath':str(path),**extra}
+    key=order_name(path,name)
+    if key not in OWNED_ORDER_VALUES:
+        try:
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER,ORDER_KEY,0,winreg.KEY_READ|winreg.KEY_WOW64_64KEY) as handle:
+                winreg.QueryValueEx(handle,key)
+                raise RuntimeError('Unexpected existing order value; preserve it.')
+        except FileNotFoundError: pass
+        OWNED_ORDER_VALUES.add(key)
+    return {'protocolVersion':2,'operation':'process','downloadId':1,'logicalName':name,'newPath':str(path),'completedAt':next(REQUEST_TIME),'requestToken':uuid.uuid4().hex,**extra}
 
 def run(args):
     sys.stdout.reconfigure(encoding='utf-8')
@@ -131,20 +151,23 @@ def run(args):
         before=n.stat(); r,_=invoke(host,request(n,t.name)); assert r['status']=='same_content_replaced' and r['hashBytes']==128*1024*1024 and t.stat().st_ino==before.st_ino and not (d/'_history').exists(),r
     case('64 MiB file streaming SHA256 processes 128 MiB with bounded buffer',stream_large)
     def protocol(d,value=None,raw=None,status='invalid_request',origin=ORIGIN):
-        r,c=invoke(host,value or {'protocolVersion':1,'operation':'ping'},origin=origin,raw=raw); assert r['status']==status and c==1,r; assert not list(d.iterdir())
-    case('Native Messaging ping and version',lambda d: (lambda r: (r[0]['status']=='ready' and r[0]['version']==args.expected_version and r[1]==0) or (_ for _ in ()).throw(AssertionError(r)))(invoke(host,{'protocolVersion':1,'operation':'ping'})))
-    for name,val,status in [('future protocol',{'protocolVersion':2,'operation':'ping'},'protocol_mismatch'),('missing version',{'operation':'ping'},'invalid_request'),('numeric coercion forbidden',{'protocolVersion':'1','operation':'ping'},'invalid_request'),('unknown operation',{'protocolVersion':1,'operation':'delete'},'invalid_request'),('extra ping property',{'protocolVersion':1,'operation':'ping','newPath':'C:\\file'},'invalid_request'),('fault injection excluded in production',request(root/'missing',_fault='new_move'),'invalid_request')]:
+        r,c=invoke(host,value or {'protocolVersion':2,'operation':'ping'},origin=origin,raw=raw); assert r['status']==status and c==1,r; assert not list(d.iterdir())
+    case('Native Messaging ping and version',lambda d: (lambda r: (r[0]['status']=='ready' and r[0]['version']==args.expected_version and r[1]==0) or (_ for _ in ()).throw(AssertionError(r)))(invoke(host,{'protocolVersion':2,'operation':'ping'})))
+    for name,val,status in [('future protocol',{'protocolVersion':3,'operation':'ping'},'protocol_mismatch'),('missing version',{'operation':'ping'},'invalid_request'),('numeric coercion forbidden',{'protocolVersion':'1','operation':'ping'},'invalid_request'),('unknown operation',{'protocolVersion':2,'operation':'delete'},'invalid_request'),('extra ping property',{'protocolVersion':2,'operation':'ping','newPath':'C:\\file'},'invalid_request'),('fault injection excluded in production',request(root/'missing',_fault='new_move'),'invalid_request')]:
         case(name,lambda d,v=val,s=status:protocol(d,v,status=s))
     case('untrusted caller origin denied',lambda d:protocol(d,status='origin_denied',origin='chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/'))
-    for name,raw,status in [('short frame',b'\x01','invalid_frame'),('oversized frame',struct.pack('<I',65537),'invalid_frame'),('truncated payload',struct.pack('<I',20)+b'{}','truncated_frame'),('duplicate JSON keys',b'{"protocolVersion":1,"protocolVersion":1,"operation":"ping"}','invalid_request'),('non-UTF8',b'{"protocolVersion":1,"operation":"\xff"}','invalid_request'),('invalid surrogate',b'{"protocolVersion":1,"operation":"\\ud800"}','invalid_request'),('nested JSON',b'{"protocolVersion":1,"operation":{}}','invalid_request'),('trailing JSON',b'{"protocolVersion":1,"operation":"ping"}{}','invalid_request')]:
+    for name,raw,status in [('short frame',b'\x01','invalid_frame'),('oversized frame',struct.pack('<I',65537),'invalid_frame'),('truncated payload',struct.pack('<I',20)+b'{}','truncated_frame'),('duplicate JSON keys',b'{"protocolVersion":2,"protocolVersion":2,"operation":"ping"}','invalid_request'),('non-UTF8',b'{"protocolVersion":2,"operation":"\xff"}','invalid_request'),('invalid surrogate',b'{"protocolVersion":2,"operation":"\\ud800"}','invalid_request'),('nested JSON',b'{"protocolVersion":2,"operation":{}}','invalid_request'),('trailing JSON',b'{"protocolVersion":2,"operation":"ping"}{}','invalid_request')]:
         wire=raw if status in ['invalid_frame','truncated_frame'] else struct.pack('<I',len(raw))+raw
         case(name,lambda d,b=wire,s=status:protocol(d,raw=b,status=s))
     for bad in ['C:relative','\\\\server\\share\\file','\\\\?\\C:\\file','C:\\a\\..\\b','C:\\a.txt:stream','C:\\NUL.txt','C:\\a.','C:\\a ']:
         case('reject path '+bad,lambda d,p=bad:protocol(d,request(p),status='invalid_path'))
     def single_request(d):
-        ping=frame({'protocolVersion':1,'operation':'ping'}); p=subprocess.run([str(host),ORIGIN],input=ping+ping,capture_output=True,timeout=5); assert p.returncode==0 and len(p.stdout)==struct.unpack('<I',p.stdout[:4])[0]+4
+        ping=frame({'protocolVersion':2,'operation':'ping'}); p=subprocess.run([str(host),ORIGIN],input=ping+ping,capture_output=True,timeout=5); assert p.returncode==0 and len(p.stdout)==struct.unpack('<I',p.stdout[:4])[0]+4
     case('one input request and response only then exit',single_request)
-    output={'environment':{'platform':sys.platform,'windows':sys.getwindowsversion().build,'fixtureRoot':str(root)},'passed':sum(r['status']=='PASS' for r in results),'failed':sum(r['status']=='FAIL' for r in results),'notRun':0,'tests':results}
+    from ordering import add_cases
+    add_cases(case,host,test_host,pair,request,invoke,frame,order_name,ORDER_KEY)
+    cleanup_order_values()
+    output={'environment':{'platform':sys.platform,'windows':sys.getwindowsversion().build,'fixtureRoot':str(root)},'orderFixtureValuesCleaned':len(OWNED_ORDER_VALUES),'passed':sum(r['status']=='PASS' for r in results),'failed':sum(r['status']=='FAIL' for r in results),'notRun':0,'tests':results}
     pathlib.Path(args.output).write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n','utf-8'); return int(output['failed']!=0)
 
 if __name__=='__main__':
