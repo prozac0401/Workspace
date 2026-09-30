@@ -1,0 +1,48 @@
+name: DownloadVersionManager Windows evaluation
+on:
+  push:
+    branches: [main]
+    paths: ['tools/DownloadVersionManager/**', 'docs/tools/download-version-manager/**', '.github/workflows/download-version-manager.yml']
+  pull_request:
+    paths: ['tools/DownloadVersionManager/**', 'docs/tools/download-version-manager/**', '.github/workflows/download-version-manager.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Install local WiX tool
+        shell: pwsh
+        run: dotnet tool install wix --version 4.0.6 --tool-path .tools/wix
+      - name: Build host, automatic tests and single evaluation MSI
+        shell: pwsh
+        run: ./tools/DownloadVersionManager/build/build.ps1 -Wix ./.tools/wix/wix.exe
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: download-version-manager-evaluation
+          path: |
+            artifacts/download-version-manager/*/DownloadVersionManager-*-x64.msi
+            artifacts/download-version-manager/*/SHA256SUMS.txt
+            artifacts/download-version-manager/*/build-manifest.json
+            artifacts/download-version-manager/*/host-results.json
+            artifacts/download-version-manager/*/extension-tests.log
+            artifacts/download-version-manager/*/release-gate-tests.log
+            artifacts/download-version-manager/*/fixture-tests.log
+            artifacts/download-version-manager/*/resource-results.json
+            artifacts/download-version-manager/*/package-verification.json
+          if-no-files-found: warn

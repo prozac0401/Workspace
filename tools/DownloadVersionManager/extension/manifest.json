@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "DownloadVersionManager (평가판)",
+  "version": "0.1.0",
+  "description": "가장 최근에 받은 파일에 원래 이름을 주고, 내용이 달라진 이전 파일만 보관합니다.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiwNiBnBAaJjDD9+Wrgwq3ZhcSjq3o93du0RkYZM+TzA9jvO+eJ+TGmefqUyhXElhQWBlI+icYRfrZmiAYdifpcq/vMaw9O2lOapQKxtlzyoX5UrI6OC3hAKLUYAo2hMK3ngIUwA2Geg+nZfMdhpBvEZXPMMdCV7cvPt7bML69OlkPv9TAi6C/53ENpFLJqvI5OUrSljzJ6LVGesdyROaO+c2mR9VCQ552vsndiMTFyo+q1wkkcXeVKhqelBWVwWeJL3HBOABHMx454n85SAMFmxB47db+MMbx4FWEr9vYV4ZkZ179e+vqTGX450PVXysso2Z8jjeRodNY7G38LPOAQIDAQAB",
+  "permissions": ["downloads", "storage", "nativeMessaging", "notifications"],
+  "background": {"service_worker": "worker.mjs", "type": "module"},
+  "action": {"default_title": "DownloadVersionManager 연결 확인", "default_popup": "popup.html"}
+}

@@ -1,0 +1,56 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="DownloadVersionManager (Evaluation)" Manufacturer="Workspace" Version="$(var.Version)" ProductCode="$(var.ProductCode)" UpgradeCode="{79E6679C-B762-48DB-B27D-B10963DC1530}" Language="1042" Codepage="65001" Scope="perUser" InstallerVersion="500">
+    <SummaryInformation Description="DownloadVersionManager 평가판 — 확장 활성화 별도 필요" Manufacturer="Workspace" Codepage="949" />
+    <MajorUpgrade DowngradeErrorMessage="더 새로운 DownloadVersionManager가 설치되어 있습니다." Schedule="afterInstallInitialize" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+    <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" /><Property Id="REBOOT" Value="ReallySuppress" /><Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="DVMEXISTINGROOT"><RegistrySearch Id="ExistingUserInstall" Root="HKCU" Key="Software\Workspace\DownloadVersionManager" Name="InstallFolder" Type="raw" Bitness="always64" /></Property>
+    <SetProperty Id="INSTALLFOLDER" Value="[DVMEXISTINGROOT]" After="AppSearch" Condition="DVMEXISTINGROOT" />
+    <Launch Condition="Installed OR VersionNT64" Message="Windows x64가 필요합니다. 현재 확인 범위는 Windows 11의 로컬 NTFS입니다." />
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" />
+    <Binary Id="Guard" SourceFile="$(var.GuardDll)" />
+    <CustomAction Id="DvmPreflight" BinaryRef="Guard" DllEntry="DvmPreflight" Execute="immediate" Return="check" />
+    <InstallExecuteSequence><Custom Action="DvmPreflight" Before="InstallInitialize" /></InstallExecuteSequence>
+    <StandardDirectory Id="LocalAppDataFolder"><Directory Id="Programs" Name="Programs"><Directory Id="INSTALLFOLDER" Name="DownloadVersionManager" /></Directory></StandardDirectory>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="Registration" Guid="{351959F8-316B-4138-AF9A-6CA84D7C7F31}" Bitness="always64">
+        <RegistryValue Root="HKCU" Key="Software\Workspace\DownloadVersionManager" Name="InstallFolder" Value="[INSTALLFOLDER]" Type="string" KeyPath="yes" />
+        <RegistryValue Root="HKCU" Key="Software\Workspace\DownloadVersionManager" Name="InventorySha256" Value="$(var.InventorySha256)" Type="string" />
+        <RegistryValue Root="HKCU" Key="Software\Google\Chrome\NativeMessagingHosts\com.workspace.download_version_manager" Value="[INSTALLFOLDER]native-host.json" Type="string" />
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\Edge\NativeMessagingHosts\com.workspace.download_version_manager" Value="[INSTALLFOLDER]native-host.json" Type="string" />
+      </Component>
+    </DirectoryRef>
+    <StandardDirectory Id="ProgramMenuFolder"><Directory Id="DvmMenu" Name="DownloadVersionManager">
+      <Component Id="SetupShortcut" Guid="{84F1C1D7-010B-441D-BF8D-936A5AE9444E}">
+        <Shortcut Id="SetupGuide" Name="DownloadVersionManager 설치 마무리" Target="[INSTALLFOLDER]setup.html" WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU" Key="Software\Workspace\DownloadVersionManager" Name="SetupShortcut" Value="1" Type="integer" KeyPath="yes" />
+        <RemoveFolder Id="RemoveDvmMenu" On="uninstall" />
+      </Component>
+    </Directory></StandardDirectory>
+    <Feature Id="Product" Title="DownloadVersionManager" Level="1"><ComponentGroupRef Id="Payload" /><ComponentRef Id="Registration" /><ComponentRef Id="SetupShortcut" /></Feature>
+    <?if $(var.RollbackTest) = 1 ?>
+    <Binary Id="RollbackFixture" SourceFile="$(var.RollbackGuardDll)" />
+    <CustomAction Id="FailRollbackTest" BinaryRef="RollbackFixture" DllEntry="DvmFailRollbackTest" Execute="deferred" Impersonate="yes" Return="check" />
+    <InstallExecuteSequence><Custom Action="FailRollbackTest" After="WriteRegistryValues" Condition="NOT REMOVE" /></InstallExecuteSequence>
+    <?endif?>
+    <UI>
+      <TextStyle Id="DefaultFont" FaceName="Malgun Gothic" Size="9" /><Property Id="DefaultUIFont" Value="DefaultFont" />
+      <Dialog Id="Welcome" Width="430" Height="270" Title="DownloadVersionManager 평가판">
+        <Control Id="Body" Type="Text" X="24" Y="24" Width="382" Height="173" Text="다운로드한 최신 파일에 원래 이름을 줍니다.&#13;&#10;내용이 달라진 이전 파일만 _history에 보관합니다.&#13;&#10;&#13;&#10;현재 사용자에게 설치하며 관리자 승인이 필요하지 않습니다.&#13;&#10;브라우저 확장은 설치 후 직접 활성화해야 합니다.&#13;&#10;시작 메뉴의 ‘설치 마무리’에서 안내를 확인하세요.&#13;&#10;&#13;&#10;이 파일은 확장 자동 설치가 검증된 정식 릴리스가 아닙니다." />
+        <Control Id="Install" Type="PushButton" X="232" Y="220" Width="78" Height="25" Default="yes" Text="설치"><Publish Event="EndDialog" Value="Return" /></Control>
+        <Control Id="Cancel" Type="PushButton" X="320" Y="220" Width="78" Height="25" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>
+      </Dialog>
+      <Dialog Id="Maintenance" Width="430" Height="210" Title="DownloadVersionManager">
+        <Control Id="Body" Type="Text" X="24" Y="24" Width="382" Height="112" Text="프로그램을 복구하거나 제거합니다.&#13;&#10;다운로드 파일과 _history는 보존합니다.&#13;&#10;브라우저를 강제로 닫거나 재시작하지 않습니다.&#13;&#10;외부에서 수정된 설치 파일이나 등록이 있으면 중단합니다.&#13;&#10;브라우저의 확장 제거는 직접 진행해 주세요." />
+        <Control Id="Repair" Type="PushButton" X="110" Y="158" Width="88" Height="24" Default="yes" Text="복구"><Publish Property="REINSTALL" Value="ALL" /><Publish Property="REINSTALLMODE" Value="amus" /><Publish Event="EndDialog" Value="Return" /></Control>
+        <Control Id="Remove" Type="PushButton" X="208" Y="158" Width="88" Height="24" Text="제거"><Publish Property="REMOVE" Value="ALL" /><Publish Event="EndDialog" Value="Return" /></Control>
+        <Control Id="Cancel" Type="PushButton" X="306" Y="158" Width="88" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>
+      </Dialog>
+      <Dialog Id="Complete" Width="430" Height="190" Title="DownloadVersionManager">
+        <Control Id="Body" Type="Text" X="24" Y="24" Width="382" Height="107" Text="프로그램 설치 작업을 마쳤습니다.&#13;&#10;확장이 자동 활성화된 것은 아닙니다.&#13;&#10;시작 메뉴 → DownloadVersionManager 설치 마무리&#13;&#10;확장을 활성화한 뒤 ‘설치 연결 확인’을 누르세요.&#13;&#10;제거한 경우 다운로드 파일과 _history는 보존됩니다." />
+        <Control Id="Close" Type="PushButton" X="320" Y="143" Width="78" Height="24" Default="yes" Cancel="yes" Text="닫기"><Publish Event="EndDialog" Value="Return" /></Control>
+      </Dialog>
+      <InstallUISequence><Show Dialog="Welcome" Before="Maintenance" Condition="NOT Installed" /><Show Dialog="Maintenance" Before="ExecuteAction" Condition="Installed AND NOT REMOVE AND NOT REINSTALL" /><Show Dialog="Complete" OnExit="success" /></InstallUISequence>
+    </UI>
+  </Package>
+</Wix>
