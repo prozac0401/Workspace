@@ -2,6 +2,8 @@
 
 날짜: 2026-09-30 · 판정: **stable BLOCKED / 로컬 평가 후보** · 조직 도입 승인: 미결정
 
+이 문서는 최초 protocol 1 평가 기록이다. 순서 결함 보완·protocol 2·추가 installer/resource·실제 Windows CI 결과와 새 MSI는 [후속 검증 기록](download-version-manager-followup-20260930.md)을 따른다. 아래 당시 결과를 현재 판정으로 확대하지 않는다.
+
 사용자의 신규 제품 개발·조건부 릴리즈 지시에 따라 [최초 명세](../tools/download-version-manager/specification.md), [ADR-0026](../design/0026-download-version-manager.md)와 제품을 추가했습니다. 기존 사용자 작업을 보존하기 위해 원격 main `5fb9728`에서 관리 worktree와 `codex/download-version-manager` branch를 만들었습니다. 기존 도구 공통화·리팩터링은 하지 않았습니다.
 
 ## 산출물과 실제 검증

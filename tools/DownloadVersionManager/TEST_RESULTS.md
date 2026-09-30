@@ -15,6 +15,7 @@
 | MSI 구조·추출·checksum | **PASS**; lifecycle과 별도 |
 | 최신 MSI native lifecycle·순서 상태/다운로드/History 보존·최종 정리 | **15 PASS / 0 FAIL** |
 | late installer failure 2개 지점 | **10 PASS / 4 FAIL / 0 NOT RUN**, 시험 등록 정리 완료 |
+| Windows CI (windows-2025, source b4265f4) | **전체 job PASS**: Host 82, 확장 38, native lifecycle 15, late failure 10 PASS / 0 FAIL |
 | 실제 Chrome·Edge·Native handshake·활성화 후 idle | **NOT RUN** |
 | 완전 자동 단일 배포 / 설치 실패 복구 | **FAIL / FAIL**; stable 게시 차단 |
 
@@ -24,7 +25,7 @@ production Host에서 원래 결함을 재현한 뒤 [ADR-0027](../../docs/desig
 
 Host 크기 **209,920 bytes (205 KiB)**, 새 프로세스 ping 10회 wall 중앙값 **21.323 ms**, lifetime **17.638–21.918 ms**. 10 MiB 두 파일 hash/compare **137.535 ms**, lifetime **185.825 ms**, peak **6,848,512 bytes**. 100 MiB 두 파일 hash/compare **1,317.722 ms**, lifetime **1,374.822 ms**, peak **14,311,424 bytes**. 추가 1 GiB 두 파일 비교(총 2 GiB 읽기)는 **13,920.919 ms**, lifetime **14,414.323 ms**, peak **14,225,408 bytes**입니다. 모든 측정 Host가 종료됐고 처리 전후 native process는 **0**입니다. OS cache를 비우지 않았으며 reboot cold-disk 측정이 아닙니다. 확장 활성화 상태의 browser idle은 NOT RUN입니다.
 
-새 native lifecycle·문서 strict/링크·원격 CI의 최종 결과와 MSI hash는 후속 delivery 기록에 연결합니다. 완료한 자동시험을 브라우저 실기 PASS로 확대하지 않습니다.
+최종 local MSI SHA-256은 `a9a93660699aea5b673cb4b223ac64c69b48a447c0b9144851d9e5bab85e5e25`입니다. 실제 [CI run](https://github.com/prozac0401/Workspace/actions/runs/36696781550)과 내려받은 artifact에서 MSI checksum 일치를 확인했습니다. CI MSI hash는 local MSI와 다릅니다. compiler·environment·artifact 및 문서 strict/링크 근거는 [후속 delivery 기록](../../docs/delivery/download-version-manager-followup-20260930.md)에 있습니다. CI의 Windows Server PASS로 local Windows 11의 late 실패를 해결했다고 판단하지 않으며 installerFailureRecovery는 FAIL입니다. 완료한 자동시험을 브라우저 실기 PASS로 확대하지 않습니다.
 
 ## 최초 평가 기록 · protocol 1 (후속 결과는 위 표)
 
