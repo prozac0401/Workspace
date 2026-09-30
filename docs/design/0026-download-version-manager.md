@@ -1,8 +1,11 @@
 # ADR-0026 · 다운로드 이벤트와 단발 Native Host
 
-상태: 채택 — 평가 구현, stable 인수 미완료  
-날짜: 2026-09-30 · 결정 담당: 사용자 요구에 따른 개발 담당  
-관련: [최초 명세](../tools/download-version-manager/specification.md), [추가 도구 개발 기준](../policies/tools.md)  
+상태: 채택 — 평가 구현, stable 인수 미완료
+
+날짜: 2026-09-30 · 결정 담당: 사용자 요구에 따른 개발 담당
+
+관련: [최초 명세](../tools/download-version-manager/specification.md), [추가 도구 개발 기준](../policies/tools.md)
+
 기존 관계: ADR-0025 다음 번호. 기존 도구의 공통 라이브러리 추출·대규모 변경 없음.
 
 ## 맥락

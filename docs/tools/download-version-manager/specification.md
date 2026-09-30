@@ -1,7 +1,9 @@
 # DownloadVersionManager · 최초 제품 명세
 
-도구 ID: DownloadVersionManager · 제품 버전: 0.1.0 · 상태: 구현·평가, stable 인수 미완료  
-원본 요구: 2026-09-30 사용자의 DownloadVersionManager 개발·시험·패키징·조건부 릴리즈 지시(0–33절). 조직 배포 설정·스토어 게시 계정·서명 주체는 미결정.  
+도구 ID: DownloadVersionManager · 제품 버전: 0.1.0 · 상태: 구현·평가, stable 인수 미완료
+
+원본 요구: 2026-09-30 사용자의 DownloadVersionManager 개발·시험·패키징·조건부 릴리즈 지시(0–33절). 조직 배포 설정·스토어 게시 계정·서명 주체는 미결정.
+
 정책: [추가 도구 개발 기준](../../policies/tools.md), [문서 작성 규칙](../../policies/documentation.md) · [ADR-0026](../../design/0026-download-version-manager.md)
 
 ## 목적과 데이터 경계
