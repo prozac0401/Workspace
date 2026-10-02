@@ -74,6 +74,9 @@ internal static class ShellFeedback
         if (result.ExitCode == 0)
             return request.Operation == "copy" ? "그림으로 복사했습니다" : "그림을 저장했습니다\n" + result.Output.TrimEnd('\r', '\n');
         if (string.IsNullOrWhiteSpace(result.Error)) return "그림 작업을 완료하지 못했습니다. 다시 실행해 주세요.";
+        // Keep the worker diagnostic stable; avoid exposing its commit terminology in the UI.
+        if (result.ExitCode == 3 && result.Error.Trim() == "커밋 전에 작업을 취소했습니다.")
+            return "그림 작업을 완료하기 전에 취소했습니다.";
         try
         {
             using JsonDocument detail = JsonDocument.Parse(result.Error.Trim());

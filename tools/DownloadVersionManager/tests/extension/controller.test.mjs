@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
+import {runInNewContext} from 'node:vm';
 import {createController, logicalFilename, belongsToLogical, HOST} from '../../extension/controller.mjs';
 
 function fixture(store = {}) {
@@ -133,3 +134,61 @@ test('setup and popup explain activation separately from diagnostic connection c
   assert.doesNotMatch(popup,/연결 확인이 끝나야/);
   assert.doesNotMatch(source,/다음 다운로드부터 정리합니다/);
 });
+
+// Execute the shipped popup script with a minimal DOM/runtime fixture. This is
+// a focused event-flow test, not a real Chrome/Edge or Native Messaging test.
+async function popupFixture(sendMessage) {
+  const elements = {'#version': {textContent: ''}, '#result': {textContent: ''}};
+  const button = {disabled: false, addEventListener(type, handler) {
+    assert.equal(type, 'click'); this.handler = handler;
+  }};
+  elements['#check'] = button;
+  const calls = [];
+  const source = await readFile(new URL('../../extension/popup.mjs', import.meta.url), 'utf8');
+  runInNewContext(source, {
+    document: {querySelector: selector => elements[selector]},
+    chrome: {runtime: {getManifest: () => ({version: '0.1.0'}), sendMessage(request) {
+      calls.push(structuredClone(request)); return sendMessage(request);
+    }}},
+  });
+  return {button, calls, output: elements['#result'], version: elements['#version'],
+    click: () => button.disabled ? undefined : button.handler()};
+}
+test('popup sends no request on opening and shows evaluation version', async () => {
+  const f = await popupFixture(() => { throw Error('unexpected request'); });
+  assert.equal(f.version.textContent, '0.1.0 평가판');
+  assert.equal(f.button.disabled, false); assert.equal(f.calls.length, 0);
+});
+test('popup ignores repeated clicks while its diagnostic request is pending', async () => {
+  let finish;
+  const response = new Promise(resolve => { finish = resolve; });
+  const f = await popupFixture(() => response);
+  const first = f.click(), repeated = f.click();
+  assert.equal(f.output.textContent, '연결을 확인하고 있습니다.');
+  const pending = {disabled: f.button.disabled, calls: f.calls.length};
+  finish({ok: true}); await Promise.all([first, repeated]);
+  assert.deepEqual(pending, {disabled: true, calls: 1});
+  assert.deepEqual(f.calls, [{type: 'handshake'}]);
+  assert.equal(f.button.disabled, false);
+  assert.equal(f.output.textContent, '설치된 프로그램과 연결됐습니다.');
+});
+for (const outcome of ['success', 'failure', 'rejected', 'thrown']) {
+  test(`popup allows a fresh check after ${outcome}`, async () => {
+    let attempt = 0;
+    const f = await popupFixture(() => {
+      if (attempt++ > 0) return Promise.resolve({ok: true});
+      if (outcome === 'thrown') throw Error('internal failure');
+      if (outcome === 'rejected') return Promise.reject(Error('internal failure'));
+      return Promise.resolve({ok: outcome === 'success'});
+    });
+    await f.click(); assert.equal(f.button.disabled, false);
+    assert.equal(f.output.textContent, outcome === 'success'
+      ? '설치된 프로그램과 연결됐습니다.'
+      : outcome === 'failure'
+        ? '연결하지 못했습니다. 설치 파일과 확장 버전을 확인해 주세요.'
+        : '연결하지 못했습니다. 설치 안내를 확인해 주세요.');
+    await f.click(); assert.equal(f.button.disabled, false);
+    assert.equal(f.output.textContent, '설치된 프로그램과 연결됐습니다.');
+    assert.deepEqual(f.calls, [{type: 'handshake'}, {type: 'handshake'}]);
+  });
+}

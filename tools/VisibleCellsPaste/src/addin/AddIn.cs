@@ -53,7 +53,7 @@ private void PasteCore(){
  }catch(Exception e){if(pending!=null)pending.Dispose();pending=null;busy=false;Notice(e);}
 }
 public void Undo(object control){try{RunActive(UndoCore);}finally{ExcelEngine.Release(control);}}
-private void UndoCore(){if(!connected||busy)return;busy=true;try{engine.UndoLast();outcome="undone";ShowStatus("마지막 붙여넣기를 되돌렸습니다.");}catch(Exception e){Notice(e);}finally{busy=false;}}
+private void UndoCore(){if(!connected||busy)return;busy=true;try{engine.UndoLast();outcome="undone";ShowStatus("마지막 붙여넣기를 되돌렸습니다.");}catch(Exception e){Notice(e,true);}finally{busy=false;}}
 public string GetDiagnostics(){return "stage=M2;connected="+connected+";clicks="+clicks+";bitness="+(IntPtr.Size*8)+";outcome="+outcome+";engine="+(engine==null?"none":engine.LastOutcome);}
 
 private sealed class Owner:IWin32Window {readonly IntPtr hwnd;public Owner(object a){hwnd=new IntPtr(Convert.ToInt64(((dynamic)a).Hwnd));}public IntPtr Handle{get{return hwnd;}}}
@@ -100,8 +100,23 @@ private void RunPendingCore(){
    }
   }else{engineOwnsWork=true;engine.Apply(work,delegate{return CancelPending(null);},null);}
   if(!connected)return;
-  outcome="success";ShowStatus("보이는 "+engine.LastCount+"칸에 붙여넣었습니다.");
+  outcome="success";ShowStatus(BuildPasteSuccessMessage());
  }catch(Exception e){Notice(e);}finally{try{if(work!=null&&!engineOwnsWork)work.Dispose();}finally{busy=false;}}
+}
+private string BuildPasteSuccessMessage(){
+ string message="보이는 "+engine.LastCount+"칸에 붙여넣었습니다.";
+ if(!engine.UndoAvailableAfterPaste)message+=" 이 붙여넣기는 도구의 되돌리기를 사용할 수 없습니다.";
+ return message;
+}
+private string BuildUndoNoticeMessage(Exception error){
+ string message=BuildNoticeMessage(error);var validation=error as ValidationException;
+ if(validation==null)return message;
+ // Validation refusals precede undo writes. Do not imply a previous paste exists after startup/Undo,
+ // or describe a retained recovery record as a completed paste.
+ message=message.Replace("변경된 셀은 없습니다.","이번 되돌리기로 변경된 셀은 없습니다.");
+ if(engine!=null&&engine.HasUndoRecord&&!engine.RecoveryRequired&&validation.Code!="VCP-UNDO-BUSY")
+  message+="\n마지막 붙여넣기는 취소되지 않았습니다.";
+ return message;
 }
 private string BuildNoticeMessage(Exception error){
  if(error is ValidationException)return error.Message;
@@ -118,7 +133,7 @@ private string BuildNoticeMessage(Exception error){
  else message="실행 결과를 확인하지 못했습니다. 셀 내용을 확인해 주세요.";
  return message+"\n오류 코드: "+error.HResult.ToString("X8");
 }
-private void Notice(Exception error){if(!connected)return;outcome=error is RecoveryException||(engine!=null&&engine.RecoveryRequired)?"recovery-required":"error";MessageBox.Show(new Owner(application),BuildNoticeMessage(error),"보이는 칸 붙여넣기",MessageBoxButtons.OK,MessageBoxIcon.Information);}
+private void Notice(Exception error,bool undoRequest=false){if(!connected)return;outcome=error is RecoveryException||(engine!=null&&engine.RecoveryRequired)?"recovery-required":"error";MessageBox.Show(new Owner(application),undoRequest?BuildUndoNoticeMessage(error):BuildNoticeMessage(error),"보이는 칸 붙여넣기",MessageBoxButtons.OK,MessageBoxIcon.Information);}
 private System.Windows.Forms.Timer statusTimer;private object oldStatus;private string ownStatus;
 private void ShowStatus(string text){
  if(!connected)return;

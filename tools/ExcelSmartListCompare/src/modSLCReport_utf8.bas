@@ -107,7 +107,7 @@ Private Sub WriteSummary(ByVal ws As Worksheet, ByVal a As CSLCList, ByVal b As 
     rows.Add Array("일부만 표시하는 이유", "[값과 위치]에는 최대 1,200개, 같은 값은 5개, 오류는 200개까지 표시합니다. 비교할 때는 전체 개수를 셉니다.")
     rows.Add Array("비교 설정", SLC_RulesText(a.CompareFullEmail, a.IgnoreCase))
     rows.Add Array("비교에서 빠지는 셀", "숨긴 셀과 필터로 가려진 셀은 읽지 않으며 개수도 세지 않습니다. 일반 범위의 제목은 직접 빼고 선택하세요.")
-    rows.Add Array("원본을 수정했다면", "수정한 범위를 다시 담으세요. 이 파일은 담았을 때의 내용이며 자동으로 바뀌지 않습니다.")
+    rows.Add Array("원본을 수정했다면", "수정한 범위를 선택해 [첫 번째 목록 바꾸기]를 누르세요. 이 파일은 담았을 때의 내용이며 자동으로 바뀌지 않습니다.")
     rows.Add Array("저장하기", "이 확인용 파일은 필요할 때 직접 저장하세요. Excel을 완전히 종료하면 기억한 첫 목록은 사라집니다.")
     InitBuffer buffer, 2
     outRow = 2

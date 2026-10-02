@@ -1,5 +1,14 @@
 # DownloadVersionManager · 실제 시험 기록
 
+## 로컬 준비 · 팝업 연결 확인 중복 클릭 · 2026-10-03
+
+기준은 main `df64b85e9a8d36fa9b9a7d5069d45523c34c3fc3`다. 연결 확인이 응답을 기다리는 동안 같은 팝업의 버튼을 잠시 비활성화하고, 성공·실패·예외 뒤에는 다시 누를 수 있게 했다. 연결 확인은 계속 진단 전용이며 확장 활성화와 다운로드 처리 조건은 바꾸지 않는다.
+
+- 기존 popup script를 실행하는 Node DOM/runtime fixture에서 두 번의 클릭이 연결 요청 두 건을 보내는 것을 재현했다. 회귀시험을 수정 전 코드에 적용하면 **45 PASS / 1 FAIL**, 수정 후에는 기존 40개와 새 팝업 6개를 합쳐 **46 PASS / 0 FAIL**이다.
+- 새 시험은 팝업을 열기만 했을 때 요청 없음, 응답 대기 중 중복 클릭, 성공·비정상 응답·Promise 거절·동기 예외 뒤 수동 재확인을 확인한다. Node 24.19.0의 모의 DOM/runtime 시험이며 실제 브라우저 확장 또는 Native Messaging 시험이 아니다.
+- 클라우드 브라우저에서 합성 팝업을 열려던 시도는 loopback URL의 `ERR_BLOCKED_BY_CLIENT`로 차단되어 렌더링·실제 키보드 동작은 **NOT RUN**이다. 접근 제한을 우회하지 않았다.
+- 이 변경은 로컬 소스 준비만 마쳤다. 새 Windows 빌드·MSI·Chrome/Edge 연결은 **NOT RUN**이고 기존 설치 파일에 반영되지 않았다. 완료한 과거 시험과 원래 Win11 installerFailureRecovery FAIL·singleDistribution FAIL·stable BLOCKED 판정은 유지한다.
+
 ## Windows 인계 후속 확인 · 2026-09-30
 
 기준 소스는 [main 38640f518de0c25b52798e3d9ddd03b23d83f689](https://github.com/prozac0401/Workspace/commit/38640f518de0c25b52798e3d9ddd03b23d83f689)다. 최신 원격 포함 여부를 확인하고 별도 작업 트리에서 진행했다. 원래 main의 미커밋 작업과 이전 산출물을 보존했으며 반영된 패치를 다시 적용하지 않았다. 2026-10-01 사용자 요청에 따라 이 검증·실기 안내 기록을 별도 브랜치에 commit·push해 원격 검토할 수 있게 반영한다.
