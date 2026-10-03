@@ -72,7 +72,7 @@ Public Function SLC_RibbonReady() As Boolean
 End Function
 
 Public Function SLC_ReleaseVersion() As String
-    SLC_ReleaseVersion = "0.2.0-rc.12"
+    SLC_ReleaseVersion = "0.2.0-rc.13"
 End Function
 
 Public Sub SLC_GetContextMenu(ByVal control As Office.IRibbonControl, ByRef content)

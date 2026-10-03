@@ -78,12 +78,3 @@ ZIP은 모두 푼 뒤 `Release` 폴더의 **Install.cmd**를 실행합니다. �
 비교 설정은 업데이트·제거 후에도 같은 계정에 남습니다. 초기화하려면 설치된 도구의 **비교 설정 → 기본값으로 되돌리기**를 사용하세요. 설치 오류를 문의할 때는 사용자 경로가 들어간 로그를 그대로 공개하지 마세요.
 
 [현재 공개된 R12 배포 파일](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12)
-
-
-## 소스 후보와 검증 기록
-
-현재 저장소 소스의 릴리스 식별자는 `0.2.0-rc.13`입니다. 명시한 집중 검사 13 PASS, ASCII/UTF-8 5쌍 PASS, RC12 대비 선택 안내·버전 외 제품 입력 불변, PowerShell AST 두 건과 packager AST·합성 방어 네 건 PASS를 확인했습니다. 오래된 시트명 기대값 검사는 이름으로 명시해 집중 목록에서 제외했고 기존 실패를 보존합니다. 전체 suite, 실제 VBA·Excel·설치 또는 패키지 제작 통과가 아닙니다.
-
-별도 임시 VBA 프로젝트 접근 승인과 기존 R12 설치·등록을 보존할 후보 시험 환경이 확인되지 않아 제작·출하를 보류합니다. 보안 설정은 변경하지 않았으며 기존 설치와 공개 자산을 유지합니다. 소스 준비용 Draft PR만 검토 대상으로 준비합니다. R12 한정 시험 생략 결정은 R13에 적용하지 않습니다.
-
-[R13 후보 명세](../../docs/tools/excel-list-compare/r13-specification.md) · [R13 제작·검증 범위 결정](docs/ADR-0021-R13-focused-wording-evaluation.md) · [R13 준비 기록](docs/RC13_RELEASE_REPORT.md).
