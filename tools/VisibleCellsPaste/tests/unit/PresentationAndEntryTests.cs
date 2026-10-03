@@ -97,6 +97,30 @@ internal static class PresentationAndEntryTests {
    else Check(error==null&&sheet.Values[2]==12&&engine.LastOutcome=="rolled-back"&&!engine.RecoveryRequired,"Touched cells were not fully restored");
   }
  }
+ static string Message(AddIn addin,string method,params object[] args){return (string)typeof(AddIn).GetMethod(method,F).Invoke(addin,args);}
+ static void PasteFeedback(bool allowed,bool hasRecord,bool recovery){
+  using(var engine=new ExcelEngine(new object())){
+   var record=hasRecord?new PreparedPaste():null;Set(engine,"undo",record);Set(engine,"undoAllowed",allowed);Outcome(engine,"success");
+   typeof(ExcelEngine).GetProperty("LastCount").GetSetMethod(true).Invoke(engine,new object[]{17});
+   typeof(ExcelEngine).GetProperty("RecoveryRequired").GetSetMethod(true).Invoke(engine,new object[]{recovery});
+   var addin=new AddIn();Set(addin,"engine",engine);string message=Message(addin,"BuildPasteSuccessMessage");
+   Check(message.StartsWith("보이는 17칸에 붙여넣었습니다."),"Paste count/success feedback changed");
+   Check(message.Contains("도구의 되돌리기를 사용할 수 없습니다.")==!(allowed&&hasRecord&&!recovery),"Feedback disagrees with the existing undo gate");
+   Check(Object.ReferenceEquals(Get(engine,"undo"),record)&&(bool)Get(engine,"undoAllowed")==allowed&&engine.LastOutcome=="success"&&engine.RecoveryRequired==recovery,"Feedback changed the record, safety gate or outcome");
+  }
+ }
+ static void UndoRefusalFeedback(string code,bool hasRecord,bool recovery,string state){
+  using(var engine=new ExcelEngine(new object())){
+   var record=hasRecord?new PreparedPaste():null;Set(engine,"undo",record);Outcome(engine,state);
+   typeof(ExcelEngine).GetProperty("RecoveryRequired").GetSetMethod(true).Invoke(engine,new object[]{recovery});
+   var addin=new AddIn();Set(addin,"engine",engine);var error=new ValidationException(code,"거절 사유.\n변경된 셀은 없습니다.");
+   string message=Message(addin,"BuildUndoNoticeMessage",error);
+   Check(message.StartsWith("거절 사유.\n이번 되돌리기로 변경된 셀은 없습니다."),"Undo refusal lost its reason or current-operation scope");
+   Check(message.Contains("마지막 붙여넣기는 취소되지 않았습니다.")==(hasRecord&&!recovery&&code!="VCP-UNDO-BUSY"),"Undo notice made a misleading last-paste claim");
+   Check(Message(addin,"BuildNoticeMessage",error)==error.Message,"Undo feedback changed paste-validation feedback");
+   Check(Object.ReferenceEquals(Get(engine,"undo"),record)&&engine.LastOutcome==state,"Undo feedback changed record/outcome");
+  }
+ }
  static void NoticeForState(string state){
   using(var engine=new ExcelEngine(new object())){Outcome(engine,state);var addin=new AddIn();Set(addin,"engine",engine);
    var method=typeof(AddIn).GetMethod("BuildNoticeMessage",F);string message=(string)method.Invoke(addin,new object[]{new COMException("synthetic late error")});
@@ -138,6 +162,24 @@ internal static class PresentationAndEntryTests {
   Test("status restoration never overwrites another owner's later message",delegate{
    var app=new PresentationApplication{Current="another owner"};var addin=new AddIn();Set(addin,"application",app);Set(addin,"ownStatus","owned feedback");Set(addin,"oldStatus",false);
    Check(Invoke(addin,"RestoreStatus",new object[0])==null&&app.Sets==0&&Object.Equals(app.Current,"another owner")&&Get(addin,"ownStatus")==null,"Later status owner was overwritten");
+  });
+  Test("paste success keeps ordinary feedback when undo gate allows it",delegate{PasteFeedback(true,true,false);});
+  Test("paste success discloses unavailable internal undo",delegate{PasteFeedback(false,true,false);});
+  Test("paste feedback never claims undo without a record",delegate{PasteFeedback(true,false,false);});
+  Test("paste feedback never claims undo during required recovery",delegate{PasteFeedback(true,true,true);});
+  foreach(string code in new[]{"VCP-UNDO-WORKBOOK","VCP-UNDO-INVALID","VCP-UNDO-STRUCTURE","VCP-UNDO-CONFLICT","VCP-PROTECTED"}){
+   string copy=code;Test("undo refusal scopes zero changes and preserves last paste: "+copy,delegate{UndoRefusalFeedback(copy,true,false,"success");});
+  }
+  Test("undo refusal still identifies earlier paste after a later no-change attempt",delegate{UndoRefusalFeedback("VCP-UNDO-INVALID",true,false,"no-change");});
+  Test("startup no-record refusal does not invent a last paste",delegate{UndoRefusalFeedback("VCP-UNDO-NONE",false,false,"idle");});
+  Test("repeated undo after success does not claim the paste remains",delegate{UndoRefusalFeedback("VCP-UNDO-NONE",false,false,"undone");});
+  Test("busy undo does not claim a completed paste",delegate{UndoRefusalFeedback("VCP-UNDO-BUSY",true,false,"success");});
+  Test("recovery-blocked undo does not claim the paste remains intact",delegate{UndoRefusalFeedback("VCP-UNDO-BUSY",true,true,"recovery-required");});
+  Test("non-validation undo failure retains conservative recovery feedback",delegate{
+   using(var engine=new ExcelEngine(new object())){Outcome(engine,"recovery-required");var addin=new AddIn();Set(addin,"engine",engine);var error=new RecoveryException("VCP-UNDO",new List<string>{"$E$2"},new List<string>{"VERIFY"});
+    string message=Message(addin,"BuildUndoNoticeMessage",error);
+    Check(message==Message(addin,"BuildNoticeMessage",error)&&message.Contains("후속 쓰기를 차단")&&!message.Contains("변경된 셀은 없습니다")&&!message.Contains("취소되지 않았습니다"),"Partial undo recovery was presented as an unchanged refusal");
+   }
   });
   Console.WriteLine("RESULT: "+passed+" passed; "+failed+" failed");return failed==0?0:1;
  }

@@ -10,6 +10,10 @@
 
 원래 요구: [사용자 작업지시 전체](specification.md) · 설계: [ADR-0009](../../design/0009-excel-selection-export-com.md) · [실제 검증 기록](../../delivery/excel-selection-export-evaluation-20260924.md)
 
+## rc.11 오류 위치 안내의 확인 범위
+
+2026-10-03 [RC11 검증 기록](../../delivery/excel-selection-export-rc11-20261003.md): 원본 행·열을 기존 서식 거절 사유에 덧붙이는 변경이다. Windows 11 Pro·Excel x64 16.0 Build 20430에서 RC11 후보 DLL 직접 엔진 호출의 혼합 서식·그라데이션 2사례 36검사 PASS, x86/x64 빌드·단위·배포 자동 검사 263 PASS. 숨김 전 원본 E27을 정확히 안내하고 원본·선택·전역 상태·출력 미생성을 확인했다. RC11 실제 메뉴·팝업, 설치·자동 로드와 변경과 무관한 전체 수동 시험은 재실행하지 않았다. 아래 RC10 및 이전 버전 결과는 해당 버전의 과거 근거로 보존하며 RC11 전체 인수나 상용 배포 승인으로 승계하지 않는다.
+
 ## rc.10 Undo 수정의 현재 범위
 
 [2026-09-26 Undo 조사·수정 검증 기록](../../delivery/excel-selection-export-undo-20260926.md)과 [ADR-0018](../../design/0018-excel-selection-export-undo.md)를 추가했다. 현재 PC Excel x64 16.0 Build 20326에서 같은 인스턴스의 결과 시트 이름·기본 글꼴·셀 기록이 원본 Undo를 비활성화함을 분리 실측했다. 완성 파일을 Workbooks.Add(template)로 여는 조사 경로에서는 활성 상태가 유지됐다. 이 결과는 여러 단계 Undo·Redo를 확인한 완성 제품 시험과 구분한다.

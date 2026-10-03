@@ -389,7 +389,7 @@ namespace ExcelSelectionExport
                                 }
                                 finally { ExportEngine.Release((object)mc); ExportEngine.Release((object)mr); ExportEngine.Release((object)merge); }
                             }
-                            CellFormat format = CellFormat.Read((object)cell);
+                            CellFormat format = CellFormat.Read((object)cell, rows[r], columns[c]);
                             string formatKey = format.Key();
                             CellFormat shared;
                             if (!formats.TryGetValue(formatKey, out shared)) { shared = format; formats.Add(formatKey, shared); }
@@ -826,7 +826,7 @@ namespace ExcelSelectionExport
                 if (value == null || value == DBNull.Value) throw new InvalidOperationException("한 셀 안에 서로 다른 글꼴이나 지원하지 않는 혼합 서식이 있습니다. 해당 셀을 제외하고 내보내 주세요.");
                 return value;
             }
-            internal static CellFormat Read(object cellObject)
+            internal static CellFormat Read(object cellObject, int sourceRow, int sourceColumn)
             {
                 dynamic cell = cellObject;
                 var result = new CellFormat();
@@ -861,6 +861,10 @@ namespace ExcelSelectionExport
                         finally { ExportEngine.Release((object)border); }
                     }
                     return result;
+                }
+                catch (InvalidOperationException error)
+                {
+                    throw new InvalidOperationException("원본 " + sourceRow + "행 " + sourceColumn + "열: " + error.Message, error);
                 }
                 finally { ExportEngine.Release((object)borders); ExportEngine.Release((object)interior); ExportEngine.Release((object)font); ExportEngine.Release((object)display); }
             }

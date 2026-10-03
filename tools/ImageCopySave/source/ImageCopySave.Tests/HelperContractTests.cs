@@ -67,9 +67,26 @@ internal static class HelperContractTests
             string message = ShellFeedback.ResultMessage(request, new WorkerResult(1, "", diagnostic));
             Check.That(message.Contains("불확실", StringComparison.Ordinal) && message.Contains("파일 저장", StringComparison.Ordinal));
             message = ShellFeedback.ResultMessage(request, new WorkerResult(3, "", "커밋 전에 작업을 취소했습니다."));
-            Check.That(message == "커밋 전에 작업을 취소했습니다.");
+            Check.That(message == "그림 작업을 완료하기 전에 취소했습니다.");
             const string forced = "작업을 강제 중단했습니다. 파일 저장 완료 여부와 클립보드 보존 여부는 불확실합니다. 임시 파일이 남을 수 있습니다.";
             Check.That(ShellFeedback.ResultMessage(request, new WorkerResult(3, "", forced)) == forced);
+        });
+        test("helper feedback translates only confirmed precommit cancellation", () =>
+        {
+            const string diagnostic = "커밋 전에 작업을 취소했습니다.";
+            foreach (string operation in new[] { "copy", "save" })
+            {
+                var request = new ShellRequest(operation, @"C:\folder", 0, 0);
+                foreach (string ending in new[] { "", "\n", "\r\n" })
+                    Check.That(ShellFeedback.ResultMessage(request, new WorkerResult(3, "", diagnostic + ending))
+                        == "그림 작업을 완료하기 전에 취소했습니다.");
+                Check.That(ShellFeedback.ResultMessage(request, new WorkerResult(1, "", diagnostic)) == diagnostic);
+                const string unknown = "알 수 없는 취소 상태입니다.";
+                Check.That(ShellFeedback.ResultMessage(request, new WorkerResult(3, "", unknown)) == unknown);
+                string completed = JsonSerializer.Serialize(new { operationCompleted = true, message = diagnostic });
+                Check.That(ShellFeedback.ResultMessage(request, new WorkerResult(3, "", completed))
+                    .Contains("작업은 완료", StringComparison.Ordinal));
+            }
         });
         test("helper feedback distinguishes actionable precommit failures without paths", () =>
         {

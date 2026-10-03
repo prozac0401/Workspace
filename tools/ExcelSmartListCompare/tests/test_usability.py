@@ -123,6 +123,20 @@ class UsabilitySourceContracts(unittest.TestCase):
             self.assertNotIn(".Value2", preview)
             self.assertNotRegex(preview, r"(?i)Set\s+mPending\s*=")
 
+    def test_preview_refresh_guidance_names_the_existing_replace_action(self):
+        summary = procedure(self.report, "WriteSummary")
+        guidance = next(line for line in summary.splitlines()
+                        if 'rows.Add Array("원본을 수정했다면",' in line)
+        self.assertIn("수정한 범위를 선택해 [첫 번째 목록 바꾸기]를 누르세요.", guidance)
+        self.assertIn("이 파일은 담았을 때의 내용이며 자동으로 바뀌지 않습니다.", guidance)
+        self.assertIn('MenuButton(prefix & "Replace", "첫 번째 목록 바꾸기", "SLC_ReplaceClick")',
+                      procedure(self.main, "SLC_MenuXml"))
+        self.assertIn('"첫 번째 목록 바꾸기", "SLC_Replace", "replace"',
+                      procedure(self.main, "SLC_AttachUI"))
+        self.assertRegex(procedure(self.main, "SLC_ReplaceClick"), r"(?m)^\s+SLC_Replace\s*$")
+        self.assertIn("RunSelection True, completed", procedure(self.main, "SLC_Replace"))
+        self.assertEqual(summary.count("rows.Add Array("), 14)
+
     def test_report_returns_the_workbook_it_created(self):
         write = procedure(self.report, "WriteReport")
         self.assertIn("Set wb = Application.Workbooks.Add", write)

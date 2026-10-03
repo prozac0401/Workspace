@@ -19,6 +19,22 @@ class EngineGuardTests
             if(!File.Exists(assemblyPath))throw new FileNotFoundException("The built add-in DLL is required.",assemblyPath);
             var assembly=Assembly.LoadFrom(assemblyPath);
             var type=assembly.GetType("ExcelSelectionExport.ExportEngine",true);
+            var formatType=type.GetNestedType("CellFormat",BindingFlags.NonPublic);
+            var readFormat=formatType.GetMethod("Read",BindingFlags.Static|BindingFlags.NonPublic);
+            foreach(int[] position in new[]{new[]{1,1},new[]{27,5},new[]{1048576,16384}})
+            {
+                var cause=new InvalidOperationException("synthetic unsupported format");
+                Exception actual=null;
+                try {readFormat.Invoke(null,new object[]{new FormatErrorCellFake(cause),position[0],position[1]});}
+                catch(TargetInvocationException error) {actual=error.InnerException;}
+                Assert(actual is InvalidOperationException&&actual.Message=="원본 "+position[0]+"행 "+position[1]+"열: "+cause.Message,"format rejection identifies the original absolute cell "+position[0]+","+position[1]);
+                Assert(Object.ReferenceEquals(actual.InnerException,cause),"format rejection retains the original cause "+position[0]+","+position[1]);
+            }
+            var comCause=new System.Runtime.InteropServices.COMException("synthetic COM failure");
+            Exception comActual=null;
+            try {readFormat.Invoke(null,new object[]{new FormatErrorCellFake(comCause),27,5});}
+            catch(TargetInvocationException error) {comActual=error.InnerException;}
+            Assert(Object.ReferenceEquals(comActual,comCause),"COM failures are not reclassified as unsupported-format guidance");
             var guard=type.GetMethod("CanReadCachedValues",BindingFlags.Static|BindingFlags.NonPublic);
             if(guard==null)throw new MissingMethodException(type.FullName,"CanReadCachedValues");
             int[,] states={{0,-4135,1},{0,-4105,1},{0,2,1},{1,-4135,0},{1,-4105,0},{1,2,0},{2,-4135,1},{2,-4105,0},{2,2,0},{3,-4135,0}};
@@ -153,6 +169,13 @@ class EngineGuardTests
 }
 
 // A managed fake only: these tests never connect to an Excel process.
+public sealed class FormatErrorCellFake
+{
+    readonly Exception failure;
+    public FormatErrorCellFake(Exception error) { failure=error; }
+    public object DisplayFormat { get { throw failure; } }
+}
+
 public sealed class RestoreApplication
 {
     bool events,screen,interactive;

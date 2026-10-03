@@ -24,6 +24,9 @@ namespace VisibleCellsPaste {
   readonly dynamic app; readonly UndoEpoch epoch; bool busy; PreparedPaste undo,inFlight; CellState[] after; long undoEpoch; string undoCommand; bool undoAllowed;
   public bool RecoveryRequired {get;private set;} public string RecoveryDetail {get;private set;}
   public string LastOutcome {get;private set;} public int LastCount {get;private set;}
+  // Feedback reads only the existing record/gate. UndoLast still rechecks every safety condition.
+  internal bool HasUndoRecord {get{return undo!=null;}}
+  internal bool UndoAvailableAfterPaste {get{return undo!=null&&undoAllowed&&!RecoveryRequired;}}
 #if VCP_TESTING
   public int FailAfterWrites=-1, FailRecoveryAt=-1; public bool CancelAfterWrite;
 #endif
