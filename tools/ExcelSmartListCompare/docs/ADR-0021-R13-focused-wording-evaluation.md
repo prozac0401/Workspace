@@ -1,6 +1,6 @@
 # ADR-0021 · R13 집중 문구 평가 후보
 
-상태: 채택 · 집중 소스 확인 완료, R13 제작·실제 시험·출하 보류
+상태: 부분 대체 · R13 제작·새 안내/Replace 실제 흐름 완료, StatusBar 평가 수용은 ADR-0022·T11·출하 대기
 
 날짜: 2026-10-03 · 적용: 0.2.0-rc.13 한정
 
@@ -9,6 +9,8 @@
 관련 요구사항·정책: [R13 명세](../../../docs/tools/excel-list-compare/r13-specification.md)의 R13-01~03, [추가 도구 개발 기준](../../../docs/policies/tools.md), [정책 문서 작성 규칙](../../../docs/policies/documentation.md). 사용자가 이미 선택한 작은 개선의 필요한 검증·버전·패키지·PR·병합·릴리스 준비를 승인한 범위에 근거한다.
 
 대체·대체됨 관계: [ADR-0020](ADR-0020-R12-wording-release.md)의 R12 한정 제작·시험 생략 결정은 그대로 보존한다. 이 결정은 RC13에 대한 별도 기준이며 R11·R12의 실제 결과와 기존 전체 인수 미완료 판정을 대체하지 않는다.
+
+2026-10-03 후속 [ADR-0022](ADR-0022-R13-known-statusbar-evaluation.md)는 아래 native 전역 상태 전항목 PASS 조건 중 정확한 StatusBar FAIL만 명시적 opt-in으로 평가 prerelease에 수용하도록 부분 대체한다. 다른 전역·원본·이전 결과·보안·기존 설치·설정·소유 정리·자연 종료와 T11의 실제 확인 조건은 그대로 필수다. 이는 사용자의 배포조건 재분석·조정 요청에 근거한 개발 담당 판단이며 최종 파일 게시·회사 승인을 뜻하지 않는다. R12 예외를 재사용하지 않는다.
 
 ## 맥락
 
@@ -56,6 +58,16 @@ RC13 전용 제작 기록과 packager는 새 소스·실제 후보 XLAM·관련 
 
 현재 집중 소스 검사는 13 PASS / 0 FAIL / 0 ERROR / 0 SKIP이다. 오래된 시트명 기대값의 `UsabilitySourceContracts.test_difference_is_one_sheet_and_preview_has_locations`는 검사명으로 명시해 선정 목록에서 제외했고, 해당 기존 FAIL을 PASS로 바꾸지 않았다. 전체 suite 통과가 아니다. ASCII/UTF-8 5쌍과 Setup·격리 실행기의 PowerShell AST 두 건은 PASS다. RC12 태그 커밋 `c1e365d2155a594d4b864609da7656796bd1a345`와 실제 source scope_guard 대조에서도 선택 안내 한 줄·릴리스/설치 버전만 변경되고 나머지 엔진·설치 입력이 불변임을 확인했다. RC13 packager의 Python AST 및 다른 SHA·NOT_RUN·중복 JSON 필드·선택하지 않은 엔진 변경을 거절하는 합성 방어 4건도 PASS다. 합성 자료의 거절은 실제 후보 제작·출하 게이트 통과가 아니다.
 
-임시 VBA 프로젝트 접근에 대한 별도 승인 답변이 없어 설정 변경은 0회다. HKCU/HKLM의 32/64비트 일반·정책 경로 8곳은 읽기 전용 확인에서 AccessVBOM 값이 없었다. 기존 R12 설치·등록을 보존해야 하며 후보 설치·제거를 위한 시험 환경은 확보하지 못했다. 따라서 새 XLAM·EXE·ZIP, 실제 Excel·native·설치·패키징·병합·태그·Release는 NOT_RUN·보류로 남긴다. 소스 준비용 Draft PR만 다음 검토 범위이며 문서 strict·생성 링크 검증은 별도 실행 대기다.
+사용자가 SmartList부터 진행하고 임시 VBA 프로젝트 접근을 허용하는 후속 승인을 했다. 제작 입력은 [Draft PR #13](https://github.com/prozac0401/Workspace/pull/13)의 `9ebaf3d661e1602e7bc6e60be4b9a0c0fe079160` 소스다. 기존 R12 설치를 제거·업그레이드하지 않는 격리 BuildOnly를 실행했다. 첫 시도는 후보 저장 전 audit 파일 교체 IOException으로 실패했으며 근본 원인은 미확정이다. 같은 소스를 새 출력 경로에서 한 번 재시도해 RC13 XLAM 제작에 성공했다. 두 시도 모두 AccessVBOM 값 부재 → 임시 DWORD 1 → 값 부재로 정확히 복원하고 소유 Excel의 자연 종료를 확인했다. 실패 시도도 지우거나 성공으로 바꾸지 않는다.
+
+저장한 같은 XLAM의 첫 외부 소스 audit는 Python 환경의 oletools 누락으로 실패했다. 기존 문서용 Python 환경으로 재실행해 VBA 7개 모듈과 RibbonX·패키지 대조에 성공했으며 audit 전후 후보 SHA-256은 같다. 새 의존성은 설치하지 않았다. 현재 환경은 Windows 11 10.0.22631, Excel 16.0 Build 20430 x64, Windows PowerShell 5.1.22621.6133이다. BuildOnly의 `tests=[]`는 기능 시험 NOT_RUN이며 실제 기능·화면 검증 성공으로 확대하지 않는다.
+
+제작 helper가 대조한 기존 설치 파일 5개와 OPEN·Add-in Manager·제품 Trusted Location의 제한된 보존은 PASS다. 첫 native는 실제 StatusBar FAIL을 포함한 부분 실행 FAIL과 미완료로 종료했고 Pos 복구는 별도 PASS다. 별도로 기존 R12 UI 분리를 Workbooks 열거로 처리한 준비 결함을 확인했으며 메뉴 상태 간섭의 원인은 확정하지 않는다. 정확한 이름의 Item으로 확인한 두 번째 native는 같은 후보의 실제 UI 한 흐름을 완료했다. 새 안내 A14/B14 전체·14항목, 수정 전 스냅샷과 이전 확인 파일 보존, 명시적 기존 Replace 클릭 후 Gamma·서로 다른 값 3개·추가 개수 0개를 확인했다.
+
+두 번째 native의 전체 판정은 8개 typed globals 중 StatusBar만 Boolean False → String `FALSE`로 바뀌어 FAIL이다. 나머지 보존·소유 결과 정리·자연 종료는 PASS, cleanupErrors는 없고 후보 SHA는 그대로다. 기존 제품·Setup 파일 10개의 해시·등록·신뢰 위치·보안·비교 설정은 기준과 일치하며, 정상 시작에서 바뀐 Options의 Pos는 원래 값 확인 후 그 값만 복원해 최종 기준 일치를 확인했다. 기존 R12 설치·등록을 제거하거나 업그레이드하지 않았다. 실제 매크로 포함은 사람이 선택했으며 영구 보안 설정 변경·자동 우회가 아니다.
+
+StatusBar FAIL의 영향·원인 미확정과 좁은 평가 수용은 ADR-0022를 따른다. T11의 비공개 동일 후보 엔진 설치·비교·결과·제거는 별도 일반 사용자 Windows·Excel 환경에서 확인할 항목으로 NOT_RUN이다. 이를 최종 EXE 실제 설치 시험으로 확대하지 않는다. EXE·ZIP·패키징·병합·태그·Release와 최종 EXE 설치·제거는 NOT_RUN이다. 소스 준비 시점의 strict 문서·생성 링크 결과와 이번 native·평가 결정 문서 갱신 후 재검증도 분리한다.
+
+후속 실제 증거 대조에서는 같은 후보의 BuildOnly·저장 소스·집중 소스 13개·native 평가 기록과 현재 해시를 연결했고 최종 보강 후 재대조도 완료했다. 기본 게이트는 실제 native FAIL을 거절하고 ADR-0022의 명시적 opt-in만 해당 FAIL을 수용한다. 실제 포장 명령은 T11 미실행 기록을 기대한 종료 코드 1로 거절했고 출력 폴더·ISCC·설치를 시작하지 않았다. 최종 포장 게이트 집중 16 PASS는 제품 소스 집중 13 PASS와 구분하고 이전 게이트 13개·14개 실행도 보존한다. 실제 입력의 수용·거절 확인은 패키징 성공이 아니다.
 
 실제 결과는 [R13 검증 기록](RC13_RELEASE_REPORT.md)과 [실행·출하 준비 기록](../../../docs/delivery/excel-smart-list-compare-rc13-20261003.md)을 따른다.

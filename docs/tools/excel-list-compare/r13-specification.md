@@ -2,7 +2,7 @@
 
 도구 ID: ExcelSmartListCompare / EXCEL-LIST-COMPARE
 
-버전·상태: 0.2.0-rc.13 · 2026-10-03 · 집중 소스 확인 완료, 새 후보 제작·실제 시험·출하 보류
+버전·상태: 0.2.0-rc.13 · 2026-10-03 · 새 안내·Replace 실제 흐름 완료, StatusBar 기존 FAIL의 평가 수용 조건 채택·T11·출하 대기
 
 제품 책임: 도구 개발·검증 담당
 
@@ -10,7 +10,7 @@
 
 기존 계약: [최초 명세](specification.md), [R11 비교·설정 명세](r11-specification.md), [R12 문구·표 표시 명세](r12-specification.md)
 
-관련 결정: [ADR-0021 · R13 집중 문구 평가 후보](../../../tools/ExcelSmartListCompare/docs/ADR-0021-R13-focused-wording-evaluation.md)
+관련 결정: [ADR-0021 · R13 집중 문구 평가 후보](../../../tools/ExcelSmartListCompare/docs/ADR-0021-R13-focused-wording-evaluation.md), [ADR-0022 · StatusBar 기존 실패를 명시한 평가 조건](../../../tools/ExcelSmartListCompare/docs/ADR-0022-R13-known-statusbar-evaluation.md)
 
 ## 사용자와 목적
 
@@ -38,10 +38,22 @@ R12와 비교한 제품 변경은 선택된 요약 안내 한 줄과 새 릴리�
 
 R12 한정 `wording-only-no-tests` 예외는 재사용하지 않는다. 새 후보에서는 집중 소스 검사와 ASCII/UTF-8 일치, 저장한 XLAM의 VBA 7개 모듈·RibbonX 대조, 동일 파일의 기능·정상 종료, 새 안내·Replace 한 흐름, 패키지·해시·문서 검증을 구분해 기록한다. T11의 다음 제품 수정·후보 조건인 설치·비교·결과·제거는 기존 설치와 업무 자료를 보존할 수 있는 환경에서 최소 대표 흐름으로 확인한다. 확인할 수 없으면 환경 제약과 NOT_RUN을 남기고 출하 판단을 다시 한다.
 
+최신 배포조건 재분석·조정 요청에 근거한 개발 판단은 ADR-0022에서 StatusBar의 정확한 기존 FAIL만 명시적 opt-in으로 평가 prerelease에 수용한다. 시험·원시 FAIL을 지우거나 PASS로 바꾸지 않는다. 나머지 전역·원본·이전 결과·설치·보안·설정 보존과 소유 정리·자연 종료는 필수다. `fullAcceptancePassed=false`, `stablePublishAllowed=false`를 유지한다. 이 판단은 최종 파일 게시나 회사 배포 승인이 아니다.
+
 실제 사용 확인은 일반 사용자 Windows·데스크톱 Excel과 합성 통합문서에 한정한다. 업무 자료, x86 Office, 새 PC·재부팅·회사 정책 환경을 확인한 것으로 확대하지 않는다. 전체 GUI·공존·성능·취소·설치 suite를 무조건 반복하지 않는다.
 
 기존 집중 13 PASS와 부분 집계 82 PASS / 오래된 시트명 기대값 1 FAIL / 부분 스냅샷 누락 2 ERROR는 과거 기록으로 보존한다. R11의 실제 취소 완료 안내 FAIL과 상태표시줄 자료형 복원 FAIL, R12 제작 당시 전체 시험 NOT_RUN과 후속 대표 공존 PASS도 각각 유지한다. 이 안내 변경은 그 원인을 해결하지 않는다.
 
-현재 집중 소스 13개와 ASCII/UTF-8 5쌍, PowerShell 구문 두 건, packager 구문·합성 방어 확인을 완료했다. 기존 오래된 시트명 기대값 검사는 명시적으로 선정 목록에서 제외했으며 전체 suite 통과가 아니다. 별도 임시 VBA 프로젝트 접근 승인과 기존 R12를 보존하는 후보 시험 환경이 확인되지 않아 실제 제작·Excel·native·설치·패키징·출하를 보류한다. 보안 설정 변경은 없다. 세부 결과와 미완료 범위는 [실행 기록](../../delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
+PR13 소스 전환 후 집중 13개를 실행해 PASS를 확인했다. 기존 ASCII/UTF-8 5쌍, PowerShell 구문 두 건과 packager 구문·합성 방어 결과도 유지한다. 오래된 시트명 기대값 검사는 명시적으로 선정 목록에서 제외했으며 전체 suite 통과가 아니다.
 
-R13은 소스 준비와 Draft PR 검토 범위에 머문다. 서명과 조직 배포 승인은 별도 미결정이며 안정판·상용 인수 완료로 표시하지 않는다. 승인·시험 환경과 실제 후보 증거를 확보한 뒤 제작·시험·출하 판단을 다시 한다.
+사용자의 임시 VBA 프로젝트 접근 승인 후 격리 BuildOnly로 RC13 XLAM을 제작하고, 저장한 VBA 7개 모듈·RibbonX가 동결 소스와 일치함을 확인했다. 첫 제작의 후보 저장 전 audit 파일 교체 실패와 새 출력 경로 한 번 재시도의 성공을 분리해 보존한다. 첫 소스 audit는 Python 환경에 oletools가 없어 실패했으며 기존 문서용 환경에서 같은 XLAM을 읽어 7개 모듈 대조에 성공했다. 의존성 설치는 하지 않았다. 두 제작 시도 모두 AccessVBOM 값 부재 → 임시 DWORD 1 → 값 부재로 정확히 복원했고 소유 Excel의 자연 종료를 확인했다.
+
+BuildOnly 자체는 후보의 매크로 기능 시험을 실행하지 않았다. 이후 첫 native는 실제 StatusBar FAIL을 포함한 부분 실행 FAIL과 미완료로 종료했다. 별도로 기존 R12 UI 분리를 Workbooks 열거로 처리한 준비 결함을 확인했으며 메뉴 상태 간섭의 원인은 확정하지 않는다. 정확한 이름의 Item으로 확인한 두 번째 실제 UI 한 흐름은 새 안내·원본 수정 후 이전 스냅샷 유지·실제 기존 Replace 클릭·새 Gamma 반영까지 완료했다. 8개 typed globals 중 StatusBar만 Boolean False → String `FALSE`로 바뀌어 전체 native 판정은 FAIL이다. 소유 결과 정리·자연 종료와 후보 SHA 불변, 기존 제품·Setup 파일 10개·등록·신뢰·보안·비교 설정의 보존은 PASS다. Options의 Pos는 원래 값 확인 후 해당 값만 복원해 최종 기준 일치를 확인했으며 첫 native의 복구도 별도 PASS로 보존한다.
+
+StatusBar는 Excel의 평소 표시를 가릴 수 있는 프로세스 내 표시 복원 결함이며, 이번 합성 데이터 흐름을 복구 불가능하게 만든 결과가 아니다. 근본 원인은 미확정이고 소스에는 이미 literal False 복원이 있으므로 검증되지 않은 한 줄 수정으로 해결된다고 주장하지 않는다. 전체 업무 자료의 무손실도 보장하지 않는다.
+
+실제 후보·BuildOnly·저장 소스 audit·집중 소스 13개·native 평가 기록과 현재 입력 해시를 연결해 평가 수용을 대조했고 최종 보강 후 재대조도 완료했다. 기본 게이트는 native FAIL을 거절하고 명시적 StatusBar opt-in만 같은 실제 FAIL을 수용한다. 최종 포장 게이트 집중 16 PASS는 제품 소스 집중 13 PASS와 별도이며 이전 게이트 13개·14개 실행도 보존한다. 실제 포장 명령은 T11 NOT_RUN 기록을 종료 코드 1로 거절했으며 출력 폴더·ISCC·설치를 시작하지 않았다. 이는 패키징 성공이 아니다.
+
+T11의 비공개 동일 후보 엔진 payload 설치·대표 비교·결과·제거는 별도 일반 사용자 Windows·Excel 환경 확보 후 확인할 항목으로 NOT_RUN이다. 이 흐름은 최종 EXE 설치 시험을 의미하지 않는다. 최종 EXE의 실제 설치·제거, EXE·ZIP·패키징·병합·태그·Release는 NOT_RUN이다. 기존 R12 설치·등록을 제거하거나 업그레이드하지 않았고 공개 다운로드는 R12로 유지한다. 세부 결과·해시·미완료 범위는 [실행 기록](../../delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
+
+R13은 [Draft PR #13](https://github.com/prozac0401/Workspace/pull/13)의 후보 검토 단계다. 서명과 조직 배포 승인은 별도 미결정이며 전체 인수·안정판 금지를 유지한다. 좁은 StatusBar 평가 수용과 T11의 남은 필수 증거를 구분해 출하 판단을 다시 한다.

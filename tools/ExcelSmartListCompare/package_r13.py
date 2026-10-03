@@ -1,7 +1,8 @@
 """Package RC13 only after exact-source build, focused and narrow native evidence.
 
 This is an unsigned focused-wording evaluation profile, never full acceptance.
-Missing/failed evidence denies packaging. R12's no-tests decision is not reused.
+Missing/failed evidence denies packaging, except the explicit, narrowly validated
+RC13 StatusBar limitation decision. R12's no-tests decision is not reused.
 The command may compile Inno Setup; it never starts Excel, installs or publishes.
 BuildOnly requires separately approved temporary VBOM access and restored security.
 Native/installation records must come from later actual owned trials. An existing
@@ -57,10 +58,11 @@ SNAPSHOT = tuple("src/" + name for name in INPUTS) + tuple(
     "src/" + Path(name).stem + "_utf8" + Path(name).suffix for name in PAIRS) + (
     "Setup.ps1", "Install.cmd", "Uninstall.cmd", "installer/SingleFile.iss", "package_r13.py",
     "tests/export_ascii.py", "tests/audit_candidate.py", "tests/test_usability.py", "tests/test_reference.py",
-    "tests/run_rc13_focused.py",
+    "tests/run_rc13_focused.py", "tests/test_rc13_known_statusbar_gate.py",
     "tests/Build-ExcelCandidate.ps1", "tests/Invoke-IsolatedExcelCandidate.ps1",
     "docs/RC13_USER_GUIDE.md", "docs/RC13_RELEASE_REPORT.md", "docs/ACCEPTANCE_TESTS.md",
-    "docs/ADR-0021-R13-focused-wording-evaluation.md")
+    "docs/ADR-0021-R13-focused-wording-evaluation.md",
+    "docs/ADR-0022-R13-known-statusbar-evaluation.md")
 NATIVE_CHECKS = ("summaryGuidanceObserved", "previousPreviewUnchanged", "previewNotAutoRefreshed",
                  "replaceActionUsed", "newPreviewUpdated", "originalWorkbookPreserved",
                  "excelGlobalsPreserved", "securitySettingsPreserved", "existingInstallationPreserved",
@@ -69,6 +71,20 @@ INSTALL_CHECKS = ("installedExactCandidate", "normalExcelStart", "comparisonExec
                   "resultWorkbookObserved", "sourceWorkbookPreserved", "userSettingsPreserved",
                   "unrelatedAddinsPreserved", "securitySettingsPreserved", "removalCompleted",
                   "preexistingProductStateRestored", "ownedResultsClosed", "excelExited")
+KNOWN_STATUSBAR_ID = "STATUSBAR_BOOLEAN_FALSE_TO_STRING_FALSE"
+KNOWN_STATUSBAR_CANDIDATE_SHA256 = "484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e"
+KNOWN_STATUSBAR_DECISION = "ADR-0022-R13-known-statusbar-evaluation.md"
+KNOWN_STATUSBAR_AUTHORITY = "USER_REQUESTED_ANALYSIS_AND_RELEASE_CONDITION_ADJUSTMENT"
+KNOWN_STATUSBAR_FIELDS = ("knownLimitation", "globalDifferences", "statusBarUiText",
+                         "globalsBefore", "globalsAfter", "globalsAfterActions")
+NATIVE_ACTIONS = ("capture", "preview-original", "preview-stale", "replace", "preview-updated")
+GLOBAL_TYPES = {"StatusBar": None, "ScreenUpdating": "System.Boolean", "EnableEvents": "System.Boolean",
+                "DisplayAlerts": "System.Boolean", "Calculation": "System.Int32", "Interactive": "System.Boolean",
+                "EnableCancelKey": "System.Int32", "AutomationSecurity": "System.Int32"}
+KNOWN_STATUSBAR_PUBLIC_REASON = (
+    'Boolean False becomes String "FALSE" and remains visible after the observed native flow. '
+    'The exact cause is not established. This is an accepted UI limitation for RC13 evaluation only; '
+    'the native restoration failure is preserved, not relabeled PASS.')
 PRIVATE = re.compile(r"(?i)(?:file://|[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|"
                      r"[\\/](?:home|Users)[\\/]|\\\\[^\\\s]+\\|(?:artifacts|\.tools)[\\/]|"
                      r"[A-Za-z0-9_.-]+\.private\.(?:json|log|bin|txt))")
@@ -181,6 +197,88 @@ def exact_run(record, exact, hashes, scope, checks):
         raise PackageError("Missing actual complete exact-candidate evidence: " + scope)
 
 
+def native_evidence(record, exact, hashes, accept_known_statusbar=False, decision_sha256=None):
+    """Schema 1 keeps the all-PASS contract. Schema 2 is a preserved FAIL with
+    exactly one declared/observed StatusBar delta, explicitly opted into by CLI.
+    Both schemas still require actual native UI, exact source/candidate and owned cleanup.
+    Schema 2 additionally binds its decision to the frozen ADR-0022 bytes. Its
+    globalsBefore/After are product-action baselines, after intentional security prep.
+    No raw record/check is modified by this function.
+    """
+    if record.get("status") == "PASS":
+        if any(name in record for name in KNOWN_STATUSBAR_FIELDS):
+            raise PackageError("Schema 1 PASS cannot carry schema 2 failure/exception evidence.")
+        exact_run(record, exact, hashes, "preview-summary-and-replace", NATIVE_CHECKS)
+        if record.get("nativeUiObserved") is not True:
+            raise PackageError("Actual native UI evidence is required.")
+        return {"status": "PASS", "excelGlobalsPreserved": "PASS", "acceptedKnownLimitation": None}
+    if accept_known_statusbar is not True:
+        raise PackageError("Native FAIL requires explicit --accept-known-statusbar-limitation.")
+    if exact != KNOWN_STATUSBAR_CANDIDATE_SHA256:
+        raise PackageError("ADR-0022 accepts the known limitation only for its actually observed RC13 candidate SHA.")
+    checks = record.get("checks")
+    if (record.get("schemaVersion") != 2 or record.get("status") != "FAIL"
+            or record.get("releaseVersion") != VERSION or record.get("scope") != "preview-summary-and-replace"
+            or type(record.get("flowCount")) is not int or record.get("flowCount") != 1
+            or "failure" not in record or record["failure"] is not None or record.get("cleanupErrors") != []
+            or record.get("fullAcceptancePassed") is not False or record.get("releaseApproved") is not False
+            or record.get("nativeUiObserved") is not True or record.get("sourceHashes") != hashes
+            or any(record.get(key) != exact for key in ("expectedSha256", "actualSha256", "finalSha256"))
+            or not isinstance(checks, dict) or set(checks) != set(NATIVE_CHECKS)
+            or checks.get("excelGlobalsPreserved") != "FAIL"
+            or any(checks[name] != "PASS" for name in NATIVE_CHECKS if name != "excelGlobalsPreserved")):
+        raise PackageError("Known StatusBar acceptance requires one actual exact-candidate flow with no other failed/incomplete check.")
+    limitation = record.get("knownLimitation")
+    if (not isinstance(limitation, dict)
+            or set(limitation) != {"id", "decision", "decisionSha256", "reason", "evaluationOnly", "authorizationRecorded", "decisionAuthority"}
+            or limitation["id"] != KNOWN_STATUSBAR_ID or limitation["decision"] != KNOWN_STATUSBAR_DECISION
+            or not isinstance(decision_sha256, str) or not re.fullmatch(r"[a-f0-9]{64}", decision_sha256)
+            or limitation["decisionSha256"] != decision_sha256
+            or not isinstance(limitation["reason"], str) or not limitation["reason"].strip()
+            or limitation["evaluationOnly"] is not True or limitation["authorizationRecorded"] is not True
+            or limitation["decisionAuthority"] != KNOWN_STATUSBAR_AUTHORITY):
+        raise PackageError("Known limitation must match the explicit RC13 evaluation decision and frozen ADR-0022 hash.")
+    before, after = record.get("globalsBefore"), record.get("globalsAfter")
+    actions = record.get("globalsAfterActions")
+    if (not isinstance(actions, list) or len(actions) != len(NATIVE_ACTIONS)
+            or any(not isinstance(item, dict) or set(item) != {"action", "globals"} for item in actions)
+            or tuple(item["action"] for item in actions) != NATIVE_ACTIONS):
+        raise PackageError("Typed globals after all five actual native actions are required in order.")
+    for values in (before, after, *(item["globals"] for item in actions)):
+        if not isinstance(values, dict) or set(values) != set(GLOBAL_TYPES):
+            raise PackageError("All eight typed Excel globals are required.")
+        for name, expected_type in GLOBAL_TYPES.items():
+            typed = values[name]
+            if not isinstance(typed, dict) or set(typed) != {"type", "value"}:
+                raise PackageError("Each Excel global needs exact type/value evidence.")
+            if name != "StatusBar" and (typed["type"] != expected_type
+                    or type(typed["value"]) is not (bool if expected_type == "System.Boolean" else int)):
+                raise PackageError("Other Excel global type/value evidence is invalid: " + name)
+    if (before["StatusBar"]["type"] != "System.Boolean" or before["StatusBar"]["value"] is not False
+            or after["StatusBar"]["type"] != "System.String" or type(after["StatusBar"]["value"]) is not str
+            or after["StatusBar"]["value"] != "FALSE"):
+        raise PackageError('Only actual Boolean False -> String "FALSE" is accepted; strings/coerced values are not the baseline.')
+    if record.get("statusBarUiText") != "FALSE" or type(record.get("statusBarUiText")) is not str:
+        raise PackageError('Actual visible StatusBar text "FALSE" must be recorded.')
+    differences = [name for name in GLOBAL_TYPES if before[name] != after[name]]
+    if differences != ["StatusBar"] or record.get("globalDifferences") != ["StatusBar"]:
+        raise PackageError("StatusBar must be the only observed and declared Excel global delta.")
+    for item in actions:
+        values = item["globals"]
+        if (values["StatusBar"] != after["StatusBar"]
+                or [name for name in GLOBAL_TYPES if before[name] != values[name]] != ["StatusBar"]):
+            raise PackageError("An intermediate native action has an additional or different global delta: " + item["action"])
+    if actions[-1]["globals"] != after:
+        raise PackageError("Final globals must match the last actual native action.")
+    return {"status": "FAIL", "excelGlobalsPreserved": "FAIL",
+            "statusBar": 'FAIL: Boolean False -> String "FALSE"; visible UI text persists',
+            "acceptedKnownLimitation": {"id": KNOWN_STATUSBAR_ID, "decision": KNOWN_STATUSBAR_DECISION,
+                "decisionSha256": decision_sha256, "evaluationOnly": True,
+                "decisionAuthority": KNOWN_STATUSBAR_AUTHORITY,
+                "reason": KNOWN_STATUSBAR_PUBLIC_REASON},
+            "otherExcelGlobalsPreserved": "PASS"}
+
+
 def evidence_guard(args, snapshot, sources, auditor):
     candidate = read(args.candidate)
     exact = digest(candidate)
@@ -255,11 +353,13 @@ def evidence_guard(args, snapshot, sources, auditor):
             or focused.get("earlierPartialAggregate", {}).get("currentRun") is not False
             or any(item.get("status") != "PASS" for item in tests)):
         raise PackageError("Actual focused 13 PASS/0 FAIL/0 ERROR must match the current sources/test revision.")
-    exact_run(records["native_record"], exact, hashes, "preview-summary-and-replace", NATIVE_CHECKS)
+    native = native_evidence(records["native_record"], exact, hashes,
+                             getattr(args, "accept_known_statusbar_limitation", False),
+                             digest(snapshot["docs/" + KNOWN_STATUSBAR_DECISION]))
     exact_run(records["install_record"], exact, hashes, "T11-install-compare-result-remove", INSTALL_CHECKS)
     if records["native_record"].get("nativeUiObserved") is not True or records["install_record"].get("actuallyInstalled") is not True:
         raise PackageError("Source-only, simulated or NOT_RUN records cannot satisfy native/installation gates.")
-    return candidate, exact, {name: digest(data) for name, data in evidence_data.items()}
+    return candidate, exact, {name: digest(data) for name, data in evidence_data.items()}, native
 
 
 def public_text(data, name):
@@ -285,6 +385,8 @@ def main():
     for name in ("candidate", "build-record", "source-audit", "focused-record", "native-record", "install-record", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--iscc", type=Path, default=Path(r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"))
+    parser.add_argument("--accept-known-statusbar-limitation", action="store_true",
+                        help="Accept only the frozen ADR-0022 RC13 Boolean-False StatusBar limitation; keep its native FAIL.")
     args = parser.parse_args()
     no_redirects(args.output)
     output = args.output.resolve()
@@ -302,7 +404,7 @@ def main():
     auditor = module(TOOL / "tests/audit_candidate.py", "rc13_source_auditor")
     scope = scope_guard(snapshot, exporter)
     sources = {name: snapshot["src/" + name] for name in INPUTS}
-    candidate, exact, evidence_hashes = evidence_guard(args, snapshot, sources, auditor)
+    candidate, exact, evidence_hashes, native = evidence_guard(args, snapshot, sources, auditor)
     commit = git("rev-parse", "HEAD").decode().strip()
     renderer_path = REPO / "scripts/package-excel-launcher-release.py"
     render_source = read(renderer_path)
@@ -376,11 +478,15 @@ def main():
                   "codeSigning": "UNSIGNED", "payloadSha256": pins, "privateEvidenceIncluded": False,
                   "sourceInputSha256": {name: digest(data) for name, data in frozen.items()},
                   "evidenceSha256": evidence_hashes,
+                  "nativeEvidence": native,
                   "checks": {"buildOnlyAndCleanup": "PASS", "sevenModulesAndRibbonX": "PASS",
                              "focusedSourceContracts": "13 PASS / 0 FAIL / 0 ERROR",
-                             "nativeSummaryReplace": "PASS: one flow", "T11Installation": "PASS: one flow"},
+                             "nativeSummaryReplace": ("PASS WITH KNOWN LIMITATION: one actual flow"
+                                 if native["acceptedKnownLimitation"] else "PASS: one flow"),
+                             "T11Installation": "PASS: one flow"},
                   "notEstablished": ["fullAcceptance", "fullPythonSuite", "fullExcelSuite", "performance", "physicalEscCancellation",
-                                     "allInstallerLifecycleCases", "newWrapperActualInstallation", "freshProfile", "otherOfficeBuilds", "organizationalApproval"],
+                                     "allInstallerLifecycleCases", "newWrapperActualInstallation", "freshProfile", "otherOfficeBuilds", "organizationalApproval"]
+                                     + (["defaultBooleanStatusBarRestoration"] if native["acceptedKnownLimitation"] else []),
                   "historicalResults": "Existing failures/errors and incomplete results remain in the release report; narrow PASS does not resolve them.",
                   "earlierPartialAggregate": {"passed": 82, "failed": 1, "errors": 2, "currentRun": False,
                                               "status": "HISTORICAL_INCOMPLETE: see preserved causes and limits in Completion-Report.html"},
@@ -409,6 +515,7 @@ def main():
         path.with_name(path.name + ".sha256").write_text(digest(read(path)) + "  " + path.name + "\n", encoding="ascii")
     (output / "Package.json").write_text(json.dumps({"version": VERSION, "sourceCommit": commit,
         "releaseProfile": PROFILE, "packageComplete": True, "fullAcceptancePassed": False, "stablePublishAllowed": False,
+        "nativeEvidence": native,
         "assets": [{"name": path.name, "bytes": path.stat().st_size, "sha256": digest(read(path))} for path in assets]}, indent=2) + "\n", encoding="utf-8")
     print("RC13 unsigned evaluation package prepared. Full acceptance/stable publication: denied.")
 
