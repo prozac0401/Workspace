@@ -3,7 +3,7 @@ param(
     [string]$DotNet = 'dotnet',
     [string]$MakeAppx = '',
     [ValidateNotNullOrEmpty()][string]$Publisher = 'CN=ImageCopySave.Evaluation',
-    [ValidatePattern('^\d+\.\d+\.\d+\.\d+$')][string]$Version = '0.1.1.0'
+    [ValidatePattern('^\d+\.\d+\.\d+\.\d+$')][string]$Version = '0.2.1.0'
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0

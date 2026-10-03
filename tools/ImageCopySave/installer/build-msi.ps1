@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$PackageResult = '',
-    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '0.2.0',
+    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '0.2.1',
     [switch]$RollbackTest,
     [string[]]$PriorBaseline = @(),
     [switch]$RecoveryUpdate

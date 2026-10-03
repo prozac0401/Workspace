@@ -1,10 +1,14 @@
 # 무서명 MSI를 만들고 설치 시험하기
 
-도구: ImageCopySave · MSI 기본 버전: 0.2.0 · 상태: 정식 Release 게시 완료 · Pages 안내 배포·공개 검증 완료
+도구: ImageCopySave · MSI 기본 버전: 0.2.1 · 상태: 출하 후보 검증 완료, PR·게시 대기
 
 책임: 도구 개발·검증 담당 · 적용 범위: Windows 11 x64
 
-작성일: 2026-09-25 · 최신 확인: 2026-09-27
+작성일: 2026-09-25 · 최신 준비: 2026-10-03
+
+0.2.1은 완료 전 취소 안내만 포함하는 후속 버전입니다. 실제 출하 helper DLL의 집중 회귀는 **8 PASS / 0 FAIL / 0 SKIP**입니다. 출하 MSI 제작과 입력·버전·구조·해시의 읽기 전용 확인을 완료했습니다. 제품 파일은 `ImageCopySave-0.2.1-x64.msi`, **50,593,964 bytes**, SHA-256 `EFF7115A469FBE760741B03D2A2F2C8288F59E6BDBB7AE805586A595E1058FC0`입니다. builder의 합성 보호 시험 39 PASS는 새 패키지 제작 범위이며 실제 MSI 설치 수명주기·Explorer·WPF는 실행하지 않았습니다. [0.2.1 기록](../../../docs/delivery/image-copy-save-021-20261003.md)에 확인 범위를 구분하며 최종 게시 상태는 GitHub Release 페이지·본문을 따릅니다. 아래 0.2.0 보존 회귀·설치·메뉴 확인은 당시 완료된 결과로 보존합니다.
+
+0.2.0에서 업데이트할 수 있게 만들 때는 공개한 0.2.0 MSI의 정확한 SHA-256과 일치하는 빌드 메타데이터를 읽기 전용으로 감사해 소유 목록을 만들고, 새 빌드의 `-PriorBaseline`에 지정합니다. 이번 감사는 404파일·23등록 값으로 PASS이며 설치나 제품 등록 변경은 없었습니다. 새 MSI의 prior는 0.1.1과 공개 0.2.0 두 개이며 내장 file 808행·등록 46행의 식별 정보까지 읽기 전용으로 확인했습니다. 이 결과를 실제 업데이트 시험으로 설명하지 않습니다. 보호 검사나 감사 목록을 우회하지 않습니다.
 
 현재 제품은 **별도 서명 없는 자체 포함 MSI**로 설치합니다. 사용자가 승인한 설치 방식은 관리자 권한의 PC 전체 설치이며, 평소 그림 복사·저장은 일반 사용자로 실행합니다. 인증서 설치, 개발자 모드, PowerShell 실행, 수동 레지스트리 등록을 일반 사용자에게 요구하지 않습니다. MSI에 포함한 native 보존 검사는 설치 자원을 읽어 비교하고 실제 쓰기·제거·롤백은 Windows Installer가 담당합니다.
 
@@ -29,7 +33,7 @@
 개발 PC에는 기존 .NET/native 빌드 도구와 WiX 4가 필요합니다. 스크립트가 도구를 자동 설치하지 않습니다. [build-msi.ps1](build-msi.ps1)은 `build-package.ps1`에서 이미 자체 포함 게시·파일 해시를 검증한 payload를 입력으로 사용하고 최신 native 빌드의 소스/DLL 해시를 검사합니다. 이전 Appx manifest와 로고는 제외하며 제품 DLL·helper와 .NET Desktop 런타임을 MSI에 전부 포함합니다. Appx 등록은 수행하지 않습니다.
 
 ```powershell
-powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/build-msi.ps1 -Version 0.2.0
+powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/build-msi.ps1 -Version 0.2.1 -PriorBaseline "<감사한 0.2.0 baseline.json>"
 powershell.exe -NoProfile -NonInteractive -File tools/ImageCopySave/installer/verify-msi.ps1 -MsiPath "<출력 MSI>"
 ```
 

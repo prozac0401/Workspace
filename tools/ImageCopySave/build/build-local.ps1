@@ -6,7 +6,7 @@ param(
     [string]$WindowsSdkVersion,
     [string]$MakeAppx,
     [string]$Publisher = 'CN=ImageCopySave.Evaluation',
-    [string]$Version = '0.1.1.0'
+    [string]$Version = '0.2.1.0'
 )
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path
