@@ -1,6 +1,6 @@
 # 그림 파일로 저장하고 이미지로 복사하기
 
-**그림 복사·저장(ImageCopySave)**은 탐색기에서 복사한 이미지를 PNG 파일로 저장하고, 그림 파일 한 개를 다른 프로그램에 붙여넣을 이미지로 복사하는 도구입니다. 이 안내는 **0.2.0** 기준입니다.
+**그림 복사·저장(ImageCopySave)**은 탐색기에서 복사한 이미지를 PNG 파일로 저장하고, 그림 파일 한 개를 다른 프로그램에 붙여넣을 이미지로 복사하는 도구입니다. 이 안내는 **0.2.1** 기준입니다.
 
 ## 설치 전에 확인하세요
 
@@ -10,11 +10,13 @@ Windows 10·ARM64, 네트워크 드라이브와 온라인 전용 파일은 지�
 
 이전 0.1.1의 Windows 11 기본 메뉴 경로에서 복사·저장 두 기능은 사용자가 직접 확인했습니다. 0.2.0 기본 설치본에서도 클래식 직접 메뉴의 복사·PNG 저장을 확인했습니다. 전체 앱 호환성이나 모든 창·탭 전환을 확인했다는 뜻은 아닙니다. 과거 메뉴 시험 중 탐색기가 잠시 응답하지 않았다가 회복한 사례는 원인이 확정되지 않았습니다. 설치 확인 범위와 남은 제한은 아래 릴리스 안내에서 확인하세요.
 
-[**0.2.0 Windows x64 MSI 다운로드**](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.0/ImageCopySave-0.2.0-x64.msi) · [SHA-256 체크섬](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.0/SHA256SUMS.txt) · [0.2.0 릴리스 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)
+0.2.1은 완료 전 취소가 확인됐을 때의 안내 문장을 개선했습니다. 집중 시험과 패키지 검사를 완료했으며, 0.2.0에서 확인한 설치·탐색기 시험은 기존 범위로 유지합니다. 이번 버전의 설치·전체 탐색기 시험을 새로 완료했다는 뜻은 아닙니다.
+
+[**0.2.1 Windows x64 MSI 다운로드**](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.1/ImageCopySave-0.2.1-x64.msi) · [SHA-256 체크섬](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.1/SHA256SUMS.txt) · [0.2.1 릴리스 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1)
 
 ## 설치하기
 
-1. **ImageCopySave-0.2.0-x64.msi**를 실행합니다.
+1. **ImageCopySave-0.2.1-x64.msi**를 실행합니다.
 2. 설치 안내와 관리자 승인 화면을 확인하고 설치합니다.
 3. 실제 로컬 폴더를 탐색기로 열어 아래 두 메뉴를 사용합니다.
 

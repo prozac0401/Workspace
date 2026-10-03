@@ -1,5 +1,9 @@
 # 그림 복사·저장 · 구현 대응 기록
 
+## 2026-10-03 · 0.2.1 출하 후보 검증 완료, PR·게시 대기
+
+Workspace PR #10의 helper 완료 전 취소 안내를 포함한 0.2.1 출하 후보를 확인했습니다. 종료 코드 3과 기존의 정확한 진단이 맞을 때만 사용자 문장이 바뀌며 worker 취소·커밋·이미지 처리·클립보드·파일·Explorer 메뉴·MSI 보호 동작은 유지합니다. 출하 DLL의 집중 회귀 8 PASS, builder의 합성 보호 39 PASS, payload 입력 18개·내용 해시와 MSI 404파일·내장 보호·0.1.1/공개 0.2.0 소유 목록의 읽기 전용 검사가 완료됐습니다. [0.2.1 기록](../../delivery/image-copy-save-021-20261003.md)은 게시 전 후보의 확인 범위입니다. 실제 WPF·Explorer·클립보드 전체 suite·새 MSI 설치 수명주기는 실행하지 않았고 과거 native 66 PASS·보존 32 PASS는 당시 근거로 유지합니다. 공개 안내는 0.2.1을 기준으로 하며 실제 게시·자산 확인 결과는 [0.2.1 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) 페이지·본문을 따릅니다.
+
 ## 2026-09-27 정식 릴리스
 
 [ImageCopySave 0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)를 게시하고 공개 MSI·체크섬을 확인했습니다. 기존·외부 수정 설치 자원 보존 보완은 같은 공개 MSI의 실제 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**으로 확인했습니다. 기본 위치 최종 설치와 클래식 직접 메뉴의 대표 그림 복사·저장도 PASS입니다. [최신 릴리스 기록](../../delivery/image-020-release-20260927.md)에 실제 결과와 앞선 배포 보류·실패 이력을 구분합니다. Pages 설치·사용 안내 배포와 실제 공개 URL·검색·사이트맵 검증도 완료했습니다.
