@@ -69,33 +69,37 @@ internal static class SetupTests
             manifest.Root.Element("files").RemoveNodes(); manifest.Root.Element("registry").Add(new XElement("value", new XAttribute("key", @"Software\Microsoft\Office\16.0\Excel\Security"), new XAttribute("name", "VBAWarnings"), new XAttribute("kind", "DWord"), new XAttribute("data", "1"))); manifest.Save(manifestFile); Reject(() => Private("LoadManifest", basePath), "foreign registry entry");
             manifest.Root.Element("registry").RemoveNodes();
             string ownComRoot = @"Software\Classes\CLSID\" + Setup.Clsid + @"\InprocServer32\";
-            foreach (string assemblyVersion in new[] { "0.1.0.0", Setup.AssemblyVersion })
+            foreach (string assemblyVersion in new[] { "0.1.0.0", "0.1.1.0", Setup.AssemblyVersion })
             {
                 manifest.Root.Element("registry").RemoveNodes();
                 manifest.Root.Element("registry").Add(new XElement("value", new XAttribute("key", ownComRoot + assemblyVersion), new XAttribute("name", "Assembly"), new XAttribute("kind", "String"), new XAttribute("data", "VisibleCellsPaste.AddIn, Version=" + assemblyVersion + ", Culture=neutral, PublicKeyToken=null")));
                 manifest.Save(manifestFile);
                 Check(Private("LoadManifest", basePath) != null, "owned assembly manifest accepted " + assemblyVersion);
             }
-            manifest.Root.Element("registry").Element("value").SetAttributeValue("key", ownComRoot + "0.1.2.0");
+            manifest.Root.Element("registry").Element("value").SetAttributeValue("key", ownComRoot + "0.1.3.0");
             manifest.Save(manifestFile); Reject(() => Private("LoadManifest", basePath), "unknown future assembly registry path");
             manifest.Root.Element("registry").Element("value").SetAttributeValue("key", @"Software\Classes\CLSID\{00000000-0000-0000-0000-000000000000}\InprocServer32\0.1.0.0");
             manifest.Save(manifestFile); Reject(() => Private("LoadManifest", basePath), "foreign previous-version COM registry path");
-            object currentRegs = Private("Registration", basePath, Path.Combine(basePath, "new.dll"), "0.1.1");
-            object priorRegs = Private("Registration", basePath, Path.Combine(basePath, "old.dll"), "0.1.0");
-            foreach (object record in (System.Collections.IEnumerable)priorRegs)
+            object currentRegs = Private("Registration", basePath, Path.Combine(basePath, "new.dll"), "0.1.2");
+            foreach (string priorAssemblyVersion in new[] { "0.1.0.0", "0.1.1.0" })
             {
-                var key = record.GetType().GetField("Key", BindingFlags.Instance | BindingFlags.NonPublic);
-                var data = record.GetType().GetField("Value", BindingFlags.Instance | BindingFlags.NonPublic);
-                key.SetValue(record, ((string)key.GetValue(record)).Replace(@"\InprocServer32\" + Setup.AssemblyVersion, @"\InprocServer32\0.1.0.0"));
-                data.SetValue(record, ((string)data.GetValue(record)).Replace("Version=" + Setup.AssemblyVersion, "Version=0.1.0.0"));
+                string priorProductVersion = priorAssemblyVersion.Substring(0, priorAssemblyVersion.LastIndexOf('.'));
+                object priorRegs = Private("Registration", basePath, Path.Combine(basePath, "old.dll"), priorProductVersion);
+                foreach (object record in (System.Collections.IEnumerable)priorRegs)
+                {
+                    var key = record.GetType().GetField("Key", BindingFlags.Instance | BindingFlags.NonPublic);
+                    var data = record.GetType().GetField("Value", BindingFlags.Instance | BindingFlags.NonPublic);
+                    key.SetValue(record, ((string)key.GetValue(record)).Replace(@"\InprocServer32\" + Setup.AssemblyVersion, @"\InprocServer32\" + priorAssemblyVersion));
+                    data.SetValue(record, ((string)data.GetValue(record)).Replace("Version=" + Setup.AssemblyVersion, "Version=" + priorAssemblyVersion));
+                }
+                var retained = ((System.Collections.Generic.IEnumerable<XElement>)Private("RegistryManifest", currentRegs, priorRegs)).ToArray();
+                var priorVersion = retained.Where(x => ((string)x.Attribute("key")) == ownComRoot + priorAssemblyVersion).ToArray();
+                Check(priorVersion.Length == 4 && (string)priorVersion.Single(x => (string)x.Attribute("name") == "Assembly").Attribute("data") == "VisibleCellsPaste.AddIn, Version=" + priorAssemblyVersion + ", Culture=neutral, PublicKeyToken=null"
+                    && retained.Where(x => ((string)x.Attribute("key")) == ownComRoot + Setup.AssemblyVersion).Count() == 4
+                    && retained.Select(x => (string)x.Attribute("key") + "|" + (string)x.Attribute("name")).Distinct().Count() == retained.Length, "upgrade retains exact old version ownership without duplicate current records " + priorAssemblyVersion);
+                manifest.Root.Element("registry").RemoveNodes();manifest.Root.Element("registry").Add(retained);manifest.Save(manifestFile);
+                Check(Private("LoadManifest", basePath) != null, "merged upgrade manifest remains valid for removal " + priorAssemblyVersion);
             }
-            var retained = ((System.Collections.Generic.IEnumerable<XElement>)Private("RegistryManifest", currentRegs, priorRegs)).ToArray();
-            var priorVersion = retained.Where(x => ((string)x.Attribute("key")) == ownComRoot + "0.1.0.0").ToArray();
-            Check(priorVersion.Length == 4 && (string)priorVersion.Single(x => (string)x.Attribute("name") == "Assembly").Attribute("data") == "VisibleCellsPaste.AddIn, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null"
-                && retained.Where(x => ((string)x.Attribute("key")) == ownComRoot + Setup.AssemblyVersion).Count() == 4
-                && retained.Select(x => (string)x.Attribute("key") + "|" + (string)x.Attribute("name")).Distinct().Count() == retained.Length, "upgrade retains exact old version ownership without duplicate current records");
-            manifest.Root.Element("registry").RemoveNodes();manifest.Root.Element("registry").Add(retained);manifest.Save(manifestFile);
-            Check(Private("LoadManifest", basePath) != null, "merged upgrade manifest remains valid for removal");
             File.WriteAllText(manifestFile, "<!DOCTYPE x [<!ENTITY xxe SYSTEM 'file:///C:/Windows/win.ini'>]><installation>&xxe;</installation>"); Reject(() => Private("LoadManifest", basePath), "DTD external entity");
             foreach (string folder in new[] { "한글 경로's", "percent%20 space #한글's", "literal%2Fname", "literal#name" }) CheckClrCodeBase(basePath, folder);
             Console.WriteLine("PASS total=" + count); return 0;

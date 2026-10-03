@@ -10,8 +10,8 @@ using System.Text;
 using System.Windows.Forms;
 
 [assembly: AssemblyTitle("보이는 칸 붙여넣기 설치")]
-[assembly: AssemblyVersion("0.1.1.1")]
-[assembly: AssemblyFileVersion("0.1.1.1")]
+[assembly: AssemblyVersion("0.1.2.1")]
+[assembly: AssemblyFileVersion("0.1.2.1")]
 namespace VisibleCellsPaste.Installation
 {
     // Packaging only. The embedded, verified release's existing installer owns

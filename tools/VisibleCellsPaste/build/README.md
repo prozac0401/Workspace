@@ -3,8 +3,8 @@
 빌드에는 Windows의 .NET Framework 4.8 C# 컴파일러와 Windows PowerShell 5.1이 필요합니다. 최종 사용자는 개발 SDK, Python, Node.js를 설치하지 않습니다.
 
 ~~~powershell
-powershell -NoProfile -File tools/VisibleCellsPaste/build/build.ps1
-powershell -NoProfile -File tools/VisibleCellsPaste/build/verify-package.ps1 -ZipPath artifacts/visible-cells-paste/0.1.1/VisibleCellsPaste_0.1.1.zip
+powershell -NoProfile -File tools/VisibleCellsPaste/build/build.ps1 -Version 0.1.2
+powershell -NoProfile -File tools/VisibleCellsPaste/build/verify-package.ps1 -ZipPath artifacts/visible-cells-paste/0.1.2/VisibleCellsPaste_0.1.2.zip
 ~~~
 
 이 스크립트는 레지스트리 또는 Office 보안 설정을 변경하지 않습니다. 소스를 두 아키텍처로 컴파일하고 설치 프로그램, 파일 해시, 한국어 안내 문서를 ZIP으로 만듭니다. 핵심/파서, 네이티브 클립보드 날짜, 대량 스냅샷, 연결 수명 주기, 실제 OLE 객체의 COM 참조 수명, 전역 상태 복구, 쓰기 진입·완료 표시 예외와 설치 경로/매니페스트 검사를 Excel 실행 없이 수행합니다. 설치 시험에는 한글·공백·작은따옴표·%·# 경로에서 실제 DLL을 로드하는 검사가 포함됩니다. 각 시험의 개수와 결과는 제작 폴더의 로그에 기록합니다. 이어서 ZIP 파일 목록/해시/PE 비트 수, COM 식별자, Ribbon 콜백과 프로덕션 오류 주입 필드 제외 여부를 검사합니다. 실행 중 Excel을 닫거나 설치하지 않습니다.
