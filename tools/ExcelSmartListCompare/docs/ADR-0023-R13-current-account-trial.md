@@ -1,6 +1,6 @@
 # ADR-0023 · R13 현재 계정의 최소 설치 시험과 기존 설치 원복
 
-상태: 채택 · 현재 계정 한 흐름 실행 승인 확보 · 실제 T11·원복 미실행
+상태: 채택 · T11 부분 실행·RC11 파일/등록 복구 · 대표 비교·결과 미실행·권한 표시 차이로 정확 원복 미완료
 
 날짜: 2026-10-04 · 적용: 동일 RC13 후보의 T11 한 흐름
 
@@ -20,7 +20,7 @@
 
 이번 RC13 제작·native 기록에서 같은 `9b37…88176` 설치를 R12라고 부른 것은 버전 표기 오류였다. 당시 파일 보존 관찰과 실패·성공 원시 기록은 유지하고 이 후속 정정을 함께 읽는다. 공개 R12 릴리스·RC12 소스 기준과 과거 R12 시험 생략 결정은 정정 대상이 아니다.
 
-현재 계정 시험 준비로 기존 제품 5파일과 제거 관리 폴더 5파일의 비공개 백업 해시 일치를 확인했다. 선정된 레지스트리 32개 영역과 제품·관리 파일·폴더 및 제품 신뢰 키의 ACL 14개 기록도 비공개로 보존했다. 백업 준비 후 원본 상태 불변을 확인했으며 설치·제거·원복·T11은 모두 NOT_RUN이다. 읽을 수 있는 백업과 해시 일치는 실제 복원 성공을 증명하지 않는다.
+준비 당시 기록: 현재 계정 시험 준비로 기존 제품 5파일과 제거 관리 폴더 5파일의 비공개 백업 해시 일치를 확인했다. 선정된 레지스트리 32개 영역과 제품·관리 파일·폴더 및 제품 신뢰 키의 ACL 14개 기록도 비공개로 보존했다. 백업 준비 후 원본 상태 불변을 확인했으며 설치·제거·원복·T11은 모두 NOT_RUN이다. 읽을 수 있는 백업과 해시 일치는 실제 복원 성공을 증명하지 않는다. 후속 실제 결과는 현재 계정 결정과 검증 기록을 따른다.
 
 ## 승인된 실행과 변경 범위
 
@@ -49,12 +49,32 @@
 
 Upgrade 자체의 실패 rollback과, 성공한 Upgrade 이후 제거·기존 RC11 원복은 다른 동작이다. 엔진은 성공한 설치를 제거할 때 이전 RC11을 자동 복원하지 않는다. 외부에서 달라진 파일·등록을 백업으로 덮어쓰지 않는다. 기대한 시험 소유 변경과 실제 현재값이 일치하는 항목에만 좁은 복구를 제안하고 미복원 항목은 별도로 남긴다.
 
-읽기 검토에서 논리적으로 원복 불가능한 사유는 발견하지 못했으나 실제 복원은 검증되지 않았다. 백업·계획 완성으로 안전한 실행이나 실제 복구 PASS를 미리 주장하지 않는다. 제품 보존·보안·소유 정리 실패는 StatusBar 예외에 포함하지 않는다.
+준비 당시 기록: 읽기 검토에서 논리적으로 원복 불가능한 사유는 발견하지 못했으나 실제 복원은 검증되지 않았다. 백업·계획 완성으로 안전한 실행이나 실제 복구 PASS를 미리 주장하지 않는다. 제품 보존·보안·소유 정리 실패는 StatusBar 예외에 포함하지 않는다. 후속 실제 결과는 현재 계정 결정과 검증 기록을 따른다.
+
+## 2026-10-04 현재 계정의 부분 T11과 제품 복구
+
+승인된 동일 후보·동결 7입력으로 공식 Install.cmd를 한 번 실행해 RC11→RC13 Upgrade를 확인했다. 설치 엔진은 exit 0·InstallCommitted였다. 첫 실행 기록의 root 검증은 manifest 해시의 대소문자 대조 때문에 FAIL이었고 원문을 보존했다. 별도 읽기 대조가 실제 설치 바이트·manifest·등록·관리 파일·ACL 보존을 확인했으며 설치를 반복하지 않았다.
+
+정상 Excel 시작에서 설치된 동일 RC13의 자동 로드를 확인하고 전용 합성 원본을 준비했다. 첫 화면 관찰이 Windows 잠금 화면이어서 UI 입력은 0회였고 목록 담기·대표 비교·결과 관찰은 실행하지 않았다. NOT_RUN_INCOMPLETE·observedFlowComplete=false·비어 있는 productActions와 원시 기록을 유지한다. 시험 소유 Excel은 cleanupErrors 없이 자연 종료했고 남은 Excel은 없었다. 후보 SHA와 제품·관리 파일은 그대로였다. 이미 완료한 새 안내·Replace 흐름이나 전체 GUI를 반복하지 않았다.
+
+정리 후 선정 상태에서는 Options.Pos와 제품 밖 Trusted Documents.LastPurgeTime DWORD가 달라졌다. 두 값은 HKCU 32/64 대조에 같은 영역의 alias로 나타났다. LastPurgeTime의 원인은 미확정이며 제품 회귀나 Office 자동 정리로 단정하지 않는다. 최초 Pos 복구 guard는 이 외부 차이를 발견해 쓰기 없이 FAIL로 중단했다. 별도 독립 검토를 거친 좁은 복구가 관찰된 LastPurgeTime을 그대로 두고 승인된 시험 소유 Pos만 원래 typed 값으로 복원했다. Pos 기록의 nonProductRegistryWritesExecuted=false는 명칭이 넓어 실제 승인된 Pos 쓰기를 제외한 무소유 영역 쓰기 없음으로 별도 정정했다. 원시 기록은 수정하지 않았다.
+
+동결 Uninstall.cmd의 공식 엔진 제거는 exit 0이었다. 후보 제품 파일·해당 OPEN·제품 신뢰 항목의 부재와 원래 관리 파일·Windows 앱 제거 등록 보존을 확인했다. unins000.exe는 실행하지 않았다. 이어 첫 제품 복구는 빈 제품 폴더를 만든 뒤 권한 exact 대조 실패로 중단했다. 이때 원래 제품 파일·등록 쓰기는 없었다. owner/group·DACL control은 같았지만 ACE 내용·순서가 달랐다. [SetNamedSecurityInfo의 상속 전파](https://learn.microsoft.com/en-us/windows/win32/secauthz/automatic-propagation-of-inheritable-aces)와 부합하는 추론이며 원래 기록의 실패를 지우지 않는다.
+
+실패가 만든 빈 폴더의 identity·현재 SDDL·전체 선정 상태를 고정하고 SetFileSecurityW로 원래 owner/group/DACL을 전달했다. [이 API는 obsolete](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setfilesecurityw)이며 일반 제품 설치 변경에 적용하지 않았다. 성공 반환 뒤 owner/group·전체 ACE 순서는 원래와 같았지만 자동 상속 AI 표시가 없어 exact SDDL 복원은 다시 FAIL이었다. [AI는 자동 상속 지원 표시](https://learn.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-control)이므로 의미 없는 문자열 차이라고 단정하지 않는다. 두 번째 실패와 실제 차이를 보존했다. 파일·제품 등록은 이 시도에서도 쓰지 않았다.
+
+이어 관찰된 단일 AI 표시 차이를 그대로 두고 원래 제품 5파일을 exclusive 생성으로 복구했다. 이 단계는 제품 폴더 ACL을 더 쓰지 않았다. actual SDDL을 숨기거나 원래 ACL 기록을 고치지 않았으며, owner/group·전체 ACE가 원래와 같고 AI 표시만 다르다는 guard를 고정했다. 파일의 바이트·기록 속성·시각 복원은 완료했지만, 제품 신뢰 키 생성 호출 뒤 Python 레지스트리 핸들 객체 구성 오류로 중단했다. 빈 제품 신뢰 키가 생성돼 있었고 Path·OPEN은 없었다. 원시 registryWritesExecuted=false가 이 빈 키 생성을 집계하지 못한 점을 실제 상태 대조와 별도 정정으로 보존했다.
+
+최종 등록 복구는 이미 생성된 동일한 빈 키의 수정 시각·원래 ACL·전체 선정 상태를 다시 고정했다. 파일·ACL을 더 쓰거나 키를 생성·삭제하지 않고 winreg.OpenKey로 기존 키를 열어 원래 자료형의 소유 식별자·제품 ID·설명·하위 폴더 제한 4값을 쓰고, 제품 신뢰 Path와 원래 OPEN을 마지막에 복원했다. 각 단계의 실제 snapshot과 자료형을 대조했다. 최종 제품·관리 10파일의 바이트·기록 속성·시각과 원래 OPEN·제품 신뢰·다른 선정 영역을 확인했다. ACL 14개 중 13개는 원래 SDDL과 같고 제품 폴더 1개만 기록한 AI 차이를 유지했다. 다른 ACL 차이는 허용하지 않았다.
+
+결과는 ORIGINAL_BYTES_REGISTRATION_RESTORED_WITH_OBSERVED_DIFFERENCES다. exactAclRestored=false·exactOriginalProductRestored=false·exactSelectedStateRestored=false다. LastPurgeTime은 관찰값을 쓰지 않고 보존했다. 파일·등록 복구 완료를 정확한 제품·선정 보안 상태 전체의 원복이나 T11 PASS로 확대하지 않는다. AI 표시 차이를 평가 출시 조건으로 수용하는 결정을 내리지 않았다. 대표 비교·결과와 보존 미완료가 남아 T11은 PARTIAL / NOT_RUN_INCOMPLETE이며 StatusBar 예외가 이를 수용한 근거는 아니다. 최종 wrapper 실제 설치·포장·병합·태그·Release는 NOT_RUN, fullAcceptancePassed=false·stablePublishAllowed=false를 유지한다.
+
+원시 백업·ACL·registry 값·사용자 경로·화면·진단은 artifacts에 비공개로 보존한다. 공개 기록에는 이 요약만 싣는다.
 
 ## 검증과 출하 판단
 
 T11은 실제 설치 후보·정상 자동 로드·대표 비교·결과 관찰·원본/설정/다른 추가 기능/보안 보존·제거·기존 제품 원복·소유 결과 정리·자연 종료의 12조건을 각각 실제 증거와 연결한다. `scope=T11-install-compare-result-remove`, `flowCount=1`, 동일 후보와 7입력 SHA를 기록한다. 준비용 NOT_RUN 체크리스트를 PASS로 편집하지 않는다.
 
-이 결정 갱신 시 현재 계정 한 흐름의 실행·복원 승인은 확보했으며 T11·복원은 NOT_RUN이다. 후보의 기존 native 전체 FAIL과 ADR-0022의 동일 StatusBar 평가 수용은 그대로 유지한다. `fullAcceptancePassed=false`, `stablePublishAllowed=false`이며 최종 wrapper 실제 설치는 `newWrapperActualInstallation=NOT_RUN`이다. EXE·ZIP·패키징·병합·태그·Release도 미실행이다. 실제 최소 흐름이 완료된 뒤에만 평가 출하 판단을 이어간다.
+현재 계정 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 공식 엔진 Upgrade·정상 자동 로드와 엔진 제거는 확인했으나, Windows 잠금 화면에서 중단해 대표 비교·결과는 실행하지 않았다. 기존 RC11 파일·등록·제품 신뢰 복구를 실제 확인했다. 제품 폴더 권한의 owner/group·전체 ACE는 원래와 같지만 자동 상속 AI 표시가 달라 정확한 제품 원복은 미완료다. 제품 밖 LastPurgeTime 변경도 원인 미확정인 관찰값을 쓰지 않고 보존했다. 선정 상태 전체 원복이나 T11 PASS로 표시하지 않는다. 최종 EXE 실제 설치·포장·병합·태그·Release는 미실행이며 공개 다운로드는 R12로 유지한다. 이 부분 실행은 기존 실패를 지우거나 T11 게이트를 완화한 결정이 아니다.
 
 비공개 백업·registry 값·소유 토큰·사용자 경로·ACL·화면·원시 로그는 공개 문서·패키지에 넣지 않는다.

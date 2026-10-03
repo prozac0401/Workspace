@@ -2,7 +2,7 @@
 
 버전: 0.2.0-rc.13 · 최초 기록: 2026-10-03 · 현재 계정 제안·정체 정정: 2026-10-04
 
-상태: 새 안내·Replace 실제 흐름 완료 · StatusBar FAIL의 좁은 평가 수용 조건 채택, T11·출하 대기
+상태: 새 안내·Replace 완료 · T11 부분 실행·RC11 파일/등록 복구 · 권한 표시 차이·대표 비교/결과·출하 대기
 
 프로필: `focused-wording-evaluation` · `fullAcceptancePassed=false`
 
@@ -16,7 +16,7 @@
 
 소스 준비의 기준 커밋은 `e41999684c6a21070e5d6fc96ebed593b0529b1d`, 실제 제작 입력의 동결 커밋은 [Draft PR #13](https://github.com/prozac0401/Workspace/pull/13)의 `9ebaf3d661e1602e7bc6e60be4b9a0c0fe079160`이다. XLAM 후보의 릴리스 식별자는 `0.2.0-rc.13`, SHA-256은 `484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e`다. EXE·ZIP과 출하 자산은 아직 제작하지 않았다. 세부 결과는 [실행 기록](../../../docs/delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
 
-실제 제작 환경은 Windows 11 10.0.22631, Excel 16.0 Build 20430 x64, Windows PowerShell 5.1.22621.6133이다. 저장 소스 audit는 기존 문서용 Python 환경을 사용했으며 새 의존성·제품 설치는 하지 않았다. 이 환경의 제작 결과를 다른 Office·새 PC 확인으로 확대하지 않는다.
+격리 제작 환경은 Windows 11 10.0.22631, Excel 16.0 Build 20430 x64, Windows PowerShell 5.1.22621.6133이다. 그 제작·소스 audit 단계에서는 새 의존성·제품 설치를 하지 않았다. 후속 현재 계정의 실제 엔진 Upgrade·부분 T11·제품 복구는 아래에 구분한다. 다른 Office·새 PC 확인으로 확대하지 않는다.
 
 | 단계 | 이번 준비 시점의 판정 |
 |---|---|
@@ -36,7 +36,7 @@
 | 새 요약 문구·기존 Replace 두 번째 실제 흐름 | flowComplete=true·native 전체 FAIL. 실제 증거 평가 11개 PASS / excelGlobalsPreserved 1 FAIL, typed globals 8개 중 StatusBar만 Boolean False → String FALSE |
 | 동일 후보의 전체 매크로·GUI suite | NOT_RUN · 실제 확인은 선택된 한 흐름이며 BuildOnly의 tests=[]는 기능 시험 PASS가 아님 |
 | 알려진 StatusBar 평가 수용 | 실제 입력 대조 PASS · 기본 게이트는 실제 native FAIL 거절, 정확한 후보·결정 SHA와 명시적 opt-in만 수용. 실제 FAIL 원문 유지 |
-| T11 새 후보 설치·대표 비교·결과·제거 | NOT_RUN · 현재 계정만 사용 가능. 기존 RC11 백업 준비 완료, 설명한 현재 계정 Upgrade·제거·정확 원복 한 흐름의 사용자 진행 지시 확보·실제 미실행. 이전 실제 포장 명령의 T11 미실행 거절은 보존 |
+| T11 새 후보 설치·대표 비교·결과·제거 | PARTIAL / NOT_RUN_INCOMPLETE · Upgrade·설치 후보 자동 로드·엔진 제거·RC11 파일/등록 복구 확인. 잠금 화면으로 UI 입력 0회·대표 비교/결과 미실행, 폴더 AI 표시와 LastPurgeTime 차이 보존·정확 원복 미완료 |
 | 최종 EXE 실제 설치·제거 | NOT_RUN · T11 비공개 엔진 payload 확인과 구분, newWrapperActualInstallation=NOT_RUN |
 | EXE·ZIP·버전·구성·해시 | NOT_RUN |
 | 문서 strict·생성 링크·공개 범위 | 2026-10-03 갱신 후 PASS · 2026-10-04 정체·계정 결정 갱신 후 PASS · strict 빌드, 공개 19개·이전 주소 2개·404·검색·사이트맵·로컬 링크. ADR-0023 포함 8문서 상대 파일 대상 60개 PASS, 외부 URL·문단 앵커 시험 아님. 이전 7문서 46개와 소스 준비 시점 31개 결과도 별도 보존 |
@@ -67,7 +67,7 @@ StatusBar 실패는 [Microsoft의 설명](https://learn.microsoft.com/en-us/offi
 
 최종 16개 방어 검사 후 실제 후보·BuildOnly·저장 소스 audit·집중 소스 13개·native 평가 기록을 현재 입력 해시와 연결한 두 번째 통합 대조도 PASS다. 직전 통합 대조 기록도 보존한다. 기본 게이트는 실제 native FAIL을 거절하고 명시적 StatusBar opt-in에서만 같은 FAIL 원문을 유지한 채 평가 수용했다. 실제 포장 명령에 T11 NOT_RUN 기록을 넣었을 때 기대한 종료 코드 1과 해당 정확한 실제 흐름 증거 부재 거절을 확인했다. 출력 폴더 생성·ISCC 시작·설치는 없었다. 이 실제 입력의 평가 수용·T11 미실행 거절 확인을 패키징 성공이나 T11 PASS로 기록하지 않는다.
 
-T11은 같은 후보와 동결 설치 입력의 비공개 엔진 payload로 대표 비교·결과·제거·기존 상태 복원을 확인할 최소 흐름이다. 별도 환경 경로는 미실행으로 보존한다. 사용자가 현재 계정만 이용할 수 있다고 알린 뒤 [ADR-0023의 현재 계정 제안](ADR-0023-R13-current-account-trial.md)을 준비했다. 기존 RC11 백업 읽기 검증은 완료했으나 그 후 설명한 Upgrade·제거·정확 원복 한 흐름의 사용자 진행 지시를 확보했다. T11·복원은 NOT_RUN이다. 비공개 엔진 payload → T11 → 최종 포장은 순환이 아니지만 이를 최종 EXE 설치 시험으로 확대하지 않는다. 최종 EXE의 실제 설치·제거는 newWrapperActualInstallation=NOT_RUN으로 남긴다. StatusBar 예외가 T11 생략을 허용하지 않는다.
+T11은 같은 후보·동결 입력의 비공개 엔진 payload 흐름이다. 승인된 [현재 계정 경로](ADR-0023-R13-current-account-trial.md)의 부분 실행·제품 복구는 아래에 기록했다. 별도 환경 경로와 최종 EXE 실제 설치는 NOT_RUN으로 보존한다. StatusBar 예외가 T11 미완료를 수용하는 근거는 아니다.
 
 RC13 자체의 [ADR-0021](ADR-0021-R13-focused-wording-evaluation.md)을 적용한다. R12의 시험 생략 예외는 적용하지 않는다. 새 native 흐름·설치 확인이 남으면 미완료 상태와 이유를 기록하고 출하 판단을 다시 한다. 제작 성공이나 소스 검사 성공을 실제 Excel·설치 시험 PASS로 바꾸지 않는다.
 
@@ -75,9 +75,29 @@ RC13 자체의 [ADR-0021](ADR-0021-R13-focused-wording-evaluation.md)을 적용�
 
 현재 설치를 직접 읽어 manifest·제품/제거 관리 Setup·XLAM 릴리스 literal이 모두 RC11임을 확인했다. XLAM SHA는 `9b37c2f05318ef4500784978f62c0ea948bd2e703ef3e5590874c0ef89988176`이며 추출 실행 소스 6개는 RC11 태그와 정규화 대조에서 같다. RC12 Main/Report와는 다르다. 앞선 제작·native에서 같은 파일을 R12라고 부른 것은 설치 버전 표기 오류다. 원시 실행 기록·파일 보존 관찰은 그대로 남기고 이번 정정을 연결한다. 공개 R12 태그, RC12 소스 변경 기준과 과거 R12 시험 생략 기록은 바꾸지 않는다.
 
-현재 계정만 이용 가능하다는 사용자 답변은 설치·제거·복원 승인이 아니다. 제품 5파일·제거 관리 5파일의 백업 해시 일치, 선정 registry 32개 영역과 ACL 14개 기록을 비공개로 확보하고 원본 상태 불변을 확인했다. 백업 검증은 실제 원복 성공이 아니며 T11·복원은 NOT_RUN이다. [현재 계정 제안](ADR-0023-R13-current-account-trial.md)은 RC11→RC13 Upgrade→최소 대표 비교→engine Uninstall→기존 RC11 정확 원복이다. 관리 파일과 Windows 제거 등록은 유지하고 `unins000.exe`는 사용하지 않는다. 후속 진행 지시는 설명한 정확한 기존 제품 신뢰 복원도 포함한다. 보안 화면은 사람이 선택하며 외부 변경 발견 시 중단한다.
+준비 당시 기록: 현재 계정만 이용 가능하다는 사용자 답변은 설치·제거·복원 승인이 아니다. 제품 5파일·제거 관리 5파일의 백업 해시 일치, 선정 registry 32개 영역과 ACL 14개 기록을 비공개로 확보하고 원본 상태 불변을 확인했다. 백업 검증은 실제 원복 성공이 아니며 T11·복원은 NOT_RUN이다. [현재 계정 제안](ADR-0023-R13-current-account-trial.md)은 RC11→RC13 Upgrade→최소 대표 비교→engine Uninstall→기존 RC11 정확 원복이다. 관리 파일과 Windows 제거 등록은 유지하고 `unins000.exe`는 사용하지 않는다. 후속 진행 지시는 설명한 정확한 기존 제품 신뢰 복원도 포함한다. 보안 화면은 사람이 선택하며 외부 변경 발견 시 중단한다. 후속 실제 결과는 현재 계정 결정과 검증 기록을 따른다.
 
-복원 helper 기본 모드의 읽기 대조는 기존 10파일·선정 registry 32개 영역·ACL 14개와 실제 현재 상태 일치 PASS였으며 제품·등록 쓰기는 없었다. 실제 제거 후 쓰기 복원은 NOT_RUN이다. ADR-0023의 포장 snapshot 추가 후 실제 증거 통합 대조 v3도 PASS다. 기존 native FAIL의 좁은 수용과 T11 NOT_RUN의 종료 코드 1 거절을 유지했으며 출력 생성·compiler·설치를 하지 않았다.
+준비 당시 기록: 복원 helper 기본 모드의 읽기 대조는 기존 10파일·선정 registry 32개 영역·ACL 14개와 실제 현재 상태 일치 PASS였으며 제품·등록 쓰기는 없었다. 실제 제거 후 쓰기 복원은 NOT_RUN이다. ADR-0023의 포장 snapshot 추가 후 실제 증거 통합 대조 v3도 PASS다. 기존 native FAIL의 좁은 수용과 T11 NOT_RUN의 종료 코드 1 거절을 유지했으며 출력 생성·compiler·설치를 하지 않았다. 후속 실제 결과는 현재 계정 결정과 검증 기록을 따른다.
+
+## 2026-10-04 현재 계정의 부분 T11과 제품 복구
+
+승인된 동일 후보·동결 7입력으로 공식 Install.cmd를 한 번 실행해 RC11→RC13 Upgrade를 확인했다. 설치 엔진은 exit 0·InstallCommitted였다. 첫 실행 기록의 root 검증은 manifest 해시의 대소문자 대조 때문에 FAIL이었고 원문을 보존했다. 별도 읽기 대조가 실제 설치 바이트·manifest·등록·관리 파일·ACL 보존을 확인했으며 설치를 반복하지 않았다.
+
+정상 Excel 시작에서 설치된 동일 RC13의 자동 로드를 확인하고 전용 합성 원본을 준비했다. 첫 화면 관찰이 Windows 잠금 화면이어서 UI 입력은 0회였고 목록 담기·대표 비교·결과 관찰은 실행하지 않았다. NOT_RUN_INCOMPLETE·observedFlowComplete=false·비어 있는 productActions와 원시 기록을 유지한다. 시험 소유 Excel은 cleanupErrors 없이 자연 종료했고 남은 Excel은 없었다. 후보 SHA와 제품·관리 파일은 그대로였다. 이미 완료한 새 안내·Replace 흐름이나 전체 GUI를 반복하지 않았다.
+
+정리 후 선정 상태에서는 Options.Pos와 제품 밖 Trusted Documents.LastPurgeTime DWORD가 달라졌다. 두 값은 HKCU 32/64 대조에 같은 영역의 alias로 나타났다. LastPurgeTime의 원인은 미확정이며 제품 회귀나 Office 자동 정리로 단정하지 않는다. 최초 Pos 복구 guard는 이 외부 차이를 발견해 쓰기 없이 FAIL로 중단했다. 별도 독립 검토를 거친 좁은 복구가 관찰된 LastPurgeTime을 그대로 두고 승인된 시험 소유 Pos만 원래 typed 값으로 복원했다. Pos 기록의 nonProductRegistryWritesExecuted=false는 명칭이 넓어 실제 승인된 Pos 쓰기를 제외한 무소유 영역 쓰기 없음으로 별도 정정했다. 원시 기록은 수정하지 않았다.
+
+동결 Uninstall.cmd의 공식 엔진 제거는 exit 0이었다. 후보 제품 파일·해당 OPEN·제품 신뢰 항목의 부재와 원래 관리 파일·Windows 앱 제거 등록 보존을 확인했다. unins000.exe는 실행하지 않았다. 이어 첫 제품 복구는 빈 제품 폴더를 만든 뒤 권한 exact 대조 실패로 중단했다. 이때 원래 제품 파일·등록 쓰기는 없었다. owner/group·DACL control은 같았지만 ACE 내용·순서가 달랐다. [SetNamedSecurityInfo의 상속 전파](https://learn.microsoft.com/en-us/windows/win32/secauthz/automatic-propagation-of-inheritable-aces)와 부합하는 추론이며 원래 기록의 실패를 지우지 않는다.
+
+실패가 만든 빈 폴더의 identity·현재 SDDL·전체 선정 상태를 고정하고 SetFileSecurityW로 원래 owner/group/DACL을 전달했다. [이 API는 obsolete](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setfilesecurityw)이며 일반 제품 설치 변경에 적용하지 않았다. 성공 반환 뒤 owner/group·전체 ACE 순서는 원래와 같았지만 자동 상속 AI 표시가 없어 exact SDDL 복원은 다시 FAIL이었다. [AI는 자동 상속 지원 표시](https://learn.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-control)이므로 의미 없는 문자열 차이라고 단정하지 않는다. 두 번째 실패와 실제 차이를 보존했다. 파일·제품 등록은 이 시도에서도 쓰지 않았다.
+
+이어 관찰된 단일 AI 표시 차이를 그대로 두고 원래 제품 5파일을 exclusive 생성으로 복구했다. 이 단계는 제품 폴더 ACL을 더 쓰지 않았다. actual SDDL을 숨기거나 원래 ACL 기록을 고치지 않았으며, owner/group·전체 ACE가 원래와 같고 AI 표시만 다르다는 guard를 고정했다. 파일의 바이트·기록 속성·시각 복원은 완료했지만, 제품 신뢰 키 생성 호출 뒤 Python 레지스트리 핸들 객체 구성 오류로 중단했다. 빈 제품 신뢰 키가 생성돼 있었고 Path·OPEN은 없었다. 원시 registryWritesExecuted=false가 이 빈 키 생성을 집계하지 못한 점을 실제 상태 대조와 별도 정정으로 보존했다.
+
+최종 등록 복구는 이미 생성된 동일한 빈 키의 수정 시각·원래 ACL·전체 선정 상태를 다시 고정했다. 파일·ACL을 더 쓰거나 키를 생성·삭제하지 않고 winreg.OpenKey로 기존 키를 열어 원래 자료형의 소유 식별자·제품 ID·설명·하위 폴더 제한 4값을 쓰고, 제품 신뢰 Path와 원래 OPEN을 마지막에 복원했다. 각 단계의 실제 snapshot과 자료형을 대조했다. 최종 제품·관리 10파일의 바이트·기록 속성·시각과 원래 OPEN·제품 신뢰·다른 선정 영역을 확인했다. ACL 14개 중 13개는 원래 SDDL과 같고 제품 폴더 1개만 기록한 AI 차이를 유지했다. 다른 ACL 차이는 허용하지 않았다.
+
+결과는 ORIGINAL_BYTES_REGISTRATION_RESTORED_WITH_OBSERVED_DIFFERENCES다. exactAclRestored=false·exactOriginalProductRestored=false·exactSelectedStateRestored=false다. LastPurgeTime은 관찰값을 쓰지 않고 보존했다. 파일·등록 복구 완료를 정확한 제품·선정 보안 상태 전체의 원복이나 T11 PASS로 확대하지 않는다. AI 표시 차이를 평가 출시 조건으로 수용하는 결정을 내리지 않았다. 대표 비교·결과와 보존 미완료가 남아 T11은 PARTIAL / NOT_RUN_INCOMPLETE이며 StatusBar 예외가 이를 수용한 근거는 아니다. 최종 wrapper 실제 설치·포장·병합·태그·Release는 NOT_RUN, fullAcceptancePassed=false·stablePublishAllowed=false를 유지한다.
+
+원시 백업·ACL·registry 값·사용자 경로·화면·진단은 artifacts에 비공개로 보존한다. 공개 기록에는 이 요약만 싣는다.
 
 ## 보존하는 과거 증거
 
@@ -89,6 +109,6 @@ RC13 자체의 [ADR-0021](ADR-0021-R13-focused-wording-evaluation.md)을 적용�
 
 ## 출하와 지원 범위
 
-지금은 새 XLAM·저장 소스·새 안내/Replace 한 실제 흐름과 StatusBar FAIL의 좁은 평가 수용·T11 미실행 거절을 확인한 후보 검토 단계다. 임시 VBA 프로젝트 접근 승인 이행·원복과 선정 범위의 최종 보존·자연 종료는 완료했다. 기존 RC11 설치·등록을 제거하거나 업그레이드하지 않았다. T11·최종 EXE 설치·EXE/ZIP·패키징·병합·태그·Release는 NOT_RUN 또는 대기다. #13은 Draft로 유지하고 필수 실제 증거를 확보한 뒤 출하 판단을 다시 한다. 무서명·회사 PC/조직 정책 환경 미확인과 기존 기능 한계, `fullAcceptancePassed=false`·`stablePublishAllowed=false`를 유지한다. 원시 로그·사용자 경로·레지스트리·화면·업무 자료는 공개 패키지에 넣지 않는다. 공개 다운로드는 R12로 유지한다.
+새 XLAM·저장 소스·새 안내/Replace와 StatusBar의 좁은 평가 수용은 확인했다. 현재 계정 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 공식 엔진 Upgrade·정상 자동 로드와 엔진 제거는 확인했으나, Windows 잠금 화면에서 중단해 대표 비교·결과는 실행하지 않았다. 기존 RC11 파일·등록·제품 신뢰 복구를 실제 확인했다. 제품 폴더 권한의 owner/group·전체 ACE는 원래와 같지만 자동 상속 AI 표시가 달라 정확한 제품 원복은 미완료다. 제품 밖 LastPurgeTime 변경도 원인 미확정인 관찰값을 쓰지 않고 보존했다. 선정 상태 전체 원복이나 T11 PASS로 표시하지 않는다. 최종 EXE 실제 설치·포장·병합·태그·Release는 미실행이며 공개 다운로드는 R12로 유지한다. #13은 Draft로 유지하고 필수 실제 증거를 확보한 뒤 출하 판단을 다시 한다. 원시 로그·사용자 정보는 공개 패키지에서 제외한다.
 
 [R13 명세](../../../docs/tools/excel-list-compare/r13-specification.md) · [후보 사용 안내](RC13_USER_GUIDE.md) · [현재 공개 R12](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12)
