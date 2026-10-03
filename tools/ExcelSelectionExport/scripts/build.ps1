@@ -1,7 +1,7 @@
 ﻿[CmdletBinding()]
 param(
     [ValidatePattern('^[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.]+)?$')]
-    [string]$Version = '0.1.0-rc.10',
+    [string]$Version = '0.1.0-rc.11',
     [string]$InnoCompiler = (Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) 'Inno Setup 6\ISCC.exe')
 )
 $ErrorActionPreference = 'Stop'
