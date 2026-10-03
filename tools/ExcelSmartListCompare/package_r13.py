@@ -62,7 +62,8 @@ SNAPSHOT = tuple("src/" + name for name in INPUTS) + tuple(
     "tests/Build-ExcelCandidate.ps1", "tests/Invoke-IsolatedExcelCandidate.ps1",
     "docs/RC13_USER_GUIDE.md", "docs/RC13_RELEASE_REPORT.md", "docs/ACCEPTANCE_TESTS.md",
     "docs/ADR-0021-R13-focused-wording-evaluation.md",
-    "docs/ADR-0022-R13-known-statusbar-evaluation.md")
+    "docs/ADR-0022-R13-known-statusbar-evaluation.md",
+    "docs/ADR-0023-R13-current-account-trial.md")
 NATIVE_CHECKS = ("summaryGuidanceObserved", "previousPreviewUnchanged", "previewNotAutoRefreshed",
                  "replaceActionUsed", "newPreviewUpdated", "originalWorkbookPreserved",
                  "excelGlobalsPreserved", "securitySettingsPreserved", "existingInstallationPreserved",

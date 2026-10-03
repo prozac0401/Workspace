@@ -2,7 +2,7 @@
 
 도구 ID: ExcelSmartListCompare / EXCEL-LIST-COMPARE
 
-버전·상태: 0.2.0-rc.13 · 2026-10-03 · 새 안내·Replace 실제 흐름 완료, StatusBar 기존 FAIL의 평가 수용 조건 채택·T11·출하 대기
+버전·상태: 0.2.0-rc.13 · 2026-10-04 갱신 · 새 안내·Replace 실제 흐름 완료, StatusBar 기존 FAIL의 평가 수용 조건 채택·T11·출하 대기
 
 제품 책임: 도구 개발·검증 담당
 
@@ -48,12 +48,14 @@ PR13 소스 전환 후 집중 13개를 실행해 PASS를 확인했다. 기존 AS
 
 사용자의 임시 VBA 프로젝트 접근 승인 후 격리 BuildOnly로 RC13 XLAM을 제작하고, 저장한 VBA 7개 모듈·RibbonX가 동결 소스와 일치함을 확인했다. 첫 제작의 후보 저장 전 audit 파일 교체 실패와 새 출력 경로 한 번 재시도의 성공을 분리해 보존한다. 첫 소스 audit는 Python 환경에 oletools가 없어 실패했으며 기존 문서용 환경에서 같은 XLAM을 읽어 7개 모듈 대조에 성공했다. 의존성 설치는 하지 않았다. 두 제작 시도 모두 AccessVBOM 값 부재 → 임시 DWORD 1 → 값 부재로 정확히 복원했고 소유 Excel의 자연 종료를 확인했다.
 
-BuildOnly 자체는 후보의 매크로 기능 시험을 실행하지 않았다. 이후 첫 native는 실제 StatusBar FAIL을 포함한 부분 실행 FAIL과 미완료로 종료했다. 별도로 기존 R12 UI 분리를 Workbooks 열거로 처리한 준비 결함을 확인했으며 메뉴 상태 간섭의 원인은 확정하지 않는다. 정확한 이름의 Item으로 확인한 두 번째 실제 UI 한 흐름은 새 안내·원본 수정 후 이전 스냅샷 유지·실제 기존 Replace 클릭·새 Gamma 반영까지 완료했다. 8개 typed globals 중 StatusBar만 Boolean False → String `FALSE`로 바뀌어 전체 native 판정은 FAIL이다. 소유 결과 정리·자연 종료와 후보 SHA 불변, 기존 제품·Setup 파일 10개·등록·신뢰·보안·비교 설정의 보존은 PASS다. Options의 Pos는 원래 값 확인 후 해당 값만 복원해 최종 기준 일치를 확인했으며 첫 native의 복구도 별도 PASS로 보존한다.
+BuildOnly 자체는 후보의 매크로 기능 시험을 실행하지 않았다. 이후 첫 native는 실제 StatusBar FAIL을 포함한 부분 실행 FAIL과 미완료로 종료했다. 별도로 기존 설치 UI 분리를 Workbooks 열거로 처리한 준비 결함을 확인했으며 메뉴 상태 간섭의 원인은 확정하지 않는다. 정확한 이름의 Item으로 확인한 두 번째 실제 UI 한 흐름은 새 안내·원본 수정 후 이전 스냅샷 유지·실제 기존 Replace 클릭·새 Gamma 반영까지 완료했다. 8개 typed globals 중 StatusBar만 Boolean False → String `FALSE`로 바뀌어 전체 native 판정은 FAIL이다. 소유 결과 정리·자연 종료와 후보 SHA 불변, 기존 제품·Setup 파일 10개·등록·신뢰·보안·비교 설정의 보존은 PASS다. Options의 Pos는 원래 값 확인 후 해당 값만 복원해 최종 기준 일치를 확인했으며 첫 native의 복구도 별도 PASS로 보존한다.
 
 StatusBar는 Excel의 평소 표시를 가릴 수 있는 프로세스 내 표시 복원 결함이며, 이번 합성 데이터 흐름을 복구 불가능하게 만든 결과가 아니다. 근본 원인은 미확정이고 소스에는 이미 literal False 복원이 있으므로 검증되지 않은 한 줄 수정으로 해결된다고 주장하지 않는다. 전체 업무 자료의 무손실도 보장하지 않는다.
 
 실제 후보·BuildOnly·저장 소스 audit·집중 소스 13개·native 평가 기록과 현재 입력 해시를 연결해 평가 수용을 대조했고 최종 보강 후 재대조도 완료했다. 기본 게이트는 native FAIL을 거절하고 명시적 StatusBar opt-in만 같은 실제 FAIL을 수용한다. 최종 포장 게이트 집중 16 PASS는 제품 소스 집중 13 PASS와 별도이며 이전 게이트 13개·14개 실행도 보존한다. 실제 포장 명령은 T11 NOT_RUN 기록을 종료 코드 1로 거절했으며 출력 폴더·ISCC·설치를 시작하지 않았다. 이는 패키징 성공이 아니다.
 
-T11의 비공개 동일 후보 엔진 payload 설치·대표 비교·결과·제거는 별도 일반 사용자 Windows·Excel 환경 확보 후 확인할 항목으로 NOT_RUN이다. 이 흐름은 최종 EXE 설치 시험을 의미하지 않는다. 최종 EXE의 실제 설치·제거, EXE·ZIP·패키징·병합·태그·Release는 NOT_RUN이다. 기존 R12 설치·등록을 제거하거나 업그레이드하지 않았고 공개 다운로드는 R12로 유지한다. 세부 결과·해시·미완료 범위는 [실행 기록](../../delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
+T11의 비공개 동일 후보 엔진 payload 설치·대표 비교·결과·제거는 NOT_RUN이다. 별도 환경을 이용할 수 없어 [ADR-0023의 현재 계정 시험·원복](../../../tools/ExcelSmartListCompare/docs/ADR-0023-R13-current-account-trial.md)을 준비했고 그 후 설명한 한 흐름의 실행·정확한 기존 제품 신뢰 복원에 대한 사용자 진행 지시를 확보했다. 실제 T11·원복은 미실행이다. 이 흐름은 최종 EXE 설치 시험을 의미하지 않는다. 최종 EXE의 실제 설치·제거, EXE·ZIP·패키징·병합·태그·Release는 NOT_RUN이다. 기존 RC11 설치·등록을 제거하거나 업그레이드하지 않았고 공개 다운로드는 R12로 유지한다. 세부 결과·해시·미완료 범위는 [실행 기록](../../delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
+
+2026-10-04 직접 manifest·Setup·XLAM 릴리스 literal과 실행 소스 6개 대조에서 현재 설치를 RC11로 확정했다. 이전 제작·native에서 R12라 부른 같은 파일의 SHA `9b37c2f05318ef4500784978f62c0ea948bd2e703ef3e5590874c0ef89988176`와 원시 보존 관찰은 유지하고 설치 버전 표기를 정정한다. 공개 R12·RC12 소스 기준과 과거 R12 시험 생략 결정은 바꾸지 않는다. 현재 계정만 이용 가능하다는 답변 자체는 실행 승인이 아니며 후속 사용자 진행 지시를 별도로 기록했다. 비공개 백업 10파일 해시·선정 registry 32개 영역·ACL 14개 기록 확보와 원본 불변 확인은 실제 복원 성공이 아니며 T11·복원은 NOT_RUN이다. 제안하는 Upgrade→최소 대표 비교→engine 제거→기존 RC11 정확 원복은 다른 추가 기능·보안·정책·관리 파일·Windows 제거 등록을 보존하고 외부 변경 발견 시 중단한다.
 
 R13은 [Draft PR #13](https://github.com/prozac0401/Workspace/pull/13)의 후보 검토 단계다. 서명과 조직 배포 승인은 별도 미결정이며 전체 인수·안정판 금지를 유지한다. 좁은 StatusBar 평가 수용과 T11의 남은 필수 증거를 구분해 출하 판단을 다시 한다.

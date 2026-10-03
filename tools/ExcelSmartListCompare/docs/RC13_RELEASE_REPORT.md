@@ -1,6 +1,6 @@
 # Excel 명단 비교 R13 · 준비·검증 기록
 
-버전: 0.2.0-rc.13 · 날짜: 2026-10-03
+버전: 0.2.0-rc.13 · 최초 기록: 2026-10-03 · 현재 계정 제안·정체 정정: 2026-10-04
 
 상태: 새 안내·Replace 실제 흐름 완료 · StatusBar FAIL의 좁은 평가 수용 조건 채택, T11·출하 대기
 
@@ -32,14 +32,14 @@
 | 저장한 VBA 7개 모듈·RibbonX·버전·파일 불변성 | 첫 Python 환경의 oletools 누락으로 소스 audit FAIL·추출 0개. 기존 문서용 환경으로 같은 후보 audit PASS·모듈 7개, 전후 SHA 동일 |
 | 제작 세션 정상 종료·제한된 설치 보존 대조 | 두 시도 모두 소유 Excel 자연 종료·임시 접근 원복·기존 Excel 보존 PASS, cleanupErrors 없음. helper의 파일 5개와 OPEN·Add-in Manager·제품 Trusted Location 대조 PASS |
 | 넓은 파일·선정 설정 대조 | 기존 제품·Setup 파일 10개 해시와 등록·신뢰·보안·비교 설정의 선정 32개 레지스트리 대조 행 일치. Pos 원래 값 확인 후 해당 값만 복원·최종 보존 PASS |
-| 첫 native | 실제 StatusBar FAIL 포함 부분 FAIL·미완료. 별도로 R12 UI 분리의 Workbooks 열거 준비 결함 확인, 메뉴 간섭 원인 미확정. Pos 복구는 별도 PASS |
+| 첫 native | 실제 StatusBar FAIL 포함 부분 FAIL·미완료. 별도로 기존 설치 UI 분리의 Workbooks 열거 준비 결함 확인, 메뉴 간섭 원인 미확정. Pos 복구는 별도 PASS |
 | 새 요약 문구·기존 Replace 두 번째 실제 흐름 | flowComplete=true·native 전체 FAIL. 실제 증거 평가 11개 PASS / excelGlobalsPreserved 1 FAIL, typed globals 8개 중 StatusBar만 Boolean False → String FALSE |
 | 동일 후보의 전체 매크로·GUI suite | NOT_RUN · 실제 확인은 선택된 한 흐름이며 BuildOnly의 tests=[]는 기능 시험 PASS가 아님 |
 | 알려진 StatusBar 평가 수용 | 실제 입력 대조 PASS · 기본 게이트는 실제 native FAIL 거절, 정확한 후보·결정 SHA와 명시적 opt-in만 수용. 실제 FAIL 원문 유지 |
-| T11 새 후보 설치·대표 비교·결과·제거 | NOT_RUN · 기존 R12 보존 필요, 별도 일반 사용자 Windows·Excel 환경 대기. 실제 포장 명령이 T11 미실행 기록을 종료 코드 1로 거절하는 것 확인 |
+| T11 새 후보 설치·대표 비교·결과·제거 | NOT_RUN · 현재 계정만 사용 가능. 기존 RC11 백업 준비 완료, 설명한 현재 계정 Upgrade·제거·정확 원복 한 흐름의 사용자 진행 지시 확보·실제 미실행. 이전 실제 포장 명령의 T11 미실행 거절은 보존 |
 | 최종 EXE 실제 설치·제거 | NOT_RUN · T11 비공개 엔진 payload 확인과 구분, newWrapperActualInstallation=NOT_RUN |
 | EXE·ZIP·버전·구성·해시 | NOT_RUN |
-| 문서 strict·생성 링크·공개 범위 | 이번 갱신 후 PASS · strict 빌드, 공개 19개·이전 주소 2개·404·검색·사이트맵·로컬 링크. 갱신한 7문서의 상대 파일 대상 46개 PASS, 외부 URL·문단 앵커 시험 아님. 소스 준비 시점의 새 링크 31개 결과도 별도 보존 |
+| 문서 strict·생성 링크·공개 범위 | 2026-10-03 갱신 후 PASS · 2026-10-04 정체·계정 결정 갱신 후 PASS · strict 빌드, 공개 19개·이전 주소 2개·404·검색·사이트맵·로컬 링크. ADR-0023 포함 8문서 상대 파일 대상 60개 PASS, 외부 URL·문단 앵커 시험 아님. 이전 7문서 46개와 소스 준비 시점 31개 결과도 별도 보존 |
 | Draft PR | #13 게시된 검토 초안 · 실제 제작 결과 반영과 검토 중, 출시 완료 아님 |
 | 패키징·병합·태그·GitHub Release·다운로드 검증 | NOT_RUN · 보류 |
 
@@ -55,11 +55,11 @@
 
 ## 실제 native와 좁은 평가 조건
 
-첫 native는 실제 StatusBar FAIL을 포함한 부분 FAIL과 미완료로 종료했다. 별도로 기존 R12 UI 분리를 Workbooks 열거로 처리한 준비 결함을 확인했으며 메뉴 상태 간섭의 원인은 확정하지 않는다. 처음부터 새 안내·Replace 전체 흐름이 성공한 것으로 기록하지 않는다. 첫 시도의 Pos 복구 PASS와 실패 기록은 유지한다.
+첫 native는 실제 StatusBar FAIL을 포함한 부분 FAIL과 미완료로 종료했다. 별도로 기존 설치 UI 분리를 Workbooks 열거로 처리한 준비 결함을 확인했으며 메뉴 상태 간섭의 원인은 확정하지 않는다. 처음부터 새 안내·Replace 전체 흐름이 성공한 것으로 기록하지 않는다. 첫 시도의 Pos 복구 PASS와 실패 기록은 유지한다.
 
-두 번째 native는 기존 R12를 정확한 이름의 Item으로 확인해 해당 세션 UI만 분리한 뒤 같은 후보로 2026-10-03 13:35:21~13:55:43 UTC에 실제 UI 한 흐름을 완료했다. 합성 원본 Alpha/Beta/Beta의 한 Beta를 Gamma로 의도적으로 수정했으며 저장하지 않았다. 첫 확인 파일과 교체 전 두 번째 확인 파일은 Beta를 계속 표시했다. 실제 기존 Replace 명령을 UI에서 실행한 뒤 세 번째 확인 파일은 Gamma·서로 다른 값 3개·추가 개수 0개를 표시했다. 요약 A14/B14 전체 안내는 두 줄로 보였으며 14항목을 유지했다. 이전 확인 파일과 원본의 디스크 내용·서식은 보존됐고 의도한 합성 메모리 수정만 있었다.
+두 번째 native는 기존 설치를 정확한 이름의 Item으로 확인해 해당 세션 UI만 분리한 뒤 같은 후보로 2026-10-03 13:35:21~13:55:43 UTC에 실제 UI 한 흐름을 완료했다. 합성 원본 Alpha/Beta/Beta의 한 Beta를 Gamma로 의도적으로 수정했으며 저장하지 않았다. 첫 확인 파일과 교체 전 두 번째 확인 파일은 Beta를 계속 표시했다. 실제 기존 Replace 명령을 UI에서 실행한 뒤 세 번째 확인 파일은 Gamma·서로 다른 값 3개·추가 개수 0개를 표시했다. 요약 A14/B14 전체 안내는 두 줄로 보였으며 14항목을 유지했다. 이전 확인 파일과 원본의 디스크 내용·서식은 보존됐고 의도한 합성 메모리 수정만 있었다.
 
-flowComplete=true와 전체 native FAIL을 구분한다. 실제 증거 평가 12개 조건 중 11개는 PASS이며 excelGlobalsPreserved는 FAIL이다. 전후 자료형을 확인한 전역 8개 중 StatusBar만 Boolean False → String FALSE다. cleanupErrors=[]·소유 Excel 자연 종료·남은 Excel 없음과 동일 후보 SHA를 확인했다. 영구 보안 설정·기존 R12 설치·등록을 변경하지 않았으며 매크로 포함은 사람이 직접 선택했다.
+flowComplete=true와 전체 native FAIL을 구분한다. 실제 증거 평가 12개 조건 중 11개는 PASS이며 excelGlobalsPreserved는 FAIL이다. 전후 자료형을 확인한 전역 8개 중 StatusBar만 Boolean False → String FALSE다. cleanupErrors=[]·소유 Excel 자연 종료·남은 Excel 없음과 동일 후보 SHA를 확인했다. 영구 보안 설정·기존 RC11 설치·등록을 변경하지 않았으며 매크로 포함은 사람이 직접 선택했다.
 
 StatusBar 실패는 [Microsoft의 설명](https://learn.microsoft.com/en-us/office/vba/api/excel.application.statusbar)에 따른 Excel 상태표시줄 제어권·기본 표시의 복원 실패다. 프로세스 내 평소 표시가 가려질 수 있지만 이번 데이터 흐름이 복구 불가능하거나 중단된 결과는 아니다. 소스에는 이미 literal False 복원이 있고, 과거 빈 COM 대조에서도 FALSE 문자열이 관찰됐으며 다른 추가 기능의 영향을 배제하지 못했다. 정확한 원인은 미확정이고 검증되지 않은 한 줄 수정으로 해결된다고 주장하지 않는다.
 
@@ -67,9 +67,17 @@ StatusBar 실패는 [Microsoft의 설명](https://learn.microsoft.com/en-us/offi
 
 최종 16개 방어 검사 후 실제 후보·BuildOnly·저장 소스 audit·집중 소스 13개·native 평가 기록을 현재 입력 해시와 연결한 두 번째 통합 대조도 PASS다. 직전 통합 대조 기록도 보존한다. 기본 게이트는 실제 native FAIL을 거절하고 명시적 StatusBar opt-in에서만 같은 FAIL 원문을 유지한 채 평가 수용했다. 실제 포장 명령에 T11 NOT_RUN 기록을 넣었을 때 기대한 종료 코드 1과 해당 정확한 실제 흐름 증거 부재 거절을 확인했다. 출력 폴더 생성·ISCC 시작·설치는 없었다. 이 실제 입력의 평가 수용·T11 미실행 거절 확인을 패키징 성공이나 T11 PASS로 기록하지 않는다.
 
-T11은 같은 후보와 동결 설치 입력의 비공개 엔진 payload를 별도 일반 사용자 Windows·Excel 환경에 설치해 대표 비교·결과·제거·복원을 확인할 최소 흐름이다. 현재 계정의 R12를 제거·업그레이드하지 않으며 환경 확보·T11은 NOT_RUN이다. 비공개 엔진 payload → T11 → 최종 포장은 순환이 아니지만 이를 최종 EXE 설치 시험으로 확대하지 않는다. 최종 EXE의 실제 설치·제거는 newWrapperActualInstallation=NOT_RUN으로 남긴다. StatusBar 예외가 T11 생략을 허용하지 않는다.
+T11은 같은 후보와 동결 설치 입력의 비공개 엔진 payload로 대표 비교·결과·제거·기존 상태 복원을 확인할 최소 흐름이다. 별도 환경 경로는 미실행으로 보존한다. 사용자가 현재 계정만 이용할 수 있다고 알린 뒤 [ADR-0023의 현재 계정 제안](ADR-0023-R13-current-account-trial.md)을 준비했다. 기존 RC11 백업 읽기 검증은 완료했으나 그 후 설명한 Upgrade·제거·정확 원복 한 흐름의 사용자 진행 지시를 확보했다. T11·복원은 NOT_RUN이다. 비공개 엔진 payload → T11 → 최종 포장은 순환이 아니지만 이를 최종 EXE 설치 시험으로 확대하지 않는다. 최종 EXE의 실제 설치·제거는 newWrapperActualInstallation=NOT_RUN으로 남긴다. StatusBar 예외가 T11 생략을 허용하지 않는다.
 
 RC13 자체의 [ADR-0021](ADR-0021-R13-focused-wording-evaluation.md)을 적용한다. R12의 시험 생략 예외는 적용하지 않는다. 새 native 흐름·설치 확인이 남으면 미완료 상태와 이유를 기록하고 출하 판단을 다시 한다. 제작 성공이나 소스 검사 성공을 실제 Excel·설치 시험 PASS로 바꾸지 않는다.
+
+## 2026-10-04 설치 정체 정정과 현재 계정 제안
+
+현재 설치를 직접 읽어 manifest·제품/제거 관리 Setup·XLAM 릴리스 literal이 모두 RC11임을 확인했다. XLAM SHA는 `9b37c2f05318ef4500784978f62c0ea948bd2e703ef3e5590874c0ef89988176`이며 추출 실행 소스 6개는 RC11 태그와 정규화 대조에서 같다. RC12 Main/Report와는 다르다. 앞선 제작·native에서 같은 파일을 R12라고 부른 것은 설치 버전 표기 오류다. 원시 실행 기록·파일 보존 관찰은 그대로 남기고 이번 정정을 연결한다. 공개 R12 태그, RC12 소스 변경 기준과 과거 R12 시험 생략 기록은 바꾸지 않는다.
+
+현재 계정만 이용 가능하다는 사용자 답변은 설치·제거·복원 승인이 아니다. 제품 5파일·제거 관리 5파일의 백업 해시 일치, 선정 registry 32개 영역과 ACL 14개 기록을 비공개로 확보하고 원본 상태 불변을 확인했다. 백업 검증은 실제 원복 성공이 아니며 T11·복원은 NOT_RUN이다. [현재 계정 제안](ADR-0023-R13-current-account-trial.md)은 RC11→RC13 Upgrade→최소 대표 비교→engine Uninstall→기존 RC11 정확 원복이다. 관리 파일과 Windows 제거 등록은 유지하고 `unins000.exe`는 사용하지 않는다. 후속 진행 지시는 설명한 정확한 기존 제품 신뢰 복원도 포함한다. 보안 화면은 사람이 선택하며 외부 변경 발견 시 중단한다.
+
+복원 helper 기본 모드의 읽기 대조는 기존 10파일·선정 registry 32개 영역·ACL 14개와 실제 현재 상태 일치 PASS였으며 제품·등록 쓰기는 없었다. 실제 제거 후 쓰기 복원은 NOT_RUN이다. ADR-0023의 포장 snapshot 추가 후 실제 증거 통합 대조 v3도 PASS다. 기존 native FAIL의 좁은 수용과 T11 NOT_RUN의 종료 코드 1 거절을 유지했으며 출력 생성·compiler·설치를 하지 않았다.
 
 ## 보존하는 과거 증거
 
@@ -81,6 +89,6 @@ RC13 자체의 [ADR-0021](ADR-0021-R13-focused-wording-evaluation.md)을 적용�
 
 ## 출하와 지원 범위
 
-지금은 새 XLAM·저장 소스·새 안내/Replace 한 실제 흐름과 StatusBar FAIL의 좁은 평가 수용·T11 미실행 거절을 확인한 후보 검토 단계다. 임시 VBA 프로젝트 접근 승인 이행·원복과 선정 범위의 최종 보존·자연 종료는 완료했다. 기존 R12 설치·등록을 제거하거나 업그레이드하지 않았다. T11·최종 EXE 설치·EXE/ZIP·패키징·병합·태그·Release는 NOT_RUN 또는 대기다. #13은 Draft로 유지하고 필수 실제 증거를 확보한 뒤 출하 판단을 다시 한다. 무서명·회사 PC/조직 정책 환경 미확인과 기존 기능 한계, `fullAcceptancePassed=false`·`stablePublishAllowed=false`를 유지한다. 원시 로그·사용자 경로·레지스트리·화면·업무 자료는 공개 패키지에 넣지 않는다. 공개 다운로드는 R12로 유지한다.
+지금은 새 XLAM·저장 소스·새 안내/Replace 한 실제 흐름과 StatusBar FAIL의 좁은 평가 수용·T11 미실행 거절을 확인한 후보 검토 단계다. 임시 VBA 프로젝트 접근 승인 이행·원복과 선정 범위의 최종 보존·자연 종료는 완료했다. 기존 RC11 설치·등록을 제거하거나 업그레이드하지 않았다. T11·최종 EXE 설치·EXE/ZIP·패키징·병합·태그·Release는 NOT_RUN 또는 대기다. #13은 Draft로 유지하고 필수 실제 증거를 확보한 뒤 출하 판단을 다시 한다. 무서명·회사 PC/조직 정책 환경 미확인과 기존 기능 한계, `fullAcceptancePassed=false`·`stablePublishAllowed=false`를 유지한다. 원시 로그·사용자 경로·레지스트리·화면·업무 자료는 공개 패키지에 넣지 않는다. 공개 다운로드는 R12로 유지한다.
 
 [R13 명세](../../../docs/tools/excel-list-compare/r13-specification.md) · [후보 사용 안내](RC13_USER_GUIDE.md) · [현재 공개 R12](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12)
