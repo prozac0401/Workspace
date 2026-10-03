@@ -1,6 +1,10 @@
 # 보이는 칸 붙여넣기
 
-**버전 0.1.1**
+**버전 0.1.2 · 서명 없는 후보**
+
+0.1.2는 붙여넣기 뒤 자체 되돌리기를 제공하지 못하는 경우와 되돌리기 거절의 변경 범위를 더 정확히 안내합니다. Windows 제작·자동 검사 302개와 후보 ZIP 무결성 검사가 통과했습니다. 현재 생산 DLL을 시험 전용 위치에 설치한 뒤 정상 Excel 시작·실제 메뉴 붙여넣기와 Undo 거절 안내·저장하지 않은 자연 종료·시험 설치 제거를 좁은 합성 흐름에서 확인했습니다. 기존 안전 조건이나 지원 범위를 넓히는 변경은 아닙니다. 앞선 외부 시험 호스트의 종료 실패와 확인 범위는 [시험 보고서](docs/test-report.md)에 별도로 보존합니다.
+
+다음은 0.1.1의 확인 이력이며 0.1.2의 실제 시험 결과를 대신하지 않습니다.
 
 2026-09-26 후속 수정본의 실제 설치·자동 로드·붙여넣기·되돌리기와 사용 후 종료를 확인했습니다. 제거·재설치 후 실제 붙여넣기에서도 숨긴 셀의 원래 값이 유지됐습니다. 확인한 환경과 이전 후보의 종료 실패 이력은 [시험 보고서](docs/test-report.md), 패키지와 게시 근거는 [배포 점검](docs/release-checklist.md)을 따릅니다.
 
@@ -11,7 +15,7 @@ Excel에서 복사한 한 행 또는 한 열의 값을, 선택한 한 열의 보
 Windows 데스크톱 Excel과 .NET Framework 4.8이 필요합니다. 웹용 Excel과 Mac용 Excel은 지원하지 않습니다.
 
 1. 열려 있는 Excel 문서를 저장하고 모든 Excel을 종료합니다.
-2. 배포 **VisibleCellsPaste-0.1.1-Setup.exe**를 실행합니다.
+2. 배포 **VisibleCellsPaste-0.1.2-Setup.exe**를 실행합니다.
 3. 설치 안내를 확인합니다. 설치 프로그램이 Excel의 32·64비트를 확인하고 맞는 파일을 설치합니다. ZIP 방식은 전체 압축 해제 후 **Install.cmd**를 실행합니다.
 4. 평소처럼 Excel을 실행합니다. 셀을 우클릭하면 **보이는 칸에 붙여넣기**와 **마지막 붙여넣기 되돌리기**가 나타납니다.
 
@@ -87,11 +91,13 @@ Excel 프로세스가 실행 중이면 설치·제거를 중단합니다. 설치
 소스는 `src`, 시험은 `tests`, 제작 스크립트는 `build`, 설치 구성은 `installer`에 있습니다. 제작하려면 저장소에서 다음 명령을 실행합니다.
 
 ```powershell
-powershell -NoProfile -File tools/VisibleCellsPaste/build/build.ps1 -Version 0.1.1
+powershell -NoProfile -File tools/VisibleCellsPaste/build/build.ps1 -Version 0.1.2
 ```
 
-ZIP과 `SHA256SUMS.txt`는 `artifacts/visible-cells-paste/0.1.1`에 생성됩니다. 최종 사용자는 개발 SDK·Python·Node.js를 설치하거나 VBA 코드를 만들 필요가 없습니다.
+ZIP과 `SHA256SUMS.txt`는 `artifacts/visible-cells-paste/0.1.2`에 생성됩니다. 최종 사용자는 개발 SDK·Python·Node.js를 설치하거나 VBA 코드를 만들 필요가 없습니다.
 
-## 로컬 단일 설치 파일 후보
+## 단일 설치 파일
 
-공개 0.1.1 payload를 그대로 포함한 [단일 EXE 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1)를 추가했습니다. 설치·제거와 재현 방법은 [단일 설치 안내](docs/single-installer.md)를 따릅니다. 기존 ZIP도 보존합니다.
+0.1.2의 단일 EXE는 새 버전의 ZIP과 그 SHA-256을 입력으로 제작하며 제품 버전은 0.1.2, wrapper 버전은 0.1.2.1입니다. 문서를 동결한 뒤 수행하는 최종 ZIP 재포장·wrapper 제작·검사·자산 게시 결과는 별도 `single-installer-manifest.json`과 [0.1.2 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.2)에서 확인합니다. 이 문서의 제작·native 확인을 실제 게시 완료의 근거로 대신하지 않습니다.
+
+공개 0.1.1 payload를 그대로 포함한 [기존 단일 EXE 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1)와 기존 ZIP도 보존합니다. 설치·제거와 재현 방법은 [단일 설치 안내](https://github.com/prozac0401/Workspace/blob/visible-cells-paste-v0.1.2/tools/VisibleCellsPaste/docs/single-installer.md)를 따릅니다.

@@ -2,8 +2,8 @@ using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Windows.Forms;
-[assembly: AssemblyVersion("0.1.1.0")]
-[assembly: AssemblyFileVersion("0.1.1.0")]
+[assembly: AssemblyVersion("0.1.2.0")]
+[assembly: AssemblyFileVersion("0.1.2.0")]
 [assembly: ComVisible(false)]
 namespace VisibleCellsPaste {
  [ComVisible(true), Guid("B65AD801-ABAF-11D0-BB8B-00A0C90F2744"), InterfaceType(ComInterfaceType.InterfaceIsDual)]

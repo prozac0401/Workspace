@@ -2,7 +2,7 @@
 param(
     [Parameter(Mandatory)][string]$ZipPath,
     [Parameter(Mandatory)][ValidatePattern('^[a-fA-F0-9]{64}$')][string]$ExpectedSha256,
-    [ValidatePattern('^[0-9]+\.[0-9]+\.[0-9]+$')][string]$Version = '0.1.1'
+    [ValidatePattern('^[0-9]+\.[0-9]+\.[0-9]+$')][string]$Version = '0.1.2'
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -54,7 +54,7 @@ Run $testExe @((Join-Path $output ('test-' + [Guid]::NewGuid().ToString('N')))) 
 $exeHash = (Get-FileHash -LiteralPath $exe).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText((Join-Path $output 'SHA256SUMS.txt'), "$exeHash  $([IO.Path]::GetFileName($exe))`r`n", [Text.Encoding]::ASCII)
 [ordered]@{
-    product = 'VisibleCellsPaste'; version = $Version; wrapperVersion = '0.1.1.1'; signed = $false
+    product = 'VisibleCellsPaste'; version = $Version; wrapperVersion = '0.1.2.1'; signed = $false
     inputZipSha256 = $actual; outputSha256 = $exeHash
     sources = @(@($source,$tests,$manifest,$PSCommandPath) | ForEach-Object { [ordered]@{ path = $_.Substring($repo.Length + 1); sha256 = (Get-FileHash -LiteralPath $_).Hash.ToLowerInvariant() } })
     note = 'Embeds the release ZIP unchanged. Product COM DLL and installation.xml engine are not rebuilt. Actual Windows/Excel tests are separate.'

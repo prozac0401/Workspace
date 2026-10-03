@@ -22,7 +22,7 @@ namespace VisibleCellsPaste.Installation
         internal const string ProgId = "Workspace.VisibleCellsPaste";
         internal const string Clsid = "{856B2219-6225-42ED-8FF1-2D06E5913AC8}";
         internal const string AddinClass = "VisibleCellsPaste.AddIn";
-        internal const string AssemblyVersion = "0.1.1.0";
+        internal const string AssemblyVersion = "0.1.2.0";
         internal const string AssemblyIdentity = "VisibleCellsPaste.AddIn, Version=" + AssemblyVersion + ", Culture=neutral, PublicKeyToken=null";
         internal const string AssemblyName = "VisibleCellsPaste.AddIn.dll";
         internal const string ManifestName = "installation.xml";
@@ -165,9 +165,10 @@ namespace VisibleCellsPaste.Installation
                 throw new InvalidDataException("설치 매니페스트 소유권/버전을 확인할 수 없습니다. 기존 파일을 변경하지 않았습니다.");
             foreach (XElement f in doc.Root.Element("files").Elements("file")) SafePath(target, (string)f.Attribute("path"));
             string[] allowed = Registration(target, Path.Combine(target, AssemblyName), "0").Select(v => v.Key + "|" + v.Name).ToArray();
-            // Accept only this product's exact prior assembly-version keys during 0.1.0 upgrades.
-            allowed = allowed.Concat(allowed.Where(v => v.Contains(@"\InprocServer32\" + AssemblyVersion + "|"))
-                .Select(v => v.Replace(@"\InprocServer32\" + AssemblyVersion + "|", @"\InprocServer32\0.1.0.0|"))).ToArray();
+            // Accept only this product's exact known prior assembly-version keys.
+            foreach (string priorAssemblyVersion in new[] { "0.1.0.0", "0.1.1.0" })
+                allowed = allowed.Concat(allowed.Where(v => v.Contains(@"\InprocServer32\" + AssemblyVersion + "|"))
+                    .Select(v => v.Replace(@"\InprocServer32\" + AssemblyVersion + "|", @"\InprocServer32\" + priorAssemblyVersion + "|"))).ToArray();
             foreach (XElement r in doc.Root.Element("registry").Elements("value"))
             {
                 RegValue value = ParseReg(r);
