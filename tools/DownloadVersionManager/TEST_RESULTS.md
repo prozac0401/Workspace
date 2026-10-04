@@ -1,5 +1,39 @@
 # DownloadVersionManager · 실제 시험 기록
 
+## 0.2.0 폴더 감시 · 2026-10-04 KST
+
+사용자가 확인한 최초 그룹 미리보기·처리 동의, 신규 suffix 연결, 3초 안정·잠금 조건, 동시 후보 보존, 기본 다운로드 위치 추종과 로그인 자동 실행을 구현 중이다. 기존 0.1.0의 FAIL/NOT RUN과 산출물을 보존한다.
+
+| 변경에 직접 필요한 범위 | 실제 결과와 한계 |
+|---|---|
+| 폴더 엔진 | **8 PASS / 0 FAIL**: 동일본 신규 file ID·creation/write time, 변경본 History, 대상 부재·잠금, source/target 관찰값 변경, 일반 실패 rollback, old 이동 뒤 강제 종료의 양쪽 내용 보존 |
+| OS 변경 알림 watcher 대표 세션 | **15 PASS / 0 FAIL**: suffix 계약, 변경 알림 시작·중지·재시작, 3초 안정, 동일/다른 내용, 잠금·writer 보존, 동시 후보·원래 대상 부재, 임시→최종 이름, 범위·기존 파일·재시작 후 기존 파일 보존. Unicode 대소문자 매핑을 Windows invariant로 맞춘 뒤 동시 후보에 Ä/ä 사례를 넣어 관련 세션만 다시 확인. 모든 앱 전수 시험이 아님 |
+| 최초 기존 그룹 | **4 PASS / 0 FAIL**: 동의 없음·그룹 보존, 사용자가 고른 번호 파일 최종 승계, 미리보기 이후 변경 보존. 실행 경로의 slash 형식으로 앞선 4건이 validator에서 거절됐던 harness 호출 오류는 제외하고 호출을 바로잡은 결과 |
+| production 제작·정적 runtime·MSI 구조 | **PASS**: 네이티브 x64 /MT, MSI 내 executable 한 개, per-user, 브라우저 확장·Native Messaging·서비스 없음, 위자드 선택 HKCU 시작 항목 |
+| 0.2.0 late installer failure | **FAIL 유지**: InstallExecute 뒤 의도적 실패에서 제품 등록 rollback access denied(5), 시작 항목의 security restore 오류 1307 관찰. 시험으로 만든 제품 공식 Windows Installer 제거 exit 0, 사용자 합성 파일 보존 |
+| 수정 후보 정상 설치·실제 --first-run 실행·repair·제거·사용자 파일 보존 | **5 PASS / 0 FAIL**, cleaned true: 후보 SHA-256 `6a12b33cd21b3d15cf53dca9fbce899b677bada219bca094e396cc67824db86e`. 설치된 GUI가 격리된 감시 폴더에서 시작하고 정상 종료, repair/remove exit 0, 파일·History·실행 설정 보존과 프로그램/시작 등록 제거 확인 |
+| 화면 높이 수정 후 설치 자산 | **4 PASS / 0 FAIL**, cleaned true: MSI `18f22f04a9fe8478a4ab28dc9c8385aefe0c5ece6eef1b192aa7dd17c0378a32`의 fresh/실제 설치 GUI 감시 시작·정상 종료/remove/사용자 파일·History·실행 설정 보존. 하단 설명 표시 확인. 완료한 repair와 late-failure 반복 없음 |
+| 설치 위자드의 기본 위치·선택 표시·취소 | **PASS**: 실제로 이동된 Windows 다운로드 위치를 해석해 표시, 기본 위치 추종·로그인 자동 실행 체크 확인. 취소 exit 1602, 설치하지 않음 |
+| 다음 Windows 로그인·실행 중 OS 다운로드 위치 실제 변경 | **NOT RUN**: 소스 구현과 현재 위치 해석 확인을 실제 다음 로그인·이동 실기 성공으로 확대하지 않음 |
+| 공개 Release·다운로드·checksum 공개 확인 | **NOT RUN / 게시 전** |
+| 문서 strict·공개 범위·로컬 링크 | **PASS**: MkDocs strict, 공개 19개·기존 이동 2개·404·검색/사이트맵·생성 로컬 링크. 내부 명세·배포 기록·원시 진단 제외 |
+
+이번 집중 확인은 엔진 8·watcher 15·최초 그룹 4, 합계 27개 결과이며 설치 후보의 5개 결과와 구분한다. 기존 Host/확장 전체 suite·대용량 성능·브라우저별 시험표를 반복하지 않았다. 파일 내용이 보존됐다는 결과를 모든 설치 실패 복구 PASS로 확장하지 않는다.
+
+최종 MSI SHA-256은 `5fba25fe5c07f7813341ca524a9d1807b36357c1a5412bbd47ea63a68ab42e47`이며 크기는 294,912 bytes다. 마지막 재제작은 잠금·cleanup·metadata 경고 안내 문구만 변경했다. 파일 처리·화면 배치·MSI·시작 항목은 바뀌지 않아 위 `18f22f04…` 실제 설치·실행·제거와 `6a12b33…` repair 증거를 관련 범위에서 재사용했다. 최종 지문 파일 자체를 다시 실제 설치한 것으로 기록하지 않는다. 최종 production 제작·패키지 추출·구조·payload/hash·정적 runtime 확인은 PASS이며 build manifest의 시험/설치 NOT RUN 표기를 별도 증거와 함께 읽는다.
+
+앞선 0.2.0 설치 후보에서는 INSTALLFOLDER 전달이 의도한 격리 경로에 반영되지 않아 제거 후 잔류 검사에서 aggregate FAIL이었다. 새 설치 후보에서 이를 고친 위 5 PASS는 `installer-fixed-lifecycle-results.json`의 별도 증거이며 앞선 `installer-lifecycle-results.json`을 PASS로 덮어쓰지 않는다. 최초 화면 하단 설명이 잘린 관찰도 보존하고 최종 창 높이를 수정했다.
+
+비공개 증거는 `artifacts/download-version-manager-watcher/` 아래 `engine-validation`, `watcher-final-validation`, `review-check`, `0.2.0`에 남긴다. 설치 증거는 `installer-fixed-lifecycle-results.json`, `installer-final-results.json`, 위자드는 `wizard-results.json`이다. 원시 installer 로그·로컬 경로·시험 상태 JSON은 공개 사이트에 싣지 않는다. 새 결과는 [이번 배포 기록](../../docs/delivery/download-version-manager-watcher-release-20261004.md)에 연결한다.
+
+## 아래는 0.1.0의 당시 기록이며 새 결과로 재판정하지 않음
+
+## 후속 개발 방향 · 2026-10-04
+
+사용자 결정으로 0.1.0은 **미완료 평가 버전으로 보존**하고, 추가 출시 준비를 진행하지 않는다. 이후 개발은 [차기 버전 명세](../../docs/tools/download-version-manager/next-version-specification.md)의 지정 폴더 감지 방식으로 별도 진행한다. 감시 프로세스 유지는 허용됐지만 차기 구현·제품 시험은 미착수다.
+
+아래 과거 시험 기록과 Win11 installerFailureRecovery FAIL·rollback access denied(5)·재설치 1638, singleDistribution FAIL, 실제 브라우저 NOT RUN, stable BLOCKED를 그대로 보존한다. Windows CI 성공을 이 실패의 해결이나 차기 버전 검증으로 확대하지 않는다. 이번 명세 변경으로 제품 시험을 재실행하거나 새로운 PASS를 추가하지 않았다.
+
 ## 로컬 준비 · 팝업 연결 확인 중복 클릭 · 2026-10-03
 
 기준은 main `df64b85e9a8d36fa9b9a7d5069d45523c34c3fc3`다. 연결 확인이 응답을 기다리는 동안 같은 팝업의 버튼을 잠시 비활성화하고, 성공·실패·예외 뒤에는 다시 누를 수 있게 했다. 연결 확인은 계속 진단 전용이며 확장 활성화와 다운로드 처리 조건은 바꾸지 않는다.

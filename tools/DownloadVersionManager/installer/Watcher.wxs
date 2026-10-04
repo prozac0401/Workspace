@@ -1,0 +1,76 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="DownloadVersionManager Watcher" Manufacturer="Workspace" Version="$(var.Version)" ProductCode="$(var.ProductCode)" UpgradeCode="{CBC7F202-BD84-4D52-9438-F01164572918}" Language="1042" Codepage="65001" Scope="perUser" InstallerVersion="500">
+    <SummaryInformation Description="DownloadVersionManager 폴더 감시 프로그램" Manufacturer="Workspace" Codepage="949" />
+    <MajorUpgrade DowngradeErrorMessage="더 새로운 DownloadVersionManager Watcher가 설치되어 있습니다." Schedule="afterInstallInitialize" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+    <Property Id="REBOOT" Value="ReallySuppress" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="DVMEXISTINGROOT"><RegistrySearch Id="ExistingInstallFolder" Root="HKCU" Key="Software\Workspace\DownloadVersionManager\Watcher" Name="InstallFolder" Type="raw" Bitness="always64" /></Property>
+    <SetProperty Id="INSTALLFOLDER" Value="[DVMEXISTINGROOT]" After="AppSearch" Condition="DVMEXISTINGROOT" />
+    <Property Id="DVMFOLLOWDOWNLOADS" Value="1"><RegistrySearch Id="ExistingFollowDownloads" Root="HKCU" Key="Software\Workspace\DownloadVersionManager\Watcher\InstallDefaults" Name="FollowDownloads" Type="raw" Bitness="always64" /></Property>
+    <Property Id="DVMWATCHFOLDER"><RegistrySearch Id="ExistingWatchFolder" Root="HKCU" Key="Software\Workspace\DownloadVersionManager\Watcher\InstallDefaults" Name="Folder" Type="raw" Bitness="always64" /></Property>
+    <Property Id="DVMSTARTATLOGIN" Value="1"><RegistrySearch Id="ExistingStartAtLogin" Root="HKCU" Key="Software\Workspace\DownloadVersionManager\Watcher\InstallDefaults" Name="StartAtLogin" Type="raw" Bitness="always64" /></Property>
+    <Property Id="DVMLAUNCHAPP" Value="1" />
+    <Binary Id="WatcherConfig" SourceFile="$(var.ConfigDll)" />
+    <CustomAction Id="ResolveDownloads" BinaryRef="WatcherConfig" DllEntry="DvmResolveDownloads" Execute="immediate" Return="check" />
+    <CustomAction Id="BrowseWatchFolder" BinaryRef="WatcherConfig" DllEntry="DvmBrowseFolder" Execute="immediate" Return="check" />
+    <CustomAction Id="LaunchApplication" FileRef="ApplicationExe" ExeCommand="--first-run" Execute="immediate" Impersonate="yes" Return="asyncNoWait" />
+    <InstallExecuteSequence><Custom Action="ResolveDownloads" After="AppSearch" Condition="NOT REMOVE" /></InstallExecuteSequence>
+    <InstallUISequence><Custom Action="ResolveDownloads" After="AppSearch" Condition="NOT REMOVE" /></InstallUISequence>
+    <Launch Condition="Installed OR VersionNT64" Message="Windows x64가 필요합니다. 지원 범위는 Windows 11의 로컬 NTFS입니다." />
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" />
+    <StandardDirectory Id="LocalAppDataFolder"><Directory Id="Programs" Name="Programs"><Directory Id="INSTALLFOLDER" Name="DownloadVersionManagerWatcher">
+      <Component Id="Application" Guid="{FDB8B81C-49CC-4B41-8BC2-C5E724114142}" Bitness="always64">
+        <File Id="ApplicationExe" Source="$(var.ApplicationExe)" Name="DownloadVersionManager.exe" />
+        <RegistryValue Root="HKCU" Key="Software\Workspace\DownloadVersionManager\Watcher" Name="InstallFolder" Value="[INSTALLFOLDER]" Type="string" KeyPath="yes" />
+      </Component>
+      <Component Id="InstallDefaults" Guid="{F6CF1934-5908-4C6A-926B-169C29D8BE8A}" Bitness="always64">
+        <RegistryValue Root="HKCU" Key="Software\Workspace\DownloadVersionManager\Watcher\InstallDefaults" Name="Folder" Value="[DVMWATCHFOLDER]" Type="string" KeyPath="yes" />
+        <RegistryValue Root="HKCU" Key="Software\Workspace\DownloadVersionManager\Watcher\InstallDefaults" Name="FollowDownloads" Value="[DVMFOLLOWDOWNLOADSINT]" Type="integer" />
+        <RegistryValue Root="HKCU" Key="Software\Workspace\DownloadVersionManager\Watcher\InstallDefaults" Name="StartAtLogin" Value="[DVMSTARTATLOGININT]" Type="integer" />
+      </Component>
+      <Component Id="LoginStartup" Guid="{F966C44F-2104-4AB9-9CCB-E87F3E33FB53}" Bitness="always64" Condition="DVMSTARTATLOGIN = 1">
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="Workspace.DownloadVersionManagerWatcher" Value="&quot;[INSTALLFOLDER]DownloadVersionManager.exe&quot; --autostart" Type="string" KeyPath="yes" />
+      </Component>
+    </Directory></Directory></StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder"><Directory Id="WatcherMenu" Name="DownloadVersionManager Watcher">
+      <Component Id="ApplicationShortcut" Guid="{3A05B6B1-A577-4B6B-BA4F-BD297E7B0316}" Bitness="always64">
+        <Shortcut Id="StartApplication" Name="DownloadVersionManager" Target="[INSTALLFOLDER]DownloadVersionManager.exe" WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU" Key="Software\Workspace\DownloadVersionManager\Watcher" Name="Shortcut" Value="1" Type="integer" KeyPath="yes" />
+        <RemoveFolder Id="RemoveWatcherMenu" On="uninstall" />
+      </Component>
+    </Directory></StandardDirectory>
+    <Feature Id="Product" Title="DownloadVersionManager Watcher" Level="1"><ComponentRef Id="Application" /><ComponentRef Id="ApplicationShortcut" /><ComponentRef Id="InstallDefaults" /><ComponentRef Id="LoginStartup" /></Feature>
+    <?if $(var.RollbackTest) = 1 ?>
+    <CustomAction Id="FailAfterExecution" Error="Local verification: deliberately fail after InstallExecute." />
+    <InstallExecuteSequence><Custom Action="FailAfterExecution" After="InstallExecute" Condition="NOT REMOVE" /></InstallExecuteSequence>
+    <?endif?>
+    <UI>
+      <TextStyle Id="DefaultFont" FaceName="Malgun Gothic" Size="9" /><Property Id="DefaultUIFont" Value="DefaultFont" />
+      <Dialog Id="Welcome" Width="460" Height="320" Title="DownloadVersionManager Watcher">
+        <Control Id="Body" Type="Text" X="24" Y="20" Width="412" Height="44" Text="선택한 폴더의 새 파일을 감시합니다. 브라우저 확장 설치가 필요하지 않습니다. 현재 사용자에게 설치합니다." />
+        <Control Id="FollowDownloads" Type="CheckBox" X="24" Y="72" Width="412" Height="20" Property="DVMFOLLOWDOWNLOADS" CheckBoxValue="1" Text="Windows 기본 다운로드 폴더를 사용하고 위치 변경을 따름" />
+        <Control Id="KnownFolder" Type="Text" X="40" Y="94" Width="390" Height="38" Text="현재 기본 위치: [DVMDOWNLOADSFOLDER]" />
+        <Control Id="FolderLabel" Type="Text" X="24" Y="142" Width="330" Height="18" Text="직접 지정할 감시 폴더:" />
+        <Control Id="Folder" Type="Edit" X="24" Y="163" Width="330" Height="22" Property="DVMWATCHFOLDER" DisableCondition="DVMFOLLOWDOWNLOADS = 1" EnableCondition="DVMFOLLOWDOWNLOADS &lt;&gt; 1" />
+        <Control Id="Browse" Type="PushButton" X="364" Y="162" Width="72" Height="24" Text="찾아보기"><Publish Event="DoAction" Value="BrowseWatchFolder" /></Control>
+        <Control Id="StartAtLogin" Type="CheckBox" X="24" Y="202" Width="412" Height="20" Property="DVMSTARTATLOGIN" CheckBoxValue="1" Text="Windows 로그인 시 자동 실행" />
+        <Control Id="Note" Type="Text" X="24" Y="229" Width="412" Height="31" Text="처음 폴더를 사용할 때 기존 파일 목록을 확인합니다. 프로그램을 종료하면 감시를 마칩니다." />
+        <Control Id="Install" Type="PushButton" X="260" Y="278" Width="78" Height="25" Default="yes" Text="설치"><Publish Event="EndDialog" Value="Return" Condition="DVMWATCHFOLDER" /></Control>
+        <Control Id="Cancel" Type="PushButton" X="348" Y="278" Width="88" Height="25" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>
+      </Dialog>
+      <Dialog Id="Maintenance" Width="430" Height="195" Title="DownloadVersionManager Watcher">
+        <Control Id="Body" Type="Text" X="24" Y="24" Width="382" Height="96" Text="프로그램을 복구하거나 제거합니다.&#13;&#10;감시 폴더의 파일과 _history는 보존합니다.&#13;&#10;열려 있는 프로그램을 종료한 뒤 진행하세요." />
+        <Control Id="Repair" Type="PushButton" X="110" Y="143" Width="88" Height="24" Default="yes" Text="복구"><Publish Property="REINSTALL" Value="ALL" /><Publish Property="REINSTALLMODE" Value="amus" /><Publish Event="EndDialog" Value="Return" /></Control>
+        <Control Id="Remove" Type="PushButton" X="208" Y="143" Width="88" Height="24" Text="제거"><Publish Property="REMOVE" Value="ALL" /><Publish Event="EndDialog" Value="Return" /></Control>
+        <Control Id="Cancel" Type="PushButton" X="306" Y="143" Width="88" Height="24" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>
+      </Dialog>
+      <Dialog Id="Complete" Width="430" Height="205" Title="DownloadVersionManager Watcher">
+        <Control Id="Body" Type="Text" X="24" Y="24" Width="382" Height="101" Text="프로그램 설치 작업을 마쳤습니다.&#13;&#10;시작 메뉴 → DownloadVersionManager Watcher에서 실행하세요.&#13;&#10;제거한 경우 감시 폴더의 파일과 _history는 보존됩니다." />
+        <Control Id="LaunchNow" Type="CheckBox" X="24" Y="129" Width="280" Height="20" Property="DVMLAUNCHAPP" CheckBoxValue="1" Text="지금 프로그램 실행" HideCondition="REMOVE" />
+        <Control Id="Close" Type="PushButton" X="320" Y="158" Width="78" Height="24" Default="yes" Cancel="yes" Text="닫기"><Publish Event="DoAction" Value="LaunchApplication" Condition="NOT REMOVE AND DVMLAUNCHAPP = 1" Order="1" /><Publish Event="EndDialog" Value="Return" Order="2" /></Control>
+      </Dialog>
+      <InstallUISequence><Show Dialog="Welcome" Before="Maintenance" Condition="NOT Installed" /><Show Dialog="Maintenance" Before="ExecuteAction" Condition="Installed AND NOT REMOVE AND NOT REINSTALL" /><Show Dialog="Complete" OnExit="success" /></InstallUISequence>
+    </UI>
+  </Package>
+</Wix>

@@ -1,7 +1,7 @@
-name: DownloadVersionManager Windows evaluation
+name: DownloadVersionManager folder watcher
 on:
   push:
-    branches: [main, 'codex/download-version-manager']
+    branches: [main]
     paths: ['tools/DownloadVersionManager/**', 'docs/tools/download-version-manager/**', '.github/workflows/download-version-manager.yml']
   pull_request:
     paths: ['tools/DownloadVersionManager/**', 'docs/tools/download-version-manager/**', '.github/workflows/download-version-manager.yml']
@@ -11,7 +11,7 @@ permissions:
 jobs:
   windows:
     runs-on: windows-2025
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,55 +19,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Install local WiX tool
+      - name: Install local WiX build tool
         shell: pwsh
-        run: dotnet tool install wix --version 4.0.6 --tool-path .tools/wix
-      - name: Build host, automatic tests and single evaluation MSI
+        working-directory: ${{ runner.temp }}
+        run: dotnet tool install wix --version 4.0.6 --tool-path "$env:GITHUB_WORKSPACE/.tools/wix"
+      - name: Build watcher MSI and focused changed-path checks
         shell: pwsh
-        run: ./tools/DownloadVersionManager/build/build.ps1 -Wix ./.tools/wix/wix.exe -LifecyclePackages
-      - name: Build separate upgrade fixture
-        shell: pwsh
-        run: ./tools/DownloadVersionManager/build/build.ps1 -Wix ./.tools/wix/wix.exe -Version 0.1.1
-      - name: Isolated native installer lifecycle
-        shell: pwsh
-        run: |
-          $testRoot = 'artifacts/download-version-manager/0.1.0-evaluation'
-          $stateFile = "$testRoot/ci-installer-results.json"
-          python tools/DownloadVersionManager/tests/integration/installer.py prepare --msi "$testRoot/DownloadVersionManager-0.1.0-x64.msi" --output $stateFile
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          python tools/DownloadVersionManager/tests/integration/installer.py resume --output $stateFile --upgrade artifacts/download-version-manager/0.1.1-evaluation/DownloadVersionManager-0.1.1-x64.msi --rollback "$testRoot/DownloadVersionManager-rollback-test.msi"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          python tools/DownloadVersionManager/tests/integration/presence.py --output "$testRoot/ci-installed-presence.json"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          python tools/DownloadVersionManager/tests/integration/installer.py cleanup --output $stateFile
-          exit $LASTEXITCODE
-      - name: Late installer rollback and subsequent reinstall
-        shell: pwsh
-        run: |
-          $testRoot = 'artifacts/download-version-manager/0.1.0-evaluation'
-          python tools/DownloadVersionManager/tests/integration/installer_faults.py --production "$testRoot/DownloadVersionManager-0.1.0-x64.msi" --late "$testRoot/DownloadVersionManager-late-rollback-test.msi" --postexecute "$testRoot/DownloadVersionManager-postexecute-rollback-test.msi" --output "$testRoot/ci-installer-late-fault-results.json"
-          exit $LASTEXITCODE
+        run: ./tools/DownloadVersionManager/build/build-watcher.ps1 -Wix ./.tools/wix/wix.exe -Tests
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: download-version-manager-evaluation
+          name: download-version-manager-watcher
           path: |
-            artifacts/download-version-manager/0.1.0-evaluation/DownloadVersionManager-0.1.0-x64.msi
-            artifacts/download-version-manager/0.1.0-evaluation/SHA256SUMS.txt
-            artifacts/download-version-manager/*/build-manifest.json
-            artifacts/download-version-manager/*/host-results.json
-            artifacts/download-version-manager/*/extension-tests.log
-            artifacts/download-version-manager/*/release-gate-tests.log
-            artifacts/download-version-manager/*/fixture-tests.log
-            artifacts/download-version-manager/*/resource-results.json
-            artifacts/download-version-manager/*/package-verification.json
-            artifacts/download-version-manager/*/ci-installer-results.json
-            artifacts/download-version-manager/*/ci-installed-presence.json
-            artifacts/download-version-manager/*/ci-installer-late-fault-results.json
+            artifacts/download-version-manager-watcher/0.2.0/DownloadVersionManager-Watcher-0.2.0-x64.msi
+            artifacts/download-version-manager-watcher/0.2.0/SHA256SUMS.txt
+            artifacts/download-version-manager-watcher/0.2.0/build-manifest.json
+            artifacts/download-version-manager-watcher/0.2.0/package-verification.json
+            artifacts/download-version-manager-watcher/0.2.0/*tests.log
           if-no-files-found: warn

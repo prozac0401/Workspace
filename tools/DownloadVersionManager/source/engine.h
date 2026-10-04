@@ -6,6 +6,12 @@ namespace dvm {
 struct Request {
     std::wstring newPath, logicalName; uint64_t downloadId = 0, completedAt = 0;
     std::wstring requestToken; // Per-download random token; browser IDs are not global.
+    // Folder input has its own approved arrival policy, not browser endTime.
+    bool folderPair = false;
+    bool requireSnapshot = false;
+    BY_HANDLE_FILE_INFORMATION expectedSource{};
+    bool requireTargetSnapshot = false;
+    BY_HANDLE_FILE_INFORMATION expectedTarget{};
 };
 struct Result {
     bool ok = false, changed = false; std::wstring status = L"internal_error", targetPath, newPath, oldPath;
