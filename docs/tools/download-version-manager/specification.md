@@ -1,6 +1,8 @@
 # DownloadVersionManager · 최초 제품 명세
 
-도구 ID: DownloadVersionManager · 제품 버전: 0.1.0 · 상태: 구현·평가, stable 인수 미완료
+도구 ID: DownloadVersionManager · 제품 버전: 0.1.0 · 상태: **미완료 평가 버전으로 보존, stable BLOCKED**
+
+2026-10-04 사용자 결정으로 0.1.0의 출시 준비를 여기서 마무리하고 미완료 상태로 남긴다. 아래는 기존 버전의 원본 요구와 구현 근거다. 이후 개발은 [차기 버전 명세](next-version-specification.md)와 [ADR-0028](../../design/0028-download-version-manager-folder-input.md)을 따른다. 지정 폴더 감시와 감시 프로세스 유지는 차기 버전의 채택 방향이며, 현재 0.1.0에 구현됐다는 뜻이 아니다. 기존 FAIL/NOT RUN과 설치 실패 복구 문제를 해결된 것으로 변경하지 않는다.
 
 원본 요구: 2026-09-30 사용자의 DownloadVersionManager 개발·시험·패키징·조건부 릴리즈 지시(0–33절). 조직 배포 설정·스토어 게시 계정·서명 주체는 미결정.
 

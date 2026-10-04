@@ -2,6 +2,15 @@
 
 Read the relevant original specification and `docs/policies/tools.md` before changing a tool. Policy source is Markdown under `docs/`; the generated site is not the editing source. Keep requirements, architecture decisions, user guidance and verification records consistent.
 
+## Highest implementation priority: confirmed requirements and minimum necessary work
+
+- At every implementation stage, implement only what a confirmed requirement or a demonstrated defect needs. Do not add speculative features, abstractions, dependencies, background behavior, or support matrices for hypothetical future needs.
+- Choose the smallest implementation that satisfies the requirement and preserves user data. Reuse existing behavior where its contract still applies; do not hide changed assumptions behind reuse.
+- Run only checks needed for the changed behavior, a demonstrated failure, or a material data/installation risk. Preserve existing evidence and required relevant checks. Do not repeat completed manual tests or broaden to full GUI, installer, performance, or whole-suite runs without a concrete reason.
+- For a stage, briefly state the requirement, intended change, and sufficient completion evidence in the existing work record. Stop expanding verification when that evidence is obtained unless a new failure or unresolved concern justifies more work. Do not create an extra approval or reporting workflow for routine choices.
+
+This user-confirmed principle applies to all tools and to future DownloadVersionManager work. It does not turn missing or failed evidence into a pass.
+
 For FolderState:
 
 - Preserve folder names and business files. State operations must not enumerate descendants or read business file contents.

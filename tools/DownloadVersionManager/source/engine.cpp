@@ -73,6 +73,13 @@ BY_HANDLE_FILE_INFORMATION info(HANDLE h) {
     return i;
 }
 uint64_t size(const BY_HANDLE_FILE_INFORMATION& i) { return (static_cast<uint64_t>(i.nFileSizeHigh)<<32)|i.nFileSizeLow; }
+bool sameSnapshot(const BY_HANDLE_FILE_INFORMATION& a,const BY_HANDLE_FILE_INFORMATION& b) {
+    return a.dwVolumeSerialNumber==b.dwVolumeSerialNumber &&
+        a.nFileIndexHigh==b.nFileIndexHigh && a.nFileIndexLow==b.nFileIndexLow &&
+        a.nFileSizeHigh==b.nFileSizeHigh && a.nFileSizeLow==b.nFileSizeLow &&
+        CompareFileTime(&a.ftLastWriteTime,&b.ftLastWriteTime)==0 &&
+        CompareFileTime(&a.ftCreationTime,&b.ftCreationTime)==0;
+}
 void ordinary(const BY_HANDLE_FILE_INFORMATION& i, bool dir) {
     if (!!(i.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)!=dir || (i.dwFileAttributes&(FILE_ATTRIBUTE_REPARSE_POINT|FILE_ATTRIBUTE_OFFLINE|FILE_ATTRIBUTE_ENCRYPTED)) || (!dir && i.nNumberOfLinks!=1)) fail(L"unsupported_file",ERROR_NOT_SUPPORTED);
     if (!dir && (i.dwFileAttributes&FILE_ATTRIBUTE_READONLY)) fail(L"permission_denied",ERROR_ACCESS_DENIED);
@@ -248,25 +255,31 @@ Result process(const Request& request
         auto n=file(newer,true);
         if (!equal(finalPath(n.v),newer)) fail(L"path_changed",ERROR_INVALID_NAME);
         const auto ni=info(n.v);
-        const auto incoming=completion(request,n.v);
+        if (request.requireSnapshot && !sameSnapshot(ni,request.expectedSource)) fail(L"source_changed",ERROR_INVALID_DATA);
+        const auto incoming=request.folderPair ? Completion{} : completion(request,n.v);
         const bool atTarget=equal(newer,target);
         std::unique_ptr<Handle> old;
         try { if (!atTarget) old=std::make_unique<Handle>(file(target,false)); }
         catch (const Error& e) { if (e.status!=L"target_missing") throw; }
-        FILE_ID_INFO targetId{};
-        if (atTarget) targetId=incoming.object;
-        else if (old) {
-            if (!equal(finalPath(old->v),target)) fail(L"path_changed",ERROR_INVALID_NAME);
-            targetId=objectId(old->v);
+        if (old && !equal(finalPath(old->v),target)) fail(L"path_changed",ERROR_INVALID_NAME);
+        if (request.requireTargetSnapshot && (!old || !sameSnapshot(info(old->v),request.expectedTarget))) fail(L"target_changed",ERROR_INVALID_DATA);
+        if (request.folderPair && !atTarget && !old) fail(L"target_missing",ERROR_FILE_NOT_FOUND);
+        Completion previous{};
+        std::unique_ptr<OrderStore> order;
+        bool stale=false;
+        if (!request.folderPair) {
+            FILE_ID_INFO targetId{};
+            if (atTarget) targetId=incoming.object;
+            else if (old) targetId=objectId(old->v);
+            order=std::make_unique<OrderStore>(target);
+            previous=order->current(atTarget || old ? &targetId : nullptr,incoming);
+            if (previous.present && previous.token==incoming.token &&
+                (!sameObject(previous.object,incoming.object) || previous.at!=incoming.at)) fail(L"request_token_reused",ERROR_INVALID_DATA);
+            if (previous.present && previous.at==incoming.at && previous.token!=incoming.token) fail(L"completion_order_ambiguous",ERROR_INVALID_DATA);
+            stale=previous.present && incoming.at<previous.at;
         }
-        OrderStore order(target);
-        const auto previous=order.current(atTarget || old ? &targetId : nullptr,incoming);
-        if (previous.present && previous.token==incoming.token &&
-            (!sameObject(previous.object,incoming.object) || previous.at!=incoming.at)) fail(L"request_token_reused",ERROR_INVALID_DATA);
-        if (previous.present && previous.at==incoming.at && previous.token!=incoming.token) fail(L"completion_order_ambiguous",ERROR_INVALID_DATA);
-        const bool stale=previous.present && incoming.at<previous.at;
         if (atTarget) {
-            if (!stale) order.prepare(previous,incoming);
+            if (!stale && order) order->prepare(previous,incoming);
             r.ok=true; r.status=L"already_current"; return r;
         }
         bool same=false;
@@ -281,11 +294,11 @@ Result process(const Request& request
             if (!SetFileInformationByHandle(n.v,FileDispositionInfo,&disp,sizeof(disp))) fail(L"permission_denied");
             r.ok=true; r.changed=true; r.status=L"superseded_same_content"; r.newPath=target; return r;
         }
-        if (!stale) {
+        if (!stale && order) {
 #ifdef DVM_TESTING
             if (hooks.fault==L"order_write") fail(L"order_state_unavailable",ERROR_ACCESS_DENIED);
 #endif
-            order.prepare(previous,incoming);
+            order->prepare(previous,incoming);
 #ifdef DVM_TESTING
             if (hooks.fault==L"crash_after_order_prepare") TerminateProcess(GetCurrentProcess(),77);
 #endif

@@ -1,54 +1,50 @@
-# DownloadVersionManager · 0.1.0 평가판
+# DownloadVersionManager · 0.2.0 폴더 감시
 
-같은 파일을 다시 받을 때 늘어나는 `보고서 (1).xlsx`, `보고서 (2).xlsx`를 현재 다운로드 이벤트에서 처리합니다. 최신 다운로드 파일 자체가 `보고서.xlsx`를 승계합니다. 같은 내용이면 이전 파일을 제거하고, 내용이 다를 때만 이전 파일을 `_history`에 보관합니다.
+**현재 상태(2026-10-04 KST): [무서명 기능 평가 prerelease](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0) 게시 완료입니다.** 브라우저 확장 없이 지정 폴더를 감시하는 네이티브 Windows 프로그램입니다. 기존 0.1.0 평가 버전과 과거 실패 기록은 보존합니다.
 
-**스토어 배포와 통합 설치 관문을 통과하지 않은 평가판입니다. MSI에 확장 파일을 넣었다는 사실을 확장 활성화 완료로 판단하지 않습니다.** 실제 시험 결과는 [TEST_RESULTS](TEST_RESULTS.md), 남은 제한은 [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md)를 확인하세요.
+[사용 안내](../../docs/tools/download-version-manager/index.md) · [0.2.0 명세](../../docs/tools/download-version-manager/next-version-specification.md) · [설계](../../docs/design/0028-download-version-manager-folder-input.md) · [실제 시험](TEST_RESULTS.md) · [남은 제한](KNOWN_LIMITATIONS.md)
 
 ## 사용 흐름
 
-Chrome/Edge의 Manifest V3 확장이 원래 이름을 다운로드 결정 이벤트에서 기억하고 `uniquify`를 제안합니다. 완료 이벤트에서 실제 저장 경로를 확인해 Native Messaging으로 Host를 한 번 실행합니다. Host는 작업 결과 하나를 반환하고 종료합니다. 정상 성공은 조용히 처리합니다.
+`DownloadVersionManager-Watcher-0.2.0-x64.msi` 한 파일을 설치합니다. 위자드에서 현재 Windows 다운로드 위치 또는 다른 폴더 한 곳을 선택합니다. 기본 다운로드 위치 변경 추종과 로그인 자동 실행은 기본 선택이며 해제할 수 있습니다. 외부 runtime이나 브라우저별 확장 설치는 필요하지 않습니다.
 
-| 기존·신규 내용 | 결과 |
+처음 폴더를 사용할 때 기존 `파일.ext`와 `파일 (n).ext` 그룹을 미리 보여 줍니다. 사용자가 번호 파일을 최신으로 선택하고 표시된 전체 그룹의 처리 순서에 동의하면 정리합니다. 선택 파일을 마지막에 원래 이름으로 이동합니다. 원래 파일 선택·그룹 보존·남은 그룹 모두 보존도 가능합니다. 검토를 취소하면 감시를 시작하지 않습니다.
+
+그 뒤 새 번호 파일은 같은 폴더의 원래 대상과 연결합니다. 3초 안정과 보호된 핸들 확보를 처리 조건으로 사용합니다. 이 조건은 앱 내부 다운로드 완료의 증명이 아닙니다. 같은 대상의 후보가 동시에 대기하면 모두 보존합니다.
+
+| 두 파일 | 결과 |
 |---|---|
-| 동일한 바이트 | 신규 파일이 원래 이름을 승계. History 생성 없음 |
-| 다른 바이트 | 이전 파일을 `_history/보고서_YYYYMMDD_HHMMSS.xlsx`로 이동. 신규 파일이 원래 이름을 승계 |
-| 기존 파일 없음 | 신규 파일을 원래 이름으로 이동 |
-| 파일 잠김·권한 부족 | 안전하게 바꿀 수 없으면 중단. 남아 있는 파일 확인 안내 |
+| 바이트가 같음 | 신규 객체가 원래 이름을 승계하고 이전 객체 제거, History 없음 |
+| 바이트가 다름 | 이전 객체를 `_history/stem_YYYYMMDD_HHMMSS[_001].ext`에 보관, 신규 객체가 원래 이름 승계 |
+| 원래 대상 없음·잠금·관찰 이후 외부 변경 | 보존 |
+| 동시에 같은 대상 후보 여럿 | 모두 보존하고 해당 세션의 자동 처리 보류 |
 
-크기를 먼저 비교하고 같을 때만 64 KiB 버퍼로 SHA-256을 계산합니다. Office/PDF 의미를 해석하지 않습니다. 신규 파일 ID와 파일 시간을 유지하는 이름 이동을 사용합니다. 내용이 다른 이전 파일의 timestamp는 History로 옮기는 로컬 시각입니다. 같은 초에는 `_001`, `_002`를 붙이고 확장자는 유지합니다.
+이름 suffix는 사용자 채택 관례입니다. 처음부터 번호가 있는 별개 이름도 원래 대상이 있으면 처리될 수 있으므로 이런 이름을 별개 문서로 사용하는 폴더에는 감시를 적용하지 않습니다. 직접 덮어쓴 이전 내용의 복구는 보장하지 않습니다.
 
-동시에 완료된 요청이 순서를 바꿔 도착해도 브라우저의 완료 시각이 더 늦은 객체를 유지합니다. 늦게 도착한 이전 다운로드는 내용이 다르면 History에 보존하고 같으면 제거합니다. 완료 시각이 같은 두 파일은 선후를 추측하지 않고 둘 다 보존한 뒤 알립니다. 실제 Chrome/Edge의 완료 시각 계약은 실기 검증이 남아 있습니다.
+## 시작·설정·제거
 
-## 설치·제거
+일반 사용자 프로세스 한 개가 선택 폴더의 OS 변경 알림을 비재귀로 받습니다. **감시 시작**·**감시 중지**를 제공하며 창을 닫으면 감시를 종료합니다. 로그인 자동 실행을 선택했다면 다음 로그인에서 다시 시작합니다.
 
-평가용 설치 파일은 `DownloadVersionManager-0.1.0-x64.msi` 하나입니다. 외부 런타임이나 관리자 권한 없이 `%LOCALAPPDATA%\Programs\DownloadVersionManager`와 HKCU Chrome/Edge NativeMessagingHosts에 설치하도록 구성했습니다. 실행 파일은 서명하지 않았습니다.
+Windows `FOLDERID_Downloads`에서 현재 사용자 다운로드 위치를 해석합니다. 기본 위치 추종을 선택한 경우 앱 시작과 사용자 폴더 registry 알림에서 경로를 갱신합니다. 사용자 지정 폴더는 위치 추종 대상이 아닙니다.
 
-설치 후 시작 메뉴의 **DownloadVersionManager 설치 마무리**에서 공식 개발용 확장 불러오기를 따라 `extension` 폴더를 선택합니다. 각 브라우저의 확장에서 **설치 연결 확인**을 누릅니다. 스토어 검토·게시 전의 평가용 fallback이며 일반 PC에서 완전 자동 단일 설치 요구를 충족하지 않습니다. 기업 정책을 변경하거나 보안을 우회하지 않습니다.
+설치 위치는 `%LOCALAPPDATA%/Programs/DownloadVersionManagerWatcher`, 설정·설치 등록·선택한 로그인 시작 항목은 HKCU입니다. 새 MSI 식별자와 경로는 0.1.0과 분리합니다. 구버전 설치·브라우저 등록·CompletionOrder는 자동 변환하거나 삭제하지 않습니다. 구버전 확장과 동일 폴더에서 함께 실행하지 않습니다.
 
-제거는 Windows의 설치된 앱에서 진행하고 확장은 각 브라우저에서 제거합니다. 프로그램 파일과 자기 Native Host 등록만 제거합니다. 다운로드 파일과 History는 사용자 데이터이며 설치 소유 자원이 아닙니다. 브라우저를 강제로 종료하거나 Explorer를 재시작하지 않습니다.
+제거 전에 프로그램을 닫습니다. 감시 폴더·History와 사용자 실행 설정은 보존합니다. 코드 서명이 없으며 조직의 도입·상용 승인을 의미하지 않습니다.
 
-대상별 최소 순서 기록은 제거·재설치 사이에 지연 요청이 최신본을 바꾸지 않도록 HKCU에 보존합니다. 파일 내용이나 경로 원문을 저장하지 않으며 정상 성공 로그가 아닙니다.
+## 파일 보존
 
-## 실패와 복구
+크기를 먼저 비교하고 같은 크기만 64 KiB 버퍼로 SHA-256을 계산합니다. 신규 객체와 그 파일 시간을 유지하는 이름 이동을 사용합니다. 파일 이동 실패 시 이전 이름 복구를 시도하고 복구 실패 위치를 안내합니다. 앱을 강제 종료하지 않습니다.
 
-기존 파일과 신규 파일을 모두 잃지 않도록 기존 객체를 먼저 안전한 이름으로 이동한 뒤 신규 객체를 이동합니다. 두 번째 이동이 실패하면 이전 파일의 원래 이름 복구를 시도합니다. 복구도 실패하면 이전 파일이 보관된 정확한 위치와 신규 파일 위치를 응답합니다. 잠긴 파일이나 앱을 강제 종료하지 않고 자동 재시도하지 않습니다.
+두 번의 이동은 하나의 트랜잭션이 아닙니다. 강제 종료·전원 장애 때 `_history` 또는 `.dvm-…pending`에 이전 객체가 남을 수 있습니다. 자동 복원·잔재 일괄 삭제는 없습니다. 파일 내용·내용 hash·telemetry를 외부에 전송하지 않습니다.
 
-같은 내용의 이전 객체도 신규 이동 전에 임시 이름으로 안전하게 보관합니다. 정상 완료에서 이를 삭제합니다. 강제 종료·전원 장애로 `_history`나 `.dvm-<random>.pending`에 이전 객체가 남을 수 있습니다. 파일을 직접 확인해 복구하세요. 이름 패턴으로 잔재를 일괄 삭제하지 않습니다.
-
-## 자원과 개인정보
-
-Native Host는 요청 한 번만 처리합니다. startup·서비스·tray·watcher·polling·자동 업데이트 daemon이 없습니다. 다운로드를 처리하지 않는 동안 제품 native process 목표는 0개입니다. 확장에도 keepalive나 장기 native connection이 없습니다.
-
-파일 내용·내용 hash·telemetry를 외부로 보내거나 장기 보관하지 않습니다. 다운로드 ID별 원래 이름·시각·임의 식별자·처리 단계만 브라우저 로컬 storage에 임시 보관합니다. 처리 후 지우고 7일 지난 metadata는 다음 이벤트에서 정리합니다. 오류는 경로 없는 최근 상태 하나만 남깁니다. 정상 성공 로그는 만들지 않습니다. Host는 HKCU에 target당 138-byte 완료 순서 상태만 갱신합니다. 값 이름은 대상 경로의 hash이고 값에는 시각·객체 ID·임의 식별자·무결성 checksum만 있으며 경로 원문·URL·내용 hash는 없습니다.
-
-## 개발
+## 제작과 증거
 
 ```powershell
-./tools/DownloadVersionManager/build/build.ps1
-# 같은 전체 제작 경로 (PowerShell을 실행할 수 없는 환경)
-python tools/DownloadVersionManager/build/build.py --msvc <MSVC-root> --sdk <SDK-root> --wix <wix.exe>
+python tools/DownloadVersionManager/build/build-watcher.py --tests --msvc <MSVC-root> --sdk <SDK-root> --wix <wix.exe>
 ```
 
-Windows x64 MSVC·Windows SDK·WiX 4·Python 3.12+·Node 22+가 제작용으로 필요합니다. 최종 사용자에게는 필요하지 않습니다. 상위 빌드는 production/test Host 분리, host/extension/protocol 시험, 자원 측정, MSI 생성·행정 추출·구조/파일 hash 검사와 SHA256SUMS 생성을 연결합니다. 실제 브라우저와 installer lifecycle은 별도 실기 관문입니다.
+Windows x64 MSVC·Windows SDK·WiX 4·Python이 제작용으로 필요합니다. C++ `/MT` 실행 파일과 MSI 하나를 제작하며 최종 사용자에게 개발 도구가 필요하지 않습니다. 변경된 폴더 입력·기존 그룹 처리·설치 위험에 필요한 검증만 수행합니다.
 
-구조: `source` Host, `extension` 공통 MV3, `tests/host`, `tests/extension`, `tests/integration`, `build`, `installer`. [명세](../../docs/tools/download-version-manager/specification.md) · [ADR-0026](../../docs/design/0026-download-version-manager.md) · [ADR-0027](../../docs/design/0027-download-completion-order.md) · [제작·CI 범위](CI_SCOPE.md) · [변경 이력](CHANGELOG.md). 제품 버전 0.1.0, Native Messaging protocol 2.
+`source/app.cpp`, `watcher.cpp`, `review.cpp`, 기존 `engine.cpp`를 새 빌드에서 사용합니다. 폴더 엔진 8건·watcher 15건·최초 그룹 4건과 MSI 구조 검사, 수정 후보의 설치/실행·repair·제거·파일 보존 5건, 화면 높이 수정 후보의 설치/실행·제거·보존 4건은 PASS입니다. 최종 안내 문구와 표준 MSI 폴더 선택 수정에는 관련 설치 근거를 재사용하고 경로 선택·설정 전달·취소를 별도로 확인했으며 새 late-failure의 설치 등록 rollback은 FAIL로 남습니다. [배포 기록](../../docs/delivery/download-version-manager-watcher-release-20261004.md)에 각 후보 지문과 한계를 구분했습니다.
+
+기존 `version.json`의 0.1.0 / protocol 2, `source/host.cpp`, `extension`, `build/build.py`와 기존 시험·산출물은 구버전 근거로 남깁니다. 0.1.0의 Win11 설치 실패 복구 FAIL·단일 배포 FAIL·실제 브라우저 NOT RUN을 새 버전의 PASS로 바꾸지 않습니다.
