@@ -2,7 +2,7 @@
 
 최초 기록: 2026-10-03 KST · 현재 계정 제안·정체 정정: 2026-10-04 KST · 책임: 도구 개발·검증 담당
 
-상태: 최종 EXE 실제 설치·대표 비교·native 보존 대조 완료 · T11 부분 기록 보존 · 평가 출시 준비
+상태: 최종 EXE 실제 설치·대표 비교·native 보존 대조·평가 prerelease 게시·다운로드 확인 완료 · T11 부분 기록 보존
 
 제품 버전: `0.2.0-rc.13` · 프로필: `focused-wording-evaluation` · `fullAcceptancePassed=false`
 
@@ -18,6 +18,8 @@
 
 ## 실제 결과
 
+2026-10-04 18:07:57 KST에 [RC13 평가 prerelease](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.13)를 게시했다. PR #13과 태그의 병합 커밋은 `35cb6ba61239af8ef92194842af7c4a7d8598dd3`, 실제 패키지 Source/Validation 동결 커밋은 `074531fa473446bbda6420e62fed0ff3037a92ed`다. 최종 EXE를 재제작하지 않고 자산을 완성했다. 네 자산과 네 체크섬을 게시 후 다시 내려받아 준비 파일·GitHub server digest·크기·SHA 일치를 확인했다. 다운로드 원시 SHA는 `411c38641f5c38d559d70b1e7dffc10c4756dcb670921b3cb35897033b2fd074`다. 현재 PC의 RC13을 유지하며 R12 자산은 보존한다. 공개 다운로드 안내도 RC13으로 갱신한다. 원시 진단·개인 경로는 자산에 포함하지 않았다.
+
 2026-10-04 최종 확인을 완료했다. 설치·시험 문서 정리·Excel 정상 종료는 사용자 확인, 대표 비교는 검증 담당의 Sky 실제 UI 관찰, 설치 경로·파일 해시·선정 설정은 일반 PowerShell의 native 읽기 대조로 구분한다. 각 목록 3개·제외 0개, Beta 2 대 1·첫 목록 초과 1개, Gamma 0 대 1·둘째 목록 초과 1개의 두 차이 행과 원본 여섯 셀 보존을 확인했다. 마지막 probe는 Excel 부재를 전후 검사했고 native 13개 객체와 선정 상태의 읽기 전후 불변을 확인했다.
 
 최종 native 원시 SHA `a96f11a0633f11fa54f100f03ba09876b9750e21bf5802660f6a86a20f6bc546`에서 설치 XLAM·제품 README/Setup/Uninstall과 관리 엔진 3파일은 prepared payload와 일치했다. 기존 권한 14개는 historical 원문과 같으며 비교 설정·정책·매크로 보안·다른 추가 기능 등록·OPEN·기존 신뢰 위치는 설치 전 native 기준과 같다. 앱 제거 등록의 DisplayVersion·InstallDate만 공식 설치 변경이다. manifest 내용은 probe가 읽지 않아 내부 필드 확인은 주장하지 않는다. 이 결과는 앞선 LocalCache 복구·미완료 T11과 다른 실제 설치 근거다.
@@ -28,7 +30,7 @@
 
 검증 담당이 현재 RC13 소스에서 실행한 집중 검사·격리 제작·저장 소스 audit·실제 새 안내/Replace와 후속 부분 T11을 기록한다. 환경은 Windows 11 10.0.22631, Excel 16.0 Build 20430 x64, Windows PowerShell 5.1.22621.6133이다. 전체 매크로·GUI suite는 NOT_RUN이며 과거 T11의 대표 비교·결과는 잠금 화면으로 미실행이었다. 최종 EXE의 대표 비교는 위 새 기록에서 완료했다.
 
-실제 XLAM의 릴리스 식별자는 `0.2.0-rc.13`, SHA-256은 `484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e`다. 제작 최종 해시와 소스 audit 전후 해시가 일치한다. 아래 최종 EXE는 비공개로 준비했고 ZIP·출하 자산은 아직 완성하지 않았다.
+제작·준비 당시 기록: 실제 XLAM의 릴리스 식별자는 `0.2.0-rc.13`, SHA-256은 `484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e`다. 제작 최종 해시와 소스 audit 전후 해시가 일치한다. 아래 최종 EXE는 비공개로 준비했고 ZIP·출하 자산은 아직 완성하지 않았다.
 
 준비 당시 기록: 2026-10-04 커밋 `4e220b1a4b0fb408b2b60b47d1807cb84220ce51`과 ADR-0024 SHA `bab569ef4d97eb641f78f4ee54252c95a75f3049a17e79c8610712af80aeb023`로 `prepare`를 실제 실행했다. `ExcelSmartListCompare-0.2.0-rc.13-Setup.exe`는 2,246,844 bytes, 파일 버전 `0.2.0.13001`, SHA-256 `14b081882513a89ccff4123245bd8950ab87d18d697fdfc6e193f0155d2c8cea`다. compiler는 한 번 실행했고 payload·EXE·비공개 준비 기록만 생성했다. `publicationReady=false`, 실제 설치·대표 비교 NOT_RUN, T11 원시 NOT_RUN_INCOMPLETE를 유지한다. 같은 EXE를 설치 확인 후 재빌드 없이 완성·게시한다.
 
@@ -161,10 +163,10 @@ R12 제작 당시 전체 시험 NOT_RUN과 2026-09-27 대표 비교·공존·정
 
 ## 출하 판단과 미확인 범위
 
-최종 EXE 실제 설치·정상 Excel 시작·대표 비교·원본 보존·소유 정리·정상 종료와 native 동일 후보·선정 설정 보존을 확인했다. 기존 T11은 PARTIAL / NOT_RUN_INCOMPLETE, StatusBar 실제 FAIL과 과거 82 PASS / 1 FAIL / 2 ERROR도 보존한다. RC13을 유지하며 제거·RC11 복구·전체 시험을 반복하지 않는다. 같은 EXE의 자산 완성과 PR 검토 후 서명 없는 평가 prerelease로 게시한다. 전체 인수·안정판·회사 승인은 아니다. 실제 게시·다운로드 결과는 후속 릴리스 기록을 따르며, 게시 전 공개 다운로드는 R12를 유지한다.
+최종 EXE 실제 설치·정상 Excel 시작·대표 비교·원본 보존·소유 정리·정상 종료와 native 동일 후보·선정 설정 보존을 확인했다. 기존 T11은 PARTIAL / NOT_RUN_INCOMPLETE, StatusBar 실제 FAIL과 과거 82 PASS / 1 FAIL / 2 ERROR도 보존한다. RC13을 유지하며 제거·RC11 복구·전체 시험을 반복하지 않는다. 같은 EXE의 자산 완성과 PR 검토·병합 후 서명 없는 평가 prerelease 게시를 완료했다. 전체 인수·안정판·회사 승인은 아니다. 실제 게시·다운로드 일치는 위 게시 후 기록을 따르며 공개 다운로드는 RC13이다. R12 자산은 보존한다.
 
 전체 GUI·공존·성능·취소·설치 suite를 무조건 재실행하지 않는다. 새 후보에서 실제 확인한 범위만 기록하며 x86 Office·새 PC·재부팅·회사 정책 환경, 서명·상용 인수는 별도 미확인 상태다. `fullAcceptancePassed=false`와 안정판 금지를 유지한다.
 
-원시 로그·화면·사용자 경로·레지스트리와 업무 자료는 artifacts의 로컬 증거로 보존하고 공개 요약에는 복사하지 않는다. 기존 공개 R12는 새 RC13 자산이 검증·게시되기 전까지 공개 안내의 다운로드 대상으로 유지한다.
+원시 로그·화면·사용자 경로·레지스트리와 업무 자료는 artifacts의 로컬 증거로 보존하고 공개 요약에는 복사하지 않는다. 기존 공개 R12는 별도 자산으로 보존하며 현재 공개 안내의 다운로드 대상은 RC13이다.
 
 [R13 명세](../tools/excel-list-compare/r13-specification.md) · [RC13 최초 결정](../../tools/ExcelSmartListCompare/docs/ADR-0021-R13-focused-wording-evaluation.md) · [StatusBar 평가 수용 결정](../../tools/ExcelSmartListCompare/docs/ADR-0022-R13-known-statusbar-evaluation.md) · [현재 계정 시험·원복 제안](../../tools/ExcelSmartListCompare/docs/ADR-0023-R13-current-account-trial.md) · [후보 검증 기록](../../tools/ExcelSmartListCompare/docs/RC13_RELEASE_REPORT.md) · [T11 조건부 대기](WORKSPACE_Tool_Backlog_20260926.md) · [R12 대표 공존](excel-coexistence-20260927.md)
