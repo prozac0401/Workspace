@@ -83,7 +83,7 @@ def main():
     pack.EXE_NAME = "ExcelSmartListCompare-" + VERSION + "-Setup.exe"
     exe = pack.compile_installer(args, output, payload)
     exe_hash = pack.digest(pack.read(exe))
-    commit = pack.git("rev-parse", "HEAD").decode("ascii")
+    commit = pack.git("rev-parse", "HEAD").decode("ascii").strip()
     renderer.render(TOOL / "docs/STABLE_USER_GUIDE.md", output / "QuickGuide.html",
                     commit, title="Excel 명단 비교 0.2.1", html_names={})
     user_files = {"Release/" + name: pack.read(payload / name) for name in NAMES}
