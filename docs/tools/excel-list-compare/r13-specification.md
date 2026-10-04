@@ -2,7 +2,7 @@
 
 도구 ID: ExcelSmartListCompare / EXCEL-LIST-COMPARE
 
-버전·상태: 0.2.0-rc.13 · 2026-10-04 갱신 · 새 안내/Replace 완료·T11 부분 실행·RC11 파일/등록 복구·일반 설치 대조 및 출하 대기
+버전·상태: 0.2.0-rc.13 · 2026-10-04 갱신 · 새 안내/Replace 완료·T11 부분 기록 보존·최종 EXE 실제 설치·대표 비교·평가 출시 대기
 
 제품 책임: 도구 개발·검증 담당
 
@@ -36,6 +36,8 @@ R12와 비교한 제품 변경은 선택된 요약 안내 한 줄과 새 릴리�
 
 ## 검증·지원과 출시 판단
 
+2026-10-04 현재 경로는 [ADR-0024](../../../tools/ExcelSmartListCompare/docs/ADR-0024-R13-final-installer-evaluation.md)가 아래 T11 단일 흐름·RC11 정확 원복 조건을 부분 대체한다. 사용자는 최종 RC13 설치 후 계속 사용을 선택했다. 같은 후보의 완료된 근거를 재사용하고 최종 EXE 실제 설치·대표 비교 한 번을 확인한다. 기존 T11 부분 실행을 PASS로 바꾸거나 역사적인 전체 registry·시각·SDDL exact를 문구 패치 출시 필수로 확대하지 않는다. 원본·설정·다른 추가 기능·정책 보존과 전체 인수·안정판 금지는 유지한다.
+
 R12 한정 `wording-only-no-tests` 예외는 재사용하지 않는다. 새 후보에서는 집중 소스 검사와 ASCII/UTF-8 일치, 저장한 XLAM의 VBA 7개 모듈·RibbonX 대조, 동일 파일의 기능·정상 종료, 새 안내·Replace 한 흐름, 패키지·해시·문서 검증을 구분해 기록한다. T11의 다음 제품 수정·후보 조건인 설치·비교·결과·제거는 기존 설치와 업무 자료를 보존할 수 있는 환경에서 최소 대표 흐름으로 확인한다. 확인할 수 없으면 환경 제약과 NOT_RUN을 남기고 출하 판단을 다시 한다.
 
 최신 배포조건 재분석·조정 요청에 근거한 개발 판단은 ADR-0022에서 StatusBar의 정확한 기존 FAIL만 명시적 opt-in으로 평가 prerelease에 수용한다. 시험·원시 FAIL을 지우거나 PASS로 바꾸지 않는다. 나머지 전역·원본·이전 결과·설치·보안·설정 보존과 소유 정리·자연 종료는 필수다. `fullAcceptancePassed=false`, `stablePublishAllowed=false`를 유지한다. 이 판단은 최종 파일 게시나 회사 배포 승인이 아니다.
@@ -54,7 +56,7 @@ StatusBar는 Excel의 평소 표시를 가릴 수 있는 프로세스 내 표시
 
 실제 후보·BuildOnly·저장 소스 audit·집중 소스 13개·native 평가 기록과 현재 입력 해시를 연결해 평가 수용을 대조했고 최종 보강 후 재대조도 완료했다. 기본 게이트는 native FAIL을 거절하고 명시적 StatusBar opt-in만 같은 실제 FAIL을 수용한다. 최종 포장 게이트 집중 16 PASS는 제품 소스 집중 13 PASS와 별도이며 이전 게이트 13개·14개 실행도 보존한다. 실제 포장 명령은 T11 NOT_RUN 기록을 종료 코드 1로 거절했으며 출력 폴더·ISCC·설치를 시작하지 않았다. 이는 패키징 성공이 아니다.
 
-현재 계정 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 공식 엔진 Upgrade·정상 자동 로드와 엔진 제거는 확인했으나, Windows 잠금 화면에서 중단해 대표 비교·결과는 실행하지 않았다. 현재 실행 view에서 관찰한 RC11 파일·등록·제품 신뢰와 원래 ACL 14개 복구를 실제 확인했다. 제품·관리 10파일의 바이트·기록 속성·생성/최종 쓰기 시각과 부모 2개 권한도 보존됐다. 제품 폴더 handle의 실제 경로는 Codex 패키지의 LocalCache 아래였고, 같은 소유 객체·5파일의 논리/물리 identity·원시 권한·내용 일치를 고정했다. 최초 백업의 물리 경로와 일반 Windows/Excel의 설치·등록 view 연결은 아직 미확인이다. 제품 밖 LastPurgeTime의 원인 미확정 관찰값도 쓰지 않고 보존했다. 전체 선정 상태 원복·일반 Excel 설치 복구·T11 PASS로 확대하지 않는다. 최종 EXE 실제 설치·포장·병합·태그·Release는 미실행이며 공개 다운로드는 R12로 유지한다. 세부 실제 결과와 실패·복구 근거는 [현재 계정 결정](../../../tools/ExcelSmartListCompare/docs/ADR-0023-R13-current-account-trial.md)과 [실행 기록](../../delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
+현재 계정 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 공식 엔진 Upgrade·정상 자동 로드와 엔진 제거는 확인했으나, Windows 잠금 화면에서 중단해 대표 비교·결과는 실행하지 않았다. 현재 실행 view에서 관찰한 RC11 파일·등록·제품 신뢰와 원래 ACL 14개 복구를 실제 확인했다. 제품·관리 10파일의 바이트·기록 속성·생성/최종 쓰기 시각과 부모 2개 권한도 보존됐다. 제품 폴더 handle의 실제 경로는 Codex 패키지의 LocalCache 아래였고, 같은 소유 객체·5파일의 논리/물리 identity·원시 권한·내용 일치를 고정했다. 최초 백업의 물리 경로는 아직 미확인이다. 후속 일반 PowerShell 진단에서는 실제 제품 폴더·5파일이 없고 관리 5파일·OPEN·신뢰 등록은 원래와 같은 것을 확인했다. 일반 Windows의 제품 복구는 미실행이다. Maximized·PrinterName의 원인 미확정 관찰 차이와 native LastPurgeTime의 원본 일치도 별도 기준으로 보존한다. 제품 밖 LastPurgeTime의 원인 미확정 관찰값도 쓰지 않고 보존했다. 전체 선정 상태 원복·일반 Excel 설치 복구·T11 PASS로 확대하지 않는다. 최종 EXE 실제 설치·포장·병합·태그·Release는 미실행이며 공개 다운로드는 R12로 유지한다. 세부 실제 결과와 실패·복구 근거는 [현재 계정 결정](../../../tools/ExcelSmartListCompare/docs/ADR-0023-R13-current-account-trial.md)과 [실행 기록](../../delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
 
 준비 당시 기록: 2026-10-04 직접 manifest·Setup·XLAM 릴리스 literal과 실행 소스 6개 대조에서 현재 설치를 RC11로 확정했다. 이전 제작·native에서 R12라 부른 같은 파일의 SHA `9b37c2f05318ef4500784978f62c0ea948bd2e703ef3e5590874c0ef89988176`와 원시 보존 관찰은 유지하고 설치 버전 표기를 정정한다. 공개 R12·RC12 소스 기준과 과거 R12 시험 생략 결정은 바꾸지 않는다. 현재 계정만 이용 가능하다는 답변 자체는 실행 승인이 아니며 후속 사용자 진행 지시를 별도로 기록했다. 비공개 백업 10파일 해시·선정 registry 32개 영역·ACL 14개 기록 확보와 원본 불변 확인은 실제 복원 성공이 아니며 T11·복원은 NOT_RUN이다. 제안하는 Upgrade→최소 대표 비교→engine 제거→기존 RC11 정확 원복은 다른 추가 기능·보안·정책·관리 파일·Windows 제거 등록을 보존하고 외부 변경 발견 시 중단한다. 후속 실제 결과는 현재 계정 결정과 검증 기록을 따른다.
 

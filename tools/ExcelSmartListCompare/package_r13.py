@@ -5,8 +5,10 @@ Missing/failed evidence denies packaging, except the explicit, narrowly validate
 RC13 StatusBar limitation decision. R12's no-tests decision is not reused.
 The command may compile Inno Setup; it never starts Excel, installs or publishes.
 BuildOnly requires separately approved temporary VBOM access and restored security.
-Native/installation records must come from later actual owned trials. An existing
-user R12 installation is not authority to remove/upgrade it or fabricate T11 PASS.
+Native/installation records must come from later actual owned trials. The default
+legacy path still requires T11. ADR-0024's explicit prepare/finalize path keeps one
+final EXE for actual human installation/comparison and later evaluation packaging.
+Neither a prepared EXE nor the preserved partial T11 record is installation PASS.
 """
 import argparse
 import hashlib
@@ -15,7 +17,6 @@ import io
 import json
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import zipfile
 
@@ -72,6 +73,11 @@ INSTALL_CHECKS = ("installedExactCandidate", "normalExcelStart", "comparisonExec
                   "resultWorkbookObserved", "sourceWorkbookPreserved", "userSettingsPreserved",
                   "unrelatedAddinsPreserved", "securitySettingsPreserved", "removalCompleted",
                   "preexistingProductStateRestored", "ownedResultsClosed", "excelExited")
+FINAL_INSTALL_CHECKS = tuple(name for name in INSTALL_CHECKS
+                            if name not in ("removalCompleted", "preexistingProductStateRestored"))
+FINAL_INSTALL_DECISION = "ADR-0024-R13-final-installer-evaluation.md"
+PARTIAL_T11_SCOPE = "RAW_OBSERVATIONS_ONLY: T11-installed-capture-compare-result"
+EXE_NAME = "ExcelSmartListCompare-" + VERSION + "-Setup.exe"
 KNOWN_STATUSBAR_ID = "STATUSBAR_BOOLEAN_FALSE_TO_STRING_FALSE"
 KNOWN_STATUSBAR_CANDIDATE_SHA256 = "484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e"
 KNOWN_STATUSBAR_DECISION = "ADR-0022-R13-known-statusbar-evaluation.md"
@@ -357,10 +363,124 @@ def evidence_guard(args, snapshot, sources, auditor):
     native = native_evidence(records["native_record"], exact, hashes,
                              getattr(args, "accept_known_statusbar_limitation", False),
                              digest(snapshot["docs/" + KNOWN_STATUSBAR_DECISION]))
-    exact_run(records["install_record"], exact, hashes, "T11-install-compare-result-remove", INSTALL_CHECKS)
-    if records["native_record"].get("nativeUiObserved") is not True or records["install_record"].get("actuallyInstalled") is not True:
-        raise PackageError("Source-only, simulated or NOT_RUN records cannot satisfy native/installation gates.")
+    if getattr(args, "phase", "legacy") == "legacy":
+        exact_run(records["install_record"], exact, hashes, "T11-install-compare-result-remove", INSTALL_CHECKS)
+        if records["install_record"].get("actuallyInstalled") is not True:
+            raise PackageError("Source-only, simulated or NOT_RUN records cannot satisfy installation gates.")
+    else:
+        final_install_decision(args, snapshot)
+        partial_t11_evidence(records["install_record"], exact, hashes)
     return candidate, exact, {name: digest(data) for name, data in evidence_data.items()}, native
+
+
+def final_install_decision(args, snapshot):
+    sha = getattr(args, "release_decision_sha256", None)
+    if (getattr(args, "retain_installed_rc13", False) is not True
+            or not isinstance(sha, str) or not re.fullmatch(r"[a-f0-9]{64}", sha)
+            or digest(snapshot["docs/" + FINAL_INSTALL_DECISION]) != sha):
+        raise PackageError("Prepare/finalize requires explicit RC13 retention and the exact ADR-0024 SHA.")
+    return {"decision": FINAL_INSTALL_DECISION, "decisionSha256": sha, "retainInstalledRC13": True}
+
+
+def partial_t11_evidence(record, exact, hashes):
+    # This is the actual incomplete raw observation format, not a replacement PASS.
+    if (record.get("schemaVersion") != 1 or record.get("releaseVersion") != VERSION
+            or record.get("scope") != PARTIAL_T11_SCOPE or record.get("status") != "NOT_RUN_INCOMPLETE"
+            or record.get("observedFlowComplete") is not False or record.get("sourceHashes") != hashes
+            or record.get("fullAcceptancePassed") is not False or record.get("releaseApproved") is not False
+            or any(record.get(key) != exact for key in ("expectedSha256", "actualSha256", "finalSha256"))):
+        raise PackageError("Preserve the actual incomplete T11 raw record; do not replace it with PASS or a template.")
+    return {"status": record["status"], "scope": record["scope"], "observedFlowComplete": False,
+            "releaseRequirementReplacedBy": FINAL_INSTALL_DECISION}
+
+
+def final_installer_evidence(path, exe_sha, exact, hashes):
+    data = read(path)
+    record = parse_json(data)
+    checks = record.get("checks")
+    if (record.get("schemaVersion") != 2 or record.get("status") != "PASS"
+            or record.get("releaseVersion") != VERSION
+            or record.get("scope") != "final-installer-and-representative-comparison"
+            or record.get("evidenceOrigin") != "direct-human-attestation-and-native-readonly"
+            or record.get("nativeUiObserved") is not True or record.get("actuallyInstalled") is not True
+            or record.get("fullAcceptancePassed") is not False or record.get("releaseApproved") is not False
+            or "failure" not in record or record["failure"] is not None or record.get("cleanupErrors") != []
+            or record.get("exeSha256") != exe_sha or record.get("installedXlamSha256") != exact
+            or record.get("sourceHashes") != hashes or not isinstance(checks, dict)
+            or set(checks) != set(FINAL_INSTALL_CHECKS)
+            or any(checks[name] != "PASS" for name in FINAL_INSTALL_CHECKS)):
+        raise PackageError("Actual final EXE installation/comparison must match this prepared EXE and installed XLAM.")
+    references = record.get("evidenceFiles")
+    if not isinstance(references, dict) or set(references) != {"humanAttestation", "nativeReadOnly"}:
+        raise PackageError("The actual human reply and native read-only audit must be linked by file SHA.")
+    pins = {}
+    for name, reference in references.items():
+        if (not isinstance(reference, dict) or set(reference) != {"path", "sha256"}
+                or not isinstance(reference["path"], str) or not reference["path"]
+                or not isinstance(reference["sha256"], str) or not re.fullmatch(r"[a-f0-9]{64}", reference["sha256"])):
+            raise PackageError("Invalid final installation evidence file reference: " + name)
+        raw = read(path.parent / reference["path"])
+        if not raw.strip() or digest(raw) != reference["sha256"]:
+            raise PackageError("Final installation evidence changed: " + name)
+        if name == "nativeReadOnly":
+            audit = parse_json(raw)
+            if (audit.get("status") != "PASS" or audit.get("scope") != "final-installed-candidate-readonly"
+                    or audit.get("releaseVersion") != VERSION or audit.get("exeSha256") != exe_sha
+                    or audit.get("installedXlamSha256") != exact
+                    or audit.get("nativeFileSystemViewConfirmed") is not True):
+                raise PackageError("Native read-only evidence must confirm the actual installed candidate and final EXE.")
+            raw_reference = audit.get("rawEvidenceFile")
+            if (not isinstance(raw_reference, dict) or set(raw_reference) != {"path", "sha256"}
+                    or not isinstance(raw_reference["path"], str) or not raw_reference["path"]
+                    or not isinstance(raw_reference["sha256"], str)
+                    or not re.fullmatch(r"[a-f0-9]{64}", raw_reference["sha256"])):
+                raise PackageError("Native assessment needs its actual read-only raw record SHA.")
+            raw_native = read((path.parent / reference["path"]).parent / raw_reference["path"])
+            observed = parse_json(raw_native)
+            if (digest(raw_native) != raw_reference["sha256"]
+                    or observed.get("status") != "READ_ONLY_LAUNCH_VIEW_CAPTURED"
+                    or observed.get("nativeFileSystemViewConfirmed") is not True
+                    or observed.get("readObservedStateUnchanged") is not True):
+                raise PackageError("Actual native read-only raw evidence must be unchanged and confirm the native view.")
+            pins["nativeReadOnlyRaw"] = digest(raw_native)
+        pins[name] = digest(raw)
+    return {"status": "PASS", "scope": record["scope"], "evidenceOrigin": record["evidenceOrigin"],
+            "actuallyInstalled": True, "checks": checks, "recordSha256": digest(data), "evidenceSha256": pins}
+
+
+def prepared_installer_guard(output, expected_payload, exact, hashes, evidence_hashes, decision, snapshot):
+    prepared = parse_json(read(output / "PreparedInstaller.private.json"))
+    exe = output / EXE_NAME
+    if (prepared.get("schemaVersion") != 1 or prepared.get("status") != "PREPARED_FOR_HUMAN_INSTALLATION"
+            or prepared.get("product") != "ExcelSmartListCompare" or prepared.get("version") != VERSION
+            or prepared.get("releaseProfile") != PROFILE or prepared.get("publicationReady") is not False
+            or prepared.get("fullAcceptancePassed") is not False or prepared.get("stablePublishAllowed") is not False
+            or prepared.get("decision") != decision or prepared.get("xlamSha256") != exact
+            or prepared.get("sourceHashes") != hashes or prepared.get("evidenceSha256") != evidence_hashes
+            or prepared.get("packagerSha256") != digest(snapshot["package_r13.py"])
+            or prepared.get("installerSourceSha256") != digest(snapshot["installer/SingleFile.iss"])
+            or prepared.get("payloadSha256") != {name: digest(data) for name, data in expected_payload.items()}
+            or not isinstance(prepared.get("exeSha256"), str)
+            or not re.fullmatch(r"[a-f0-9]{64}", prepared["exeSha256"])
+            or digest(read(exe)) != prepared["exeSha256"]):
+        raise PackageError("The prepared EXE, payload, source inputs, decision or evidence changed.")
+    payload = output / "payload"
+    no_redirects(payload)
+    if (set(item.name for item in payload.iterdir()) != set(expected_payload)
+            or any(read(payload / name) != data for name, data in expected_payload.items())):
+        raise PackageError("Prepared compiler payload changed; do not rebuild or replace the EXE.")
+    return prepared
+
+
+def compile_installer(args, output, payload):
+    result = subprocess.run([str(args.iscc), "/Qp", "/DPayloadDir=" + str(payload), "/DEngineVersion=" + VERSION,
+                             "/DFileVersion=" + FILE_VERSION, "/O" + str(output), str(TOOL / "installer/SingleFile.iss")],
+                            cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    (output / "compiler.private.log").write_bytes(result.stdout)
+    exe = output / EXE_NAME
+    if result.returncode or not exe.is_file():
+        raise PackageError("Inno Setup failed; partial output remains private and must not be published.")
+    return exe
 
 
 def public_text(data, name):
@@ -388,12 +508,27 @@ def main():
     parser.add_argument("--iscc", type=Path, default=Path(r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"))
     parser.add_argument("--accept-known-statusbar-limitation", action="store_true",
                         help="Accept only the frozen ADR-0022 RC13 Boolean-False StatusBar limitation; keep its native FAIL.")
+    parser.add_argument("--phase", choices=("legacy", "prepare", "finalize"), default="legacy",
+                        help="Legacy requires T11; prepare creates one private EXE; finalize packages that same installed EXE.")
+    parser.add_argument("--retain-installed-rc13", action="store_true",
+                        help="Use the user's recorded ADR-0024 choice to keep the final RC13 installation.")
+    parser.add_argument("--release-decision-sha256", help="Exact SHA-256 of the adopted ADR-0024 bytes.")
+    parser.add_argument("--final-installer-record", type=Path,
+                        help="Finalize only: actual human installation/comparison with native read-only evidence.")
     args = parser.parse_args()
     no_redirects(args.output)
     output = args.output.resolve()
     artifacts = (REPO / "artifacts").resolve()
-    if output == artifacts or not output.is_relative_to(artifacts) or output.exists():
+    if output == artifacts or not output.is_relative_to(artifacts):
+        raise PackageError("Use an output directory below repository artifacts.")
+    if args.phase == "finalize":
+        if (not output.is_dir() or any((output / name).exists() for name in ("Release", "Verification", "Package.json"))
+                or args.final_installer_record is None):
+            raise PackageError("Finalize requires the prepared directory, a final installation record and no completed/partial package.")
+    elif output.exists():
         raise PackageError("Use a fresh output directory below repository artifacts.")
+    if args.phase != "finalize" and args.final_installer_record is not None:
+        raise PackageError("Final installation evidence belongs to finalize only.")
     if args.candidate.suffix.lower() != ".xlam":
         raise PackageError("An explicit current RC13 XLAM is required.")
     # Load all evidence before invoking compiler or creating any output.
@@ -401,6 +536,8 @@ def main():
     if any(not path.is_file() for path in records_present):
         raise PackageError("Publication denied: required build/focused/native/installation evidence is missing.")
     snapshot = {name: read(TOOL / name) for name in SNAPSHOT}
+    if args.phase != "legacy":
+        snapshot["docs/" + FINAL_INSTALL_DECISION] = read(TOOL / "docs" / FINAL_INSTALL_DECISION)
     exporter = module(TOOL / "tests/export_ascii.py", "rc13_ascii_exporter")
     auditor = module(TOOL / "tests/audit_candidate.py", "rc13_source_auditor")
     scope = scope_guard(snapshot, exporter)
@@ -429,53 +566,79 @@ def main():
     for name, data in frozen.items():
         if normalized(data) != normalized(git("show", commit + ":" + name)):
             raise PackageError("Commit every RC13 packaging input before packaging: " + name)
-    if not args.iscc.is_file():
-        raise PackageError("Inno Setup compiler is missing.")
-    no_redirects(args.iscc)
+    if args.phase != "finalize":
+        if not args.iscc.is_file():
+            raise PackageError("Inno Setup compiler is missing.")
+        no_redirects(args.iscc)
     for name in ("docs/RC13_USER_GUIDE.md", "docs/RC13_RELEASE_REPORT.md"):
         public_text(snapshot[name], name)
     history = snapshot["docs/RC13_RELEASE_REPORT.md"].decode("utf-8-sig")
     if any(text not in history for text in ("82 PASS", "1 FAIL", "2 ERROR")):
         raise PackageError("The report must preserve the earlier 82 PASS / 1 FAIL / 2 ERROR aggregate and its scope/causes.")
-    output.mkdir(parents=True)
-    release, verification, payload = output / "Release", output / "Verification", output / "payload"
-    for directory in (release, verification, payload):
-        directory.mkdir()
     header = ("# Excel 명단 비교 RC13 · 서명 없는 평가 후보\n\n"
               "선택한 요약 안내의 집중 확인 범위이며 전체 인수·안정판·조직 배포 승인을 뜻하지 않습니다. "
               "현재 후보의 실제 확인과 기존 실패·미실행 범위는 Verification의 기록을 따릅니다.\n\n")
     guide = (header + snapshot["docs/RC13_USER_GUIDE.md"].decode("utf-8-sig")).encode("utf-8")
-    (release / "README.md").write_bytes(guide)
-    (release / "ExcelSmartListCompare.xlam").write_bytes(candidate)
-    for name in ("Setup.ps1", "Install.cmd", "Uninstall.cmd"):
-        (release / name).write_bytes(snapshot[name])
+    release_files = {"README.md": guide, "ExcelSmartListCompare.xlam": candidate,
+                     **{name: snapshot[name] for name in ("Setup.ps1", "Install.cmd", "Uninstall.cmd")}}
+    pins, definitions = {}, []
+    for name, macro in {"Install.cmd": "InstallHash", "Uninstall.cmd": "UninstallHash", "Setup.ps1": "SetupHash", "README.md": "ReadmeHash", "ExcelSmartListCompare.xlam": "XlamHash"}.items():
+        pins[name] = digest(release_files[name])
+        definitions.append(f'#define {macro} "{pins[name]}"\n')
+    expected_payload = {**release_files, "PayloadHashes.iss": "".join(definitions).encode("ascii"),
+                        "manager.id": b"SLC-68A45C44-2026-OneFile-1\n"}
+    hashes = {name: digest(data) for name, data in sources.items()}
+    decision = final_install_decision(args, snapshot) if args.phase != "legacy" else None
+    t11 = partial_t11_evidence(parse_json(read(args.install_record)), exact, hashes) if decision else None
+    final_install, prepared = None, None
+    payload = output / "payload"
+    if args.phase == "finalize":
+        prepared = prepared_installer_guard(output, expected_payload, exact, hashes, evidence_hashes, decision, snapshot)
+        exe = output / EXE_NAME
+        final_install = final_installer_evidence(args.final_installer_record, prepared["exeSha256"], exact, hashes)
+        compiler_sha = prepared["compilerSha256"]
+    else:
+        output.mkdir(parents=True)
+        payload.mkdir()
+        for name, data in expected_payload.items():
+            (payload / name).write_bytes(data)
+        exe = compile_installer(args, output, payload)
+        compiler_sha = digest(read(args.iscc))
+    if (any(read(REPO / name) != data for name, data in frozen.items()) or read(args.candidate) != candidate
+            or any(digest(read(getattr(args, name))) != value for name, value in evidence_hashes.items())
+            or any(read(payload / name) != data for name, data in expected_payload.items())):
+        raise PackageError("Frozen source/candidate changed during packaging; publication denied.")
+    if args.phase == "prepare":
+        prepared = {"schemaVersion": 1, "status": "PREPARED_FOR_HUMAN_INSTALLATION", "product": "ExcelSmartListCompare",
+                    "version": VERSION, "releaseProfile": PROFILE, "publicationReady": False,
+                    "fullAcceptancePassed": False, "stablePublishAllowed": False, "decision": decision,
+                    "sourceCommit": commit, "sourceHashes": hashes, "sourceScope": scope,
+                    "sourceInputSha256": {name: digest(data) for name, data in frozen.items()},
+                    "evidenceSha256": evidence_hashes, "nativeEvidence": native, "T11Evidence": t11,
+                    "xlamSha256": exact, "exeSha256": digest(read(exe)), "fileVersion": FILE_VERSION,
+                    "compilerSha256": compiler_sha, "installerSourceSha256": digest(snapshot["installer/SingleFile.iss"]),
+                    "packagerSha256": digest(snapshot["package_r13.py"]),
+                    "payloadSha256": {name: digest(data) for name, data in expected_payload.items()},
+                    "actualFinalInstallation": "NOT_RUN", "packagingDoesNotInstallOrPublish": True}
+        with (output / "PreparedInstaller.private.json").open("x", encoding="utf-8") as stream:
+            stream.write(json.dumps(prepared, ensure_ascii=False, indent=2) + "\n")
+        print("One RC13 EXE prepared privately for actual human installation/comparison. Publication ready: false.")
+        return
+    release, verification = output / "Release", output / "Verification"
+    release.mkdir()
+    verification.mkdir()
+    for name, data in release_files.items():
+        (release / name).write_bytes(data)
     renderer.render(TOOL / "docs/RC13_USER_GUIDE.md", release / "QuickGuide.html", commit, title="Excel 명단 비교 RC13 평가 후보", html_names={})
     quick = release / "QuickGuide.html"
     quick.write_text(quick.read_text(encoding="utf-8").replace("<main>",
         "<main><p><strong>서명 없는 RC13 평가 후보.</strong> 집중 확인 범위이며 전체 인수·안정판·조직 배포 승인을 뜻하지 않습니다.</p>", 1), encoding="utf-8")
-    pins, definitions = {}, []
-    for name, macro in {"Install.cmd": "InstallHash", "Uninstall.cmd": "UninstallHash", "Setup.ps1": "SetupHash", "README.md": "ReadmeHash", "ExcelSmartListCompare.xlam": "XlamHash"}.items():
-        shutil.copyfile(release / name, payload / name)
-        pins[name] = digest(read(payload / name))
-        definitions.append(f'#define {macro} "{pins[name]}"\n')
-    (payload / "PayloadHashes.iss").write_text("".join(definitions), encoding="ascii")
-    (payload / "manager.id").write_text("SLC-68A45C44-2026-OneFile-1\n", encoding="ascii")
-    result = subprocess.run([str(args.iscc), "/Qp", "/DPayloadDir=" + str(payload), "/DEngineVersion=" + VERSION,
-                             "/DFileVersion=" + FILE_VERSION, "/O" + str(output), str(TOOL / "installer/SingleFile.iss")],
-                            cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    (output / "compiler.private.log").write_bytes(result.stdout)
-    exe = output / ("ExcelSmartListCompare-" + VERSION + "-Setup.exe")
-    if result.returncode or not exe.is_file():
-        raise PackageError("Inno Setup failed; partial output remains private and must not be published.")
-    if (any(read(REPO / name) != data for name, data in frozen.items()) or read(args.candidate) != candidate
-            or any(digest(read(getattr(args, name))) != value for name, value in evidence_hashes.items())):
-        raise PackageError("Frozen source/candidate changed during packaging; publication denied.")
     validation = {"schemaVersion": 1, "product": "ExcelSmartListCompare", "version": VERSION,
                   "releaseProfile": PROFILE, "releaseDecision": "FOCUSED_EVALUATION_ONLY",
                   "fullAcceptancePassed": False, "releaseApproved": False, "stablePublishAllowed": False,
                   "prereleaseRequired": True, "sourceCommit": commit, "sourceScope": scope,
                   "xlamSha256": exact, "exeSha256": digest(read(exe)), "fileVersion": FILE_VERSION,
-                  "compilerSha256": digest(read(args.iscc)),
+                  "compilerSha256": compiler_sha,
                   "codeSigning": "UNSIGNED", "payloadSha256": pins, "privateEvidenceIncluded": False,
                   "sourceInputSha256": {name: digest(data) for name, data in frozen.items()},
                   "evidenceSha256": evidence_hashes,
@@ -484,7 +647,7 @@ def main():
                              "focusedSourceContracts": "13 PASS / 0 FAIL / 0 ERROR",
                              "nativeSummaryReplace": ("PASS WITH KNOWN LIMITATION: one actual flow"
                                  if native["acceptedKnownLimitation"] else "PASS: one flow"),
-                             "T11Installation": "PASS: one flow"},
+                             "T11Installation": "NOT_RUN_INCOMPLETE: preserved raw partial flow" if decision else "PASS: one flow"},
                   "notEstablished": ["fullAcceptance", "fullPythonSuite", "fullExcelSuite", "performance", "physicalEscCancellation",
                                      "allInstallerLifecycleCases", "newWrapperActualInstallation", "freshProfile", "otherOfficeBuilds", "organizationalApproval"]
                                      + (["defaultBooleanStatusBarRestoration"] if native["acceptedKnownLimitation"] else []),
@@ -492,11 +655,23 @@ def main():
                   "earlierPartialAggregate": {"passed": 82, "failed": 1, "errors": 2, "currentRun": False,
                                               "status": "HISTORICAL_INCOMPLETE: see preserved causes and limits in Completion-Report.html"},
                   "packagingDoesNotInstallOrPublish": True}
+    if final_install:
+        validation["finalInstallationDecision"] = decision
+        validation["T11Evidence"] = t11
+        validation["finalInstallerEvidence"] = final_install
+        validation["preparedSourceCommit"] = prepared["sourceCommit"]
+        validation["checks"]["finalInstallerAndRepresentativeComparison"] = "PASS: actual final EXE and installed XLAM"
+        validation["notEstablished"].remove("newWrapperActualInstallation")
     data = (json.dumps(validation, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     public_text(data, "Validation.json")
     (verification / "Validation.json").write_bytes(data)
     renderer.render(TOOL / "docs/RC13_RELEASE_REPORT.md", verification / "Completion-Report.html", commit,
                     title="Excel 명단 비교 RC13 집중 검증 기록", html_names={"RC13_RELEASE_REPORT.md": "Completion-Report.html"})
+    if final_install:
+        report = verification / "Completion-Report.html"
+        report.write_text(report.read_text(encoding="utf-8").replace("<main>",
+            "<main><p><strong>최종 EXE 설치·대표 비교: PASS.</strong> 사람이 실제 확인한 동일 EXE와 설치 XLAM의 해시는 Validation.json을 따릅니다. "
+            "기존 T11 부분 실행·원시 FAIL은 보존하며 전체 인수·안정판 승인으로 확대하지 않습니다.</p>", 1), encoding="utf-8")
     for path in (*release.glob("*.html"), *verification.glob("*.html")):
         public_text(read(path), path.name)
     assets = [exe]
@@ -512,11 +687,17 @@ def main():
     source_zip = output / (prefix + "-Source.zip")
     write_zip(source_zip, {"Workspace/" + name: data for name, data in frozen.items()})
     assets.append(source_zip)
+    if final_install:
+        prepared_installer_guard(output, expected_payload, exact, hashes, evidence_hashes, decision, snapshot)
+        if final_installer_evidence(args.final_installer_record, prepared["exeSha256"], exact, hashes) != final_install:
+            raise PackageError("Actual final installation evidence changed during packaging.")
     for path in assets:
         path.with_name(path.name + ".sha256").write_text(digest(read(path)) + "  " + path.name + "\n", encoding="ascii")
     (output / "Package.json").write_text(json.dumps({"version": VERSION, "sourceCommit": commit,
         "releaseProfile": PROFILE, "packageComplete": True, "fullAcceptancePassed": False, "stablePublishAllowed": False,
         "nativeEvidence": native,
+        **({"publicationReady": True, "finalInstallationDecision": decision,
+            "T11Evidence": t11, "finalInstallerEvidence": final_install} if final_install else {}),
         "assets": [{"name": path.name, "bytes": path.stat().st_size, "sha256": digest(read(path))} for path in assets]}, indent=2) + "\n", encoding="utf-8")
     print("RC13 unsigned evaluation package prepared. Full acceptance/stable publication: denied.")
 

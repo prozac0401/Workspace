@@ -1,6 +1,6 @@
 # ADR-0023 · R13 현재 계정의 최소 설치 시험과 기존 설치 원복
 
-상태: 채택 · T11 부분 실행·RC11 파일/등록 복구 · 실행 view의 원래 권한 복구·대표 비교·결과 및 일반 설치 대조 미완료
+상태: 부분 대체 · T11 부분 실행·실행 view 복구 기록 보존 · 최종 RC13 설치·유지는 ADR-0024
 
 날짜: 2026-10-04 · 적용: 동일 RC13 후보의 T11 한 흐름
 
@@ -11,6 +11,8 @@
 대체·대체됨 관계: [ADR-0021](ADR-0021-R13-focused-wording-evaluation.md)의 보존 가능한 환경에서 T11을 실제 확인한다는 조건은 유지한다. 별도 시험 환경을 먼저 확보하는 실행 제안 대신 승인된 현재 계정 경로를 적용한다. [ADR-0022](ADR-0022-R13-known-statusbar-evaluation.md)의 동일 후보 StatusBar 평가 예외·결정 SHA·원시 native FAIL은 변경하지 않는다. 이 결정은 실제 실행 성공이나 회사 배포 승인이 아니다.
 
 ## 맥락
+
+2026-10-04 후속 [ADR-0024](ADR-0024-R13-final-installer-evaluation.md)는 사용자가 최종 RC13을 설치하고 계속 사용하기로 선택한 근거로 아래 RC11 복구·재업그레이드·제거·재복구 경로를 대체한다. 일반 Windows의 원래 파일 부재는 최종 RC13 설치가 정상화한 사실로 해결하며 RC11 원복 완료로 표시하지 않는다. 아래 단계별 계획·실제 실패·성공·환경 한계는 과거 기록으로 보존한다. 최종 EXE 설치·대표 비교는 아직 미실행이다.
 
 사용자는 별도 Windows/Excel 환경 대신 현재 계정만 사용할 수 있다고 알렸다. 이 답변은 환경 정보이며 기존 제품의 실제 업그레이드·제거·원복이나 신뢰 등록 재생성을 승인한 것으로 해석하지 않는다. 기존 fresh-install 절차는 Upgrade/Repair 발견 시 중단하는 절차였으므로 현재 계정에서 그대로 실행하지 않는다.
 
@@ -83,7 +85,21 @@ Upgrade 자체의 실패 rollback과, 성공한 Upgrade 이후 제거·기존 RC
 
 LastPurgeTime의 관찰값은 그대로이며 `exactSelectedStateRestored=false`, `initialBackupPhysicalViewConfirmed=false`, `nativeUnpackagedInstallationVerified=false`다. 원래 AI 차이가 남았다는 판단은 위 후속 실제 복구로 갱신하되, 과거 실패·원인 미확정·현재 환경 한계를 보존한다. 대표 비교·결과는 계속 미실행이고 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 새 Upgrade·Excel 실행·최종 EXE 설치·포장·병합·태그·Release는 이 복구에서 수행하지 않았다. StatusBar 예외·전체 인수 및 안정판 금지는 변경하지 않았다.
 
-다음 최소 확인은 사람이 시작 메뉴에서 연 일반 PowerShell의 읽기 전용 대조다. 제품/관리의 알려진 10파일·handle 실제 경로·원래 권한 14개·선정 32영역을 새 비공개 기록에 읽고 전후 불변을 확인한다. 설치·Excel 시작·파일/등록/보안 변경은 없다. 일반 설치 view와 현재 관찰 view의 차이가 있으면 새 시험을 시작하지 않고 원래 백업·실제 값과 관계를 분석한다. 동일성이 확인된 뒤에만 최신 계속 지시 범위에서 같은 후보의 미완료 T11 재개 계획·새 시작 기준·원복 guard를 별도로 고정한다. 과거 한 흐름 기록을 수정·재사용하거나 사람이 재시도를 금지한 것으로 확대하지 않는다.
+당시 제안한 최소 확인은 사람이 시작 메뉴에서 연 일반 PowerShell의 읽기 전용 대조였다. 그 읽기 진단은 아래에 완료 결과를 기록했고, 이후 T11 재개 계획은 ADR-0024의 최종 설치·RC13 유지 경로로 대체했다. 제품/관리의 알려진 10파일·handle 실제 경로·원래 권한 14개·선정 32영역을 새 비공개 기록에 읽고 전후 불변을 확인한다. 설치·Excel 시작·파일/등록/보안 변경은 없다. 일반 설치 view와 현재 관찰 view의 차이가 있으면 새 시험을 시작하지 않고 원래 백업·실제 값과 관계를 분석한다. 동일성이 확인된 뒤에만 최신 계속 지시 범위에서 같은 후보의 미완료 T11 재개 계획·새 시작 기준·원복 guard를 별도로 고정한다. 과거 한 흐름 기록을 수정·재사용하거나 사람이 재시도를 금지한 것으로 확대하지 않는다.
+
+## 2026-10-04 일반 PowerShell의 읽기 진단: 실제 제품 부재
+
+사용자가 시작 메뉴에서 연 일반 PowerShell로 읽기 전용 probe를 실행했다. 원시 SHA는 `f6b14d9dc7b2ad8eca60d4893bcd0bc1d3679370608d29aa7edc246c4704b039`, probe 소스 SHA는 `90ccaeb40d0725907d7749229460bc118d7da65fd8e5046692f4d566fbf166c0`다. 상태는 READ_ONLY_LAUNCH_VIEW_CAPTURED이며 제품·등록·ACL 쓰기, Excel·설치 실행, UI 입력은 없었다. 선정 상태·ACL·13개 객체의 전후 관찰을 대조했다. 현재 제품 디렉터리와 5파일은 absent다. 관리 폴더·Engine·5파일의 7객체는 실제 logical 경로와 handle final path가 정확히 같고 identity·기록 metadata가 전후 동일하다. 관리 5파일의 원래 바이트·기록 metadata도 exact다. 기존 ACL 8개는 원래와 같으며 제품 대상 6개는 부재다. nativeFileSystemViewConfirmed=false는 13개 중 6개 부재와 함께 원문으로 보존한다.
+
+따라서 현재 Codex LocalCache의 14 ACL 복구와 일반 Windows의 원래 설치 복구는 다른 결과다. 일반 Windows에는 원래 제품 파일이 아직 없다. OPEN과 Location6의 값·자료형·소유 식별은 원본과 같으므로 등록 재생성·Path 변경은 필요하지 않다. 최초 백업·Upgrade 때의 물리 경로 기원은 여전히 미확정이고, 현재 부재를 선택한 안내 패치의 기능 회귀로 단정하지 않는다.
+
+일반 진단의 선정 registry 32영역은 역사 원본과 Excel Options의 Maximized(DWORD)·PrinterName(REG_SZ) 데이터만 다르다. 32/64 alias로 반복돼 4 leaf 차이이며 값 존재·자료형·키 구조는 같다. 발생 원인·시점·시험 소유는 미확정이다. 일반 진단의 LastPurgeTime은 역사 원본과 같고, Codex 복구 view의 보존 관찰값과 다르다. 이 세 값은 각 view의 원시 기록을 유지하며 덮어쓰거나 원복하지 않는다. 다른 선정 등록과 Pos·OPEN·Location6는 역사 원본과 같다. 이 일반 진단 전체를 새 native 비교 기준으로 별도 고정한다.
+
+현재 환경에서 공식 Volume GUID/current-SID HKU alias로 같은 대상만 읽은 대조도 일반 진단과 일치하지 않았다. 제품·등록·권한 쓰기는 없었다. alias 이름·package identity 없음만으로 일반 view를 얻었다고 주장하지 않고 그 방식의 실제 복구는 실행하지 않았다.
+
+당시 제안한 다음 행동은 일반 PowerShell로 없는 제품 디렉터리와 원래 5파일만 복구하는 것이었다. 이 복구 제안은 미실행으로 남겼으며 이후 ADR-0024의 최종 RC13 설치·유지 경로로 대체했다. 일반 진단의 32영역과 관리 7객체·기존 8권한, 현재 사용자·원래 backup/source SHA와 제품 소유 식별을 쓰기 전에 다시 대조한다. private 단계에서 5파일의 원래 바이트·기록 속성·생성/최종 쓰기 시각·ACL을 확정하고, exclusive 생성한 실제 제품 폴더의 handle 경로·identity·volume을 확인한 뒤 replacement 없는 같은-volume move로 복원한다. 이미 활성인 OPEN·신뢰 등록을 고려해 XLAM은 마지막에 활성화한다. 새로 만든 소유 대상에만 필요할 때 원래 ACL을 복원하고, registry·관리 파일·부모 ACL·다른 추가 기능은 쓰지 않는다. 외부 변경·Excel·redirect·예상 밖 파일·불일치 시 중단하며 단일 실행 marker와 실패·partial journal을 보존한다.
+
+원래 native 제품 복구는 아직 NOT_RUN이다. Codex 환경의 default 읽기 실행은 제품 부재 조건에서 setter/파일 쓰기 전에 FAIL / NOT_RUN으로 거절돼 잘못된 view의 실행을 수용하지 않았다. 일반 PowerShell의 실제 복구와 최종 대조 전에는 14권한·10파일이 native에서 복구됐다고 쓰지 않는다. 대표 비교·결과·새 Upgrade·최종 EXE·포장·병합·태그·Release도 미실행이며 T11 미완료·전체 인수 및 안정판 금지를 유지한다.
 
 원시 백업·ACL·registry 값·사용자 경로·화면·진단은 artifacts에 비공개로 보존한다. 공개 기록에는 이 요약만 싣는다.
 
@@ -91,6 +107,6 @@ LastPurgeTime의 관찰값은 그대로이며 `exactSelectedStateRestored=false`
 
 T11은 실제 설치 후보·정상 자동 로드·대표 비교·결과 관찰·원본/설정/다른 추가 기능/보안 보존·제거·기존 제품 원복·소유 결과 정리·자연 종료의 12조건을 각각 실제 증거와 연결한다. `scope=T11-install-compare-result-remove`, `flowCount=1`, 동일 후보와 7입력 SHA를 기록한다. 준비용 NOT_RUN 체크리스트를 PASS로 편집하지 않는다.
 
-현재 계정 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 공식 엔진 Upgrade·정상 자동 로드와 엔진 제거는 확인했으나, Windows 잠금 화면에서 중단해 대표 비교·결과는 실행하지 않았다. 현재 실행 view에서 관찰한 RC11 파일·등록·제품 신뢰와 원래 ACL 14개 복구를 실제 확인했다. 제품·관리 10파일의 바이트·기록 속성·생성/최종 쓰기 시각과 부모 2개 권한도 보존됐다. 제품 폴더 handle의 실제 경로는 Codex 패키지의 LocalCache 아래였고, 같은 소유 객체·5파일의 논리/물리 identity·원시 권한·내용 일치를 고정했다. 최초 백업의 물리 경로와 일반 Windows/Excel의 설치·등록 view 연결은 아직 미확인이다. 제품 밖 LastPurgeTime의 원인 미확정 관찰값도 쓰지 않고 보존했다. 전체 선정 상태 원복·일반 Excel 설치 복구·T11 PASS로 확대하지 않는다. 최종 EXE 실제 설치·포장·병합·태그·Release는 미실행이며 공개 다운로드는 R12로 유지한다. 이 부분 실행은 기존 실패를 지우거나 T11 게이트를 완화한 결정이 아니다.
+현재 계정 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 공식 엔진 Upgrade·정상 자동 로드와 엔진 제거는 확인했으나, Windows 잠금 화면에서 중단해 대표 비교·결과는 실행하지 않았다. 현재 실행 view에서 관찰한 RC11 파일·등록·제품 신뢰와 원래 ACL 14개 복구를 실제 확인했다. 제품·관리 10파일의 바이트·기록 속성·생성/최종 쓰기 시각과 부모 2개 권한도 보존됐다. 제품 폴더 handle의 실제 경로는 Codex 패키지의 LocalCache 아래였고, 같은 소유 객체·5파일의 논리/물리 identity·원시 권한·내용 일치를 고정했다. 최초 백업의 물리 경로는 아직 미확인이다. 후속 일반 PowerShell 진단에서는 실제 제품 폴더·5파일이 없고 관리 5파일·OPEN·신뢰 등록은 원래와 같은 것을 확인했다. 일반 Windows의 제품 복구는 미실행이다. Maximized·PrinterName의 원인 미확정 관찰 차이와 native LastPurgeTime의 원본 일치도 별도 기준으로 보존한다. 제품 밖 LastPurgeTime의 원인 미확정 관찰값도 쓰지 않고 보존했다. 전체 선정 상태 원복·일반 Excel 설치 복구·T11 PASS로 확대하지 않는다. 최종 EXE 실제 설치·포장·병합·태그·Release는 미실행이며 공개 다운로드는 R12로 유지한다. 이 부분 실행은 기존 실패를 지우거나 T11 게이트를 완화한 결정이 아니다.
 
 비공개 백업·registry 값·소유 토큰·사용자 경로·ACL·화면·원시 로그는 공개 문서·패키지에 넣지 않는다.
