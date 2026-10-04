@@ -2,7 +2,9 @@
 
 DownloadVersionManager 0.2.0은 선택한 폴더의 새 파일을 감지해 원래 이름을 유지하고, 내용이 달라진 이전 파일만 `_history`에 보관하는 Windows 프로그램입니다. 브라우저 확장 설치는 필요하지 않습니다.
 
-**0.2.0의 무서명 평가용 MSI를 준비했으며 아직 공개 게시하지 않았습니다.** 설치 파일 이름은 `DownloadVersionManager-Watcher-0.2.0-x64.msi`입니다. 이전 0.1.0은 미완료 평가 버전입니다.
+[0.2.0 MSI 다운로드](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.0/DownloadVersionManager-Watcher-0.2.0-x64.msi) · [릴리즈 안내](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0) · [SHA-256 체크섬](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.0/SHA256SUMS.txt)
+
+**서명 없는 평가판**입니다. 설치 파일은 `DownloadVersionManager-Watcher-0.2.0-x64.msi` 하나입니다. 이전 0.1.0은 미완료 평가 버전입니다.
 
 ## 설치와 감시 시작
 
@@ -17,7 +19,7 @@ msiexec.exe /x '{6CF9F782-F53F-5964-AEEA-BC1CC63A20C5}'
 ```
 
 1. 설치 화면의 현재 Windows 다운로드 폴더를 확인합니다. 기본 설정은 Windows에서 다운로드 위치를 바꾸면 그 위치를 따릅니다.
-2. 다른 폴더를 쓰려면 기본 위치 선택을 끄고 **찾아보기**로 폴더를 고릅니다.
+2. 다른 폴더를 쓰려면 **찾아보기**로 폴더를 고릅니다. 직접 선택하면 기본 위치 추종이 해제됩니다.
 3. **Windows 로그인 시 자동 실행**은 기본으로 켜져 있습니다. 자동 실행을 원하지 않으면 설치 화면에서 해제합니다.
 4. 설치를 마치고 프로그램을 실행합니다. 처음 사용하는 폴더에 기존 번호 파일이 있으면 아래 확인 화면이 먼저 열립니다.
 

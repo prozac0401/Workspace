@@ -1,6 +1,6 @@
 # DownloadVersionManager 0.2.0 · 폴더 감시 릴리즈 기록
 
-날짜: 2026-10-04 KST · 제품: 0.2.0 x64 · 상태: **무서명 기능 평가 prerelease 준비 완료, 게시 전**
+날짜: 2026-10-04 KST · 제품: 0.2.0 x64 · 상태: **무서명 기능 평가 prerelease 게시 완료**
 
 이 기록은 실제 실행한 범위만 남긴다. 기존 0.1.0의 설치 실패·미검증·미게시 결과를 보존하며 상용 승인으로 분류하지 않는다.
 
@@ -40,7 +40,7 @@
 | 최종 위자드 다른 폴더 선택·설정 전달·취소 | **PASS** | 표준 MSI 선택 창에서 격리된 빈 폴더를 선택. 선택 경로 표시·기본 추종 해제·MSI session property 전달 확인. 취소 1602·preflight clean, 업무 다운로드 폴더 미변경 |
 | 다음 로그인·실행 중 OS 다운로드 위치 변경 | **NOT RUN** | 현재 위치 해석과 소스 구현으로 해당 실기 성공을 대신하지 않음 |
 | 문서 strict·공개 링크 | **PASS** | MkDocs strict, 공개 19개·기존 이동 2개·404·검색/사이트맵·생성 로컬 링크. 내부 명세·배포 기록·진단 제외 |
-| tag·Release·공개 자산 | **NOT RUN** | 게시 전 |
+| tag·Release·공개 자산 | **PASS** | 2026-10-04 20:40:22 KST 게시. tag가 최종 source commit에 연결, MSI·체크섬 2개를 다운로드해 최종 hash와 일치 확인 |
 
 합계 27개 집중 결과와 수정 후보의 5개·화면 높이 수정 후보의 4개 설치 결과를 구분하며 전체 Host/확장·대용량·브라우저별 시험을 반복하지 않았다. 초기 후보의 INSTALLFOLDER 전달 오류와 제거 후 잔류 검사 FAIL은 보존하고 수정 후보의 성공과 구분한다. GUI 하단 설명 잘림도 보존하고 창 높이 수정 후 실제 표시를 확인했다. 설치 실패 복구는 새 제품에도 남는 실제 제한이다. 정상 설치 성공이나 다른 MSI identity를 근거로 과거 0.1.0 실패를 해결됐다고 바꾸지 않는다.
 
@@ -52,6 +52,6 @@
 
 ## 릴리즈 경계
 
-의도한 태그는 `download-version-manager-v0.2.0`이고 사용자 핵심 자산은 MSI와 `SHA256SUMS.txt`다. 정상 설치·실행·제거 근거와 알려진 installer 실패 복구 제한을 포함한 **무서명 기능 평가 prerelease**를 준비했다. 아직 공개 링크를 활성화하거나 Release 게시 완료를 선언하지 않는다.
+[Release](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0)를 2026-10-04 20:40:22 KST에 무서명 기능 평가 prerelease로 게시했다. 태그 `download-version-manager-v0.2.0`는 source commit `6d4bb38eeb52b0755de3ed9108c42c037b121d30`에 연결된다. [MSI](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.0/DownloadVersionManager-Watcher-0.2.0-x64.msi)와 [SHA256SUMS](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.0/SHA256SUMS.txt) 두 자산만 게시했다. 실제 게시 자산 다운로드와 체크섬 비교는 PASS이며 `public-assets-results.json`에 남겼다. 공개 안내의 설치 링크를 활성화했다. 원시 로그·로컬 경로·시험 파일은 Release에 올리지 않았다.
 
-게시 후 실제 태그·자산 다운로드·checksum·설치 안내 링크를 확인해 이 기록을 마무리한다. 조직 도입·서명 주체·상용 승인은 미결정이다.
+[소스 PR #16](https://github.com/prozac0401/Workspace/pull/16)은 열려 있으며 main merge와 Pages 사이트 배포 완료를 의미하지 않는다. 조직 도입·서명 주체·상용 승인은 미결정이며 알려진 installer 실패 복구 제한을 포함한다.

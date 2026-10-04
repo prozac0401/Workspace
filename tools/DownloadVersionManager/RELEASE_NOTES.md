@@ -1,6 +1,6 @@
-# DownloadVersionManager 0.2.0 · 폴더 감시 릴리즈 노트 초안
+# DownloadVersionManager 0.2.0 · 폴더 감시 릴리즈 노트
 
-**무서명 기능 평가 prerelease를 준비했으며 공개 Release 게시 전입니다.** 관련 설치·실행·제거 근거를 확보했고 알려진 실패 복구 제한을 포함합니다. 상용 승인 또는 모든 설치 실패 복구를 인증한 릴리즈로 분류하지 않습니다.
+**[무서명 기능 평가 prerelease](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0)를 게시했습니다.** 관련 설치·실행·제거 근거를 확보했고 알려진 실패 복구 제한을 포함합니다. 상용 승인 또는 모든 설치 실패 복구를 인증한 릴리즈로 분류하지 않습니다.
 
 사용자 설치 파일은 `DownloadVersionManager-Watcher-0.2.0-x64.msi` 하나입니다. 현재 사용자에게 설치하며 외부 runtime과 브라우저 확장이 필요하지 않습니다. 설치 위자드에서 현재 Windows 다운로드 폴더 또는 다른 폴더를 고릅니다. 기본 다운로드 위치 변경 추종과 로그인 자동 실행은 기본 선택이며 해제할 수 있습니다.
 
@@ -18,7 +18,7 @@ Windows 11 x64·고정 로컬 NTFS에서 폴더 엔진 8건, watcher 대표 세�
 
 감시 중 일반 사용자 프로세스 한 개가 유지됩니다. 창을 닫으면 감시가 끝나며 시작 메뉴에서 다시 실행할 수 있습니다. 제거 전에 프로그램을 닫습니다. 감시 폴더·History와 사용자 실행 설정은 보존합니다. 구버전 0.1.0 설치·브라우저 등록·순서 상태는 자동 변경하지 않으며 같은 폴더에서 구버전 확장과 함께 실행하지 않습니다.
 
-예정 태그: `download-version-manager-v0.2.0`. 아직 자산 링크를 활성화하지 않습니다. 실제 결과는 [TEST_RESULTS](TEST_RESULTS.md), 제한은 [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md)를 따릅니다.
+태그: `download-version-manager-v0.2.0`. [MSI 다운로드](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.0/DownloadVersionManager-Watcher-0.2.0-x64.msi) · [SHA256SUMS](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.0/SHA256SUMS.txt). 게시된 두 자산을 실제 다운로드해 체크섬을 확인했습니다. 실제 결과는 [TEST_RESULTS](TEST_RESULTS.md), 제한은 [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md)를 따릅니다.
 
 ## 0.1.0 당시 릴리즈 노트 초안 — 미게시 기록 보존
 

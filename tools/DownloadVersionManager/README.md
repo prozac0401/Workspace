@@ -1,6 +1,6 @@
 # DownloadVersionManager · 0.2.0 폴더 감시
 
-**현재 상태(2026-10-04 KST): 무서명 기능 평가 prerelease 준비 완료, 공개 MSI 게시 전입니다.** 브라우저 확장 없이 지정 폴더를 감시하는 네이티브 Windows 프로그램입니다. 기존 0.1.0 평가 버전과 과거 실패 기록은 보존합니다.
+**현재 상태(2026-10-04 KST): [무서명 기능 평가 prerelease](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0) 게시 완료입니다.** 브라우저 확장 없이 지정 폴더를 감시하는 네이티브 Windows 프로그램입니다. 기존 0.1.0 평가 버전과 과거 실패 기록은 보존합니다.
 
 [사용 안내](../../docs/tools/download-version-manager/index.md) · [0.2.0 명세](../../docs/tools/download-version-manager/next-version-specification.md) · [설계](../../docs/design/0028-download-version-manager-folder-input.md) · [실제 시험](TEST_RESULTS.md) · [남은 제한](KNOWN_LIMITATIONS.md)
 

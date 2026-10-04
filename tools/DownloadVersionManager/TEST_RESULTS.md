@@ -16,7 +16,7 @@
 | 설치 위자드의 기본 위치·선택 표시·취소 | **PASS**: 실제로 이동된 Windows 다운로드 위치를 해석해 표시, 기본 위치 추종·로그인 자동 실행 체크 확인. 취소 exit 1602, 설치하지 않음 |
 | 최종 위자드 다른 폴더 선택·설정 전달·취소 | **PASS**: 표준 MSI BrowseDlg/PathEdit로 빈 artifact 폴더 선택, 화면 경로와 MSI session property 일치·FollowDownloads 해제·edit 활성화. 취소 1602/preflight clean. 네이티브 화면 갱신 FAIL·동일 dialog 재생성 2856·포커스 없는 자동화 실패는 별도 보존 |
 | 다음 Windows 로그인·실행 중 OS 다운로드 위치 실제 변경 | **NOT RUN**: 소스 구현과 현재 위치 해석 확인을 실제 다음 로그인·이동 실기 성공으로 확대하지 않음 |
-| 공개 Release·다운로드·checksum 공개 확인 | **NOT RUN / 게시 전** |
+| 공개 Release·다운로드·checksum 공개 확인 | **PASS**: source commit `6d4bb38eeb52b0755de3ed9108c42c037b121d30`의 tag, GitHub prerelease 게시, MSI·SHA256SUMS 2개 실제 다운로드·지문 일치 |
 | 문서 strict·공개 범위·로컬 링크 | **PASS**: MkDocs strict, 공개 19개·기존 이동 2개·404·검색/사이트맵·생성 로컬 링크. 내부 명세·배포 기록·원시 진단 제외 |
 
 이번 집중 확인은 엔진 8·watcher 15·최초 그룹 4, 합계 27개 결과이며 설치 후보의 5개 결과와 구분한다. 기존 Host/확장 전체 suite·대용량 성능·브라우저별 시험표를 반복하지 않았다. 파일 내용이 보존됐다는 결과를 모든 설치 실패 복구 PASS로 확장하지 않는다.
