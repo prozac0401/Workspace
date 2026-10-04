@@ -27,17 +27,17 @@ File List to Excel v1.2.0의 설치·복구·제거와 이전 버전 업그레�
 
 | 프로그램 | 설치 파일 | 확인할 내용 |
 |---|---|---|
-| FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·사용](docs/tools/folderstate/index.md) |
+| FolderState 0.1.3 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3) | [설치·사용](docs/tools/folderstate/index.md) |
 | Excel 명단 비교 0.2.1 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.1/ExcelSmartListCompare-0.2.1-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.1) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
 | 선택범위 내보내기 0.1.0-rc.10 평가판 | [Excel x64용 EXE](https://github.com/prozac0401/Workspace/releases/download/excel-selection-export-v0.1.0-rc.10/ExcelSelectionExport-0.1.0-rc.10-x64-Setup.exe) · [x86용·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.10) | [설치·사용·알려진 제한](docs/tools/excel-selection-export/index.md) |
 | File List to Excel 1.2.0 | [Windows x64 MSI](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [배포 자료](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) | [설치·사용 안내](docs/tools/file-list-to-excel/index.md) |
-| 업무 책갈피 0.2.8 평가판 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.8/WorkBookmark-0.2.8-win-x64.msi) · [평가판 배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) | [설치·사용 안내](docs/tools/bookmark/index.md) |
+| 업무 책갈피 0.2.8 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.8/WorkBookmark-0.2.8-win-x64.msi) · [배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) | [설치·사용 안내](docs/tools/bookmark/index.md) |
 | 그림 복사·저장 0.2.0 | [Windows x64 MSI](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.0/ImageCopySave-0.2.0-x64.msi) · [릴리스 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) | [설치·사용·기존 자료 보존](docs/tools/image-copy-save/guide.md) |
 | 보이는 칸 붙여넣기 0.1.1 | [Windows 단일 설치 EXE](https://github.com/prozac0401/Workspace/releases/download/visible-cells-paste-v0.1.1-setup.1/VisibleCellsPaste-0.1.1-Setup.exe) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1) | [설치·사용 안내](docs/tools/visible-cells-paste/index.md) |
 
 Excel 명단 비교 0.2.1은 Excel의 상태표시줄을 보존하고 기존 제품 도구 모음에 진행·취소 결과를 표시합니다. 같은 저장 후보의 실제 회귀·비교·설정·복구 검사와 정상 종료·기존 설치 보존을 확인했습니다. [0.2.1 제작·검증 기록](tools/ExcelSmartListCompare/docs/STABLE_RELEASE_REPORT.md)에서 실제 실행·재사용 근거·미검증 범위를 구분합니다. 설치 파일에는 코드 서명이 없습니다.
 
-업무 책갈피 0.2.8 평가판은 한 줄 메모·오른쪽 화살표 스티커를 유지하고, Edge·Chrome에 이어 네이버 Whale의 확장 없는 웹페이지 기록을 추가했습니다. 실제 Whale에서의 기록·재열기는 아직 미검증입니다. 제목 클릭 또는 Ctrl+E로 편집하고 다른 창으로 이동하면 자동 저장하며, 작은 스티커는 편집할 동안만 커집니다. 직접 선택한 표시 방식과 조절한 크기는 유지합니다. DB v5를 유지하며 업데이트 전에 [백업·설정 변경 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 MSI·ZIP은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8)에서 제공합니다.
+업무 책갈피 0.2.8은 한 줄 메모·오른쪽 화살표 스티커를 유지하고, Edge·Chrome에 이어 네이버 Whale의 확장 없는 웹페이지 기록을 추가했습니다. 사용자가 실제 Whale에서 저장·재열기가 정상 동작함을 확인했습니다. [정식 채널 전환 기록](docs/delivery/stable-tools-release-20261005.md)에 사용자 확인과 자동시험·미검증 범위를 구분합니다. 제목 클릭 또는 Ctrl+E로 편집하고 다른 창으로 이동하면 자동 저장하며, 작은 스티커는 편집할 동안만 커집니다. 직접 선택한 표시 방식과 조절한 크기는 유지합니다. DB v5를 유지하며 업데이트 전에 [백업·설정 변경 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 MSI·ZIP은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8)에서 제공합니다.
 
 현재 배포·검증 결과와 과거 기록은 [배포·검증 안내](docs/delivery/index.md)에서 구분해 확인하세요.
 
@@ -85,4 +85,4 @@ assets/       다중 해상도 상태 아이콘
 
 Excel 최초 입력 자료는 [원본 보존 폴더](tools/ExcelSmartListCompare/archive/README.md)에 있습니다. 생성물은 artifacts/, bin/, obj/, site/에 두고 Git에 포함하지 않습니다. 이전 로컬 ExcelE2E-* 시험 폴더도 추적하지 않습니다.
 
-배포 단계와 확인 결과는 [품질 기준](docs/delivery/quality.md), [검증 기록](docs/delivery/verification.md)에서 확인하세요. 제작자를 확인하는 코드 서명과 새 PC에서의 설치·업데이트·제거 검증이 끝나기 전에는 상용 정식판으로 분류하지 않습니다.
+배포 단계와 확인 결과는 [품질 기준](docs/delivery/quality.md), [검증 기록](docs/delivery/verification.md)에서 확인하세요. 사용자 요청에 따른 정식 릴리스 채널과 코드 서명·회사별 도입 승인은 구분합니다. 확인하지 않은 환경과 상용 인수 조건은 각 검증 기록에 남깁니다.

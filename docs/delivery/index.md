@@ -12,15 +12,15 @@ DownloadVersionManager 0.1.0은 공개 릴리스 전의 [평가 후보 기록](d
 
 | 도구 | 설치·사용 안내 | 배포와 검증 기록 |
 |---|---|---|
-| FolderState 0.1.3 RC1 | [설치·사용·문제 해결](../tools/folderstate/index.md) | [공개 MSI 수명주기](folderstate-lifecycle-20260926.md) · [2026-09-20 게시](releases-20260920.md) · [사용성 시험](folderstate-usability-20260919.md) |
-| Excel 명단 비교 0.2.0 R12 | [설치·사용](../tools/excel-list-compare/index.md) | [R12 제작·배포 기록](../../tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md) · [테스트 미실행 결정](../../tools/ExcelSmartListCompare/docs/ADR-0020-R12-wording-release.md) |
+| FolderState 0.1.3 | [설치·사용·문제 해결](../tools/folderstate/index.md) | [정식 전환](stable-tools-release-20261005.md) · [공개 MSI 수명주기](folderstate-lifecycle-20260926.md) · [2026-09-20 게시](releases-20260920.md) · [사용성 시험](folderstate-usability-20260919.md) |
+| Excel 명단 비교 0.2.1 | [설치·사용](../tools/excel-list-compare/index.md) | [0.2.1 정식 배포·실제 Excel 검증](../../tools/ExcelSmartListCompare/docs/STABLE_RELEASE_REPORT.md) |
 | 선택범위 내보내기 0.1.0-rc.10 평가판 | [설치·사용](../tools/excel-selection-export/index.md) | [rc.10 Undo 검증](excel-selection-export-undo-20260926.md) · [후속 게시](backlog-releases-20260927.md) |
 | File List to Excel 1.2.0 | [설치·사용](../tools/file-list-to-excel/index.md) | [원본 릴리스](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) · [Workspace 소개 게시](excel-tools-publication-20260924.md) |
 | 보이는 칸 붙여넣기 0.1.1 | [설치·사용](../tools/visible-cells-paste/index.md) | [설치·검증](../../tools/VisibleCellsPaste/docs/install-security.md) · [단일 EXE 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1) |
-| 업무 책갈피 0.2.8 평가판 | [설치·사용](../tools/bookmark/index.md) | [0.2.8 안내 반영](bookmark-028-publication-20260927.md) · [이전 수명주기](bookmark-lifecycle-20260927.md) · [BookMark 릴리스](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) |
+| 업무 책갈피 0.2.8 | [설치·사용](../tools/bookmark/index.md) | [정식 전환](stable-tools-release-20261005.md) · [0.2.8 안내 반영](bookmark-028-publication-20260927.md) · [이전 수명주기](bookmark-lifecycle-20260927.md) · [BookMark 릴리스](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) |
 | 그림 복사·저장 0.2.0 | [설치·사용 안내](../tools/image-copy-save/guide.md) | [정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) · [보존·설치·게시 기록](image-020-release-20260927.md) |
 
-현재 안내하는 설치 파일은 서명되지 않았습니다. 선택범위 내보내기는 전체 인수 미완료인 평가판이며 알려진 실패와 미실행 시험은 실제 평가 기록에 남깁니다. File List to Excel은 별도 저장소의 v1.2.0과 선택형 Excel 파일 복사를 안내합니다. FolderState는 사전 릴리스이며, Excel R12는 사용자 요청으로 기능 테스트를 생략한 문구 교정 배포입니다. 업무 책갈피 0.2.8 평가판은 BookMark 저장소에서 MSI·ZIP으로 배포합니다. 해당 릴리스의 브라우저 자동검사 34개·패키지 검사 54개는 기존 제품 근거이며 실제 Whale 창에서 저장·재열기는 미검증입니다. 이전 스티커·설치 시험을 이번 버전의 새 실기로 합산하지 않습니다. 제품의 자동검사·패키지 확인과 Workspace 문서 검증은 위 배포 기록에서 구분합니다. 파일 게시와 상용 인수 승인을 구분합니다.
+현재 안내하는 설치 파일은 서명되지 않았습니다. FolderState 0.1.3·Excel 명단 비교 0.2.1·업무 책갈피 0.2.8은 사용자 요청에 따라 정식 릴리스 채널로 게시했습니다. FolderState와 업무 책갈피는 기존 바이너리를 그대로 유지합니다. 같은 FolderState MSI의 실제 설치·복구·업데이트·제거와 자료 보존 기록, 업무 책갈피의 기존 브라우저 34개·패키지 54개 검사 및 사용자 Whale 저장·재열기 확인을 구분합니다. Excel 0.2.1은 수정한 저장 후보에서 실제 회귀·비교·설정·복구 검사를 통과했습니다. [최신 배포 기록](stable-tools-release-20261005.md)에 재사용한 근거와 미검증 환경을 남깁니다. 선택범위 내보내기는 전체 인수 미완료인 평가판이며 알려진 실패와 미실행 시험을 유지합니다. File List to Excel은 별도 저장소의 v1.2.0을 안내합니다. 정식 채널 게시와 코드 서명·상용 인수·회사별 도입 승인은 구분합니다.
 
 [순차 처리 백로그](WORKSPACE_Tool_Backlog_20260926.md)에서 로컬 후보와 공개 버전의 차이·남은 작업을 확인합니다.
 

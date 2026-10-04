@@ -1,7 +1,7 @@
 # Excel 명단 비교 0.2.1 정식 배포 기록
 
 - 작성일: 2026-10-05
-- 상태: 정식 배포 준비 · 사용자 요청에 따른 일반 릴리스 채널
+- 상태: 정식 배포 완료 · 사용자 요청에 따른 일반 릴리스 채널
 - 기준 소스: `94b3e3360e12c75479e6a901f4fe2271672001a1`
 - 관련 요구: RC13 미제 해결과 평가판이 아닌 배포판 발행, 작업·시험 최소화
 - 적용 정책: [도구 정책](../../../docs/policies/tools.md)
@@ -46,3 +46,13 @@ RC13 최종 EXE의 실제 설치·대표 비교·원본 보존·정상 종료 �
 원시 로그·사용자 경로·등록·보안 값은 저장소의 로컬 artifacts에만 보관하고 공개 ZIP에는 개인정보를 뺀 이 기록과 build manifest만 넣는다.
 
 [과거 RC13 배포 기록](RC13_RELEASE_REPORT.md) · [사용 안내](STABLE_USER_GUIDE.md)
+
+## 실제 게시 확인 · 2026-10-05
+
+[PR #17](https://github.com/prozac0401/Workspace/pull/17)은 main `f9e4b77d67a4b66ec3ad2a486fe1d4208ac0ce2d`에 병합됐습니다. Windows CI와 Documentation CI는 SUCCESS입니다. [0.2.1 Release](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.1)는 draft·prerelease가 아니며 공개 자산 6개를 실제로 내려받아 제작 파일·체크섬과 대조했습니다.
+
+- 설치 EXE: `df1abba1720be680a16b983f552cfdae88b21eaf885f85a071008ee9a8b45db6`
+- 사용자 ZIP: `d2837f959400bcc3af739529b5434a7d06a757adcfc433d25e8ee28890dec101`
+- 검증 ZIP: `6e4acccc5a2208efd447facc25adf02cb6b87bc7570a36920e5df598ca4e95ea`
+
+실제 포장 기준은 `0d76e5660ba529c42f5eb5089453f8cbc127ba98`이며 병합까지 제품 소스는 같습니다. 이후 packager의 commit 문자열 끝 공백 제거만 반영했습니다. 이 게시 문단은 공개 ZIP의 제작 시점 기록 이후 추가한 게시 결과이며, 이미 게시한 파일은 교체하지 않았습니다.
