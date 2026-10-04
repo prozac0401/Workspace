@@ -5,11 +5,15 @@ param(
     [switch]$ApprovedTemporaryVbaAccess,
     [switch]$ProbeOnly,
     [switch]$BuildOnly,
-    [ValidateSet('0.2.0-rc.10','0.2.0-rc.11','0.2.0-rc.12','0.2.0-rc.13')][string]$ExpectedReleaseVersion='0.2.0-rc.11'
+    [string]$SavedCandidate,
+    [string]$SerializedAuditPath,
+    [ValidateSet('0.2.0-rc.10','0.2.0-rc.11','0.2.0-rc.12','0.2.0-rc.13','0.2.1')][string]$ExpectedReleaseVersion='0.2.0-rc.11'
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 if($ProbeOnly -and $BuildOnly){throw 'Choose ProbeOnly or BuildOnly, not both.'}
+if($SavedCandidate -and ($ProbeOnly -or $BuildOnly)){throw 'SavedCandidate runs runtime checks only.'}
+if($SavedCandidate -and -not $SerializedAuditPath){throw 'SavedCandidate requires a read-only serialized audit.'}
 $repoRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
 $toolRoot=Split-Path -Parent $PSScriptRoot
 $artifacts=[IO.Path]::GetFullPath((Join-Path $repoRoot 'artifacts'))
@@ -26,7 +30,7 @@ $evidence=Join-Path $output 'build.private';[void][IO.Directory]::CreateDirector
 $sourceSnapshot=Join-Path $evidence 'source';[void][IO.Directory]::CreateDirectory($sourceSnapshot)
 $utf8=New-Object Text.UTF8Encoding($false)
 $audit=[ordered]@{
-    schemaVersion=1;mode=$(if($ProbeOnly){'Probe'}elseif($BuildOnly){'BuildOnly'}else{'BuildAndTest'});status='NOT_RUN';phase='preflight'
+    schemaVersion=1;mode=$(if($SavedCandidate){'TestSavedCandidate'}elseif($ProbeOnly){'Probe'}elseif($BuildOnly){'BuildOnly'}else{'BuildAndTest'});status='NOT_RUN';phase='preflight'
     runtimeTests=$(if($BuildOnly){'NOT_RUN: user-requested wording-only release'}else{'NOT_RUN'})
     startedUtc=[DateTime]::UtcNow.ToString('o');finishedUtc=$null;failure=$null;cleanupErrors=@()
     releaseVersion=$null;expectedSha256=$null;actualSha256=$null;finalSha256=$null;candidatePath=$null
@@ -42,10 +46,15 @@ $installedPath=$null;$installedManifest=$null;$installedSnapshot=$null;$security
 $accessSnapshotTaken=$false;$securityWritten=$false;$unknownBooks=$false;$ownedBooks=New-Object Collections.ArrayList
 $priorEnableEvents=$null
 $mutex=$null;$locked=$false;$exitCode=1
+ $script:auditSequence=0
 function Save-Audit {
-    $destination=Join-Path $output 'usability.private.json';$temporary=Join-Path $output 'usability.private.writing'
-    [IO.File]::WriteAllText($temporary,($audit | ConvertTo-Json -Depth 18),$utf8)
-    if([IO.File]::Exists($destination)){[IO.File]::Replace($temporary,$destination,[NullString]::Value)}else{[IO.File]::Move($temporary,$destination)}
+    $script:auditSequence++
+    $json=$audit | ConvertTo-Json -Depth 18
+    # Preserve every completed phase before updating the convenience summary.
+    # Replacing a file can fail while a read-only observer holds it open.
+    $phaseFile=Join-Path $evidence ('phase-'+$script:auditSequence.ToString('D4')+'.private.json')
+    [IO.File]::WriteAllText($phaseFile,$json,$utf8)
+    [IO.File]::WriteAllText((Join-Path $output 'usability.private.json'),$json,$utf8)
 }
 function Set-Phase([string]$Name){
     $audit.phase=$Name;$audit.lastPhaseUtc=[DateTime]::UtcNow.ToString('o');Save-Audit
@@ -169,7 +178,7 @@ try{
     try{$progId=if($curVer){[string]$curVer.GetValue('')}else{''}}finally{if($curVer){$curVer.Close()}}
     if($progId -notmatch '^Excel\.Application\.(\d+)$'){throw 'Cannot determine installed Excel version.'}
     $audit.officeVersion=$Matches[1]+'.0'
-    Assert-VbaPolicy $audit.officeVersion
+    if(-not $SavedCandidate){Assert-VbaPolicy $audit.officeVersion}
     $local=[Environment]::GetFolderPath('LocalApplicationData')
     $installedDirectory=Join-Path $local 'ExcelSmartListCompare';$manifestPath=Join-Path $installedDirectory 'install.json'
     if(Test-Path -LiteralPath $installedDirectory){
@@ -183,12 +192,20 @@ try{
     $securityPath='Software\Microsoft\Office\'+$audit.officeVersion+'\Excel\Security'
     $audit.accessBefore=Read-AccessValue $securityPath;$accessSnapshotTaken=$true
     $alreadyEnabled=$audit.accessBefore.present -and $audit.accessBefore.kind -ceq 'DWord' -and $audit.accessBefore.value -eq 1
-    if(-not $alreadyEnabled -and -not $ApprovedTemporaryVbaAccess){throw (Candidate-Failure 'Temporary VBA project access requires explicit approval.' 'BLOCKED_POLICY' 5)}
+    if(-not $SavedCandidate -and -not $alreadyEnabled -and -not $ApprovedTemporaryVbaAccess){throw (Candidate-Failure 'Temporary VBA project access requires explicit approval.' 'BLOCKED_POLICY' 5)}
     if(-not $audit.accessBefore.keyPresent){throw (Candidate-Failure 'Excel security key is absent; this helper does not create it.' 'BLOCKED_POLICY' 5)}
+    if($SavedCandidate){
+        $candidate=[IO.Path]::GetFullPath($SavedCandidate)
+        $proof=Get-Content -LiteralPath $SerializedAuditPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        if($proof.status -cne 'PASS' -or $proof.xlamSha256After -cne (Hash-File $candidate) -or [IO.Path]::GetFullPath($proof.xlamPath) -ine $candidate){throw 'Saved candidate/audit identity mismatch.'}
+        $audit.candidatePath=$candidate;$audit.expectedSha256=$proof.xlamSha256After;$audit.actualSha256=$audit.expectedSha256
+    }
     $imports=@('CSLCList.cls','CSLCAppEvents.cls','modSLCNormalize.bas','modSLCMain.bas','modSLCReport.bas')
     foreach($name in ($imports+@('ThisWorkbook_events.txt','customUI14.xml'))){
         Copy-Item -LiteralPath (Join-Path $toolRoot ('src/'+$name)) -Destination (Join-Path $sourceSnapshot $name)
-        $audit.inputHashes+=@([ordered]@{name=$name;sha256=(Hash-File (Join-Path $sourceSnapshot $name))})
+        $sourceHash=Hash-File (Join-Path $sourceSnapshot $name)
+        if($SavedCandidate -and $proof.sourceHashes.$name -cne $sourceHash){throw ('Saved candidate source changed: '+$name)}
+        $audit.inputHashes+=@([ordered]@{name=$name;sha256=$sourceHash})
     }
     foreach($name in ($imports+@('ThisWorkbook_events.txt'))){if(@([IO.File]::ReadAllBytes((Join-Path $sourceSnapshot $name)) | Where-Object {$_ -gt 127}).Count){throw 'VBA imports must be ASCII exports.'}}
     Add-Type @'
@@ -212,9 +229,9 @@ public static class SlcIsolatedBinding {
     }
 }
 '@
-    Assert-VbaPolicy $audit.officeVersion
+    if(-not $SavedCandidate){Assert-VbaPolicy $audit.officeVersion}
     if(-not (Same-AccessValue $audit.accessBefore (Read-AccessValue $securityPath))){throw 'VBA access preference changed externally before write.'}
-    if(-not $alreadyEnabled){
+    if(-not $SavedCandidate -and -not $alreadyEnabled){
         $prior=[ordered]@{keyPath=$securityPath;valueName='AccessVBOM';snapshot=$audit.accessBefore;temporaryValue=1;temporaryKind='DWord';approvedTemporaryVbaAccess=$true}
         $stream=[IO.File]::Open((Join-Path $evidence 'access-before.private.json'),[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read)
         $writer=New-Object IO.StreamWriter($stream,$utf8)
@@ -293,6 +310,7 @@ public static class SlcIsolatedBinding {
     }else{$bitnessError=[Runtime.InteropServices.Marshal]::GetLastWin32Error()}
     $audit.environment=[ordered]@{osVersion=[Environment]::OSVersion.VersionString;powerShellVersion=$PSVersionTable.PSVersion.ToString();excelVersion=$audit.excelVersion;excelBuild=$excelBuild;excelProcessBitness=$processBits;bitnessProbe='IsWow64Process';bitnessError=$bitnessError}
     Close-OwnedBook $bootstrapBook;$bootstrapBook=$null
+    if(-not $SavedCandidate){
     Set-Phase 'before-probe-book-add'
     $probeBook=$excel.Workbooks.Add(-4167);[void]$ownedBooks.Add($probeBook)
     Set-Phase 'after-probe-book-add'
@@ -332,6 +350,9 @@ public static class SlcIsolatedBinding {
         $audit.candidatePath=$candidate;$audit.candidateSaved=$true
         $audit.expectedSha256=Hash-File $candidate;$audit.actualSha256=$audit.expectedSha256
         $audit.phase='candidate-saved';Save-Audit
+        }
+    }
+        if(-not $ProbeOnly){
         Assert-OwnedWorkspace
         if($BuildOnly){
             # Building does not require macro execution or reopening an untrusted
@@ -347,7 +368,8 @@ public static class SlcIsolatedBinding {
         $candidateBook=$excel.Workbooks.Open($candidate,0,$true);[void]$ownedBooks.Add($candidateBook)
         Set-Phase 'after-saved-candidate-reopen'
         if([IO.Path]::GetFullPath([string]$candidateBook.FullName) -ine $candidate -or -not [bool]$candidateBook.IsAddin){throw 'Exact saved candidate was not reopened.'}
-        $audit.sourceStage='serialized';Assert-SerializedSource $candidateBook;$audit.serializedSourceAudit='PASS'
+        $audit.sourceStage='serialized'
+        if($SavedCandidate){$audit.serializedSourceAudit='PASS: external read-only audit';$audit.serializedAuditPath=$SerializedAuditPath}else{Assert-SerializedSource $candidateBook;$audit.serializedSourceAudit='PASS'}
         $q="'"+([string]$candidateBook.Name).Replace("'","''")+"'!"
         $audit.releaseVersion=[string]$excel.Run($q+'SLC_ReleaseVersion')
         if($audit.releaseVersion -cne $ExpectedReleaseVersion){throw 'Saved candidate release version mismatch.'}
@@ -355,7 +377,11 @@ public static class SlcIsolatedBinding {
         # the add-in. Keep ownership explicit and close it with the other books.
         $harnessBook=$excel.Workbooks.Add(-4167);[void]$ownedBooks.Add($harnessBook)
         $audit.harnessWorkbookName=[string]$harnessBook.Name;Save-Audit
-        foreach($name in @('SLC_UiProbe','SLC_TestAll','SLC_UsabilityTests')){
+        $runtimeNames=@('SLC_UiProbe','SLC_TestAll','SLC_UsabilityTests')
+        if($ExpectedReleaseVersion -ceq '0.2.1'){
+            $runtimeNames=@('SLC_UiProbe','SLC_StatusPreservationTests','SLC_UsabilityTests')
+        }
+        foreach($name in $runtimeNames){
             Assert-OwnedWorkspace
             $audit.phase=$name;Save-Audit
             $watch=[Diagnostics.Stopwatch]::StartNew();$result=[string]$excel.Run($q+$name);$watch.Stop()

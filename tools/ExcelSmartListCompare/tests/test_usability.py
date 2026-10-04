@@ -97,6 +97,25 @@ class UsabilitySourceContracts(unittest.TestCase):
         cls.report = (SRC / "modSLCReport_utf8.bas").read_text(encoding="utf-8")
         cls.model = (SRC / "CSLCList_utf8.cls").read_text(encoding="utf-8")
 
+    def test_run_selection_calls_match_actual_signature(self):
+        signature = procedure(self.main, "RunSelection").split("    Dim selected", 1)[0]
+        parameters = re.findall(r"(?:Optional\s+)?By(?:Val|Ref)\s+\w+", signature)
+        required = sum(not p.startswith("Optional") for p in parameters)
+        calls = re.findall(r"(?m)^\s*RunSelection\s+([^\r\n]+)", self.main)
+        self.assertGreater(len(calls), 0)
+        for call in calls:
+            with self.subTest(call=call):
+                count = len(call.split(","))
+                self.assertGreaterEqual(count, required)
+                self.assertLessEqual(count, len(parameters))
+
+    def test_product_preserves_external_excel_status(self):
+        # Ignore the isolated regression fixture, which deliberately seeds text.
+        production = self.main.replace(procedure(self.main, "SLC_StatusPreservationTests"), "")
+        self.assertNotRegex(production, r"(?im)^\s*(?:Let\s+)?Application\.StatusBar\s*=")
+        for name in ["RunSelection", "PreviewSnapshot", "SLC_Cancel", "PollCancellation"]:
+            self.assertNotIn("StatusBar =", procedure(self.main, name))
+
     def test_equality_exits_before_report_creation(self):
         compare = procedure(self.main, "ShowComparison")
         self.assertIn("SLC_WriteUsabilityResults", compare)
@@ -201,14 +220,16 @@ class UsabilitySourceContracts(unittest.TestCase):
 
     def test_difference_is_one_sheet_and_preview_has_locations(self):
         write = procedure(self.report, "WriteReport")
-        for sheet in ["요약", "명단비교_결과", "제외·발생위치"]:
+        for sheet in ["요약", "명단비교_결과", "값과 위치"]:
             self.assertIn('"' + sheet + '"', write)
         self.assertIn(".SplitRow = headerRow", procedure(self.report, "FormatTable"))
         self.assertIn("FormatTable ws, outRow - 1, 10, True, 8", procedure(self.report, "WriteDifferences"))
         self.assertNotIn("WriteVariants", self.report)
         self.assertNotIn("VariantSamples", self.model)
-        self.assertIn("생략", procedure(self.report, "WriteSummary"))
-        self.assertIn("원본 전체", procedure(self.report, "WriteSummary"))
+        self.assertIn("LocationSummary(a)", procedure(self.report, "WriteSummary"))
+        self.assertIn("ErrorSummary(a)", procedure(self.report, "WriteSummary"))
+        self.assertIn("OmittedOccurrences", procedure(self.report, "LocationSummary"))
+        self.assertIn("OmittedErrors", procedure(self.report, "ErrorSummary"))
 
     def test_formula_like_raw_values_are_written_as_text(self):
         safe = procedure(self.report, "SafeText")

@@ -13,7 +13,7 @@ Private Declare Function SLC_GetWindowThreadProcessId Lib "user32" Alias "GetWin
 Private Declare Function SLC_GetCurrentProcessId Lib "kernel32" Alias "GetCurrentProcessId" () As Long
 #End If
 
-Private Const VERSION_TEXT As String = "0.2.0"
+Private Const VERSION_TEXT As String = "0.2.1"
 Private Const UI_TAG As String = "SLC_68A45C44_2026"
 Private Const BAR_NAME As String = "SLC_68A45C44_Toolbar"
 Private Const MAX_VISIBLE As Long = 100000
@@ -40,9 +40,6 @@ Private mUiAttached As Boolean
 Private mUiFailure As String
 Private mAppEvents As CSLCAppEvents
 Private mRibbonLoaded As Boolean
-Private mOwnStatus As Boolean
-Private mPreviousStatus As Variant
-Private mLastStatus As String
 Private mPhase As String
 Private mLastOutcome As String
 Private Const SETTINGS_APP As String = "ExcelSmartListCompare"
@@ -72,7 +69,7 @@ Public Function SLC_RibbonReady() As Boolean
 End Function
 
 Public Function SLC_ReleaseVersion() As String
-    SLC_ReleaseVersion = "0.2.0-rc.13"
+    SLC_ReleaseVersion = "0.2.1"
 End Function
 
 Public Sub SLC_GetContextMenu(ByVal control As Office.IRibbonControl, ByRef content)
@@ -278,7 +275,6 @@ Public Sub SLC_DetachUI()
     Set mAppEvents = Nothing
     If mBusy Then mCancelled = True
     Set mPending = Nothing
-    ReleaseStatus
     RemoveOwnUI
     mUiAttached = False
 End Sub
@@ -327,7 +323,6 @@ Public Sub SLC_Clear()
     If mBusy Then Exit Sub
     Set mPending = Nothing
     mLastOutcome = SLC_U("CCAB 0020 BC88 C9F8 0020 BAA9 B85D C744 0020 BE44 C6E0 C2B5 B2C8 B2E4 002E 0020 C6D0 BCF8 0020 C140 C740 0020 ADF8 B300 B85C C785 B2C8 B2E4 002E")
-    ReleaseStatus
     RefreshUI
 End Sub
 
@@ -335,7 +330,7 @@ Public Sub SLC_Cancel()
     If Not mBusy Then Exit Sub
     mCancelled = True
     mPhase = SLC_U("CDE8 C18C 0020 C694 CCAD B428 0020 00B7 0020 C791 C5C5 0020 C885 B8CC B97C 0020 AE30 B2E4 B824 0020 C8FC C138 C694 002E")
-    SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020") & mPhase
+    SetProgress mPhase
     RefreshUI
 End Sub
 
@@ -350,7 +345,7 @@ End Function
 
 Private Sub SetPhase(ByVal text As String)
     mPhase = text
-    SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020") & text
+    SetProgress text
     RefreshUI
 End Sub
 
@@ -383,7 +378,6 @@ Private Sub PreviewSnapshot(ByRef completedResult As Workbook, Optional ByVal ra
     Application.EnableCancelKey = xlDisabled
     mLastOutcome = SLC_U("B2F4 C740 0020 CCAB 0020 BAA9 B85D C758 0020 D655 C778 C6A9 0020 D30C C77C C744 0020 C5F4 C5C8 C2B5 B2C8 B2E4 002E 0020 C774 C5B4 C11C 0020 B450 0020 BC88 C9F8 0020 BAA9 B85D ACFC 0020 BE44 AD50 D560 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E")
 Finished:
-    ReleaseStatus
     mBusy = False
     mPhase = ""
     Application.EnableCancelKey = oldCancel
@@ -392,7 +386,6 @@ Finished:
 Failed:
     errNo = Err.Number: errText = Err.Description
     On Error Resume Next
-    ReleaseStatus
     mBusy = False
     mPhase = ""
     If operationCommitted Then
@@ -475,7 +468,6 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean, ByRef completedResult As 
     Checkpoint
     If current.Total = 0 Then
         mLastOutcome = SLC_U("BE44 AD50 D560 0020 AC12 0020 C5C6 C74C 0020 00B7 0020 C774 C804 0020 CCAB 0020 BAA9 B85D 0020 C720 C9C0")
-        ReleaseStatus
         If Not raiseTestError Then MsgBox SLC_U("C120 D0DD D55C 0020 C140 C5D0 0020 BE44 AD50 D560 0020 AC12 C774 0020 C5C6 C2B5 B2C8 B2E4 002E") & vbCrLf & NoValuesSummary(current) & vbCrLf & _
                SLC_U("C228 AE34 0020 C140 ACFC 0020 D544 D130 B85C 0020 AC00 B824 C9C4 0020 C140 C740 0020 C77D C9C0 0020 C54A C2B5 B2C8 B2E4 002E") & vbCrLf & PendingSummary(), _
                vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
@@ -500,13 +492,11 @@ Private Sub RunSelection(ByVal replaceOnly As Boolean, ByRef completedResult As 
         Else
             mLastOutcome = SLC_U("BE44 AD50 0020 C644 B8CC 0020 00B7 0020 CCAB 0020 BAA9 B85D C744 0020 BE44 C6E0 C2B5 B2C8 B2E4 002E 0020 C0C8 0020 CCAB 0020 BAA9 B85D C744 0020 B2F4 C73C C138 C694 002E")
         End If
-        ReleaseStatus
         If completedResult Is Nothing And Not raiseTestError Then
             MsgBox EqualityMessage(previousPending, current), vbInformation, SLC_U("BA85 B2E8 0020 BE44 AD50")
         End If
     End If
 Finished:
-    ReleaseStatus
     mPhase = ""
     If setState Then
         Application.Interactive = oldInteractive
@@ -524,7 +514,6 @@ Failed:
         Application.EnableCancelKey = xlDisabled
         Application.Interactive = oldInteractive
     End If
-    ReleaseStatus
     mBusy = False
     RefreshUI
     If setState Then Application.EnableCancelKey = oldCancel
@@ -580,7 +569,7 @@ Private Function PrepareParts(ByVal sel As Range, ByVal ask As Boolean, _
         text = SLC_U("C120 D0DD D55C 0020 C140 C774 0020 B9CE C544 0020 C228 AE40 0020 C5EC BD80 B97C 0020 D655 C778 D558 B294 0020 B370 0020 C2DC AC04 C774 0020 AC78 B9B4 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E") & vbCrLf & _
             SLC_U("D655 C778 D560 0020 C140 003A 0020") & Format$(scanCount, "#,##0") & SLC_U("AC1C") & vbCrLf & _
             SLC_U("C228 AE34 0020 C140 ACFC 0020 D544 D130 B85C 0020 AC00 B824 C9C4 0020 C140 C740 0020 BE44 AD50 C5D0 C11C 0020 BE8D B2C8 B2E4 002E") & vbCrLf & _
-            SLC_U("C774 0020 C2DC D5D8 0020 BC84 C804 C5D0 C11C B294 0020 0045 0073 0063 B97C 0020 B20C B7EC B3C4 0020 C791 C5C5 C774 0020 CDE8 C18C B418 C9C0 0020 C54A C744 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E") & vbCrLf & _
+            SLC_U("C791 C5C5 0020 CDE8 C18C 0020 BC84 D2BC 0020 B610 B294 0020 C791 C5C5 0020 C911 C778 0020 0045 0078 0063 0065 006C 0020 CC3D C5D0 C11C 0020 0045 0073 0063 B97C 0020 B20C B7EC 0020 CDE8 C18C B97C 0020 C694 CCAD D560 0020 C218 0020 C788 C2B5 B2C8 B2E4 002E") & vbCrLf & _
             SLC_U("ACC4 C18D D560 AE4C C694 003F 0020 BC94 C704 B97C 0020 C904 C774 B824 BA74 0020 005B C544 B2C8 C694 005D B97C 0020 B204 B974 C138 C694 002E")
         If ask Then
             If MsgBox(text, vbYesNo + vbExclamation + vbDefaultButton2, SLC_U("BA85 B2E8 0020 BE44 AD50 0020 002D 0020 C120 D0DD 0020 BC94 C704 0020 D655 C778")) <> vbYes Then Exit Function
@@ -766,7 +755,7 @@ Private Function ReadParts(ByVal sel As Range, ByVal parts As Collection, ByVal 
                     tick = tick + 1
                     If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
                     If tick Mod 512 = 0 Then
-                        SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020 C77D B294 0020 C911 0020 00B7 0020") & Format$(result.VisibleCellCount, "#,##0") & SLC_U("C140 0020 D655 C778 0020 002F 0020") & _
+                        SetProgress SLC_U("C77D B294 0020 C911 0020 00B7 0020") & Format$(result.VisibleCellCount, "#,##0") & SLC_U("C140 0020 D655 C778 0020 002F 0020") & _
                             Format$(result.Total, "#,##0") & SLC_U("AC1C 0020 D56D BAA9 0020 B2F4 C74C")
                         Checkpoint
                     End If
@@ -931,42 +920,11 @@ Private Function HeldEscapeSampleCancels(ByVal busy As Boolean, ByVal foreground
     HeldEscapeSampleCancels = (keyState < 0)
 End Function
 
-Private Sub SetStatus(ByVal text As String)
-    If Not mOwnStatus Then
-        mPreviousStatus = PreviousStatus()
-        mOwnStatus = True
-    End If
-    If mOwnStatus Then
-        If CStr(Application.StatusBar) <> mLastStatus And Len(mLastStatus) > 0 Then
-            mPreviousStatus = PreviousStatus()
-        End If
-    End If
-    mLastStatus = text
-    Application.StatusBar = text
-End Sub
-
-Private Function PreviousStatus() As Variant
-    ' Preserve the exact Variant, including an external literal string "FALSE".
-    PreviousStatus = Application.StatusBar
-End Function
-
-Private Sub ReleaseStatus()
-    On Error Resume Next
-    If mOwnStatus Then
-        If VarType(Application.StatusBar) = vbString Then
-            If CStr(Application.StatusBar) = mLastStatus Then
-                ' Pass an actual Boolean, not a Variant coerced to display text.
-                If VarType(mPreviousStatus) = vbBoolean Then
-                    Application.StatusBar = False
-                Else
-                    Application.StatusBar = mPreviousStatus
-                End If
-            End If
-        End If
-    End If
-    mOwnStatus = False
-    mLastStatus = ""
-    On Error GoTo 0
+Private Sub SetProgress(ByVal text As String)
+    ' Keep Excel's status bar untouched: False setters can become literal text.
+    ' The existing product toolbar owns progress and the persistent outcome.
+    mPhase = text
+    RefreshUI
 End Sub
 
 Private Function CountOf(ByVal list As CSLCList, ByVal key As String) As Long
@@ -989,7 +947,7 @@ Private Function ShowComparison(ByVal a As CSLCList, ByVal b As CSLCList) As Wor
         tick = tick + 1
         If tick Mod CANCEL_POLL_ITEMS = 0 Then PollCancellation
         If tick Mod 1024 = 0 Then
-            SetStatus SLC_U("BA85 B2E8 0020 BE44 AD50 003A 0020 AC12 ACFC 0020 AC1C C218 0020 BE44 AD50 0020 C911 0020 00B7 0020") & Format$(tick, "#,##0") & SLC_U("C885 B958 0020 D655 C778")
+            SetProgress SLC_U("AC12 ACFC 0020 AC1C C218 0020 BE44 AD50 0020 C911 0020 00B7 0020") & Format$(tick, "#,##0") & SLC_U("C885 B958 0020 D655 C778")
             Checkpoint
         End If
     Next k
@@ -1363,7 +1321,6 @@ Public Function SLC_TestAll() As String
     n = n + 1
     other.Close SaveChanges:=False
     Set other = Nothing
-    ReleaseStatus
     Application.EnableEvents = oldEvents
     Application.EnableCancelKey = oldCancel
     Set mPending = savedPending
@@ -1379,12 +1336,70 @@ Failed:
     If Not other Is Nothing Then other.Close SaveChanges:=False
     Application.EnableEvents = oldEvents
     Application.EnableCancelKey = oldCancel
-    ReleaseStatus
     Set mPending = savedPending
     mSettingsLoaded = savedLoaded: mFullEmail = savedFull: mIgnoreCase = savedIgnore: mKeepFirst = savedKeep
     If Not oldBook Is Nothing Then oldBook.Activate
     On Error GoTo 0
     Err.Raise errNo, "SLC_TestAll", errText
+End Function
+
+Public Function SLC_StatusPreservationTests() As String
+    ' Synthetic bounded regression: standard status, external text, literal FALSE.
+    Dim wb As Workbook, ws As Worksheet, output As Workbook, saved As CSLCList
+    Dim oldBusy As Boolean, oldCancelled As Boolean, oldKeep As Boolean
+    Dim oldPhase As String, oldOutcome As String, oldStatus As Variant
+    Dim oldCancel As Long, value As Variant, expected As Variant, i As Long
+    Dim failureNumber As Long, failureText As String
+    If mBusy Then Err.Raise ERR_DATA, , "An active comparison prevents testing"
+    Set saved = mPending: oldKeep = mKeepFirst: oldCancel = Application.EnableCancelKey
+    oldStatus = Application.StatusBar: oldPhase = mPhase: oldOutcome = mLastOutcome
+    oldBusy = mBusy: oldCancelled = mCancelled
+    On Error GoTo Failed
+    Call AssertR11(VarType(oldStatus) = vbBoolean, "Fresh Excel default status must be Boolean")
+    Set wb = Application.Workbooks.Add(xlWBATWorksheet)
+    Set ws = wb.Worksheets(1)
+    ws.Range("A1:A2048").Value2 = "synthetic unchanged"
+    mKeepFirst = False
+    For i = 0 To 2
+        If i = 1 Then Application.StatusBar = "External synthetic status"
+        If i = 2 Then Application.StatusBar = "FALSE"
+        expected = Application.StatusBar
+        Set mPending = Nothing
+        ws.Range("A1:A2048").Select
+        RunSelection True, output, True
+        value = Application.StatusBar
+        Call AssertR11(VarType(value) = VarType(expected) And CStr(value) = CStr(expected), "Capture preserves raw status")
+        RunSelection False, output, True
+        value = Application.StatusBar
+        Call AssertR11(VarType(value) = VarType(expected) And CStr(value) = CStr(expected), "Compare preserves raw status")
+        mBusy = True: mCancelled = False
+        SLC_Cancel
+        On Error Resume Next
+        PollCancellation
+        failureNumber = Err.Number: Err.Clear
+        On Error GoTo Failed
+        Call AssertR11(failureNumber = ERR_CANCEL, "Product cancel reaches checkpoint")
+        value = Application.StatusBar
+        Call AssertR11(VarType(value) = VarType(expected) And CStr(value) = CStr(expected), "Cancel request preserves raw status")
+        mBusy = False: mCancelled = False
+    Next i
+    wb.Close SaveChanges:=False: Set wb = Nothing
+    Set mPending = saved: mKeepFirst = oldKeep
+    mBusy = oldBusy: mCancelled = oldCancelled: mPhase = oldPhase: mLastOutcome = oldOutcome
+    Application.EnableCancelKey = oldCancel
+    RefreshUI
+    SLC_StatusPreservationTests = "PASS: 3 raw status variants x capture/compare/cancel request; synthetic source unchanged"
+    Exit Function
+Failed:
+    failureNumber = Err.Number: failureText = Err.Description
+    On Error Resume Next
+    If Not wb Is Nothing Then wb.Close SaveChanges:=False
+    Set mPending = saved: mKeepFirst = oldKeep
+    mBusy = oldBusy: mCancelled = oldCancelled: mPhase = oldPhase: mLastOutcome = oldOutcome
+    Application.EnableCancelKey = oldCancel
+    RefreshUI
+    On Error GoTo 0
+    SLC_StatusPreservationTests = "FAIL: " & CStr(failureNumber) & " / " & failureText
 End Function
 
 Public Function SLC_UsabilityTests() As String
@@ -1597,11 +1612,9 @@ Public Function SLC_UsabilityTests() As String
     source.Close SaveChanges:=False: Set source = Nothing
     DeleteSetting SETTINGS_APP, scope
     mSettingsTestSection = ""
-    ReleaseStatus
     Set mPending = oldPending
     mSettingsLoaded = savedLoaded: mFullEmail = savedFull: mIgnoreCase = savedIgnore: mKeepFirst = savedKeep
     mBusy = False: mCancelled = oldCancelled: mPhase = oldPhase: mLastOutcome = oldOutcome
-    Application.StatusBar = oldStatus
     Application.EnableEvents = oldEvents
     Application.EnableCancelKey = oldCancel
     If Not oldBook Is Nothing Then oldBook.Activate
@@ -1626,12 +1639,10 @@ Failed:
         End If
     End If
     mSettingsTestSection = ""
-    ReleaseStatus
     Set mPending = oldPending
     mSettingsLoaded = savedLoaded: mFullEmail = savedFull: mIgnoreCase = savedIgnore: mKeepFirst = savedKeep
     mBusy = False: mCancelled = oldCancelled: mPhase = oldPhase: mLastOutcome = oldOutcome
     TraceR11 "cleanup application state: " & testStage & " / " & CStr(errNo) & " / " & errText
-    Application.StatusBar = oldStatus
     Application.EnableEvents = oldEvents
     Application.EnableCancelKey = oldCancel
     If Not oldBook Is Nothing Then oldBook.Activate
