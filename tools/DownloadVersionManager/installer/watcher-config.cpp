@@ -1,7 +1,6 @@
 #include <windows.h>
 #include <msiquery.h>
 #include <shlobj.h>
-#include <shobjidl.h>
 #include <string>
 
 namespace {
@@ -34,41 +33,4 @@ extern "C" __declspec(dllexport) UINT __stdcall DvmResolveDownloads(MSIHANDLE se
     if (property(session, L"DVMFOLLOWDOWNLOADS") == L"1" || property(session, L"DVMWATCHFOLDER").empty()) selected = MsiSetPropertyW(session, L"DVMWATCHFOLDER", path);
     CoTaskMemFree(path);
     return set == ERROR_SUCCESS && selected == ERROR_SUCCESS ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-}
-
-extern "C" __declspec(dllexport) UINT __stdcall DvmBrowseFolder(MSIHANDLE session) {
-    const HRESULT initialized = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-    if (FAILED(initialized) && initialized != RPC_E_CHANGED_MODE) return ERROR_INSTALL_FAILURE;
-    IFileDialog* dialog = nullptr;
-    HRESULT result = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dialog));
-    if (SUCCEEDED(result)) {
-        DWORD options = 0;
-        result = dialog->GetOptions(&options);
-        if (SUCCEEDED(result)) result = dialog->SetOptions(options | FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
-        if (SUCCEEDED(result)) result = dialog->SetTitle(L"감시할 폴더 선택");
-        IShellItem* current = nullptr;
-        const std::wstring selected = property(session, L"DVMWATCHFOLDER");
-        if (SUCCEEDED(SHCreateItemFromParsingName(selected.c_str(), nullptr, IID_PPV_ARGS(&current)))) {
-            dialog->SetFolder(current);
-            current->Release();
-        }
-        if (SUCCEEDED(result)) result = dialog->Show(GetActiveWindow());
-        if (SUCCEEDED(result)) {
-            IShellItem* item = nullptr;
-            result = dialog->GetResult(&item);
-            if (SUCCEEDED(result)) {
-                PWSTR path = nullptr;
-                result = item->GetDisplayName(SIGDN_FILESYSPATH, &path);
-                if (SUCCEEDED(result)) {
-                    if (MsiSetPropertyW(session, L"DVMWATCHFOLDER", path) != ERROR_SUCCESS || MsiSetPropertyW(session, L"DVMFOLLOWDOWNLOADS", L"") != ERROR_SUCCESS) result = E_FAIL;
-                    CoTaskMemFree(path);
-                }
-                item->Release();
-            }
-        }
-        dialog->Release();
-    }
-    if (SUCCEEDED(initialized)) CoUninitialize();
-    if (result == HRESULT_FROM_WIN32(ERROR_CANCELLED)) return ERROR_SUCCESS;
-    return SUCCEEDED(result) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
 }

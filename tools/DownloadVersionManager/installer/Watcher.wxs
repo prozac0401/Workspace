@@ -13,12 +13,12 @@
     <Property Id="DVMLAUNCHAPP" Value="1" />
     <Binary Id="WatcherConfig" SourceFile="$(var.ConfigDll)" />
     <CustomAction Id="ResolveDownloads" BinaryRef="WatcherConfig" DllEntry="DvmResolveDownloads" Execute="immediate" Return="check" />
-    <CustomAction Id="BrowseWatchFolder" BinaryRef="WatcherConfig" DllEntry="DvmBrowseFolder" Execute="immediate" Return="check" />
     <CustomAction Id="LaunchApplication" FileRef="ApplicationExe" ExeCommand="--first-run" Execute="immediate" Impersonate="yes" Return="asyncNoWait" />
     <InstallExecuteSequence><Custom Action="ResolveDownloads" After="AppSearch" Condition="NOT REMOVE" /></InstallExecuteSequence>
     <InstallUISequence><Custom Action="ResolveDownloads" After="AppSearch" Condition="NOT REMOVE" /></InstallUISequence>
     <Launch Condition="Installed OR VersionNT64" Message="Windows x64가 필요합니다. 지원 범위는 Windows 11의 로컬 NTFS입니다." />
     <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" />
+    <StandardDirectory Id="TARGETDIR"><Directory Id="DVMWATCHFOLDER" Name="WatchedFolder" /></StandardDirectory>
     <StandardDirectory Id="LocalAppDataFolder"><Directory Id="Programs" Name="Programs"><Directory Id="INSTALLFOLDER" Name="DownloadVersionManagerWatcher">
       <Component Id="Application" Guid="{FDB8B81C-49CC-4B41-8BC2-C5E724114142}" Bitness="always64">
         <File Id="ApplicationExe" Source="$(var.ApplicationExe)" Name="DownloadVersionManager.exe" />
@@ -52,12 +52,20 @@
         <Control Id="FollowDownloads" Type="CheckBox" X="24" Y="72" Width="412" Height="20" Property="DVMFOLLOWDOWNLOADS" CheckBoxValue="1" Text="Windows 기본 다운로드 폴더를 사용하고 위치 변경을 따름" />
         <Control Id="KnownFolder" Type="Text" X="40" Y="94" Width="390" Height="38" Text="현재 기본 위치: [DVMDOWNLOADSFOLDER]" />
         <Control Id="FolderLabel" Type="Text" X="24" Y="142" Width="330" Height="18" Text="직접 지정할 감시 폴더:" />
-        <Control Id="Folder" Type="Edit" X="24" Y="163" Width="330" Height="22" Property="DVMWATCHFOLDER" DisableCondition="DVMFOLLOWDOWNLOADS = 1" EnableCondition="DVMFOLLOWDOWNLOADS &lt;&gt; 1" />
-        <Control Id="Browse" Type="PushButton" X="364" Y="162" Width="72" Height="24" Text="찾아보기"><Publish Event="DoAction" Value="BrowseWatchFolder" /></Control>
+        <Control Id="Folder" Type="PathEdit" X="24" Y="163" Width="330" Height="22" Property="DVMWATCHFOLDER" DisableCondition="DVMFOLLOWDOWNLOADS = 1" EnableCondition="DVMFOLLOWDOWNLOADS &lt;&gt; 1" />
+        <Control Id="Browse" Type="PushButton" X="364" Y="162" Width="72" Height="24" Text="찾아보기"><Publish Event="SpawnDialog" Value="WatchFolderBrowse" /></Control>
         <Control Id="StartAtLogin" Type="CheckBox" X="24" Y="202" Width="412" Height="20" Property="DVMSTARTATLOGIN" CheckBoxValue="1" Text="Windows 로그인 시 자동 실행" />
         <Control Id="Note" Type="Text" X="24" Y="229" Width="412" Height="31" Text="처음 폴더를 사용할 때 기존 파일 목록을 확인합니다. 프로그램을 종료하면 감시를 마칩니다." />
         <Control Id="Install" Type="PushButton" X="260" Y="278" Width="78" Height="25" Default="yes" Text="설치"><Publish Event="EndDialog" Value="Return" Condition="DVMWATCHFOLDER" /></Control>
         <Control Id="Cancel" Type="PushButton" X="348" Y="278" Width="88" Height="25" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>
+      </Dialog>
+      <Dialog Id="WatchFolderBrowse" Width="390" Height="265" Title="감시할 폴더 선택">
+        <Control Id="FolderLabel" Type="Text" X="20" Y="16" Width="350" Height="18" Text="감시할 폴더를 선택하세요." />
+        <Control Id="Folders" Type="DirectoryCombo" X="20" Y="42" Width="350" Height="68" Property="DVMWATCHFOLDER" Fixed="yes"><Subscribe Event="IgnoreChange" Attribute="IgnoreChange" /></Control>
+        <Control Id="Directories" Type="DirectoryList" X="20" Y="73" Width="350" Height="109" Property="DVMWATCHFOLDER" Sunken="yes" />
+        <Control Id="Path" Type="PathEdit" X="20" Y="192" Width="350" Height="22" Property="DVMWATCHFOLDER" />
+        <Control Id="Select" Type="PushButton" X="198" Y="231" Width="80" Height="24" Default="yes" Text="선택"><Publish Event="SetTargetPath" Value="DVMWATCHFOLDER" Order="1" /><Publish Property="DVMFOLLOWDOWNLOADS" Value="{}" Order="2" /><Publish Event="EndDialog" Value="Return" Order="3" /></Control>
+        <Control Id="Cancel" Type="PushButton" X="290" Y="231" Width="80" Height="24" Cancel="yes" Text="취소"><Publish Event="Reset" Value="0" Order="1" /><Publish Event="EndDialog" Value="Return" Order="2" /></Control>
       </Dialog>
       <Dialog Id="Maintenance" Width="430" Height="195" Title="DownloadVersionManager Watcher">
         <Control Id="Body" Type="Text" X="24" Y="24" Width="382" Height="96" Text="프로그램을 복구하거나 제거합니다.&#13;&#10;감시 폴더의 파일과 _history는 보존합니다.&#13;&#10;열려 있는 프로그램을 종료한 뒤 진행하세요." />

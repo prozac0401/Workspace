@@ -29,14 +29,15 @@ def verify(args):
     assert not query(file, 'SELECT * FROM `ServiceControl`')
     assert not query(file, 'SELECT * FROM `RemoveFile` WHERE `FileName` IS NOT NULL')
     actions = query(file, 'SELECT `Action`, `Type`, `Source`, `Target` FROM `CustomAction`')
-    allowed_actions = {'SetARPINSTALLLOCATION': ('51', None, None), 'SetINSTALLFOLDER': ('51', None, None), 'ResolveDownloads': ('1', 'WatcherConfig', 'DvmResolveDownloads'), 'BrowseWatchFolder': ('1', 'WatcherConfig', 'DvmBrowseFolder'), 'LaunchApplication': ('210', 'ApplicationExe', '--first-run')}
+    allowed_actions = {'SetARPINSTALLLOCATION': ('51', None, None), 'SetINSTALLFOLDER': ('51', None, None), 'ResolveDownloads': ('1', 'WatcherConfig', 'DvmResolveDownloads'), 'LaunchApplication': ('210', 'ApplicationExe', '--first-run')}
     assert len(actions) == len(allowed_actions), actions
     for row in actions:
         assert row[0] in allowed_actions, row
         kind, source, target = allowed_actions[row[0]]
         assert row[1] == kind and (source is None or row[2] == source) and (target is None or row[3] == target), row
     execute_sequence = query(file, 'SELECT `Action` FROM `InstallExecuteSequence`')
-    assert ['LaunchApplication'] not in execute_sequence and ['BrowseWatchFolder'] not in execute_sequence, 'Silent installation must not launch UI'
+    assert ['LaunchApplication'] not in execute_sequence, 'Silent installation must not launch UI'
+    assert not query(file, 'SELECT * FROM `CreateFolder`'), 'The installer must not create or own the watch folder'
     files = query(file, 'SELECT `FileName`, `FileSize` FROM `File`')
     assert len(files) == 1 and files[0][0].split('|')[-1] == 'DownloadVersionManager.exe' and int(files[0][1]) == executable.stat().st_size, files
     media = query(file, 'SELECT `Cabinet` FROM `Media`')
@@ -51,7 +52,7 @@ def verify(args):
     assert result.returncode == 0, result.returncode
     found = list(extract.rglob('DownloadVersionManager.exe'))
     assert len(found) == 1 and digest(found[0]) == digest(executable), 'Embedded executable mismatch'
-    report = {'status': 'PASS', 'version': props['ProductVersion'], 'perUser': True, 'embeddedPayloadFiles': 1, 'browserExtension': False, 'nativeMessaging': False, 'services': 0, 'startupRegistration': 'HKCU Run, user-selected default on', 'installerActions': 'known-folder resolution, native folder picker, UI-only optional launch', 'staticRuntime': True, 'sha256': digest(file), 'lifecycle': 'NOT RUN by package verification'}
+    report = {'status': 'PASS', 'version': props['ProductVersion'], 'perUser': True, 'embeddedPayloadFiles': 1, 'browserExtension': False, 'nativeMessaging': False, 'services': 0, 'startupRegistration': 'HKCU Run, user-selected default on', 'installerActions': 'known-folder resolution, standard MSI directory chooser, UI-only optional launch', 'staticRuntime': True, 'sha256': digest(file), 'lifecycle': 'NOT RUN by package verification'}
     pathlib.Path(args.output).write_text(json.dumps(report, indent=2) + '\n', 'utf-8')
     print(json.dumps(report))
 

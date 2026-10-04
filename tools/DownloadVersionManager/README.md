@@ -45,6 +45,6 @@ python tools/DownloadVersionManager/build/build-watcher.py --tests --msvc <MSVC-
 
 Windows x64 MSVC·Windows SDK·WiX 4·Python이 제작용으로 필요합니다. C++ `/MT` 실행 파일과 MSI 하나를 제작하며 최종 사용자에게 개발 도구가 필요하지 않습니다. 변경된 폴더 입력·기존 그룹 처리·설치 위험에 필요한 검증만 수행합니다.
 
-`source/app.cpp`, `watcher.cpp`, `review.cpp`, 기존 `engine.cpp`를 새 빌드에서 사용합니다. 폴더 엔진 8건·watcher 15건·최초 그룹 4건과 MSI 구조 검사, 수정 후보의 설치/실행·repair·제거·파일 보존 5건, 화면 높이 수정 후보의 설치/실행·제거·보존 4건은 PASS입니다. 최종 메시지 수정 제작에는 바뀌지 않은 관련 설치 근거를 재사용했으며 새 late-failure의 설치 등록 rollback은 FAIL로 남습니다. [배포 기록](../../docs/delivery/download-version-manager-watcher-release-20261004.md)에 각 후보 지문과 한계를 구분했습니다.
+`source/app.cpp`, `watcher.cpp`, `review.cpp`, 기존 `engine.cpp`를 새 빌드에서 사용합니다. 폴더 엔진 8건·watcher 15건·최초 그룹 4건과 MSI 구조 검사, 수정 후보의 설치/실행·repair·제거·파일 보존 5건, 화면 높이 수정 후보의 설치/실행·제거·보존 4건은 PASS입니다. 최종 안내 문구와 표준 MSI 폴더 선택 수정에는 관련 설치 근거를 재사용하고 경로 선택·설정 전달·취소를 별도로 확인했으며 새 late-failure의 설치 등록 rollback은 FAIL로 남습니다. [배포 기록](../../docs/delivery/download-version-manager-watcher-release-20261004.md)에 각 후보 지문과 한계를 구분했습니다.
 
 기존 `version.json`의 0.1.0 / protocol 2, `source/host.cpp`, `extension`, `build/build.py`와 기존 시험·산출물은 구버전 근거로 남깁니다. 0.1.0의 Win11 설치 실패 복구 FAIL·단일 배포 FAIL·실제 브라우저 NOT RUN을 새 버전의 PASS로 바꾸지 않습니다.

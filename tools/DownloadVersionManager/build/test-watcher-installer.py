@@ -172,7 +172,7 @@ def run(args):
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Run') as key:
             assert winreg.QueryValueEx(key, 'Workspace.DownloadVersionManagerWatcher')[0] == '"' + str(install / 'DownloadVersionManager.exe') + '" --autostart'
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, WATCHER_KEY + r'\InstallDefaults') as key:
-            assert winreg.QueryValueEx(key, 'Folder')[0] == str(work / 'Watched Folder') and winreg.QueryValueEx(key, 'FollowDownloads')[0] == 0
+            assert winreg.QueryValueEx(key, 'Folder')[0].rstrip('\\') == str(work / 'Watched Folder') and winreg.QueryValueEx(key, 'FollowDownloads')[0] == 0
         if state.get('runtimeSettings'):
             assert all(registration(WATCHER_KEY, name) == value for name, value in state['runtimeSettings'].items()), 'Repair reset app settings'
         preserved()

@@ -67,6 +67,6 @@
 
 ## 검증·배포 상태
 
-폴더 엔진 8건·OS 알림 watcher 대표 세션 15건·최초 그룹 처리 4건은 PASS다. production 제작·MSI 구조와 문서 strict·공개 링크, 수정 후보의 설치/실행·repair·제거·파일 보존 5건, 화면 높이 수정 후보의 설치/실행·제거·보존 4건도 PASS다. 실제 위자드의 현재 기본 위치·체크·취소를 확인했다. 최종 안내 문구 수정에는 관련 증거를 재사용했다. 새 MSI late-failure에서 제품 등록 rollback 실패는 남으며 다음 로그인·실행 중 OS 위치 변경과 공개 자산 확인은 NOT RUN이다. [실제 시험 기록](../../../tools/DownloadVersionManager/TEST_RESULTS.md)과 [이번 배포 기록](../../delivery/download-version-manager-watcher-release-20261004.md)에 후보 지문·한계를 구분한다.
+폴더 엔진 8건·OS 알림 watcher 대표 세션 15건·최초 그룹 처리 4건은 PASS다. production 제작·MSI 구조와 문서 strict·공개 링크, 수정 후보의 설치/실행·repair·제거·파일 보존 5건, 화면 높이 수정 후보의 설치/실행·제거·보존 4건도 PASS다. 실제 위자드의 현재 기본 위치·체크·취소를 확인했다. 최종 안내 문구 수정에는 관련 설치 근거를 재사용했다. 표준 MSI 폴더 선택의 경로 표시·설정 전달·취소는 최종 파일에서 별도로 확인했다. 새 MSI late-failure에서 제품 등록 rollback 실패는 남으며 다음 로그인·실행 중 OS 위치 변경과 공개 자산 확인은 NOT RUN이다. [실제 시험 기록](../../../tools/DownloadVersionManager/TEST_RESULTS.md)과 [이번 배포 기록](../../delivery/download-version-manager-watcher-release-20261004.md)에 후보 지문·한계를 구분한다.
 
 0.1.0의 Win11 rollback access denied(5)·재설치 1638·`installerFailureRecovery FAIL`, 단일 배포 FAIL, 브라우저 NOT RUN은 당시 판정으로 보존한다. 다른 MSI 식별자와 간소화된 새 구조만으로 과거 실패가 해결됐다고 판단하지 않는다. 새 설치 구조의 관련 실패 복구를 확인한다. 확장/Store 전용 관문과 과거 전체 시험표는 0.2.0에 복제하지 않는다.

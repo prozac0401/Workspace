@@ -2,7 +2,7 @@
 
 ## 0.2.0 폴더 감시 · 2026-10-04 KST
 
-사용자가 확인한 최초 그룹 미리보기·처리 동의, 신규 suffix 연결, 3초 안정·잠금 조건, 동시 후보 보존, 기본 다운로드 위치 추종과 로그인 자동 실행을 구현 중이다. 기존 0.1.0의 FAIL/NOT RUN과 산출물을 보존한다.
+사용자가 확인한 최초 그룹 미리보기·처리 동의, 신규 suffix 연결, 3초 안정·잠금 조건, 동시 후보 보존, 기본 다운로드 위치 추종과 로그인 자동 실행을 구현했다. 기존 0.1.0의 FAIL/NOT RUN과 산출물을 보존한다.
 
 | 변경에 직접 필요한 범위 | 실제 결과와 한계 |
 |---|---|
@@ -14,17 +14,18 @@
 | 수정 후보 정상 설치·실제 --first-run 실행·repair·제거·사용자 파일 보존 | **5 PASS / 0 FAIL**, cleaned true: 후보 SHA-256 `6a12b33cd21b3d15cf53dca9fbce899b677bada219bca094e396cc67824db86e`. 설치된 GUI가 격리된 감시 폴더에서 시작하고 정상 종료, repair/remove exit 0, 파일·History·실행 설정 보존과 프로그램/시작 등록 제거 확인 |
 | 화면 높이 수정 후 설치 자산 | **4 PASS / 0 FAIL**, cleaned true: MSI `18f22f04a9fe8478a4ab28dc9c8385aefe0c5ece6eef1b192aa7dd17c0378a32`의 fresh/실제 설치 GUI 감시 시작·정상 종료/remove/사용자 파일·History·실행 설정 보존. 하단 설명 표시 확인. 완료한 repair와 late-failure 반복 없음 |
 | 설치 위자드의 기본 위치·선택 표시·취소 | **PASS**: 실제로 이동된 Windows 다운로드 위치를 해석해 표시, 기본 위치 추종·로그인 자동 실행 체크 확인. 취소 exit 1602, 설치하지 않음 |
+| 최종 위자드 다른 폴더 선택·설정 전달·취소 | **PASS**: 표준 MSI BrowseDlg/PathEdit로 빈 artifact 폴더 선택, 화면 경로와 MSI session property 일치·FollowDownloads 해제·edit 활성화. 취소 1602/preflight clean. 네이티브 화면 갱신 FAIL·동일 dialog 재생성 2856·포커스 없는 자동화 실패는 별도 보존 |
 | 다음 Windows 로그인·실행 중 OS 다운로드 위치 실제 변경 | **NOT RUN**: 소스 구현과 현재 위치 해석 확인을 실제 다음 로그인·이동 실기 성공으로 확대하지 않음 |
 | 공개 Release·다운로드·checksum 공개 확인 | **NOT RUN / 게시 전** |
 | 문서 strict·공개 범위·로컬 링크 | **PASS**: MkDocs strict, 공개 19개·기존 이동 2개·404·검색/사이트맵·생성 로컬 링크. 내부 명세·배포 기록·원시 진단 제외 |
 
 이번 집중 확인은 엔진 8·watcher 15·최초 그룹 4, 합계 27개 결과이며 설치 후보의 5개 결과와 구분한다. 기존 Host/확장 전체 suite·대용량 성능·브라우저별 시험표를 반복하지 않았다. 파일 내용이 보존됐다는 결과를 모든 설치 실패 복구 PASS로 확장하지 않는다.
 
-최종 MSI SHA-256은 `5fba25fe5c07f7813341ca524a9d1807b36357c1a5412bbd47ea63a68ab42e47`이며 크기는 294,912 bytes다. 마지막 재제작은 잠금·cleanup·metadata 경고 안내 문구만 변경했다. 파일 처리·화면 배치·MSI·시작 항목은 바뀌지 않아 위 `18f22f04…` 실제 설치·실행·제거와 `6a12b33…` repair 증거를 관련 범위에서 재사용했다. 최종 지문 파일 자체를 다시 실제 설치한 것으로 기록하지 않는다. 최종 production 제작·패키지 추출·구조·payload/hash·정적 runtime 확인은 PASS이며 build manifest의 시험/설치 NOT RUN 표기를 별도 증거와 함께 읽는다.
+최종 MSI SHA-256은 `c7be2ea44b09b2afd9d3a82956150aafba5390a8013ceccfeacd6583965a30e7`이며 크기는 294,912 bytes다. 마지막 재제작은 잠금·cleanup·metadata 안내 문구와 설치 위자드 폴더 선택만 변경했다. 표준 MSI BrowseDlg/PathEdit로 바꾸고 네이티브 picker action을 제거했으며 해당 선택·취소는 최종 파일에서 PASS다. 파일 처리·설치 위치·registry·시작 항목의 관련 근거로 위 `18f22f04…` 실제 설치·실행·제거와 `6a12b33…` repair 증거를 관련 범위에서 재사용했다. 최종 지문 파일 자체를 다시 실제 설치한 것으로 기록하지 않는다. 최종 production 제작·패키지 추출·구조·payload/hash·정적 runtime 확인은 PASS이며 build manifest의 시험/설치 NOT RUN 표기를 별도 증거와 함께 읽는다.
 
 앞선 0.2.0 설치 후보에서는 INSTALLFOLDER 전달이 의도한 격리 경로에 반영되지 않아 제거 후 잔류 검사에서 aggregate FAIL이었다. 새 설치 후보에서 이를 고친 위 5 PASS는 `installer-fixed-lifecycle-results.json`의 별도 증거이며 앞선 `installer-lifecycle-results.json`을 PASS로 덮어쓰지 않는다. 최초 화면 하단 설명이 잘린 관찰도 보존하고 최종 창 높이를 수정했다.
 
-비공개 증거는 `artifacts/download-version-manager-watcher/` 아래 `engine-validation`, `watcher-final-validation`, `review-check`, `0.2.0`에 남긴다. 설치 증거는 `installer-fixed-lifecycle-results.json`, `installer-final-results.json`, 위자드는 `wizard-results.json`이다. 원시 installer 로그·로컬 경로·시험 상태 JSON은 공개 사이트에 싣지 않는다. 새 결과는 [이번 배포 기록](../../docs/delivery/download-version-manager-watcher-release-20261004.md)에 연결한다.
+비공개 증거는 `artifacts/download-version-manager-watcher/` 아래 `engine-validation`, `watcher-final-validation`, `review-check`, `0.2.0`에 남긴다. 설치 증거는 `installer-fixed-lifecycle-results.json`, `installer-final-results.json`, 위자드는 `wizard-results.json`, 최종 선택은 `wizard-browse-results.json`이다. DVM CI와 문서 CI는 `b4d0fa2`에서 SUCCESS이며 마지막 위자드 변경에는 해당 좁은 검증과 패키지 검사만 수행했다. 원시 installer 로그·로컬 경로·시험 상태 JSON은 공개 사이트에 싣지 않는다. 새 결과는 [이번 배포 기록](../../docs/delivery/download-version-manager-watcher-release-20261004.md)에 연결한다.
 
 ## 아래는 0.1.0의 당시 기록이며 새 결과로 재판정하지 않음
 
