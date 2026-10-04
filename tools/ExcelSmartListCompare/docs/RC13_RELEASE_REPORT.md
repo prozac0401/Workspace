@@ -2,7 +2,7 @@
 
 버전: 0.2.0-rc.13 · 최초 기록: 2026-10-03 · 현재 계정 제안·정체 정정: 2026-10-04
 
-상태: 새 안내·Replace·최종 EXE 준비 완료 · T11 부분 기록 보존 · 실제 설치·대표 비교·평가 출시 대기
+상태: 최종 EXE 실제 설치·대표 비교·native 보존 대조 완료 · T11 부분 기록 보존 · 평가 출시 준비
 
 프로필: `focused-wording-evaluation` · `fullAcceptancePassed=false`
 
@@ -14,11 +14,19 @@
 
 ## 현재 결과와 남은 확인
 
+2026-10-04 최종 EXE 설치는 사용자가 완료했다고 확인했다. 대표 비교는 검증 담당의 Sky 실제 UI 관찰로 한 번 실행했다. Alpha/Beta/Beta와 Alpha/Beta/Gamma가 각각 3개·제외 0개로 집계됐고, Beta 2 대 1·첫 목록 초과 1개, Gamma 0 대 1·둘째 목록 초과 1개의 두 차이 행이 표시됐다. 비교 후 원본 여섯 셀은 그대로였다. 시험용 두 문서 정리·Excel 정상 종료는 사용자 확인과 후속 읽기 probe의 Excel 부재 조건으로 연결했다. 사용자가 비교 결과까지 확인했다고 기록하지 않는다.
+
+일반 PowerShell의 최종 읽기 원시 SHA는 `a96f11a0633f11fa54f100f03ba09876b9750e21bf5802660f6a86a20f6bc546`다. native 13개 객체의 실제 handle 경로·전후 불변, 설치 XLAM·README·Setup·Uninstall 및 관리 엔진 3개 payload 일치와 기존 권한 14개 일치를 확인했다. 설치 전 native 기준과 다른 registry 값은 제품 앱 제거 등록의 새 DisplayVersion·InstallDate뿐이다. 비교 설정·정책·매크로 보안·다른 추가 기능 등록·OPEN·기존 신뢰 위치는 선정한 범위에서 같은 typed 값이다. install.json의 바이트 해시를 기록했지만 원시 probe가 내용을 읽지 않았으므로 내부 필드 확인으로 확대하지 않는다. 전체 historical 상태와 Codex LocalCache 복구본 일치는 출시 조건이 아니다.
+
+처음 UIA set_value의 접근성 값은 실제 화면에 반영되지 않아 빈 목록 안내가 나왔다. 그 입력 근거는 제외하고 키보드로 실제 셀 값을 입력·확정한 뒤 위 한 번의 비교를 완료했다. 제품 회귀나 비교 실패로 단정하지 않는다. 기존 StatusBar `FALSE` 표시도 그대로였으며 ADR-0022의 좁은 평가 수용만 유지한다. 추가 시험·재설치·제거·RC11 복구는 실행하지 않았다.
+
+EXE에 포함한 사용 안내는 준비 당시 동결 문서여서 '미제작·공개 R12' 상태 문구가 남아 있다. 설치·비교 절차는 유효하며, 최신 제작·설치·비교 상태는 이 기록과 릴리스 설명·최신 공개 안내를 우선한다. 정확히 시험한 EXE를 다시 제작하지 않는다. 출하 자산·PR·게시·다운로드의 후속 결과는 실제 완성한 Validation.json과 릴리스 기록에서 구분한다.
+
 현재 출시 경로는 [ADR-0024](ADR-0024-R13-final-installer-evaluation.md)를 따른다. 사용자가 과도한 시험을 금지하고 **최종 RC13을 설치하고 계속 사용**을 선택했다. 같은 후보의 완료된 제작·소스·새 안내/Replace 근거를 재사용하고 최종 EXE를 한 번 제작해 일반 Windows의 실제 설치·대표 비교 결과와 연결한다. 기존 T11은 PARTIAL / NOT_RUN_INCOMPLETE로 보존한다. 제거·RC11 원복·전체 GUI/성능/취소/설치 suite와 추가 ACL 실험을 반복하지 않는다. 최종 설치·비교·게시가 끝나기 전에는 출시 완료로 표시하지 않는다.
 
 소스 준비의 기준 커밋은 `e41999684c6a21070e5d6fc96ebed593b0529b1d`, 실제 제작 입력의 동결 커밋은 [Draft PR #13](https://github.com/prozac0401/Workspace/pull/13)의 `9ebaf3d661e1602e7bc6e60be4b9a0c0fe079160`이다. XLAM 후보의 릴리스 식별자는 `0.2.0-rc.13`, SHA-256은 `484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e`다. 아래 최종 EXE는 비공개로 준비했고 ZIP·출하 자산은 아직 완성하지 않았다. 세부 결과는 [실행 기록](../../../docs/delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
 
-2026-10-04 커밋 `4e220b1a4b0fb408b2b60b47d1807cb84220ce51`과 ADR-0024 SHA `bab569ef4d97eb641f78f4ee54252c95a75f3049a17e79c8610712af80aeb023`로 `prepare`를 실제 실행했다. `ExcelSmartListCompare-0.2.0-rc.13-Setup.exe`는 2,246,844 bytes, 파일 버전 `0.2.0.13001`, SHA-256 `14b081882513a89ccff4123245bd8950ab87d18d697fdfc6e193f0155d2c8cea`다. compiler는 한 번 실행했고 payload·EXE·비공개 준비 기록만 생성했다. `publicationReady=false`, 실제 설치·대표 비교 NOT_RUN, T11 원시 NOT_RUN_INCOMPLETE를 유지한다. 같은 EXE를 설치 확인 후 재빌드 없이 완성·게시한다.
+준비 당시 기록: 2026-10-04 커밋 `4e220b1a4b0fb408b2b60b47d1807cb84220ce51`과 ADR-0024 SHA `bab569ef4d97eb641f78f4ee54252c95a75f3049a17e79c8610712af80aeb023`로 `prepare`를 실제 실행했다. `ExcelSmartListCompare-0.2.0-rc.13-Setup.exe`는 2,246,844 bytes, 파일 버전 `0.2.0.13001`, SHA-256 `14b081882513a89ccff4123245bd8950ab87d18d697fdfc6e193f0155d2c8cea`다. compiler는 한 번 실행했고 payload·EXE·비공개 준비 기록만 생성했다. `publicationReady=false`, 실제 설치·대표 비교 NOT_RUN, T11 원시 NOT_RUN_INCOMPLETE를 유지한다. 같은 EXE를 설치 확인 후 재빌드 없이 완성·게시한다.
 
 새 준비/완성 경계는 기존 16개와 신규 4개를 포함한 합성 검사 20 PASS다. 원시 증거 연결 보강 뒤 신규 4개만 다시 확인해 PASS였으며 두 실행을 합산하지 않는다. 문서 strict·공개 19페이지/이전 주소 2개/404·공개 범위·로컬 링크도 PASS, ADR-0024 포함 9문서의 상대 파일 대상 75개는 PASS다. 제품 실물·설치 PASS가 아니며 외부 URL·문단 앵커 시험은 아니다.
 
@@ -43,7 +51,7 @@
 | 동일 후보의 전체 매크로·GUI suite | NOT_RUN · 실제 확인은 선택된 한 흐름이며 BuildOnly의 tests=[]는 기능 시험 PASS가 아님 |
 | 알려진 StatusBar 평가 수용 | 실제 입력 대조 PASS · 기본 게이트는 실제 native FAIL 거절, 정확한 후보·결정 SHA와 명시적 opt-in만 수용. 실제 FAIL 원문 유지 |
 | T11 새 후보 설치·대표 비교·결과·제거 | PARTIAL / NOT_RUN_INCOMPLETE · Upgrade·설치 후보 자동 로드·엔진 제거·RC11 파일/등록 복구 확인. 잠금 화면으로 UI 입력 0회·대표 비교/결과 미실행. 후속 현재 실행 view의 14 ACL exact 복구, LastPurgeTime 차이 보존·일반 설치 연결 미확인 |
-| 최종 EXE 실제 설치·대표 비교 | NOT_RUN · ADR-0024의 RC13 유지 경로, 제거·RC11 원복 반복 없음 |
+| 최종 EXE 실제 설치·대표 비교 | PASS · 사용자 실제 설치·종료 확인 / Sky 실제 대표 비교·원본 보존 / native 동일 후보·선정 설정 보존 대조. ADR-0024의 RC13 유지 경로, 제거·RC11 원복 반복 없음 |
 | EXE·ZIP·버전·구성·해시 | 최종 EXE 비공개 준비 PASS · ZIP·출하 자산 미완성 |
 | 문서 strict·생성 링크·공개 범위 | 2026-10-03 갱신 후 PASS · 2026-10-04 정체·계정 결정 갱신 후 PASS · strict 빌드, 공개 19개·이전 주소 2개·404·검색·사이트맵·로컬 링크. ADR-0023 포함 8문서 상대 파일 대상 60개 PASS, 외부 URL·문단 앵커 시험 아님. 이전 7문서 46개와 소스 준비 시점 31개 결과도 별도 보존 |
 | Draft PR | #13 게시된 검토 초안 · 실제 제작 결과 반영과 검토 중, 출시 완료 아님 |
@@ -145,6 +153,6 @@ LastPurgeTime의 관찰값은 그대로이며 `exactSelectedStateRestored=false`
 
 ## 출하와 지원 범위
 
-새 XLAM·저장 소스·새 안내/Replace와 StatusBar의 좁은 평가 수용은 확인했다. 현재 계정 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 공식 엔진 Upgrade·정상 자동 로드와 엔진 제거는 확인했으나, Windows 잠금 화면에서 중단해 대표 비교·결과는 실행하지 않았다. 현재 실행 view에서 관찰한 RC11 파일·등록·제품 신뢰와 원래 ACL 14개 복구를 실제 확인했다. 제품·관리 10파일의 바이트·기록 속성·생성/최종 쓰기 시각과 부모 2개 권한도 보존됐다. 제품 폴더 handle의 실제 경로는 Codex 패키지의 LocalCache 아래였고, 같은 소유 객체·5파일의 논리/물리 identity·원시 권한·내용 일치를 고정했다. 최초 백업의 물리 경로는 아직 미확인이다. 후속 일반 PowerShell 진단에서는 실제 제품 폴더·5파일이 없고 관리 5파일·OPEN·신뢰 등록은 원래와 같은 것을 확인했다. 일반 Windows의 제품 복구는 미실행이다. Maximized·PrinterName의 원인 미확정 관찰 차이와 native LastPurgeTime의 원본 일치도 별도 기준으로 보존한다. 제품 밖 LastPurgeTime의 원인 미확정 관찰값도 쓰지 않고 보존했다. 전체 선정 상태 원복·일반 Excel 설치 복구·T11 PASS로 확대하지 않는다. 최종 EXE 실제 설치·포장·병합·태그·Release는 미실행이며 공개 다운로드는 R12로 유지한다. #13은 Draft로 유지하고 필수 실제 증거를 확보한 뒤 출하 판단을 다시 한다. 원시 로그·사용자 정보는 공개 패키지에서 제외한다.
+최종 EXE 실제 설치·정상 Excel 시작·대표 비교·원본 보존·소유 정리·정상 종료와 native 동일 후보·선정 설정 보존을 확인했다. 기존 T11은 PARTIAL / NOT_RUN_INCOMPLETE, StatusBar 실제 FAIL과 과거 82 PASS / 1 FAIL / 2 ERROR도 보존한다. RC13을 유지하며 제거·RC11 복구·전체 시험을 반복하지 않는다. 같은 EXE의 자산 완성과 PR 검토 후 서명 없는 평가 prerelease로 게시한다. 전체 인수·안정판·회사 승인은 아니다. 실제 게시·다운로드 결과는 후속 릴리스 기록을 따르며, 게시 전 공개 다운로드는 R12를 유지한다.
 
 [R13 명세](../../../docs/tools/excel-list-compare/r13-specification.md) · [후보 사용 안내](RC13_USER_GUIDE.md) · [현재 공개 R12](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12)
