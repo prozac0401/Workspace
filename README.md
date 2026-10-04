@@ -28,14 +28,14 @@ File List to Excel v1.2.0의 설치·복구·제거와 이전 버전 업그레�
 | 프로그램 | 설치 파일 | 확인할 내용 |
 |---|---|---|
 | FolderState 0.1.3 RC1 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1) | [설치·사용](docs/tools/folderstate/index.md) |
-| Excel 명단 비교 0.2.0 R12 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
+| Excel 명단 비교 0.2.1 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.1/ExcelSmartListCompare-0.2.1-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.1) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
 | 선택범위 내보내기 0.1.0-rc.10 평가판 | [Excel x64용 EXE](https://github.com/prozac0401/Workspace/releases/download/excel-selection-export-v0.1.0-rc.10/ExcelSelectionExport-0.1.0-rc.10-x64-Setup.exe) · [x86용·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.10) | [설치·사용·알려진 제한](docs/tools/excel-selection-export/index.md) |
 | File List to Excel 1.2.0 | [Windows x64 MSI](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [배포 자료](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) | [설치·사용 안내](docs/tools/file-list-to-excel/index.md) |
 | 업무 책갈피 0.2.8 평가판 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.8/WorkBookmark-0.2.8-win-x64.msi) · [평가판 배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) | [설치·사용 안내](docs/tools/bookmark/index.md) |
 | 그림 복사·저장 0.2.0 | [Windows x64 MSI](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.0/ImageCopySave-0.2.0-x64.msi) · [릴리스 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) | [설치·사용·기존 자료 보존](docs/tools/image-copy-save/guide.md) |
 | 보이는 칸 붙여넣기 0.1.1 | [Windows 단일 설치 EXE](https://github.com/prozac0401/Workspace/releases/download/visible-cells-paste-v0.1.1-setup.1/VisibleCellsPaste-0.1.1-Setup.exe) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1) | [설치·사용 안내](docs/tools/visible-cells-paste/index.md) |
 
-Excel R12는 비교 로직을 유지하면서 차이 결과와 담은 목록 확인의 문구·표를 간결하게 정리했습니다. 제작 당시 사용자 요청에 따라 전체 테스트는 생략했으며, 이후 합성 대표 비교·정상 종료·공존 보존만 확인했습니다. 당시 결정은 [R12 제작·배포 기록](tools/ExcelSmartListCompare/docs/RC12_RELEASE_REPORT.md)에 구분해 남깁니다. 현재 안내하는 설치 파일에는 코드 서명이 없습니다.
+Excel 명단 비교 0.2.1은 Excel의 상태표시줄을 보존하고 기존 제품 도구 모음에 진행·취소 결과를 표시합니다. 같은 저장 후보의 실제 회귀·비교·설정·복구 검사와 정상 종료·기존 설치 보존을 확인했습니다. [0.2.1 제작·검증 기록](tools/ExcelSmartListCompare/docs/STABLE_RELEASE_REPORT.md)에서 실제 실행·재사용 근거·미검증 범위를 구분합니다. 설치 파일에는 코드 서명이 없습니다.
 
 업무 책갈피 0.2.8 평가판은 한 줄 메모·오른쪽 화살표 스티커를 유지하고, Edge·Chrome에 이어 네이버 Whale의 확장 없는 웹페이지 기록을 추가했습니다. 실제 Whale에서의 기록·재열기는 아직 미검증입니다. 제목 클릭 또는 Ctrl+E로 편집하고 다른 창으로 이동하면 자동 저장하며, 작은 스티커는 편집할 동안만 커집니다. 직접 선택한 표시 방식과 조절한 크기는 유지합니다. DB v5를 유지하며 업데이트 전에 [백업·설정 변경 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 MSI·ZIP은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8)에서 제공합니다.
 
@@ -60,7 +60,7 @@ powershell -NoProfile -File scripts/build.ps1
 
 설치 파일은 `artifacts/release/FolderState-0.1.3-win-x64.msi`에 만들어집니다. 파일이 바뀌었는지 확인하는 SHA-256 파일도 함께 생성합니다. 설치 파일에 실행에 필요한 .NET이 포함되어 있어 사용자 PC에 따로 설치할 필요가 없습니다. 현재 Windows 사용자 계정에 설치됩니다.
 
-Excel 추가 기능의 [설치·사용 안내](tools/ExcelSmartListCompare/docs/RC12_USER_GUIDE.md)와 [제작·배포 범위](tools/ExcelSmartListCompare/docs/ADR-0020-R12-wording-release.md)를 참고하세요. 새 소스, 제작한 XLAM, 공개된 설치 파일을 구분합니다.
+Excel 추가 기능의 [설치·사용 안내](tools/ExcelSmartListCompare/docs/STABLE_USER_GUIDE.md)와 [제작·배포 범위](tools/ExcelSmartListCompare/docs/STABLE_RELEASE_REPORT.md)를 참고하세요. 새 소스, 제작한 XLAM, 공개된 설치 파일을 구분합니다.
 
 문서 사이트를 확인하려면 다음 명령을 실행하세요.
 
