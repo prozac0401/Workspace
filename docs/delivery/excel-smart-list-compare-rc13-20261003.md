@@ -2,7 +2,7 @@
 
 최초 기록: 2026-10-03 KST · 현재 계정 제안·정체 정정: 2026-10-04 KST · 책임: 도구 개발·검증 담당
 
-상태: 새 안내·Replace 완료 · T11 부분 기록 보존 · 최종 EXE 제작·실제 설치·대표 비교·평가 출시 대기
+상태: 새 안내·Replace·최종 EXE 준비 완료 · T11 부분 기록 보존 · 실제 설치·대표 비교·평가 출시 대기
 
 제품 버전: `0.2.0-rc.13` · 프로필: `focused-wording-evaluation` · `fullAcceptancePassed=false`
 
@@ -22,7 +22,11 @@
 
 검증 담당이 현재 RC13 소스에서 실행한 집중 검사·격리 제작·저장 소스 audit·실제 새 안내/Replace와 후속 부분 T11을 기록한다. 환경은 Windows 11 10.0.22631, Excel 16.0 Build 20430 x64, Windows PowerShell 5.1.22621.6133이다. 전체 매크로·GUI suite는 NOT_RUN이며 대표 비교·결과는 잠금 화면으로 미실행이다.
 
-실제 XLAM의 릴리스 식별자는 `0.2.0-rc.13`, SHA-256은 `484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e`다. 제작 최종 해시와 소스 audit 전후 해시가 일치한다. EXE·ZIP과 출하 자산은 아직 제작하지 않았다.
+실제 XLAM의 릴리스 식별자는 `0.2.0-rc.13`, SHA-256은 `484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e`다. 제작 최종 해시와 소스 audit 전후 해시가 일치한다. 아래 최종 EXE는 비공개로 준비했고 ZIP·출하 자산은 아직 완성하지 않았다.
+
+2026-10-04 커밋 `4e220b1a4b0fb408b2b60b47d1807cb84220ce51`과 ADR-0024 SHA `bab569ef4d97eb641f78f4ee54252c95a75f3049a17e79c8610712af80aeb023`로 `prepare`를 실제 실행했다. `ExcelSmartListCompare-0.2.0-rc.13-Setup.exe`는 2,246,844 bytes, 파일 버전 `0.2.0.13001`, SHA-256 `14b081882513a89ccff4123245bd8950ab87d18d697fdfc6e193f0155d2c8cea`다. compiler는 한 번 실행했고 payload·EXE·비공개 준비 기록만 생성했다. `publicationReady=false`, 실제 설치·대표 비교 NOT_RUN, T11 원시 NOT_RUN_INCOMPLETE를 유지한다. 같은 EXE를 설치 확인 후 재빌드 없이 완성·게시한다.
+
+새 준비/완성 경계는 기존 16개와 신규 4개를 포함한 합성 검사 20 PASS다. 원시 증거 연결 보강 뒤 신규 4개만 다시 확인해 PASS였으며 두 실행을 합산하지 않는다. 문서 strict·공개 19페이지/이전 주소 2개/404·공개 범위·로컬 링크도 PASS, ADR-0024 포함 9문서의 상대 파일 대상 75개는 PASS다. 제품 실물·설치 PASS가 아니며 외부 URL·문단 앵커 시험은 아니다.
 
 | 대상 | 상태 | 근거·완료 기준 |
 |---|---|---|
@@ -43,8 +47,8 @@
 | 알려진 StatusBar 평가 수용 | 실제 입력 통합 대조 PASS | 기본 게이트는 실제 native FAIL 거절, 정확한 후보·결정 SHA와 명시적 opt-in만 수용. 실제 FAIL 원문 유지,다른 필수 조건 유지 |
 | 전체 내장 기능·GUI suite | NOT_RUN | 실제 확인은 선택된 합성 한 흐름. BuildOnly의 비어 있는 tests 목록도 기능 시험 PASS가 아님 |
 | T11 새 후보 설치·대표 비교·결과·제거 | PARTIAL / NOT_RUN_INCOMPLETE | Upgrade·설치 후보 자동 로드·제거·RC11 파일/등록 복구 확인. 잠금 화면으로 UI 입력 0회·비교/결과 미실행. 폴더 AI 표시 차이와 LastPurgeTime 관찰값 보존·정확 원복 미완료 |
-| 최종 EXE 실제 설치·제거 | NOT_RUN | T11 비공개 엔진 payload 설치와 구분, newWrapperActualInstallation=NOT_RUN |
-| EXE·ZIP·버전·구성·SHA-256·공개 기록 | NOT_RUN | RC13 전용 profile·false 인수 상태·소스/후보/증거 해시, 새 설치·소스·검증 자산. 로컬 로그·사용자 정보 제외 |
+| 최종 EXE 실제 설치·대표 비교 | NOT_RUN | ADR-0024의 RC13 유지 경로, 제거·RC11 원복 반복 없음 |
+| EXE·ZIP·버전·구성·SHA-256·공개 기록 | 최종 EXE 비공개 준비 PASS · ZIP·출하 자산 미완성 | 같은 EXE 설치 후 재빌드 없이 완성, 로컬 로그·사용자 정보 제외 |
 | strict 문서 빌드·생성 링크·공개 범위 | 2026-10-03 갱신 후 PASS · 2026-10-04 계정 결정·정체 정정 후 PASS | MkDocs strict 성공. 공개 19개·이전 주소 2개·404·검색·사이트맵·로컬 링크 확인. 현재 ADR-0023을 포함한 8문서 상대 파일 대상 60개 PASS이며 외부 URL·문단 앵커 시험은 아님. 이전 7문서 46개와 소스 준비 시점 31개 결과도 별도 보존. RC13 내부 문서는 공개 사이트에서 제외 |
 | Draft PR | #13 게시·검토 중 | 소스·문서·제작 방어 변경의 초안이며 이번 실제 제작 결과 반영 중. 출시 완료를 뜻하지 않음 |
 | 패키지·병합·태그·Release·다운로드 | NOT_RUN | 실제 후보 검토와 출하 판단 후 정확한 소스·자산·해시 일치 |
