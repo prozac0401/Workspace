@@ -5,7 +5,7 @@ param(
     [switch]$ApprovedTemporaryVbaAccess,
     [switch]$ProbeOnly,
     [switch]$BuildOnly,
-    [ValidateSet('0.2.0-rc.10','0.2.0-rc.11','0.2.0-rc.12')][string]$ExpectedReleaseVersion='0.2.0-rc.11'
+    [ValidateSet('0.2.0-rc.10','0.2.0-rc.11','0.2.0-rc.12','0.2.0-rc.13')][string]$ExpectedReleaseVersion='0.2.0-rc.11'
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
