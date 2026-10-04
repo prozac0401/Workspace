@@ -1,6 +1,6 @@
 # FolderState 설치·사용 {#folderstate}
 
-**FolderState 0.1.3 RC1** · 폴더 아이콘으로 업무 진행 상태를 표시합니다. 폴더 이름과 업무 파일은 그대로 둡니다.
+**FolderState 0.1.3** · 폴더 아이콘으로 업무 진행 상태를 표시합니다. 폴더 이름과 업무 파일은 그대로 둡니다.
 
 [설치 파일](#download) · [설치하기](#installation) · [사용하기](#use) · [문제 해결](#troubleshooting) · [업데이트·제거](#maintenance)
 
@@ -8,12 +8,12 @@
 
 **Windows 11 x64 PC용 프로그램입니다.**
 
-[FolderState 0.1.3 RC1 설치 파일 받기](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi){ .md-button .md-button--primary }
-[배포 내용 확인](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3-rc.1){ .md-button }
+[FolderState 0.1.3 설치 파일 받기](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3/FolderState-0.1.3-win-x64.msi){ .md-button .md-button--primary }
+[배포 내용 확인](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3){ .md-button }
 
-파일 이름: `FolderState-0.1.3-win-x64.msi` · 시험용 버전 · 코드 서명 없음
+파일 이름: `FolderState-0.1.3-win-x64.msi` · 정식 배포 · 코드 서명 없음
 
-0.1.3 RC1에는 **폴더 확인**, 현재 상태 강조, 대상별 결과 안내와 별도의 **아이콘 저장 위치 적용**이 포함됩니다. [현재 화면의 사용 순서](#use)를 확인하세요. [SHA-256 파일](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3-rc.1/FolderState-0.1.3-win-x64.msi.sha256)로 내려받은 파일을 확인할 수 있습니다.
+0.1.3에는 **폴더 확인**, 현재 상태 강조, 대상별 결과 안내와 별도의 **아이콘 저장 위치 적용**이 포함됩니다. [현재 화면의 사용 순서](#use)를 확인하세요. [SHA-256 파일](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3/FolderState-0.1.3-win-x64.msi.sha256)로 내려받은 파일을 확인할 수 있습니다.
 
 ### 설치 전에 확인하세요 {#requirements}
 
@@ -21,7 +21,7 @@
 
 네트워크 공유 폴더, 동기화 폴더, 회사 보안 프로그램이 관리하는 폴더에서는 동작을 충분히 확인하지 못했습니다.
 
-0.1.3 RC1은 아직 상용 배포 승인을 받지 않은 **시험용 버전**입니다. 설치 파일에는 제작자를 확인할 수 있는 전자 서명이 없습니다. 제작자 표시와 지원 방법도 아직 정해지지 않았습니다. 현재 Windows 11 일반 사용자 계정에서 공개 MSI의 설치·복구·0.1.0 업데이트·제거와 시험 폴더 자료 보존을 확인했습니다. 실제 Explorer 메뉴와 네 상태, 아이콘 복구·초기화·Portable, 기존 사용자 아이콘과 외부 설정 보존도 합성 폴더에서 확인했습니다. 별도 .NET이 없는 새 PC와 재부팅 후 확인은 남아 있습니다.
+0.1.3은 사용자 요청에 따라 **정식 릴리스 채널**로 게시했습니다. 기존 0.1.3 RC1과 설치 파일이 같으므로 이미 사용 중이면 재설치할 필요가 없습니다. [전환 기록](https://github.com/prozac0401/Workspace/blob/main/docs/delivery/stable-tools-release-20261005.md)에서 같은 파일의 검증 근거와 사용자 확인을 구분합니다. 코드 서명과 회사별 도입 승인은 별도입니다. 설치 파일에는 제작자를 확인할 수 있는 전자 서명이 없습니다. 제작자 표시와 지원 방법도 아직 정해지지 않았습니다. 현재 Windows 11 일반 사용자 계정에서 공개 MSI의 설치·복구·0.1.0 업데이트·제거와 시험 폴더 자료 보존을 확인했습니다. 실제 Explorer 메뉴와 네 상태, 아이콘 복구·초기화·Portable, 기존 사용자 아이콘과 외부 설정 보존도 합성 폴더에서 확인했습니다. 별도 .NET이 없는 새 PC와 재부팅 후 확인은 남아 있습니다.
 
 회사 PC에서는 사용해도 되는지 확인한 뒤 시험용 폴더에서 시작하세요. 보안 경고가 나오면 회사 담당자에게 확인하세요. 보안 설정을 끄고 설치하지 마세요.
 
@@ -177,7 +177,7 @@
 
 ### 버튼을 누를 수 없어요 {#buttons}
 
-이 절은 **FolderState 0.1.3 RC1** 화면 기준입니다. 이전 버전을 사용한다면 [설치 파일](#download)에서 새 버전을 확인하세요.
+이 절은 **FolderState 0.1.3** 화면 기준입니다. 이전 버전을 사용한다면 [설치 파일](#download)에서 새 버전을 확인하세요.
 
 - 경로를 입력하거나 바꿨다면 **폴더 확인** 또는 **Enter**를 먼저 누릅니다. 이전 폴더에 잘못 적용하지 않도록 확인 전에는 변경 버튼을 사용할 수 없습니다.
 - 상태가 없는 폴더에는 네 상태 중 하나를 먼저 저장합니다. 첫 상태는 **이 PC** 설정으로 저장됩니다. 그 뒤 아이콘 위치를 고르고 **아이콘 저장 위치 적용**을 누를 수 있습니다.
