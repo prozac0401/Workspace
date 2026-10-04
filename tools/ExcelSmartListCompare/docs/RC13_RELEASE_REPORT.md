@@ -2,7 +2,7 @@
 
 버전: 0.2.0-rc.13 · 최초 기록: 2026-10-03 · 현재 계정 제안·정체 정정: 2026-10-04
 
-상태: 최종 EXE 실제 설치·대표 비교·native 보존 대조 완료 · T11 부분 기록 보존 · 평가 출시 준비
+상태: 최종 EXE 실제 설치·대표 비교·native 보존 대조·평가 prerelease 게시·다운로드 확인 완료 · T11 부분 기록 보존
 
 프로필: `focused-wording-evaluation` · `fullAcceptancePassed=false`
 
@@ -14,6 +14,8 @@
 
 ## 현재 결과와 남은 확인
 
+2026-10-04 18:07:57 KST에 [RC13 평가 prerelease](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.13)를 게시했다. PR #13 병합·태그는 `35cb6ba61239af8ef92194842af7c4a7d8598dd3`이며 패키지의 동결 Source/Validation 기준 커밋은 `074531fa473446bbda6420e62fed0ff3037a92ed`다. finalizer는 컴파일러 없이 같은 EXE로 자산을 완성했다. 게시된 EXE·Release/Source/Verification ZIP 4개와 체크섬 4개를 다시 내려받아 준비 파일·GitHub server digest·크기·SHA 전부 일치를 확인했다. 다운로드 원시 SHA는 `411c38641f5c38d559d70b1e7dffc10c4756dcb670921b3cb35897033b2fd074`다. Source ZIP의 문서는 당시 동결 snapshot이며 이 게시 후 갱신 기록과 구분한다. R12 자산은 보존한다.
+
 2026-10-04 최종 EXE 설치는 사용자가 완료했다고 확인했다. 대표 비교는 검증 담당의 Sky 실제 UI 관찰로 한 번 실행했다. Alpha/Beta/Beta와 Alpha/Beta/Gamma가 각각 3개·제외 0개로 집계됐고, Beta 2 대 1·첫 목록 초과 1개, Gamma 0 대 1·둘째 목록 초과 1개의 두 차이 행이 표시됐다. 비교 후 원본 여섯 셀은 그대로였다. 시험용 두 문서 정리·Excel 정상 종료는 사용자 확인과 후속 읽기 probe의 Excel 부재 조건으로 연결했다. 사용자가 비교 결과까지 확인했다고 기록하지 않는다.
 
 일반 PowerShell의 최종 읽기 원시 SHA는 `a96f11a0633f11fa54f100f03ba09876b9750e21bf5802660f6a86a20f6bc546`다. native 13개 객체의 실제 handle 경로·전후 불변, 설치 XLAM·README·Setup·Uninstall 및 관리 엔진 3개 payload 일치와 기존 권한 14개 일치를 확인했다. 설치 전 native 기준과 다른 registry 값은 제품 앱 제거 등록의 새 DisplayVersion·InstallDate뿐이다. 비교 설정·정책·매크로 보안·다른 추가 기능 등록·OPEN·기존 신뢰 위치는 선정한 범위에서 같은 typed 값이다. install.json의 바이트 해시를 기록했지만 원시 probe가 내용을 읽지 않았으므로 내부 필드 확인으로 확대하지 않는다. 전체 historical 상태와 Codex LocalCache 복구본 일치는 출시 조건이 아니다.
@@ -24,7 +26,7 @@ EXE에 포함한 사용 안내는 준비 당시 동결 문서여서 '미제작·
 
 현재 출시 경로는 [ADR-0024](ADR-0024-R13-final-installer-evaluation.md)를 따른다. 사용자가 과도한 시험을 금지하고 **최종 RC13을 설치하고 계속 사용**을 선택했다. 같은 후보의 완료된 제작·소스·새 안내/Replace 근거를 재사용하고 최종 EXE를 한 번 제작해 일반 Windows의 실제 설치·대표 비교 결과와 연결한다. 기존 T11은 PARTIAL / NOT_RUN_INCOMPLETE로 보존한다. 제거·RC11 원복·전체 GUI/성능/취소/설치 suite와 추가 ACL 실험을 반복하지 않는다. 최종 설치·비교·게시가 끝나기 전에는 출시 완료로 표시하지 않는다.
 
-소스 준비의 기준 커밋은 `e41999684c6a21070e5d6fc96ebed593b0529b1d`, 실제 제작 입력의 동결 커밋은 [Draft PR #13](https://github.com/prozac0401/Workspace/pull/13)의 `9ebaf3d661e1602e7bc6e60be4b9a0c0fe079160`이다. XLAM 후보의 릴리스 식별자는 `0.2.0-rc.13`, SHA-256은 `484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e`다. 아래 최종 EXE는 비공개로 준비했고 ZIP·출하 자산은 아직 완성하지 않았다. 세부 결과는 [실행 기록](../../../docs/delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
+제작·준비 당시 기록: 소스 준비의 기준 커밋은 `e41999684c6a21070e5d6fc96ebed593b0529b1d`, 실제 제작 입력의 동결 커밋은 [Draft PR #13](https://github.com/prozac0401/Workspace/pull/13)의 `9ebaf3d661e1602e7bc6e60be4b9a0c0fe079160`이다. XLAM 후보의 릴리스 식별자는 `0.2.0-rc.13`, SHA-256은 `484419befa0cd763635b1f9592cff43bd13e657e19d5a693d76a78fa071ed14e`다. 아래 최종 EXE는 비공개로 준비했고 ZIP·출하 자산은 아직 완성하지 않았다. 세부 결과는 [실행 기록](../../../docs/delivery/excel-smart-list-compare-rc13-20261003.md)에 남긴다.
 
 준비 당시 기록: 2026-10-04 커밋 `4e220b1a4b0fb408b2b60b47d1807cb84220ce51`과 ADR-0024 SHA `bab569ef4d97eb641f78f4ee54252c95a75f3049a17e79c8610712af80aeb023`로 `prepare`를 실제 실행했다. `ExcelSmartListCompare-0.2.0-rc.13-Setup.exe`는 2,246,844 bytes, 파일 버전 `0.2.0.13001`, SHA-256 `14b081882513a89ccff4123245bd8950ab87d18d697fdfc6e193f0155d2c8cea`다. compiler는 한 번 실행했고 payload·EXE·비공개 준비 기록만 생성했다. `publicationReady=false`, 실제 설치·대표 비교 NOT_RUN, T11 원시 NOT_RUN_INCOMPLETE를 유지한다. 같은 EXE를 설치 확인 후 재빌드 없이 완성·게시한다.
 
@@ -153,6 +155,6 @@ LastPurgeTime의 관찰값은 그대로이며 `exactSelectedStateRestored=false`
 
 ## 출하와 지원 범위
 
-최종 EXE 실제 설치·정상 Excel 시작·대표 비교·원본 보존·소유 정리·정상 종료와 native 동일 후보·선정 설정 보존을 확인했다. 기존 T11은 PARTIAL / NOT_RUN_INCOMPLETE, StatusBar 실제 FAIL과 과거 82 PASS / 1 FAIL / 2 ERROR도 보존한다. RC13을 유지하며 제거·RC11 복구·전체 시험을 반복하지 않는다. 같은 EXE의 자산 완성과 PR 검토 후 서명 없는 평가 prerelease로 게시한다. 전체 인수·안정판·회사 승인은 아니다. 실제 게시·다운로드 결과는 후속 릴리스 기록을 따르며, 게시 전 공개 다운로드는 R12를 유지한다.
+최종 EXE 실제 설치·정상 Excel 시작·대표 비교·원본 보존·소유 정리·정상 종료와 native 동일 후보·선정 설정 보존을 확인했다. 기존 T11은 PARTIAL / NOT_RUN_INCOMPLETE, StatusBar 실제 FAIL과 과거 82 PASS / 1 FAIL / 2 ERROR도 보존한다. RC13을 유지하며 제거·RC11 복구·전체 시험을 반복하지 않는다. 같은 EXE의 자산 완성과 PR 검토·병합 후 서명 없는 평가 prerelease 게시를 완료했다. 전체 인수·안정판·회사 승인은 아니다. 실제 게시·다운로드 일치는 위 게시 후 기록을 따르며 공개 다운로드는 RC13이다. R12 자산은 보존한다.
 
 [R13 명세](../../../docs/tools/excel-list-compare/r13-specification.md) · [후보 사용 안내](RC13_USER_GUIDE.md) · [현재 공개 R12](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12)

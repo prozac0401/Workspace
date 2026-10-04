@@ -2,7 +2,7 @@
 
 도구 ID: ExcelSmartListCompare / EXCEL-LIST-COMPARE
 
-버전·상태: 0.2.0-rc.13 · 2026-10-04 갱신 · 새 안내/Replace·최종 EXE 설치·대표 비교 확인·T11 부분 기록 보존·평가 출시 준비
+버전·상태: 0.2.0-rc.13 · 2026-10-04 갱신 · 최종 EXE 설치·대표 비교·평가 prerelease 게시·다운로드 확인·T11 부분 기록 보존
 
 제품 책임: 도구 개발·검증 담당
 

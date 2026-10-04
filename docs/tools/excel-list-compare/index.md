@@ -1,15 +1,19 @@
 # Excel 명단 비교 설치·사용
 
-**Excel 명단 비교 0.2.0 R12** · 차이 결과와 담은 목록 확인을 더 쉽게 읽도록 정리했습니다.
+**Excel 명단 비교 0.2.0-rc.13 · 서명 없는 평가판** · 원본을 수정한 뒤 담은 첫 목록을 갱신할 때 **첫 번째 목록 바꾸기**를 누르도록 안내합니다.
 
 ## 설치 파일 받기
 
-[R12 받기 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Setup.exe){ .md-button .md-button--primary }
-[ZIP으로 받기](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-win-x64.zip){ .md-button }
+[RC13 받기 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.13/ExcelSmartListCompare-0.2.0-rc.13-Setup.exe){ .md-button .md-button--primary }
+[ZIP으로 받기](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.13/ExcelSmartListCompare-0.2.0-rc.13-win-x64.zip){ .md-button }
 
-수정일: 2026-09-21 · [파일 확인용 SHA-256](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Setup.exe.sha256) · [배포 내용](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12) · [제작·배포 기록](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.12/ExcelSmartListCompare-0.2.0-rc.12-Verification.zip)
+수정일: 2026-10-04 · [파일 확인용 SHA-256](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.13/ExcelSmartListCompare-0.2.0-rc.13-Setup.exe.sha256) · [배포 내용](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.13) · [제작·배포 기록](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.0-rc.13/ExcelSmartListCompare-0.2.0-rc.13-Verification.zip) · [이전 R12](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12)
 
-R12는 비교 로직을 유지한 문구·표 표시 교정판입니다. 제작 당시 기능·설치 전체 시험은 요청에 따라 생략했습니다. 2026-09-27에는 같은 제품 파일로 합성 통합문서의 대표 비교·정상 종료와 다른 세 도구의 순차 제거 후 메뉴·설정 보존을 확인했습니다. 이 확인은 R12 전체 기능·성능·취소·설치 수명주기 검증을 대신하지 않습니다. 설치 파일에는 코드 서명이 없습니다.
+RC13은 비교 규칙과 설정을 유지한 작은 안내 개선입니다. 현재 PC에서 최종 설치 파일의 실제 설치·합성 목록 대표 비교·원본 보존·정상 종료와 선정한 설정 보존을 확인했습니다. 전체 기능·성능·취소·설치 수명주기, 다른 Office·새 PC·회사 정책 환경을 검증한 안정판이나 회사 승인판은 아닙니다. 설치 파일에는 코드 서명이 없습니다.
+
+기존 취소 완료 안내와 상태표시줄 복원 문제는 남아 있습니다. 상태표시줄에 `FALSE`가 보여 평소 상태 표시가 가려질 수 있습니다. 필요한 파일을 저장하고 Excel을 정상 종료한 뒤 다시 열어 상태를 확인하세요. 이 절차가 원인 해결이나 재발 방지를 뜻하지 않습니다.
+
+설치본에 포함된 안내는 준비 당시 문서여서 'EXE 미제작·현재 공개 R12' 문구가 남아 있습니다. RC13 제작·설치 확인·게시는 완료했으며 최신 상태는 이 페이지와 배포 내용을 우선합니다. 동봉된 설치·비교·제거 절차는 RC13에 맞습니다.
 
 두 목록의 값과 개수가 같은지 확인합니다. 같으면 짧게 알려주고, 차이가 있으면 새 Excel 파일에 표시합니다.
 
@@ -18,7 +22,7 @@ R12는 비교 로직을 유지한 문구·표 표시 교정판입니다. 제작 
 64비트 Windows와 PC에 설치된 데스크톱 Excel이 필요합니다. Mac과 브라우저용 Excel은 지원하지 않습니다.
 
 1. 작업 중인 파일을 저장하고 Excel 창을 모두 닫습니다.
-2. **ExcelSmartListCompare-0.2.0-rc.12-Setup.exe**를 실행하고 **설치**를 누릅니다.
+2. **ExcelSmartListCompare-0.2.0-rc.13-Setup.exe**를 실행하고 **설치**를 누릅니다.
 3. Excel의 **추가 기능** 탭에서 명단 비교 버튼을 확인합니다. 셀을 우클릭해도 사용할 수 있습니다.
 
 ZIP은 모두 푼 뒤 `Release` 폴더의 **Install.cmd**를 실행합니다. 현재 Windows 계정에 설치하며 관리자 권한·Python·VBA 편집기는 필요하지 않습니다. 제품 폴더는 Excel의 신뢰할 수 있는 위치로 등록되므로 제품 파일만 보관하세요. 회사 정책으로 차단되면 회사의 승인된 설치 절차를 따르세요.
@@ -80,4 +84,4 @@ ZIP은 모두 푼 뒤 `Release` 폴더의 **Install.cmd**를 실행합니다. �
 
 비교 설정은 업데이트·제거 후에도 같은 계정에 남습니다. 초기화하려면 설치된 도구의 **비교 설정 → 기본값으로 되돌리기**를 사용하세요. 설치 오류를 문의할 때는 사용자 경로가 들어간 로그를 그대로 공개하지 마세요.
 
-[R12 배포 파일](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.12)
+[RC13 평가 배포 파일](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.0-rc.13)
