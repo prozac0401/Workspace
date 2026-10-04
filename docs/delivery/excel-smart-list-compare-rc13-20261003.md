@@ -2,7 +2,7 @@
 
 최초 기록: 2026-10-03 KST · 현재 계정 제안·정체 정정: 2026-10-04 KST · 책임: 도구 개발·검증 담당
 
-상태: 새 안내·Replace 완료 · T11 부분 실행·RC11 파일/등록 복구 · 권한 표시 차이·대표 비교/결과·출하 대기
+상태: 새 안내·Replace 완료 · T11 부분 실행·RC11 파일/등록 복구 · 실행 view의 권한 복구·일반 설치 대조·대표 비교/결과·출하 대기
 
 제품 버전: `0.2.0-rc.13` · 프로필: `focused-wording-evaluation` · `fullAcceptancePassed=false`
 
@@ -105,9 +105,23 @@ manifest·제품/제거 관리 Setup·실제 XLAM 릴리스 literal을 읽어 �
 
 최종 등록 복구는 이미 생성된 동일한 빈 키의 수정 시각·원래 ACL·전체 선정 상태를 다시 고정했다. 파일·ACL을 더 쓰거나 키를 생성·삭제하지 않고 winreg.OpenKey로 기존 키를 열어 원래 자료형의 소유 식별자·제품 ID·설명·하위 폴더 제한 4값을 쓰고, 제품 신뢰 Path와 원래 OPEN을 마지막에 복원했다. 각 단계의 실제 snapshot과 자료형을 대조했다. 최종 제품·관리 10파일의 바이트·기록 속성·시각과 원래 OPEN·제품 신뢰·다른 선정 영역을 확인했다. ACL 14개 중 13개는 원래 SDDL과 같고 제품 폴더 1개만 기록한 AI 차이를 유지했다. 다른 ACL 차이는 허용하지 않았다.
 
-결과는 ORIGINAL_BYTES_REGISTRATION_RESTORED_WITH_OBSERVED_DIFFERENCES다. exactAclRestored=false·exactOriginalProductRestored=false·exactSelectedStateRestored=false다. LastPurgeTime은 관찰값을 쓰지 않고 보존했다. 파일·등록 복구 완료를 정확한 제품·선정 보안 상태 전체의 원복이나 T11 PASS로 확대하지 않는다. AI 표시 차이를 평가 출시 조건으로 수용하는 결정을 내리지 않았다. 대표 비교·결과와 보존 미완료가 남아 T11은 PARTIAL / NOT_RUN_INCOMPLETE이며 StatusBar 예외가 이를 수용한 근거는 아니다. 최종 wrapper 실제 설치·포장·병합·태그·Release는 NOT_RUN, fullAcceptancePassed=false·stablePublishAllowed=false를 유지한다.
+등록 복구 단계의 결과는 ORIGINAL_BYTES_REGISTRATION_RESTORED_WITH_OBSERVED_DIFFERENCES였다. exactAclRestored=false·exactOriginalProductRestored=false·exactSelectedStateRestored=false다. LastPurgeTime은 관찰값을 쓰지 않고 보존했다. 파일·등록 복구 완료를 정확한 제품·선정 보안 상태 전체의 원복이나 T11 PASS로 확대하지 않는다. AI 표시 차이를 평가 출시 조건으로 수용하는 결정을 내리지 않았다. 대표 비교·결과와 보존 미완료가 남아 T11은 PARTIAL / NOT_RUN_INCOMPLETE이며 StatusBar 예외가 이를 수용한 근거는 아니다. 최종 wrapper 실제 설치·포장·병합·태그·Release는 NOT_RUN, fullAcceptancePassed=false·stablePublishAllowed=false를 유지한다.
 
 후속 복구 후보 진단은 비공개 출력 아래 새 빈 디렉터리 2개에만 한정했다. 같은 원래 descriptor에서 AI만 없는 시작 상태를 재현하고 `SetNamedSecurityInfo(info4)`와 독점 handle의 `SetSecurityInfo(info4)`를 비교했다. 두 API는 반환 0이었고 AI는 생겼지만 owner/group이 같은 상태에서 ACE가 5개에서 4개로 바뀌어 전체 원래 descriptor exact는 모두 false였다. 진단 완료는 복구 성공이 아니며 두 후보를 실제 제품에 적용하지 않았다. 설치 파일·등록·선정 상태와 현재 관찰 ACL 14개, 시험 부모 ACL의 불변을 대조했다. 제품·등록 쓰기·Excel 실행·설치·UI 입력은 없었다. 다른 시험 부모에서의 결과이므로 원래 실제 경로의 내부 원인 확정이나 복구 불가능 판정으로 확대하지 않는다. 동결 진단 소스 SHA는 `3525dc319c0b8d3e4d2c281eeac1568b27dd18108573b19b3f5d6d4505c15ef7`, 원시 기록 SHA는 `4fb338a639fb74acf88508af67144860be8ac5409807e4f8f552dfb12f291683`이다. 이 결과로 T11 또는 출시 조건을 완화하지 않는다.
+
+## 2026-10-04 현재 실행 view의 ACL 복구와 남은 환경 대조
+
+후속 빈 폴더 시험에서는 원래 전체 descriptor에 `SE_DACL_AUTO_INHERIT_REQ`(AR)만 메모리에서 추가하고 `SetFileSecurityW(info7)`를 적용했다. 원래 owner/group·ACE 5개·AI가 모두 정확히 일치했고 AR는 남지 않았다. 별도 원래 제품 5파일을 복사한 시험에서도 디렉터리만 한 번 적용한 뒤 파일의 바이트·기록 속성·생성/최종 쓰기 시각·identity·원시 ACL의 전후 동일성을 확인했다. 적용 후 자식 setter로 차이를 보정하지 않았다. 두 시험의 실제 설치 선정 상태·관찰 ACL 14개·시험 부모는 불변이었다. 빈 폴더 소스/원시 SHA는 `765fc8a4fbffaf20dcdd65ae0dddf9ccdd5182a0b5c9fb1ea68d198353b128d0` / `2ca5c7b7333747c6ac4c8463301966380eb8a41438765a209b6152a3d91f9318`, 5파일 시험은 `fb5f667cd98f7645c7b42a2c590e35d984349c8901b358b1ac6d2240e4d1a70f` / `c5e3d31a8d876d5547263f85172c1b45c7159a21ac192b53c57a9e23fe1151ce`다. 이 AR 요청은 [공식 control API](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-setsecuritydescriptorcontrol)를 사용한 원래 객체 복구 진단이며 제품 설치 엔진 변경이 아니다.
+
+실제 대상의 첫 적용 시도는 `GetFinalPathNameByHandleW` 반환 경로와 논리 경로의 차이를 발견해 setter 전 `FAIL / NOT_RUN`으로 중단했다. 권한·파일·등록 쓰기는 없었고 실패 기록은 보존했다. 반환 경로는 Codex 패키지 LocalCache 아래였다. 별도 읽기 대조로 논리/물리 디렉터리와 원래 5파일의 device/inode·handle volume/file index·final path·바이트·기록 metadata·원시 ACL 전체가 같은 것을 확인했다. 원래 소유 directory identity와 두 부모 ACL도 고정했다. 매핑 원시 SHA는 `949501fbdf6f0e5ec182dff8523dbcdce5fcfc534132e52f348ae09c1f0318e7`이다.
+
+이 동일 소유 객체에 한정한 새 복구 helper는 정확한 매핑·소유 identity·파일 10개·선정 32영역·권한 14개·부모 2개·Excel 없음·설치 mutex를 다시 대조한 뒤 논리 제품 경로의 descriptor를 한 번 적용했다. API BOOL 1/error 0, 전체 원래 directory SDDL과 자식 5파일 ACL, 원래 ACL 14개 모두 exact를 실제 확인했다. 파일·등록·부모·명시적 자식 setter는 실행하지 않았다. 자동 상속의 자식 영향은 setter 부재만으로 주장하지 않고 실제 자식 권한과 파일 전후 대조로 확인했다. 제품·관리 10파일의 바이트·기록 metadata, 제품 등록·두 부모·제품 5파일 identity는 보존됐다. 실제 복구 소스 SHA는 `e3bf8eee3407d110c16ccadd945e4817a65a07c949f14bd2f31f438ccdd565b7`, 원시 SHA는 `a41c42383356f027044fcd9d35a0166d4f6fedf6d94c05b31b2b3b1701d22bb4`다.
+
+이 성공은 현재 실행 view에서 관찰한 소유 객체의 복구다. [MSIX 문서의 private-first/fallback 동작](https://learn.microsoft.com/en-us/windows/msix/desktop/desktop-to-uwp-behind-the-scenes)과 부합하지만, 최초 RC11 백업·Upgrade 때의 물리 경로까지 같은 것을 증명하지 않는다. 일반 Windows/Excel이 보는 제품 파일·OPEN·신뢰 등록의 연결도 아직 확인하지 못했다. `GetCurrentPackageFullName`이 package identity 없음으로 반환한 같은 Python에서도 LocalCache final path가 관찰돼, 이 API 하나만으로 일반 실행 view를 확정하지 않았다. OPEN/신뢰 경로를 물리 경로로 바꾸거나 실제 AppData를 추가로 수정하지 않았다.
+
+LastPurgeTime의 관찰값은 그대로이며 `exactSelectedStateRestored=false`, `initialBackupPhysicalViewConfirmed=false`, `nativeUnpackagedInstallationVerified=false`다. 원래 AI 차이가 남았다는 판단은 위 후속 실제 복구로 갱신하되, 과거 실패·원인 미확정·현재 환경 한계를 보존한다. 대표 비교·결과는 계속 미실행이고 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 새 Upgrade·Excel 실행·최종 EXE 설치·포장·병합·태그·Release는 이 복구에서 수행하지 않았다. StatusBar 예외·전체 인수 및 안정판 금지는 변경하지 않았다.
+
+다음 최소 확인은 사람이 시작 메뉴에서 연 일반 PowerShell의 읽기 전용 대조다. 제품/관리의 알려진 10파일·handle 실제 경로·원래 권한 14개·선정 32영역을 새 비공개 기록에 읽고 전후 불변을 확인한다. 설치·Excel 시작·파일/등록/보안 변경은 없다. 일반 설치 view와 현재 관찰 view의 차이가 있으면 새 시험을 시작하지 않고 원래 백업·실제 값과 관계를 분석한다. 동일성이 확인된 뒤에만 최신 계속 지시 범위에서 같은 후보의 미완료 T11 재개 계획·새 시작 기준·원복 guard를 별도로 고정한다. 과거 한 흐름 기록을 수정·재사용하거나 사람이 재시도를 금지한 것으로 확대하지 않는다.
 
 원시 백업·ACL·registry 값·사용자 경로·화면·진단은 artifacts에 비공개로 보존한다. 공개 기록에는 이 요약만 싣는다.
 
@@ -121,7 +135,7 @@ R12 제작 당시 전체 시험 NOT_RUN과 2026-09-27 대표 비교·공존·정
 
 ## 출하 판단과 미확인 범위
 
-임시 VBA 프로젝트 접근 원복·제작·소스 audit·새 안내/Replace와 StatusBar 평가 수용을 확인했다. 현재 계정 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 공식 엔진 Upgrade·정상 자동 로드와 엔진 제거는 확인했으나, Windows 잠금 화면에서 중단해 대표 비교·결과는 실행하지 않았다. 기존 RC11 파일·등록·제품 신뢰 복구를 실제 확인했다. 제품 폴더 권한의 owner/group·전체 ACE는 원래와 같지만 자동 상속 AI 표시가 달라 정확한 제품 원복은 미완료다. 제품 밖 LastPurgeTime 변경도 원인 미확정인 관찰값을 쓰지 않고 보존했다. 선정 상태 전체 원복이나 T11 PASS로 표시하지 않는다. 최종 EXE 실제 설치·포장·병합·태그·Release는 미실행이며 공개 다운로드는 R12로 유지한다. #13은 Draft로 유지하며 남은 필수 증거를 확보한 뒤 출하 판단을 다시 한다.
+임시 VBA 프로젝트 접근 원복·제작·소스 audit·새 안내/Replace와 StatusBar 평가 수용을 확인했다. 현재 계정 T11은 PARTIAL / NOT_RUN_INCOMPLETE다. 공식 엔진 Upgrade·정상 자동 로드와 엔진 제거는 확인했으나, Windows 잠금 화면에서 중단해 대표 비교·결과는 실행하지 않았다. 현재 실행 view에서 관찰한 RC11 파일·등록·제품 신뢰와 원래 ACL 14개 복구를 실제 확인했다. 제품·관리 10파일의 바이트·기록 속성·생성/최종 쓰기 시각과 부모 2개 권한도 보존됐다. 제품 폴더 handle의 실제 경로는 Codex 패키지의 LocalCache 아래였고, 같은 소유 객체·5파일의 논리/물리 identity·원시 권한·내용 일치를 고정했다. 최초 백업의 물리 경로와 일반 Windows/Excel의 설치·등록 view 연결은 아직 미확인이다. 제품 밖 LastPurgeTime의 원인 미확정 관찰값도 쓰지 않고 보존했다. 전체 선정 상태 원복·일반 Excel 설치 복구·T11 PASS로 확대하지 않는다. 최종 EXE 실제 설치·포장·병합·태그·Release는 미실행이며 공개 다운로드는 R12로 유지한다. #13은 Draft로 유지하며 남은 필수 증거를 확보한 뒤 출하 판단을 다시 한다.
 
 전체 GUI·공존·성능·취소·설치 suite를 무조건 재실행하지 않는다. 새 후보에서 실제 확인한 범위만 기록하며 x86 Office·새 PC·재부팅·회사 정책 환경, 서명·상용 인수는 별도 미확인 상태다. `fullAcceptancePassed=false`와 안정판 금지를 유지한다.
 
