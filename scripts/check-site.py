@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 # Keep this explicit: a new page requires a publication-scope review.
 public_routes = {
-    '', 'getting-started/', 'quick-reference/', 'principles/',
+    '', 'getting-started/', 'quick-reference/', 'principles/', 'education-operations/',
     'policies/workspace/', 'policies/kits/', 'policies/files-email/',
     'policies/archive-security/', 'policies/decisions/', 'policies/folder-workflow/',
     'policies/work-efficiency/',

@@ -7,6 +7,7 @@ exclude_docs: |
   !/principles.md
   !/getting-started.md
   !/quick-reference.md
+  !/education-operations.md
   !/policies/workspace.md
   !/policies/kits.md
   !/policies/files-email.md
@@ -86,6 +87,7 @@ nav:
       - 지금 할 일 찾기: quick-reference.md
       - 자료 정리의 10가지 습관: principles.md
       - 업무 하나로 시작하기: getting-started.md
+      - 교육 업무에 도구 써 보기: education-operations.md
       - 회사에서 정할 항목: policies/decisions.md
   - 자료와 업무 정리:
       - 자료를 둘 곳 정하기: policies/workspace.md
@@ -100,7 +102,7 @@ nav:
       - 탐색기 파일 목록을 Excel로: tools/file-list-to-excel/index.md
       - 보이는 칸 붙여넣기 설치·사용: tools/visible-cells-paste/index.md
       - 그림 복사·저장 설치·사용: tools/image-copy-save/guide.md
-      - 다운로드 이름 유지 · 평가 안내: tools/download-version-manager/index.md
+      - 다운로드 이름 유지 · 시험용 안내: tools/download-version-manager/index.md
   - 불편할 때 더 살펴보기:
       - 반복되는 불편 줄이기: policies/work-efficiency.md
       - 일을 이어서 하고 다른 사람에게 넘기기: policies/folder-workflow.md
