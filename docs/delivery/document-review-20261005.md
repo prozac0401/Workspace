@@ -1,7 +1,7 @@
 # 문서 리뷰 반영과 교육 업무 안내 게시
 
 날짜: 2026-10-05 한국시간
-상태: 문서 작성·로컬 검사 완료, GitHub 게시 결과는 아래에 따로 기록
+상태: 문서 작성·로컬 검사·GitHub 자동 검사·Pages 게시·실제 공개 주소 확인 완료
 기준 소스: cef6f4702496e3048461483052e38e095f10f159
 관련 결정: [교육 업무 예시와 쉬운 공개 안내](../design/0029-education-public-guide.md)
 관련 규칙: [정책 문서 작성 규칙](../policies/documentation.md), [GitHub Pages 운영](pages.md)
@@ -64,4 +64,21 @@ GitHub Releases API에서 Workspace와 별도 BookMark·File-List-To-Excel 저�
 
 ## GitHub 반영과 실제 게시
 
-검사한 문서 변경을 PR로 제출하고 CI 통과 후 main에 반영합니다. 실제 게시 결과와 공개 URL 내용은 이 절의 후속 기록으로 남깁니다. 아직 확인하기 전에는 게시 완료로 표시하지 않습니다.
+[PR #19](https://github.com/prozac0401/Workspace/pull/19)의 최종 소스 `fe0449f1b2683bc052d85de8d8fd0f83bd97e676`에서 아래 자동 검사가 모두 성공했습니다. 문구 교정 뒤의 최종 소스를 기준으로 확인했습니다.
+
+- [Documentation](https://github.com/prozac0401/Workspace/actions/runs/37247092472) — success
+- [VisibleCellsPaste Windows build](https://github.com/prozac0401/Workspace/actions/runs/37247092396) — success
+- [DownloadVersionManager folder watcher](https://github.com/prozac0401/Workspace/actions/runs/37247092383) — success
+- [Windows build and MSI](https://github.com/prozac0401/Workspace/actions/runs/37247092518) — success
+
+사용자가 요청한 공개 게시 범위에 따라 PR을 main에 반영했습니다. 반영 커밋은 `15084f0f786956da2ae4bf3f51cca1bab1283c9e`입니다. [Documentation 실행](https://github.com/prozac0401/Workspace/actions/runs/37247327112)의 build와 deploy가 성공했습니다.
+
+실제 공개 주소 확인 시각: 2026-10-05T00:24:37.339Z (UTC). 브라우저 캐시를 사용하지 않는 요청으로 확인했습니다.
+
+- [첫 화면](https://prozac0401.github.io/Workspace/)의 최신 버전·다운로드 연결이 반영되었습니다.
+- [교육 업무 안내](https://prozac0401.github.io/Workspace/education-operations/)가 HTTP 200으로 열리고 일곱 예시의 문단 주소가 있습니다.
+- 공개 안내 20개 모두 HTTP 200입니다. 검색과 사이트맵은 동일한 20개 안내만 포함합니다.
+- FolderState의 이전 주소 두 개는 해당 설치·문제 해결 문단으로 이동하는 문서를 유지합니다.
+- 내부 검토 기록, ADR와 FolderState 도움말 원본의 공개 주소는 HTTP 404입니다.
+
+이번 확인은 안내 게시 결과입니다. 기존 Release 파일을 다시 만들거나 제품 설치·사용 시험 결과를 추가한 것은 아닙니다.
