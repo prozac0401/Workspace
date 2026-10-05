@@ -1,55 +1,51 @@
 # Workspace
 
-**필요한 자료를 찾고, 다음에 할 일을 알 수 있도록 돕습니다.** 파일과 메일을 정리하는 방법, 폴더에 진행 상태를 표시하는 FolderState, 두 목록을 비교하는 Excel 명단 비교, 저장한 작업 위치로 돌아가는 업무 책갈피, 보이는 셀을 새 통합문서로 만드는 선택범위 내보내기, 탐색기 파일 목록과 중복 검사 결과를 Excel로 만드는 File List to Excel, 숨긴 행을 건너뛰어 값을 넣는 보이는 칸 붙여넣기를 안내합니다.
+**필요한 자료를 찾고, 다음에 할 일을 확인하는 방법을 안내합니다.** 파일과 메일 정리 방법과 여덟 가지 업무 도구의 설치·사용법을 볼 수 있습니다.
 
-[지금 할 일 찾기](docs/quick-reference.md)에서 자신의 상황을 골라 보세요. 처음 사용한다면 [업무 하나로 시작하기](docs/getting-started.md)를 따라 하면 됩니다. 반복하는 업무는 복사용 기본 폴더를 만들어 두고 새 업무를 시작할 때 복사해 씁니다. 업무가 끝나면 그 폴더를 통째로 보관합니다.
+[안내 사이트](https://prozac0401.github.io/Workspace/)에서 필요한 상황을 고르세요. 처음 시작한다면 [업무 하나로 시작하기](docs/getting-started.md)를 보세요. 명단 비교나 제출물 정리에 도구를 쓰려면 [교육 업무에 도구 써 보기](docs/education-operations.md)를 따라 해 보세요.
 
-- **[FolderState 설치·사용](docs/tools/folderstate/index.md)**: Windows 폴더 아이콘으로 업무 진행 상태를 표시합니다.
-- **[Excel 명단 비교 설치·사용](docs/tools/excel-list-compare/index.md)**: 두 목록에서 다른 값과 중복된 값을 찾습니다.
-- **[선택범위 내보내기 설치·사용](docs/tools/excel-selection-export/index.md)**: 설치 후 Excel 시작 시 메뉴가 준비되며, 보이는 셀과 수식 결과를 새 통합문서로 만듭니다.
-- **[File List to Excel 설치·사용](docs/tools/file-list-to-excel/index.md)**: 탐색기에서 파일·폴더를 우클릭해 목록과 중복 검사 결과를 Excel로 만듭니다.
-- **[업무 책갈피 설치·사용](docs/tools/bookmark/index.md)**: 문서 위치·웹페이지를 남기고 목록이나 포스트잇 스티커에서 다시 엽니다.
-- **[보이는 칸 붙여넣기 설치·사용](docs/tools/visible-cells-paste/index.md)**: 숨긴 행을 건너뛰어 한 열의 보이는 칸에만 값을 넣습니다.
-- **[파일과 메일 정리하기](docs/policies/workspace.md)**: 현재 업무, 복사용 기본 폴더, 끝난 업무를 어디에 둘지 안내합니다.
-- **[놓치는 일과 반복 작업 줄이기](docs/policies/work-efficiency.md)**: 요청을 모으거나 이전 해결 방법을 찾기 어려울 때 필요한 방법만 골라 씁니다.
+업무 정리 방법은 **제안**입니다. 저장 위치, 자료를 볼 수 있는 사람, 보관 기간은 회사에서 정한 기준을 따릅니다. 공개 예시는 가짜 자료로 설명합니다.
 
-[안내 사이트](https://prozac0401.github.io/Workspace/) · [폴더 상태 도구의 최초 명세](01_Windows_Explorer_폴더상태도구_명세.md) · [파일·폴더·메일 정리의 최초 설계안](02_사무실PC_파일폴더이메일_정리설계안.md)
+## 프로그램 고르기
 
-업무 안내는 **제안 단계**입니다. 저장 위치와 자료 보관 기간 등은 회사에서 정한 기준을 따릅니다. 안내 사이트에는 업무 안내와 각 프로그램의 설치·사용법을 공개합니다. 개발 명세·설계·양식·배포·검증 기록은 저장소에서 관리하며 사이트에는 공개하지 않습니다.
+GitHub의 공개 배포 목록을 **2026년 10월 5일**에 확인했습니다. 아래 링크는 각 도구의 최신 설치·사용 안내입니다. 설치 파일에는 제작자의 전자 서명이 없습니다. 설치 전에 사용할 PC와 알려진 제한을 확인하세요.
 
-## 프로그램 받기
-
-**다운로드 전 확인:** 현재 안내하는 설치 파일에는 코드 서명이 없습니다. 제품별 설치 안내에서 사용 환경과 알려진 제한을 먼저 확인하세요.
-
-선택범위 내보내기는 컴파일된 COM 추가 기능이며 명단 비교와 설치·메뉴·제거가 별도입니다. rc.10에서 실제 메뉴 실행 후 원본 편집의 Undo·Redo를 확인했고, 후속 API 시험의 자연 종료·현재 PC 제거·합성 공존을 확인했습니다. 과거 Excel 잔존 원인은 미확정이며 x86 실제 실행·격리 환경·재부팅·모든 실패/취소와 전체 환경 검증은 남아 있습니다. 시험판 게시를 전체 인수 완료로 해석하지 않습니다. File List to Excel은 별도 저장소의 v1.2.0을 안내하며, 선택 설치로 Excel에서 선택한 실제 파일을 새 폴더에 복사할 수 있습니다.
-
-File List to Excel v1.2.0의 설치·복구·제거와 이전 버전 업그레이드는 검증되어 있습니다. 선택형 파일 복사의 지원 범위와 미검증 환경은 [설치 안내](docs/tools/file-list-to-excel/index.md)에서 확인하세요.
-
-| 프로그램 | 설치 파일 | 확인할 내용 |
+| 하고 싶은 일 | 최신 안내 | 공개 파일 |
 |---|---|---|
-| FolderState 0.1.3 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3/FolderState-0.1.3-win-x64.msi) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3) | [설치·사용](docs/tools/folderstate/index.md) |
-| Excel 명단 비교 0.2.1 | [Windows 설치 파일 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.1/ExcelSmartListCompare-0.2.1-Setup.exe) · [ZIP·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.1) | [설치·사용 안내](docs/tools/excel-list-compare/index.md) |
-| 선택범위 내보내기 0.1.0-rc.10 평가판 | [Excel x64용 EXE](https://github.com/prozac0401/Workspace/releases/download/excel-selection-export-v0.1.0-rc.10/ExcelSelectionExport-0.1.0-rc.10-x64-Setup.exe) · [x86용·배포 자료](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.10) | [설치·사용·알려진 제한](docs/tools/excel-selection-export/index.md) |
-| File List to Excel 1.2.0 | [Windows x64 MSI](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [배포 자료](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) | [설치·사용 안내](docs/tools/file-list-to-excel/index.md) |
-| 업무 책갈피 0.2.8 | [Windows x64 설치 파일 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.8/WorkBookmark-0.2.8-win-x64.msi) · [배포 자료](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) | [설치·사용 안내](docs/tools/bookmark/index.md) |
-| 그림 복사·저장 0.2.0 | [Windows x64 MSI](https://github.com/prozac0401/Workspace/releases/download/image-copy-save-v0.2.0/ImageCopySave-0.2.0-x64.msi) · [릴리스 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0) | [설치·사용·기존 자료 보존](docs/tools/image-copy-save/guide.md) |
-| 보이는 칸 붙여넣기 0.1.1 | [Windows 단일 설치 EXE](https://github.com/prozac0401/Workspace/releases/download/visible-cells-paste-v0.1.1-setup.1/VisibleCellsPaste-0.1.1-Setup.exe) · [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.1-setup.1) | [설치·사용 안내](docs/tools/visible-cells-paste/index.md) |
+| 폴더에 진행 상태 표시하기 | [FolderState 0.1.3](docs/tools/folderstate/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3) |
+| 두 명단의 차이와 중복 개수 찾기 | [Excel 명단 비교 0.2.1](docs/tools/excel-list-compare/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.1) |
+| Excel에서 보이는 칸만 새 파일로 만들기 | [선택범위 내보내기 0.1.0-rc.11 시험용](docs/tools/excel-selection-export/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.11) |
+| 폴더 속 파일을 목록으로 보고 필요한 파일 모으기 | [File List to Excel 1.2.0](docs/tools/file-list-to-excel/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) |
+| 숨긴 행을 건너뛰어 한 열에 값 넣기 | [보이는 칸 붙여넣기](docs/tools/visible-cells-paste/index.md) | [배포 목록에서 도구 이름으로 찾기](https://github.com/prozac0401/Workspace/releases) |
+| 복사한 그림을 파일로 저장하기 | [그림 복사·저장 0.2.1](docs/tools/image-copy-save/guide.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) |
+| 보던 문서나 웹페이지 다시 열기 | [업무 책갈피 0.2.8](docs/tools/bookmark/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) |
+| 다시 받은 파일에 원래 이름 주기 | [다운로드 이름 유지 0.2.0 시험용](docs/tools/download-version-manager/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0) |
 
-Excel 명단 비교 0.2.1은 Excel의 상태표시줄을 보존하고 기존 제품 도구 모음에 진행·취소 결과를 표시합니다. 같은 저장 후보의 실제 회귀·비교·설정·복구 검사와 정상 종료·기존 설치 보존을 확인했습니다. [0.2.1 제작·검증 기록](tools/ExcelSmartListCompare/docs/STABLE_RELEASE_REPORT.md)에서 실제 실행·재사용 근거·미검증 범위를 구분합니다. 설치 파일에는 코드 서명이 없습니다.
+보이는 칸 붙여넣기의 확인한 최신 배포 파일은 0.1.2입니다. 설치 안내는 기존 요청에 따라 배포 목록에서 파일을 고르는 방식으로 제공합니다.
 
-업무 책갈피 0.2.8은 한 줄 메모·오른쪽 화살표 스티커를 유지하고, Edge·Chrome에 이어 네이버 Whale의 확장 없는 웹페이지 기록을 추가했습니다. 사용자가 실제 Whale에서 저장·재열기가 정상 동작함을 확인했습니다. [정식 채널 전환 기록](docs/delivery/stable-tools-release-20261005.md)에 사용자 확인과 자동시험·미검증 범위를 구분합니다. 제목 클릭 또는 Ctrl+E로 편집하고 다른 창으로 이동하면 자동 저장하며, 작은 스티커는 편집할 동안만 커집니다. 직접 선택한 표시 방식과 조절한 크기는 유지합니다. DB v5를 유지하며 업데이트 전에 [백업·설정 변경 안내](docs/tools/bookmark/index.md#backup)를 확인하세요. 소스와 MSI·ZIP은 별도 [BookMark 저장소](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8)에서 제공합니다.
+시험용 두 도구는 정식 배포 전 단계입니다. 선택범위 내보내기는 32비트 Excel 등 확인하지 못한 환경이 남아 있습니다. 다운로드 이름 유지는 설치 실패 뒤 설치 기록이 남아 다시 설치하지 못할 수 있어 일상 업무 사용을 아직 권하지 않습니다.
 
-현재 배포·검증 결과와 과거 기록은 [배포·검증 안내](docs/delivery/index.md)에서 구분해 확인하세요.
+FolderState 0.1.3과 업무 책갈피 0.2.8은 이전에 배포한 같은 파일을 정식 배포로 표시한 것입니다. 이 표시 변경 때문에 다시 설치할 필요는 없습니다. 회사 사용 승인과 모든 PC에서의 동작 확인은 별개입니다.
 
-## 그림 복사·저장 0.2.0
+## 교육 업무에서 써 보기
 
-[그림 복사·저장](docs/tools/image-copy-save/guide.md)은 Windows 11 x64의 로컬 그림 파일을 이미지로 복사하고, 복사한 이미지를 현재 폴더에 PNG로 저장합니다. 기본 메뉴에서는 **더 많은 옵션 표시**, 클래식 직접 메뉴에서는 해당 명령을 바로 사용합니다. 설치·유지보수는 관리자 승인, 평소 실행은 일반 사용자 권한을 사용하며 자체 포함 MSI에는 코드 서명이 없습니다.
+[일곱 가지 교육 업무 예시](docs/education-operations.md)에서 지금 필요한 장면 하나를 고르세요. 가짜 자료를 준비하는 방법, 실행 순서, 기대 결과, 주의할 점을 함께 적었습니다. 도구를 모두 설치할 필요는 없습니다.
 
-기존 등록·외부 수정 파일을 보존하는 MSI 검증 32개와 기본 설치본의 대표 복사·저장을 확인하고 정식 릴리스를 게시했습니다. Windows 11 기본 메뉴의 기존 사용자 확인과 이번 검증 범위는 [릴리스 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)와 [실제 배포 기록](docs/delivery/image-020-release-20260927.md)에서 구분합니다.
+- [자료를 둘 곳 정하기](docs/policies/workspace.md)
+- [반복 업무의 기본 폴더와 일정 준비하기](docs/policies/kits.md)
+- [파일과 메일 정리하기](docs/policies/files-email.md)
+- [끝난 업무 보관과 자료 보호](docs/policies/archive-security.md)
+- [놓치는 일과 반복 작업 줄이기](docs/policies/work-efficiency.md)
+
+## 문서와 확인 기록
+
+편집할 문서는 docs/에 있습니다. 공개 사이트에는 업무 안내, 가짜 자료 예시, 허용한 프로그램의 설치·사용 안내만 올립니다. 개발 문서와 과거 확인 기록은 저장소에서 관리합니다.
+
+[최신 버전과 확인 기록](docs/delivery/index.md) · [이번 문서 수정과 게시 기록](docs/delivery/document-review-20261005.md)
+
+[폴더 상태 도구의 최초 명세](01_Windows_Explorer_폴더상태도구_명세.md) · [파일·폴더·메일 정리의 최초 설계안](02_사무실PC_파일폴더이메일_정리설계안.md)
 
 ## 개발자가 프로그램을 만드는 방법
-
-DownloadVersionManager 0.1.0 [평가 안내](docs/tools/download-version-manager/index.md)를 추가했습니다. 브라우저 완료 이벤트와 단발 Native Host로 최신 파일의 이름을 유지하고, 다른 내용의 이전 파일만 History에 보관합니다. 공개 릴리스는 미게시이며 완전 자동 통합 설치 관문은 미충족입니다. [소스·제작 방법](tools/DownloadVersionManager/README.md)과 [검증 기록](tools/DownloadVersionManager/TEST_RESULTS.md)을 구분해 확인하세요.
 
 FolderState는 C# / .NET 10 / WPF로 만들었습니다. 아래 명령은 Windows 11 x64에서 실행합니다. .NET SDK 버전은 `global.json`을 따릅니다. 각 도구의 현재 확인 범위는 [배포·검증 안내](docs/delivery/index.md)를 참고하세요.
 

@@ -1,16 +1,26 @@
-# 그림 복사·저장 · 구현 대응 기록
+# 그림 복사·저장 · 배포 안내와 구현 기록
 
-## 2026-10-03 · 0.2.1 출하 후보 검증 완료, PR·게시 대기
+## 현재 배포와 사용 안내
 
-Workspace PR #10의 helper 완료 전 취소 안내를 포함한 0.2.1 출하 후보를 확인했습니다. 종료 코드 3과 기존의 정확한 진단이 맞을 때만 사용자 문장이 바뀌며 worker 취소·커밋·이미지 처리·클립보드·파일·Explorer 메뉴·MSI 보호 동작은 유지합니다. 출하 DLL의 집중 회귀 8 PASS, builder의 합성 보호 39 PASS, payload 입력 18개·내용 해시와 MSI 404파일·내장 보호·0.1.1/공개 0.2.0 소유 목록의 읽기 전용 검사가 완료됐습니다. [0.2.1 기록](../../delivery/image-copy-save-021-20261003.md)은 게시 전 후보의 확인 범위입니다. 실제 WPF·Explorer·클립보드 전체 suite·새 MSI 설치 수명주기는 실행하지 않았고 과거 native 66 PASS·보존 32 PASS는 당시 근거로 유지합니다. 공개 안내는 0.2.1을 기준으로 하며 실제 게시·자산 확인 결과는 [0.2.1 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) 페이지·본문을 따릅니다.
+현재 공개 버전은 **0.2.1**입니다. 2026-10-03에 일반 배포로 게시했습니다.
 
-## 2026-09-27 정식 릴리스
+[현재 설치·사용 안내](guide.md) · [0.2.1 배포 페이지와 설치 파일](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) · [0.2.1 제작·확인·게시 기록](../../delivery/image-copy-save-021-20261003.md)
 
-[ImageCopySave 0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)를 게시하고 공개 MSI·체크섬을 확인했습니다. 기존·외부 수정 설치 자원 보존 보완은 같은 공개 MSI의 실제 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**으로 확인했습니다. 기본 위치 최종 설치와 클래식 직접 메뉴의 대표 그림 복사·저장도 PASS입니다. [최신 릴리스 기록](../../delivery/image-020-release-20260927.md)에 실제 결과와 앞선 배포 보류·실패 이력을 구분합니다. Pages 설치·사용 안내 배포와 실제 공개 URL·검색·사이트맵 검증도 완료했습니다.
+Windows 11 64비트용이며 설치·복구·제거에는 관리자 승인이 필요합니다. 평소 복사·저장은 일반 사용자로 실행합니다. 설치 파일에는 전자 서명이 없습니다. 회사에서의 사용 승인과 아직 확인하지 않은 환경은 설치 안내를 먼저 읽으세요.
+
+**아래는 날짜별 개발·확인 기록입니다.** 이전 버전의 성공·실패와 미확인 항목은 당시 파일의 근거로 보존합니다. 과거 결과를 0.2.1의 새 설치·전체 사용 시험 결과로 합산하지 않습니다.
+
+## 2026-10-03 · 0.2.1 제작·확인·게시
+
+Workspace PR #10의 helper 완료 전 취소 안내를 포함한 0.2.1 출하 후보를 확인했습니다. 종료 코드 3과 기존의 정확한 진단이 맞을 때만 사용자 문장이 바뀌며 worker 취소·커밋·이미지 처리·클립보드·파일·Explorer 메뉴·MSI 보호 동작은 유지합니다. 출하 DLL의 집중 회귀 8 PASS, builder의 합성 보호 39 PASS, payload 입력 18개·내용 해시와 MSI 404파일·내장 보호·0.1.1/공개 0.2.0 소유 목록의 읽기 전용 검사가 완료됐습니다. [0.2.1 기록](../../delivery/image-copy-save-021-20261003.md)은 후보 확인과 실제 게시 결과를 구분합니다. 실제 WPF·Explorer·클립보드 전체 suite·새 MSI 설치 수명주기는 실행하지 않았고 과거 native 66 PASS·보존 32 PASS는 당시 근거로 유지합니다. 공개 안내는 0.2.1을 기준으로 하며 실제 게시·자산 확인 결과는 [0.2.1 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) 페이지·본문을 따릅니다.
+
+## 2026-09-27 · 0.2.0 당시 배포·확인
+
+[ImageCopySave 0.2.0 정식 Release](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.0)를 게시하고 공개 MSI·체크섬을 확인했습니다. 기존·외부 수정 설치 자원 보존 보완은 같은 공개 MSI의 실제 보존 시험 **32 PASS / 0 FAIL / 0 NOT RUN**으로 확인했습니다. 기본 위치 최종 설치와 클래식 직접 메뉴의 대표 그림 복사·저장도 PASS입니다. [당시 배포 기록](../../delivery/image-020-release-20260927.md)에 실제 결과와 앞선 배포 보류·실패 이력을 구분합니다. Pages 설치·사용 안내 배포와 실제 공개 URL·검색·사이트맵 검증도 완료했습니다.
 
 Windows 11 기본 메뉴 경로의 두 기능은 기존 사용자 직접 확인 PASS입니다. 이번 0.2.0 기본 설치본의 클래식 직접 메뉴 확인은 별도 자동화 관찰이며, 150×150 PNG 복사·저장 왕복의 22,500픽셀 차이는 0개였습니다. 저장 후 최종 행 선택은 NOT_CONFIRMED입니다. 두 결과를 모든 조건별 숨김·창/탭·외부 앱 확인으로 확대하지 않습니다.
 
-도구 ID: ImageCopySave · 현행 명세 v1.2 · 상태: 0.2.0 정식 Release 게시, 보존·설치·대표 복사/저장 PASS, 미확인 조건은 아래에 유지
+도구 ID: ImageCopySave · 당시 명세 v1.2 · 당시 상태: 0.2.0 정식 Release 게시, 보존·설치·대표 복사/저장 PASS, 미확인 조건은 아래에 유지
 제품 책임: 도구 개발·검증 담당
 적용 정책: [추가 도구 개발 기준](../../policies/tools.md), [문서 작성 규칙](../../policies/documentation.md)
 현재 결정: [공통 클래식 메뉴·무서명 관리자 MSI](../../design/0023-image-copy-save-classic-menu.md), [관리자 설치·일반 사용자 실행](../../design/0022-image-admin-install.md), [현재 사용자 시험](../../design/0020-image-current-session-tests.md)
@@ -19,7 +29,7 @@ Windows 11 기본 메뉴 경로의 두 기능은 기존 사용자 직접 확인 
 
 현재 폴더에 클립보드 그림을 저장하고, 선택한 그림 파일을 이미지 자체로 복사합니다. 현재 경로는 [v1.2 변경 계약](ImageCopySave_Requirements_v1.2.md)의 공통 클래식 메뉴입니다. Windows 11 기본 메뉴에서는 ‘더 많은 옵션 표시’ 뒤에, 클래식 직접 표시 모드에서는 바로 접근합니다. [v1.0 원본](ImageCopySave_Requirements_v1.0.md)과 [v1.1](ImageCopySave_Requirements_v1.1.md)은 당시 명세로 보존합니다.
 
-## 요구와 현재 대응
+## 0.2.0까지의 요구와 확인 기록
 
 | 요구 | 현재·기존 증거 | 확인 범위와 남은 조건 |
 |---|---|---|
