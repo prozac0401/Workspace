@@ -33,6 +33,13 @@ public_assets = {
     'assets/handbook/focused-folder.webp',
     'assets/handbook/decision-checklist.webp',
     'assets/handbook/work-safety.webp',
+    'assets/education-examples/compare.png',
+    'assets/education-examples/paste.png',
+    'assets/education-examples/export.png',
+    'assets/education-examples/collect.png',
+    'assets/education-examples/image.png',
+    'assets/education-examples/bookmark.png',
+    'assets/education-examples/state.png',
 }
 
 site = Path(sys.argv[1] if len(sys.argv) > 1 else 'site').resolve()

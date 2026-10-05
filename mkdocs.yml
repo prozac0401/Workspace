@@ -31,6 +31,13 @@ exclude_docs: |
   !/assets/handbook/focused-folder.webp
   !/assets/handbook/decision-checklist.webp
   !/assets/handbook/work-safety.webp
+  !/assets/education-examples/compare.png
+  !/assets/education-examples/paste.png
+  !/assets/education-examples/export.png
+  !/assets/education-examples/collect.png
+  !/assets/education-examples/image.png
+  !/assets/education-examples/bookmark.png
+  !/assets/education-examples/state.png
   # Material theme resources; check-site.py rejects unreviewed docs assets here.
   !/assets/images/favicon.png
   !/assets/stylesheets/**

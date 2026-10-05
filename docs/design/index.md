@@ -1,5 +1,7 @@
 # 설계 결정 목록
 
+- [ADR-0030 · 교육 업무의 설명용 예시 화면](0030-education-example-screens.md) — 가상 화면 촬영 PNG 7개만 공개, 실제 제품 시험과 구분, 문서·메뉴 유지
+
 - [ADR-0029 · 교육 업무 예시와 쉬운 공개 안내](0029-education-public-guide.md) — 가짜 자료 7장면, 최신 버전 요약, 일상말 기준과 공개 범위 검사
 
 - [ADR-0028 · DVM 차기 버전의 지정 폴더 감지](0028-download-version-manager-folder-input.md) — 기존 0.1.0 미완료 보존, 앱과 무관한 폴더 감지·감시 프로세스 유지 채택, 최소 구현·검증 원칙

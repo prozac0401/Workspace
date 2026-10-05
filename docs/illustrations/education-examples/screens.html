@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>교육 업무의 설명용 예시 화면</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;padding:0}body{background:#e6eaf0;color:#243244;font-family:"Malgun Gothic","맑은 고딕",system-ui,sans-serif;font-size:18px;line-height:1.5}main{width:900px;margin:0 auto}.scene{width:900px;background:#fff;padding:24px;margin:0 0 24px;overflow:hidden}.example-label{background:#fff1bf;border:2px solid #e5bb43;border-radius:6px;color:#624609;padding:10px 14px;font-weight:700;font-size:18px}.scene-title{display:flex;align-items:center;gap:14px;margin:18px 0 6px}.scene-number{flex:none;display:grid;place-items:center;width:44px;height:44px;background:#153d57;border-radius:10px;color:#fff;font-weight:700;font-size:24px}h1{margin:0;font-size:28px;line-height:1.3}h2{margin:0 0 10px;font-size:24px;line-height:1.4}h3{margin:0 0 8px;font-size:20px;line-height:1.4}p{margin:0 0 10px}.tool-name{margin:0 0 16px;color:#496176}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.grid-paste{grid-template-columns:220px 1fr}.grid-image{grid-template-columns:300px 1fr}.grid-bookmark{grid-template-columns:1fr 1fr}.panel{border:1px solid #b8c7d2;border-radius:7px;overflow:hidden;background:#fff;min-width:0}.window-title{padding:9px 12px;background:#edf4f7;color:#23475c;font-weight:700;font-size:18px}.excel-title{background:#1d6748;color:#fff}.path{padding:10px 12px;background:#f5f7f9;border-bottom:1px solid #d2dbe3;font-weight:700;overflow-wrap:anywhere}.panel-content{padding:14px}.step{margin:16px 0;padding:12px 14px;background:#f0f5fa;border-left:5px solid #3674ad}.step strong{color:#16486f}.step-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 0}.menu-action{display:inline-block;border:1px solid #719bb5;background:#fff;border-radius:5px;padding:8px 12px;font-weight:700;font-size:18px;color:#173e58}.menu-action.selected{background:#e6f2fb;border:2px solid #3674ad}.arrow{font-size:24px;color:#4b6273;font-weight:700}.note{margin:12px 0 0;padding:10px 12px;background:#fff7dd;border-left:4px solid #e2b33e}.result{margin-top:16px;border:2px solid #52917b;border-radius:7px;overflow:hidden}.result-title{background:#e8f5ee;padding:10px 12px;color:#245c45;font-weight:700;font-size:20px}.result-body{padding:14px}.plain-result{padding:14px;border:2px solid #52917b;border-radius:7px;background:#eff8f3;margin-top:16px}.result-label{font-size:20px;font-weight:700;color:#245c45;margin-bottom:8px}table{width:100%;border-collapse:collapse;table-layout:auto;font-size:18px}th,td{padding:8px 10px;border:1px solid #d2dbe3;text-align:left;vertical-align:middle}th{background:#f1f5f8;font-weight:700}td{background:#fff}.row-no{width:42px;text-align:center;background:#f4f6f8;color:#617183;font-weight:400}.col-letter{text-align:center;background:#edf2f5;color:#53697a;font-weight:400}.sheet-tab{padding:9px 12px;background:#f0f4f6;font-weight:700;color:#1d6748;border-top:1px solid #d2dbe3}.selected-cell{background:#e6f5ec;border:2px solid #1d8158;font-weight:700}.changed td{background:#eaf7f0}.preserved td{background:#f4f6f8}.quiet{color:#5c6a75}.hidden-guide{background:#f1f2f5!important;color:#6a7180}.short-table td,.short-table th{padding:6px 9px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.stat{padding:12px;background:#edf5fa;border:1px solid #bfd1de;border-radius:7px;text-align:center}.stat strong{display:block;font-size:27px;color:#174e72}.footer{margin-top:18px;padding-top:12px;border-top:1px solid #ccd7df;color:#536574;font-size:18px}.sticker{display:flex;align-items:center;gap:10px;margin:16px 0;background:#fff1a8;border:1px solid #d5b548;border-radius:4px;padding:14px 10px 14px 16px;box-shadow:2px 3px 0 #e1d6b5;font-size:18px}.sticker-text{white-space:nowrap;flex:1}.sticker-arrow{width:34px;flex:none;text-align:center;font-size:27px;font-weight:700;border-left:1px solid #ccb752;color:#655011}.folder-list .folder-name{font-weight:700}.folder-symbol{display:inline-block;width:28px;height:21px;position:relative;background:#f3d67a;border:1px solid #bfa45d;border-radius:3px;margin-right:10px;vertical-align:middle}.folder-symbol:before{content:"";position:absolute;left:2px;top:-6px;width:12px;height:6px;background:#f3d67a;border:1px solid #bfa45d;border-bottom:0;border-radius:3px 3px 0 0}.state-symbol{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font-size:21px;font-weight:700;margin-right:8px;vertical-align:middle}.doing{border:4px solid #347ab8;border-right-color:#c0d7e9;background:#eff7ff}.issue{color:#fff;background:#bc4550}.todo{border:3px solid #858c96;background:#f4f5f6}.file-symbol{display:inline-block;width:21px;height:27px;border:1px solid #6e899c;border-radius:2px;background:#edf5fa;vertical-align:middle;margin-right:10px}.timetable{border:2px solid #50849c;background:#fff;padding:16px}.timetable h3{text-align:center;color:#1b4e6c;font-size:24px;margin-bottom:14px}.timetable th,.timetable td{padding:12px 10px}.image-file{border:1px solid #b7c9d4;border-radius:6px;padding:12px;margin-top:12px;background:#f7fafc}.tiny-preview{padding:8px;border:1px solid #b6cbd4;background:#fff;margin-bottom:10px}.tiny-preview h3{font-size:20px;text-align:center;margin:0 0 6px}.tiny-preview p{font-size:18px;margin:0;text-align:center}.selection-description{padding:10px 12px;background:#edf7f1;border-top:1px solid #c2dacf;color:#245c45;font-weight:700}.source-data{font-weight:700;font-size:20px}.book-location{display:flex;gap:10px;align-items:center;margin-bottom:10px}.cell-address{padding:7px 12px;background:#eef7f1;border:1px solid #92b9a6;font-weight:700}.export-source{table-layout:fixed}.export-source th,.export-source td{padding:7px 6px;overflow-wrap:anywhere}.export-source col:nth-child(1){width:114px}.export-source col:nth-child(2){width:153px}.export-source col:nth-child(3){width:55px}.export-source col:nth-child(4){width:210px}.export-source col:nth-child(5){width:76px}
+</style>
+</head>
+<body>
+<main>
+<section class="scene" id="compare" aria-labelledby="compare-title">
+  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
+  <div class="scene-title"><div class="scene-number">1</div><h1 id="compare-title">두 명단에서 값과 개수가 다른 항목 찾기</h1></div>
+  <p class="tool-name">Excel 명단 비교 · 명단대조_합성.xlsx</p>
+  <div class="grid">
+    <div class="panel">
+      <div class="window-title excel-title">첫 목록 · 기준명단</div>
+      <table aria-label="기준명단"><thead><tr><th class="row-no"></th><th class="col-letter">A</th></tr></thead><tbody>
+        <tr><td class="row-no">1</td><th>교육생ID</th></tr>
+        <tr><td class="row-no">2</td><td class="selected-cell">TEST001</td></tr>
+        <tr><td class="row-no">3</td><td class="selected-cell">TEST002</td></tr>
+        <tr><td class="row-no">4</td><td class="selected-cell">TEST003</td></tr>
+        <tr><td class="row-no">5</td><td class="selected-cell">TEST003</td></tr>
+        <tr><td class="row-no">6</td><td class="selected-cell">TEST004</td></tr>
+        <tr><td class="row-no">7</td><td class="selected-cell">TEST005</td></tr>
+      </tbody></table>
+      <div class="selection-description">A2:A7 선택 · 제목 제외 · 6항목</div>
+    </div>
+    <div class="panel">
+      <div class="window-title excel-title">둘째 목록 · 확정후보</div>
+      <table aria-label="확정후보"><thead><tr><th class="row-no"></th><th class="col-letter">A</th></tr></thead><tbody>
+        <tr><td class="row-no">1</td><th>교육생ID</th></tr>
+        <tr><td class="row-no">2</td><td class="selected-cell">TEST005</td></tr>
+        <tr><td class="row-no">3</td><td class="selected-cell">TEST004</td></tr>
+        <tr><td class="row-no">4</td><td class="selected-cell">TEST003</td></tr>
+        <tr><td class="row-no">5</td><td class="selected-cell">TEST002</td></tr>
+        <tr><td class="row-no">6</td><td class="selected-cell">TEST001</td></tr>
+        <tr><td class="row-no">7</td><td class="selected-cell">TEST006</td></tr>
+      </tbody></table>
+      <div class="selection-description">A2:A7 선택 · 제목 제외 · 6항목</div>
+    </div>
+  </div>
+  <div class="step"><strong>할 일</strong><div class="step-row"><span class="menu-action">첫 번째 목록 담기</span><span class="arrow">→</span><span class="menu-action">담은 목록 확인</span><span class="arrow">→</span><span class="menu-action">두 번째 목록 담아 비교</span></div></div>
+  <div class="result"><div class="result-title">예상 결과 · 명단비교_결과</div>
+    <table aria-label="예상 차이"><thead><tr><th>값</th><th>첫 목록 개수</th><th>둘째 목록 개수</th></tr></thead><tbody><tr><td>TEST003</td><td>2</td><td>1</td></tr><tr><td>TEST006</td><td>0</td><td>1</td></tr></tbody></table>
+  </div>
+  <div class="note">항목 수가 같아도 내용은 다릅니다. 이 결과만 보고 교육 대상자를 확정하지 마세요.</div>
+  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+</section>
+
+<section class="scene" id="paste" aria-labelledby="paste-title">
+  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
+  <div class="scene-title"><div class="scene-number">2</div><h1 id="paste-title">A반의 보이는 세 칸에만 ‘확정’ 넣기</h1></div>
+  <p class="tool-name">보이는 칸 붙여넣기 · 상태입력_합성.xlsx</p>
+  <div class="grid grid-paste">
+    <div class="panel"><div class="window-title excel-title">다른 시트의 원본</div><table aria-label="복사할 세 값"><tbody><tr><td class="selected-cell">확정</td></tr><tr><td class="selected-cell">확정</td></tr><tr><td class="selected-cell">확정</td></tr></tbody></table><div class="panel-content"><strong>세 칸을 Ctrl+C</strong><p class="quiet">원본 Excel은<br>열어 둡니다.</p></div></div>
+    <div class="panel"><div class="window-title excel-title">A반만 보이는 대상</div><table aria-label="A반만 보이는 원본"><thead><tr><th class="row-no"></th><th>A · 교육생ID</th><th>B · 반</th><th>C · 상태</th></tr></thead><tbody><tr><td class="row-no">2</td><td>TEST001</td><td>A반</td><td class="selected-cell">대기</td></tr><tr><td class="row-no">4</td><td>TEST003</td><td>A반</td><td class="selected-cell">대기</td></tr><tr><td class="row-no">6</td><td>TEST005</td><td>A반</td><td class="selected-cell">대기</td></tr></tbody></table><div class="selection-description">C2:C7 선택 · B반 행은 숨김</div><div class="panel-content">보이는 순서: TEST001 → TEST003 → TEST005</div></div>
+  </div>
+  <div class="step"><strong>할 일</strong> · 선택한 범위 안에서 마우스 오른쪽 버튼<div class="step-row"><span class="menu-action selected">보이는 칸에 붙여넣기</span></div></div>
+  <div class="result"><div class="result-title">예상 결과 · B반을 다시 보이게 하여 확인</div><table aria-label="붙여넣기 예상 결과"><thead><tr><th>교육생ID</th><th>반</th><th>상태</th><th>확인할 점</th></tr></thead><tbody>
+    <tr class="changed"><td>TEST001</td><td>A반</td><td>확정</td><td>A반만 변경</td></tr>
+    <tr class="preserved"><td>TEST002</td><td>B반</td><td>대기</td><td>기존 값 유지</td></tr>
+    <tr class="changed"><td>TEST003</td><td>A반</td><td>확정</td><td>A반만 변경</td></tr>
+    <tr class="preserved"><td>TEST004</td><td>B반</td><td>확정</td><td>기존 값 유지</td></tr>
+    <tr class="changed"><td>TEST005</td><td>A반</td><td>확정</td><td>A반만 변경</td></tr>
+    <tr class="preserved"><td>TEST006</td><td>B반</td><td>대기</td><td>기존 값 유지</td></tr>
+  </tbody></table></div>
+  <div class="note">한 칸을 세 칸에 반복하는 기능이 아닙니다. 값 3개와 보이는 대상 3칸의 순서를 먼저 맞추세요.</div>
+  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+</section>
+
+<section class="scene" id="export" aria-labelledby="export-title">
+  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
+  <div class="scene-title"><div class="scene-number">3</div><h1 id="export-title">안내에 필요한 세 사람·세 열만 따로 만들기</h1></div>
+  <p class="tool-name">선택범위 내보내기 · 안내명단_합성.xlsx · 현재 배포본은 평가판</p>
+  <div class="panel"><div class="window-title excel-title">준비할 원본 · 필터와 숨김을 적용하기 전</div><table class="export-source" aria-label="내보내기 원본"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>A · 교육생ID</th><th>B · 표시명</th><th>C · 반</th><th class="hidden-guide">D · 내부 검토 메모</th><th>E · 상태</th></tr></thead><tbody>
+    <tr><td>TEST001</td><td>가상교육생A</td><td>A</td><td class="hidden-guide">합성 내부메모1</td><td>확정</td></tr>
+    <tr class="preserved"><td>TEST002</td><td>가상교육생B</td><td>A</td><td class="hidden-guide">합성 내부메모2</td><td>대기</td></tr>
+    <tr><td>TEST003</td><td>가상교육생C</td><td>A</td><td class="hidden-guide">합성 내부메모3</td><td>확정</td></tr>
+    <tr><td>TEST004</td><td>가상교육생D</td><td>A</td><td class="hidden-guide">합성 내부메모4</td><td>확정</td></tr>
+  </tbody></table></div>
+  <div class="step"><strong>할 일</strong><p>확정인 사람만 보이게 하기 · D열 숨기기 · <strong>A1:D5 선택</strong></p><p class="quiet">제목을 포함합니다. E열의 상태는 선택 범위 밖입니다.</p><div class="step-row"><span>마우스 오른쪽 버튼</span><span class="arrow">→</span><span class="menu-action">선택범위 내보내기</span><span class="arrow">→</span><span class="menu-action selected">새 Excel로</span></div></div>
+  <div class="result"><div class="result-title">예상 결과 · 아직 저장하지 않은 새 Excel 파일</div><table aria-label="세 사람과 세 열 예상 결과"><thead><tr><th>교육생ID</th><th>표시명</th><th>반</th></tr></thead><tbody><tr><td>TEST001</td><td>가상교육생A</td><td>A</td></tr><tr><td>TEST003</td><td>가상교육생C</td><td>A</td></tr><tr><td>TEST004</td><td>가상교육생D</td><td>A</td></tr></tbody></table></div>
+  <div class="note">TEST002·내부 검토 메모·상태 열은 없어야 합니다. 새 파일을 직접 살펴본 뒤 저장하세요.</div>
+  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+</section>
+
+<section class="scene" id="collect" aria-labelledby="collect-title">
+  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
+  <div class="scene-title"><div class="scene-number">4</div><h1 id="collect-title">파일 수와 제출한 사람 수를 나누어 확인하기</h1></div>
+  <p class="tool-name">File List to Excel · 이미 이 PC에 받아 둔 연습 파일</p>
+  <div class="panel"><div class="window-title">탐색기 목록의 예</div><div class="path">교육운영_합성 › 과정A</div><table aria-label="준비할 다섯 파일"><thead><tr><th>안쪽 폴더</th><th>파일 이름</th></tr></thead><tbody>
+    <tr><td>강의자료</td><td><span class="file-symbol"></span>01_과정안내.txt</td></tr>
+    <tr><td>강의자료</td><td><span class="file-symbol"></span>02_강의안.txt</td></tr>
+    <tr><td>제출물</td><td><span class="file-symbol"></span>TEST001_과제1.txt</td></tr>
+    <tr><td>제출물</td><td><span class="file-symbol"></span>TEST002_과제1.txt</td></tr>
+    <tr><td>제출물</td><td><span class="file-symbol"></span>TEST002_과제1_수정본.txt</td></tr>
+  </tbody></table></div>
+  <div class="step"><strong>할 일</strong> · 과정A에서 마우스 오른쪽 버튼<div class="step-row"><span>더 많은 옵션 표시</span><span class="arrow">→</span><span class="menu-action selected">하위 폴더까지 Excel로</span><span class="arrow">→</span><span>과제1 파일만 보이게 하기</span></div></div>
+  <div class="stats"><div class="stat"><strong>전체 5파일</strong>강의자료 2 + 과제1 3</div><div class="stat"><strong>과제1 3파일</strong>TEST002 파일은 2개</div><div class="stat"><strong>제출자 2명</strong>TEST001 · TEST002</div></div>
+  <div class="plain-result"><div class="result-label">예상 결과와 사람이 정할 일</div><p>기준 명단: TEST001 · TEST002 · TEST003</p><p><strong>TEST002의 수정본을 쓸지는 사람이 결정합니다.</strong><br>TEST003은 제출 여부를 추가로 확인합니다.</p><p class="quiet">파일이 없다는 이유만으로 미제출을 확정하지 마세요.</p></div>
+  <div class="step"><strong>필요한 파일을 모으려면 · 선택 기능을 설치한 경우</strong><div class="step-row"><span>필요한 파일 행 선택</span><span class="arrow">→</span><span class="menu-action">파일목록 → 선택한 파일 복사…</span><span class="arrow">→</span><span class="menu-action">여기에 복사</span></div><p style="margin:10px 0 0">선택한 파일의 복사본은 <strong>모은파일</strong>로 시작하는 새 폴더에 모입니다.</p></div>
+  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+</section>
+
+<section class="scene" id="image" aria-labelledby="image-title">
+  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
+  <div class="scene-title"><div class="scene-number">5</div><h1 id="image-title">복사한 시간표를 과정 폴더의 PNG로 저장하기</h1></div>
+  <p class="tool-name">그림 복사·저장 · 시간표는 그림 프로그램에서 만든 가짜 자료</p>
+  <div class="grid grid-image">
+    <div><h2>복사할 그림</h2><div class="timetable"><h3>합성 과정 A</h3><table aria-label="연습 시간표"><thead><tr><th>시간</th><th>내용</th></tr></thead><tbody><tr><td>09:00</td><td>안내</td></tr><tr><td>10:00</td><td>실습</td></tr><tr><td>11:00</td><td>질의응답</td></tr></tbody></table></div><div class="note">그림 자체를 복사합니다.<br>다른 내용을 이어서 복사하지 마세요.</div></div>
+    <div class="panel"><div class="window-title">탐색기 · 저장할 폴더</div><div class="path">교육운영_합성 › 과정A › 안내이미지</div><div class="panel-content"><p>폴더 안 빈 곳에서<br><strong>마우스 오른쪽 버튼</strong></p><div class="step-row"><span>더 많은 옵션 표시</span><span class="arrow">→</span><span class="menu-action selected">복사한 그림 저장</span></div><div class="image-file"><div class="result-label">예상 결과 · PNG 파일 1개</div><div class="tiny-preview"><h3>합성 과정 A</h3><p>09:00 안내 · 10:00 실습<br>11:00 질의응답</p></div><p><span class="file-symbol"></span>그림_날짜_시간.png</p><p class="quiet">만들어진 파일을 열어 글자와 잘림을 확인합니다.</p></div></div></div>
+  </div>
+  <div class="note">탐색기에서 파일을 Ctrl+C로 복사하는 것과 다릅니다. 파일의 그림을 복사할 때는 <strong>그림으로 복사</strong> 메뉴를 쓰세요.</div>
+  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+</section>
+
+<section class="scene" id="bookmark" aria-labelledby="bookmark-title">
+  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
+  <div class="scene-title"><div class="scene-number">6</div><h1 id="bookmark-title">문서 위치와 다음 할 일을 남겨 다시 돌아오기</h1></div>
+  <p class="tool-name">업무 책갈피 · 과정A_운영연습.xlsx를 먼저 저장합니다.</p>
+  <div class="grid grid-bookmark">
+    <div class="panel"><div class="window-title excel-title">기억할 Excel 위치</div><div class="panel-content"><div class="book-location"><span class="cell-address">B4</span><span>안내준비 시트</span></div><table aria-label="책갈피 위치"><thead><tr><th class="row-no"></th><th class="col-letter">B</th></tr></thead><tbody><tr><td class="row-no">1</td><td>&nbsp;</td></tr><tr><td class="row-no">2</td><td>&nbsp;</td></tr><tr><td class="row-no">3</td><td>&nbsp;</td></tr><tr><td class="row-no">4</td><td class="selected-cell">합성 안내표 검토 지점</td></tr></tbody></table></div><div class="sheet-tab">안내준비</div><div class="selection-description">입력을 마친 뒤 Ctrl+Alt+B</div></div>
+    <div class="panel"><div class="window-title">남겨 둘 한 줄 메모의 예</div><div class="panel-content"><p>스티커 제목을 누르거나 <strong>Ctrl+E</strong></p><div class="sticker"><span class="sticker-text">과정A 안내표 4행부터 확인</span><span class="sticker-arrow">→</span></div><p>메모를 쓴 뒤 <strong>Enter</strong>로 저장합니다.</p><div class="step"><strong>다시 돌아올 때</strong><p style="margin:8px 0 0">Ctrl+Alt+J →<br><strong>오른쪽 화살표(바로가기)</strong></p></div><p class="quiet">위 화살표는 뜻을 설명하기 위해<br>그린 기호입니다.</p></div></div>
+  </div>
+  <div class="plain-result"><div class="result-label">예상 결과 · 안내준비 시트의 B4로 돌아오기</div><p><strong>과정A_운영연습.xlsx → 안내준비 → B4</strong><br>「합성 안내표 검토 지점」인지 확인하고 일을 이어 갑니다.</p></div>
+  <div class="note">문서 내용을 보관하는 기능은 아닙니다. 행이나 열을 바꿨다면 돌아온 내용을 확인하세요.</div>
+  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+</section>
+
+<section class="scene" id="state" aria-labelledby="state-title">
+  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
+  <div class="scene-title"><div class="scene-number">7</div><h1 id="state-title">과정 폴더마다 사람이 고른 상태 표시하기</h1></div>
+  <p class="tool-name">FolderState · 아래 상태는 연습용 제안입니다.</p>
+  <div class="panel"><div class="window-title">탐색기 목록의 예 · 사람이 각각 상태를 지정한 뒤</div><div class="path">교육운영_합성 › 과정A</div><table class="folder-list" aria-label="연습 폴더 상태"><thead><tr><th>폴더 이름</th><th>연습 상황</th><th>고른 상태</th></tr></thead><tbody>
+    <tr><td class="folder-name"><span class="folder-symbol"></span>01_입과안내</td><td>안내 내용을 검토 중</td><td><span class="state-symbol doing"></span>진행 중</td></tr>
+    <tr><td class="folder-name"><span class="folder-symbol"></span>02_강의자료</td><td>배포할지 결정이 필요함</td><td><span class="state-symbol issue">!</span>확인 필요</td></tr>
+    <tr><td class="folder-name"><span class="folder-symbol"></span>03_마감</td><td>아직 시작하지 않음</td><td><span class="state-symbol todo"></span>시작 전</td></tr>
+  </tbody></table></div>
+  <div class="step"><strong>할 일</strong> · 폴더를 하나씩 직접 고릅니다.<div class="step-row"><span>마우스 오른쪽 버튼</span><span class="arrow">→</span><span>더 많은 옵션 표시</span><span class="arrow">→</span><span class="menu-action">업무 상태</span></div><div class="step-row"><span class="menu-action">시작 전</span><span class="menu-action">진행 중</span><span class="menu-action">완료</span><span class="menu-action">확인 필요</span></div><p style="margin:10px 0 0">각 폴더의 상황에 맞는 상태 하나를 누릅니다.</p></div>
+  <div class="plain-result"><div class="result-label">예상 결과 · 이름과 연습 파일은 그대로</div><p>사람이 고른 상태를 표시합니다.<br>폴더 안 파일을 읽거나 일을 끝냈는지 자동으로 판단하지 않습니다.</p></div>
+  <div class="note">원·느낌표는 뜻을 설명하기 위한 기호입니다. 실제 아이콘과 같다는 뜻은 아닙니다.<br><strong>시작 전</strong>은 상태를 저장하고, <strong>상태 표시 지우기</strong>는 상태 자체를 없앱니다.</div>
+  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+</section>
+</main>
+</body>
+</html>
