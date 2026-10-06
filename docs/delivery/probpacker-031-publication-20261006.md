@@ -45,4 +45,8 @@ ProbPacker를 공개로 바꾸지 않고 같은 네 파일만 Workspace의 `offi
 
 ## 공개 게시 결과
 
-Workspace Release·비인증 다운로드·Documentation·공개 페이지는 게시 후 실제 결과를 이 절에 기록합니다. 현재 이 절만으로 공개 게시 완료를 주장하지 않습니다.
+[Workspace 공개 사전 릴리스](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1)는 **2026-10-06 03:31:27 UTC**에 게시했습니다. 태그는 안내 커밋 `628e339155eb5e8a8d0328927babcd825a8ed9db`를 가리킵니다. 네 자산의 업로드 완료·크기·SHA-256이 위 로컬 배포물과 일치했습니다.
+
+**03:31:39 UTC**에 인증 없는 요청으로 네 공개 파일을 모두 내려받았습니다. 모두 HTTP 200이며 파일 크기와 SHA-256이 로컬·비공개 ProbPacker 배포본과 일치했습니다. 이 확인은 로그인 가능한 계정의 접근을 공개 다운로드 성공으로 대체하지 않습니다. 로컬 자료는 `artifacts/probpacker-031-publication-20261006/package-verification.json`과 `public-download-verification.json`에 보관하며 Pages에 복사하지 않습니다.
+
+Documentation 실행과 실제 공개 페이지의 확인 결과는 완료 후 추가합니다. 이 절의 현재 확인 범위는 공개 Release와 다운로드까지입니다.
