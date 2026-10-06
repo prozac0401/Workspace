@@ -18,7 +18,7 @@ mkdocs.yml의 exclude_docs에서 전체 문서를 제외하고 검토한 문서�
 
 현재 공개 안내는 21개입니다. FolderState의 이전 설치·문제 해결 주소 2개에는 통합 안내로 이동하는 문서를 생성합니다. 이 두 주소를 메뉴·검색·사이트맵의 별도 안내로 싣지 않습니다. 공개 자산은 CSS와 FolderState 화면, 기존 WebP 이미지 6개와 교육 예시 화면 7개로 모두 15개입니다. 오피스 자동화 도구 안내를 추가하면서 공개 자산은 늘리지 않습니다.
 
-ProbPacker의 Office Automation Tools 0.3.1은 [ADR-0034](../design/0034-office-automation-public-guide.md)에 따라 `tools/office-automation/` 한 페이지와 Workspace 공개 릴리스의 고정 태그 EXE·ZIP 링크로 안내합니다. 원본 ProbPacker는 비공개이므로 배포물만 Workspace에 동일 해시로 게시합니다. 공개 소개는 MS Office Excel·PowerPoint(PPT)·Word용 도구이며 Python 없이 실행하는 방법으로 설명합니다. 서명과 남은 검증 범위는 제외한 배포 기록에 보존합니다. 바이너리·QA 자료·인증서·원시 진단은 Pages로 복사하지 않습니다.
+ProbPacker의 Office Automation Tools 0.3.1은 [ADR-0034](../design/0034-office-automation-public-guide.md)에 따라 `tools/office-automation/` 한 페이지와 Workspace 공개 릴리스의 고정 태그 EXE·ZIP 링크로 안내합니다. 원본 ProbPacker는 비공개이므로 배포물만 Workspace에 동일 해시로 게시합니다. 공개 소개는 MS Office Excel·PowerPoint(PPT)·Word용 도구이며 Python 없이 실행하는 방법으로 설명합니다. 사용자 요청에 따라 공개 페이지와 검색에는 ProbPacker 저장소의 이름·존재·비공개 설명을 넣지 않습니다. 서명과 남은 검증 범위는 제외한 배포 기록에 보존합니다. 바이너리·QA 자료·인증서·원시 진단은 Pages로 복사하지 않습니다.
 
 [정책 문서 작성 규칙](../policies/documentation.md), [교육 업무 안내 공개 결정](../design/0029-education-public-guide.md)을 따릅니다. 새 공개 문서가 생기면 메뉴·허용 목록·검사 목록을 함께 고칩니다.
 

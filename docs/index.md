@@ -56,7 +56,7 @@ hide:
 | 다시 받은 파일에 원래 이름을 주고 싶어요 | **[다운로드 이름 유지 0.2.1 설치 안내](tools/download-version-manager/index.md)** — 이전 파일을 수정 시각 이름으로 보관하고 알림 영역에서 열기·종료를 사용합니다. |
 | Excel 파일을 합치거나 나누고, 양식 문서를 한꺼번에 만들고 싶어요 | **[오피스 자동화 도구 0.3.1 받기](tools/office-automation/index.md)** — MS Office Excel·PowerPoint(PPT)·Word용 도구입니다. 원본 행과 출력 계획을 확인한 뒤 실행하세요. |
 
-오피스 자동화 도구는 ProbPacker에서 만든 단일 실행 파일을 Workspace의 공개 배포 페이지에서 제공합니다. Python을 따로 설치할 필요가 없습니다. [다운로드와 사용 방법](tools/office-automation/index.md)에서 세 기능의 사용 순서를 확인하세요.
+오피스 자동화 도구는 단일 실행 파일로 제공합니다. Python을 따로 설치할 필요가 없습니다. [다운로드와 사용 방법](tools/office-automation/index.md)에서 세 기능의 사용 순서를 확인하세요.
 
 다운로드 이름 유지의 설치와 제거 중에는 관리자 승인이 요청될 수 있으며 설치 후에는 일반 권한으로 실행합니다. 각 프로그램 안내에서 설치 순서와 사용 방법을 확인하세요.
 

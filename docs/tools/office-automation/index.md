@@ -1,6 +1,6 @@
 # Office 문서 자동화 실행·사용
 
-**Office Automation Tools / ProbPacker 0.3.1**
+**Office Automation Tools 0.3.1**
 
 Excel 파일 여러 개를 하나로 합치고, 명단을 부서별 파일로 나누고, 명단의 값을 Excel·Word·PowerPoint 양식에 넣습니다. 프로그램의 **엑셀 병합 / 엑셀 분리 / 템플릿 채우기** 세 탭에서 작업합니다.
 
@@ -14,8 +14,6 @@ Excel 파일 여러 개를 하나로 합치고, 명단을 부서별 파일로 �
 [0.3.1 실행 파일·안내 함께 받기 (ZIP)](https://github.com/prozac0401/Workspace/releases/download/office-automation-tools-v0.3.1/OfficeAutomationTools-onefile-pyinstaller-win64.zip){ .md-button }
 
 [0.3.1 배포 내용](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1) · [파일 확인용 SHA-256](https://github.com/prozac0401/Workspace/releases/download/office-automation-tools-v0.3.1/SHA256SUMS.txt) · [폴더형 배포 받기 (ZIP)](https://github.com/prozac0401/Workspace/releases/download/office-automation-tools-v0.3.1/OfficeAutomationTools-pyinstaller-win64.zip)
-
-개발 저장소 ProbPacker는 비공개입니다. 위 링크는 누구나 받을 수 있도록 **Workspace의 공개 배포 페이지에 올린 같은 실행 파일과 ZIP**으로 연결합니다.
 
 | 받은 파일 | 실행 방법 |
 |---|---|
