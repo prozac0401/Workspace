@@ -28,6 +28,8 @@ FolderState 0.1.3과 업무 책갈피 0.2.8은 기존 설치 파일을 그대로
 
 ## 개발·게시 절차
 
+- [File List to Excel의 AI 대화 기반 정리 사용 예 반영](file-list-ai-organization-20261006.md)
+
 - [FolderState 빌드와 패키지 검사](build.md)
 - [GitHub Pages 공개 범위와 검증](pages.md)
 - [상용 배포 품질 기준](quality.md)

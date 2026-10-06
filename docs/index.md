@@ -62,6 +62,8 @@ hide:
 
 [교육 업무에서 도구 써 보기](education-operations.md){ .md-button } — 명단 비교, 전달할 파일 만들기, 제출물 모으기 등 일곱 가지 예시입니다.
 
+[파일 목록 Excel을 보며 AI와 정리 초안 만들기](tools/file-list-to-excel/index.md#ai-organization) — 뒤섞인 작업 자료의 분류 기준을 대화로 다듬고, 확정한 파일을 업무별 폴더에 복사하는 사용 예입니다.
+
 </section>
 
 <section class="handbook-section" aria-labelledby="resume" markdown>
