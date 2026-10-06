@@ -1,5 +1,24 @@
 # 변경 이력
 
+## 0.2.1 정식 배포 기준 · 2026-10-06
+
+사용자가 검증된 정상 0.2.1의 정식 Release와 Pages 게시를 승인했습니다. 배포 파일은 `DownloadVersionManager-Watcher-0.2.1-x64.msi`와 `SHA256SUMS.txt` 두 개이며 이미 시험한 정상 MSI를 그대로 재사용합니다. MSI SHA-256은 `0feea2fc119bad780da9dcb57d2a0303ef0e2e0c6f6a20a746fd3ab3f86a0ef5`입니다. 실패 기능은 없으며 시험 MSI·개인 진단·백업은 배포하지 않습니다.
+
+[정식 Release](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [설치·사용 안내](https://prozac0401.github.io/Workspace/tools/download-version-manager/) · [이번 게시 기록](../../docs/delivery/download-version-manager-guide-update-20261006.md)
+
+설치기의 필요한 관리자 승인은 사용자가 직접 허용하며 현재 사용자 설치와 일반 권한 앱 실행을 유지합니다. 현재 Windows 11 x64 한 PC에서 취소·대표 후반 실패 뒤 자동 복구·정상 재설치·실행·종료·제거를 확인했습니다. 코드 서명과 조직 도입 승인은 별도입니다. 소스·자동 검사·실제 Release 자산·Pages 게시 확인은 이번 PR 본문에 기록합니다.
+
+아래의 준비 완료·게시 미실행·과거 FAIL/NOT RUN 문구는 각 기록 시점의 결과로 보존합니다. 이번 배포의 자산과 다른 버전·미래 CI 재빌드 파일을 혼동하지 않습니다.
+
+## 0.2.1 · 정식 릴리즈 준비 · 2026-10-06
+
+- History 날짜를 실제 보관 객체의 마지막 수정 시각으로 바꾸고 읽기 전용 보호·다른 접근 실패의 보존 안내를 구분했습니다. 처리 기록의 가로 스크롤·카드 UI와 전용 EXE/창/트레이 아이콘을 적용했습니다.
+- X·Alt+F4에서 감시 창을 숨기고 트레이 열기·더블클릭으로 같은 창을 복원하며 종료에서 프로세스를 끝냅니다.
+- 현재 사용자 LocalAppData·HKCU 설치를 유지하면서 Installer 상승 권한을 허용하고 설치 버튼에 방패를 표시했습니다. 설치 중 관리자 승인이 요청될 수 있으며 설치 후 앱의 일반 권한 실행을 확인했습니다.
+- 현재 Windows 11 x64 한 PC에서 최종 두 취소·동등 payload 후반 실패 자동 복구·복구 후 정상 재설치·앱 실행/종료·정상 제거·원래 설정 복원을 통과했습니다. 과거 FAIL/NOTRUN과 다른 환경의 미검증 상태는 유지합니다.
+- 정상 MSI `0feea2fc119bad780da9dcb57d2a0303ef0e2e0c6f6a20a746fd3ab3f86a0ef5`를 준비했고 시험 전용 실패 MSI는 배포하지 않습니다. CI 경로/조건 검사와 실제 CI NOTRUN을 구분하며 재빌드 파일은 별도 지문/검증이 필요합니다.
+- 코드 서명은 없고 조직 도입·상용 승인은 미결정입니다. GitHub Release 게시는 실행하지 않았으며 공개 0.2.0 링크는 유지합니다.
+
 ## 0.2.0 · 폴더 감시 prerelease 게시 완료 · 2026-10-04
 
 - 브라우저 확장 대신 지정 폴더 한 곳을 비재귀로 감시하는 네이티브 C++ 프로그램을 추가했습니다.

@@ -30,13 +30,12 @@ jobs:
         shell: pwsh
         run: ./tools/DownloadVersionManager/build/build-watcher.ps1 -Wix ./.tools/wix/wix.exe -Tests
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: download-version-manager-watcher
           path: |
-            artifacts/download-version-manager-watcher/0.2.0/DownloadVersionManager-Watcher-0.2.0-x64.msi
-            artifacts/download-version-manager-watcher/0.2.0/SHA256SUMS.txt
-            artifacts/download-version-manager-watcher/0.2.0/build-manifest.json
-            artifacts/download-version-manager-watcher/0.2.0/package-verification.json
-            artifacts/download-version-manager-watcher/0.2.0/*tests.log
-          if-no-files-found: warn
+            artifacts/download-version-manager-watcher/0.2.1/DownloadVersionManager-Watcher-0.2.1-x64.msi
+            artifacts/download-version-manager-watcher/0.2.1/SHA256SUMS.txt
+            artifacts/download-version-manager-watcher/0.2.1/build-manifest.json
+            artifacts/download-version-manager-watcher/0.2.1/package-verification.json
+            artifacts/download-version-manager-watcher/0.2.1/*tests.log
+          if-no-files-found: error

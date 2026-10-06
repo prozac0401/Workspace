@@ -109,7 +109,7 @@ nav:
       - 탐색기 파일 목록을 Excel로: tools/file-list-to-excel/index.md
       - 보이는 칸 붙여넣기 설치·사용: tools/visible-cells-paste/index.md
       - 그림 복사·저장 설치·사용: tools/image-copy-save/guide.md
-      - 다운로드 이름 유지 · 시험용 안내: tools/download-version-manager/index.md
+      - 다운로드 이름 유지 설치·사용: tools/download-version-manager/index.md
   - 불편할 때 더 살펴보기:
       - 반복되는 불편 줄이기: policies/work-efficiency.md
       - 일을 이어서 하고 다른 사람에게 넘기기: policies/folder-workflow.md

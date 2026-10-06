@@ -1,23 +1,29 @@
-# DownloadVersionManager 안내 갱신·Pages 게시
+# DownloadVersionManager 0.2.1 정식 Release·Pages 게시
 
-날짜: 2026-10-06 한국시간 · 기준 소스: `c866435e278d84d4a110b5c3b23101e6dab53628`
+날짜: 2026-10-06 한국시간 · 기준 원격: `c866435e278d84d4a110b5c3b23101e6dab53628`
 
-## 요청과 최소 변경
+## 요청과 변경
 
-사용자가 Workspace GitHub Pages의 최신 내용 반영과 배포를 요청했습니다. 기존 DVM 안내·첫 화면·교육 업무 안내에서 공개 0.2.0의 제한과 준비된 0.2.1의 검증 결과를 구분합니다. 0.2.1의 관리자 승인, 일반 권한 실행, 취소·후반 실패 뒤 자동 복구, 트레이 열기·종료, 보관 파일 수정 시각과 읽기 전용 보존 안내를 반영합니다. 기존 공개 문서 20개·이전 주소 이동 2개·자산·메뉴는 유지합니다.
+사용자가 최신 DVM 내용으로 Workspace GitHub Pages를 갱신하고, 검증된 정상 0.2.1 MSI의 정식 GitHub Release 게시까지 명시 승인했습니다. 기존 검증 source·설치 제작 입력·시험 source·요구/설계/검증 기록을 소스 커밋에 보존합니다. 원래 사용자 작업은 별도 checkout에 그대로 유지합니다.
 
-이번 작업은 문서와 Pages 게시입니다. 도구 코드나 설치 파일을 바꾸지 않으며 제품 설치·실패·GUI 시험은 반복하지 않습니다. 기존 실제 검증 근거를 사용합니다. 공개 다운로드는 검증된 기존 0.2.0 자산을 유지하며 새 0.2.1 GitHub Release 게시를 이 문서 변경만으로 선언하지 않습니다.
+공개 안내·첫 화면·교육 업무 안내를 0.2.1의 설치 승인/일반 권한 실행, 실패 복구, 트레이 열기·종료, 수정 시각 History 이름, 읽기 전용 보존과 지원 범위에 맞춥니다. 공개 안내 20개·이전 주소 이동 2개·허용 자산을 유지하고 메뉴 이름에서 이전 시험용 표시를 바꿉니다. 원시 로그·개인 경로·SID·백업·실패 주입 MSI는 공개하지 않습니다.
 
-## 사용한 검증 근거와 한계
+## 배포할 고정 파일과 소스
 
-2026-10-06 Windows 11 x64 한 PC에서 정상 0.2.1의 설치 전·진행 중 취소, 정상 파일과 기존 payload·설정이 같은 시험 MSI의 후반 실패 뒤 자동 복구, 정상 재설치·일반 권한 실행·종료·제거를 확인했습니다. 복구 판정은 별도 제거·수동 정리 전에 전후 상태 일치로 확인했습니다. 원래 경로·사용자 설정으로 최종 설치를 마무리했습니다.
+태그는 `download-version-manager-v0.2.1`, 정식 Release는 `prerelease=false`입니다. 정상 MSI와 `SHA256SUMS.txt` 두 파일만 배포합니다. 이미 실제 검증한 정상 MSI를 그대로 재사용하며 앱·MSI 재빌드나 제품 수동 시험은 반복하지 않습니다. CI의 재빌드 artifact를 이번 자산으로 대체하지 않습니다.
 
-검증한 정상 MSI SHA-256은 `0feea2fc119bad780da9dcb57d2a0303ef0e2e0c6f6a20a746fd3ab3f86a0ef5`이며 실패 기능은 없습니다. EXE SHA-256은 `3cddb6e185c7f1741cce6bb9b5b91f9afb3898a7a983598cfdc976e1be592abd`입니다. 이 증거는 로컬 정상 0.2.1의 결과이며 공개 0.2.0이나 미래 재빌드 파일에 소급 적용하지 않습니다. 다른 PC·모든 실패 지점·다음 로그인·동작 중 다운로드 위치 변경·조직 도입 승인은 별도로 구분합니다. 코드 서명은 없습니다.
+- MSI: `DownloadVersionManager-Watcher-0.2.1-x64.msi`, 380,928 bytes, SHA-256 `0feea2fc119bad780da9dcb57d2a0303ef0e2e0c6f6a20a746fd3ab3f86a0ef5`
+- EXE: SHA-256 `3cddb6e185c7f1741cce6bb9b5b91f9afb3898a7a983598cfdc976e1be592abd`
+- 소스: 배포 작업본에서 정상 패키지 제작 입력 20개의 Windows 작업 파일 지문이 기존 기록과 일치합니다. Git의 표준 텍스트 줄바꿈 정규화와 패키지의 Windows 입력 파일 해시는 구분합니다.
 
-원시 설치 로그·개인 경로·SID·설정 백업·실패 주입 MSI를 공개 문서나 게시 자산에 복사하지 않습니다. 과거 FAIL과 NOT RUN은 당시 기록으로 보존합니다.
+[정상 MSI](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.1/DownloadVersionManager-Watcher-0.2.1-x64.msi) · [Release](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [체크섬](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.1/SHA256SUMS.txt) · [공개 안내](https://prozac0401.github.io/Workspace/tools/download-version-manager/)
 
-## 문서 확인과 게시 결과
+## 재사용한 실제 검증과 한계
 
-로컬 `python -m mkdocs build --strict`, `python scripts/check-site.py site`, `git diff --check`가 통과했습니다. 공개 안내 20개·이전 주소 이동 2개·404, 공개 검색·사이트맵·허용 자산·로컬 연결을 확인했습니다. 독립 문구 검토에서 초기 0.2.0 시험본의 결과를 최종 공개 MSI에 확대하지 않도록 표현을 교정했습니다. 개인 경로·SID·원시 진단 노출도 없는 것으로 검토했습니다.
+2026-10-06 Windows 11 x64 한 PC에서 설치 시작 전·진행 중 취소, 정상 MSI와 프로그램·설정이 같은 시험 MSI의 후반 실패 뒤 자동 원상복귀, 정상 재설치·일반 권한 실행·종료·제거를 통과했습니다. 실패 후 별도 제거·수동 정리 전에 전후 상태 일치를 확인했으며 원래 설치 위치·사용자 설정으로 최종 설치를 마무리했습니다. 업무 자료 보존은 측정한 직하 항목의 metadata 범위이며 내용을 전수 읽은 판정으로 확대하지 않습니다.
 
-GitHub Documentation 작업 성공과 실제 공개 페이지 반영까지가 게시 완료 근거입니다. 실제 자동 검사·Pages 게시·HTTP 확인 결과는 이 변경의 PR 본문에 기록합니다. 로컬 검사 완료와 실제 공개 게시 완료를 구분합니다.
+과거 FAIL·NOT RUN과 초기 0.2.0 후보/최종 공개 파일의 차이는 보존합니다. 다른 PC·모든 실패 지점·다음 로그인·동작 중 다운로드 위치 변경·조직 도입 승인으로 확대하지 않습니다. 코드 서명은 없습니다.
+
+## 게시 확인
+
+문서 strict 빌드·공개 경로/자산·검색/사이트맵·로컬 연결·diff 검사와 독립 문구 검토가 완료되면 이 소스 커밋을 PR로 검토합니다. GitHub 자동 검사 성공 뒤 태그·Release 자산을 게시하고 실제 다운로드의 SHA-256을 대조합니다. Pages 배포 성공과 실제 공개 페이지 내용·링크를 확인해야 게시 완료로 판단합니다. 실제 커밋·Actions·Release·Pages 결과는 이 변경 PR 본문에 기록하며 게시 전 계획과 완료된 결과를 구분합니다.

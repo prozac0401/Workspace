@@ -1,4 +1,28 @@
-# DownloadVersionManager 0.2.0 · 폴더 감시 릴리즈 노트
+# DownloadVersionManager · 릴리즈 노트
+
+## 0.2.1 정식 배포 기준 · 2026-10-06
+
+사용자가 검증된 정상 0.2.1의 정식 Release와 Pages 게시를 승인했습니다. 배포 파일은 `DownloadVersionManager-Watcher-0.2.1-x64.msi`와 `SHA256SUMS.txt` 두 개이며 이미 시험한 정상 MSI를 그대로 재사용합니다. MSI SHA-256은 `0feea2fc119bad780da9dcb57d2a0303ef0e2e0c6f6a20a746fd3ab3f86a0ef5`입니다. 실패 기능은 없으며 시험 MSI·개인 진단·백업은 배포하지 않습니다.
+
+[정식 Release](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [설치·사용 안내](https://prozac0401.github.io/Workspace/tools/download-version-manager/) · [이번 게시 기록](../../docs/delivery/download-version-manager-guide-update-20261006.md)
+
+설치기의 필요한 관리자 승인은 사용자가 직접 허용하며 현재 사용자 설치와 일반 권한 앱 실행을 유지합니다. 현재 Windows 11 x64 한 PC에서 취소·대표 후반 실패 뒤 자동 복구·정상 재설치·실행·종료·제거를 확인했습니다. 코드 서명과 조직 도입 승인은 별도입니다. 소스·자동 검사·실제 Release 자산·Pages 게시 확인은 이번 PR 본문에 기록합니다.
+
+아래의 준비 완료·게시 미실행·과거 FAIL/NOT RUN 문구는 각 기록 시점의 결과로 보존합니다. 이번 배포의 자산과 다른 버전·미래 CI 재빌드 파일을 혼동하지 않습니다.
+
+## 0.2.1 · 정식 릴리즈 준비 · 2026-10-06
+
+**정상 MSI를 준비했고 관련 실제 설치·복구 시험을 통과했습니다. GitHub Release 게시는 실행하지 않았습니다.** 현재 공개 다운로드는 아래 0.2.0을 유지합니다.
+
+History 이름은 실제 보관 파일의 마지막 수정 시각을 사용합니다. 확인된 읽기 전용 보호와 다른 접근 실패 안내를 구분하고 처리 기록의 가로 스크롤을 제공합니다. 카드 UI와 전용 아이콘을 적용했으며 X·Alt+F4는 감시 창을 숨기고 트레이의 열기·더블클릭으로 같은 창을 복원합니다. 프로그램을 완전히 끝내려면 트레이의 종료를 사용합니다. 기존 파일 보존·비재귀 감시 계약은 유지합니다.
+
+`DownloadVersionManager-Watcher-0.2.1-x64.msi`는 현재 사용자 LocalAppData·HKCU에 설치합니다. 설치 중 Windows가 관리자 승인을 요청할 수 있으며 사용자가 직접 승인합니다. 설치 후 앱은 일반 권한으로 실행합니다. 외부 runtime·브라우저 확장은 필요하지 않으며 코드 서명은 없습니다.
+
+현재 Windows 11 x64 한 PC의 합성 fixture에서 위자드·진행 중 취소, 정상 MSI와 동등한 payload의 후반 실패 자동 원상복귀, 복구 후 정상 재설치, 일반 권한 앱 실행·트레이 종료, 정상 제거를 통과했습니다. 원래 사용자 위치·설정과 로그인 시작 항목 복원도 확인했습니다. 이전 관리자 승인 미허용 실패와 승인 미완료로 실패 지점에 도달하지 못한 기록은 보존합니다. 다른 PC·클린 OS·모든 설치 실패 지점의 인증으로 확대하지 않습니다.
+
+이번 정상 MSI SHA-256은 `0feea2fc119bad780da9dcb57d2a0303ef0e2e0c6f6a20a746fd3ab3f86a0ef5`입니다. 실패 주입 MSI는 시험 전용이며 배포하지 않습니다. CI의 정상 자산 경로/조건 검사는 통과했지만 실제 CI 실행은 NOTRUN이고 미래 재빌드 파일은 별도 지문/검증이 필요합니다. 조직의 도입·상용 승인은 미결정입니다. 지원 범위와 파일 처리·전원 장애 제한은 [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md), 실제 결과는 [TEST_RESULTS](TEST_RESULTS.md)를 따릅니다.
+
+## 0.2.0 · 폴더 감시 게시 기록
 
 **[무서명 기능 평가 prerelease](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0)를 게시했습니다.** 관련 설치·실행·제거 근거를 확보했고 알려진 실패 복구 제한을 포함합니다. 상용 승인 또는 모든 설치 실패 복구를 인증한 릴리즈로 분류하지 않습니다.
 
