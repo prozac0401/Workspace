@@ -5,7 +5,95 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>교육 업무의 설명용 예시 화면</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;padding:0}body{background:#e6eaf0;color:#243244;font-family:"Malgun Gothic","맑은 고딕",system-ui,sans-serif;font-size:18px;line-height:1.5}main{width:900px;margin:0 auto}.scene{width:900px;background:#fff;padding:24px;margin:0 0 24px;overflow:hidden}.example-label{background:#fff1bf;border:2px solid #e5bb43;border-radius:6px;color:#624609;padding:10px 14px;font-weight:700;font-size:18px}.scene-title{display:flex;align-items:center;gap:14px;margin:18px 0 6px}.scene-number{flex:none;display:grid;place-items:center;width:44px;height:44px;background:#153d57;border-radius:10px;color:#fff;font-weight:700;font-size:24px}h1{margin:0;font-size:28px;line-height:1.3}h2{margin:0 0 10px;font-size:24px;line-height:1.4}h3{margin:0 0 8px;font-size:20px;line-height:1.4}p{margin:0 0 10px}.tool-name{margin:0 0 16px;color:#496176}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.grid-paste{grid-template-columns:220px 1fr}.grid-image{grid-template-columns:300px 1fr}.grid-bookmark{grid-template-columns:1fr 1fr}.panel{border:1px solid #b8c7d2;border-radius:7px;overflow:hidden;background:#fff;min-width:0}.window-title{padding:9px 12px;background:#edf4f7;color:#23475c;font-weight:700;font-size:18px}.excel-title{background:#1d6748;color:#fff}.path{padding:10px 12px;background:#f5f7f9;border-bottom:1px solid #d2dbe3;font-weight:700;overflow-wrap:anywhere}.panel-content{padding:14px}.step{margin:16px 0;padding:12px 14px;background:#f0f5fa;border-left:5px solid #3674ad}.step strong{color:#16486f}.step-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 0}.menu-action{display:inline-block;border:1px solid #719bb5;background:#fff;border-radius:5px;padding:8px 12px;font-weight:700;font-size:18px;color:#173e58}.menu-action.selected{background:#e6f2fb;border:2px solid #3674ad}.arrow{font-size:24px;color:#4b6273;font-weight:700}.note{margin:12px 0 0;padding:10px 12px;background:#fff7dd;border-left:4px solid #e2b33e}.result{margin-top:16px;border:2px solid #52917b;border-radius:7px;overflow:hidden}.result-title{background:#e8f5ee;padding:10px 12px;color:#245c45;font-weight:700;font-size:20px}.result-body{padding:14px}.plain-result{padding:14px;border:2px solid #52917b;border-radius:7px;background:#eff8f3;margin-top:16px}.result-label{font-size:20px;font-weight:700;color:#245c45;margin-bottom:8px}table{width:100%;border-collapse:collapse;table-layout:auto;font-size:18px}th,td{padding:8px 10px;border:1px solid #d2dbe3;text-align:left;vertical-align:middle}th{background:#f1f5f8;font-weight:700}td{background:#fff}.row-no{width:42px;text-align:center;background:#f4f6f8;color:#617183;font-weight:400}.col-letter{text-align:center;background:#edf2f5;color:#53697a;font-weight:400}.sheet-tab{padding:9px 12px;background:#f0f4f6;font-weight:700;color:#1d6748;border-top:1px solid #d2dbe3}.selected-cell{background:#e6f5ec;border:2px solid #1d8158;font-weight:700}.changed td{background:#eaf7f0}.preserved td{background:#f4f6f8}.quiet{color:#5c6a75}.hidden-guide{background:#f1f2f5!important;color:#6a7180}.short-table td,.short-table th{padding:6px 9px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.stat{padding:12px;background:#edf5fa;border:1px solid #bfd1de;border-radius:7px;text-align:center}.stat strong{display:block;font-size:27px;color:#174e72}.footer{margin-top:18px;padding-top:12px;border-top:1px solid #ccd7df;color:#536574;font-size:18px}.sticker{display:flex;align-items:center;gap:10px;margin:16px 0;background:#fff1a8;border:1px solid #d5b548;border-radius:4px;padding:14px 10px 14px 16px;box-shadow:2px 3px 0 #e1d6b5;font-size:18px}.sticker-text{white-space:nowrap;flex:1}.sticker-arrow{width:34px;flex:none;text-align:center;font-size:27px;font-weight:700;border-left:1px solid #ccb752;color:#655011}.folder-list .folder-name{font-weight:700}.folder-symbol{display:inline-block;width:28px;height:21px;position:relative;background:#f3d67a;border:1px solid #bfa45d;border-radius:3px;margin-right:10px;vertical-align:middle}.folder-symbol:before{content:"";position:absolute;left:2px;top:-6px;width:12px;height:6px;background:#f3d67a;border:1px solid #bfa45d;border-bottom:0;border-radius:3px 3px 0 0}.state-symbol{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font-size:21px;font-weight:700;margin-right:8px;vertical-align:middle}.doing{border:4px solid #347ab8;border-right-color:#c0d7e9;background:#eff7ff}.issue{color:#fff;background:#bc4550}.todo{border:3px solid #858c96;background:#f4f5f6}.file-symbol{display:inline-block;width:21px;height:27px;border:1px solid #6e899c;border-radius:2px;background:#edf5fa;vertical-align:middle;margin-right:10px}.timetable{border:2px solid #50849c;background:#fff;padding:16px}.timetable h3{text-align:center;color:#1b4e6c;font-size:24px;margin-bottom:14px}.timetable th,.timetable td{padding:12px 10px}.image-file{border:1px solid #b7c9d4;border-radius:6px;padding:12px;margin-top:12px;background:#f7fafc}.tiny-preview{padding:8px;border:1px solid #b6cbd4;background:#fff;margin-bottom:10px}.tiny-preview h3{font-size:20px;text-align:center;margin:0 0 6px}.tiny-preview p{font-size:18px;margin:0;text-align:center}.selection-description{padding:10px 12px;background:#edf7f1;border-top:1px solid #c2dacf;color:#245c45;font-weight:700}.source-data{font-weight:700;font-size:20px}.book-location{display:flex;gap:10px;align-items:center;margin-bottom:10px}.cell-address{padding:7px 12px;background:#eef7f1;border:1px solid #92b9a6;font-weight:700}.export-source{table-layout:fixed}.export-source th,.export-source td{padding:7px 6px;overflow-wrap:anywhere}.export-source col:nth-child(1){width:114px}.export-source col:nth-child(2){width:153px}.export-source col:nth-child(3){width:55px}.export-source col:nth-child(4){width:210px}.export-source col:nth-child(5){width:76px}
+/* Handbook paper, ink and brass; Excel selection, sticky-note and state colors retain their meaning. */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#fbf7f0;color:#2c2622;font-family:"Malgun Gothic","맑은 고딕",system-ui,sans-serif;font-size:18px;line-height:1.5}
+main{width:900px;margin:0 auto}
+.scene{width:900px;background:#fffdf9;padding:24px;margin:0 0 24px;overflow:hidden}
+.example-label{background:#f2e9dd;border:2px solid #8a622f;border-radius:4px;color:#785326;padding:10px 14px;font-weight:700;font-size:18px}
+.scene-title{display:flex;align-items:center;gap:14px;margin:18px 0 6px}
+.scene-number{flex:none;display:grid;place-items:center;width:44px;height:44px;background:#8a622f;border-radius:4px;color:#fff;font-weight:700;font-size:24px}
+h1{margin:0;font-size:28px;line-height:1.3}
+h2{margin:0 0 10px;font-size:24px;line-height:1.4}
+h3{margin:0 0 8px;font-size:20px;line-height:1.4}
+p{margin:0 0 10px}
+.tool-name{margin:0 0 16px;color:#6e6258}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-paste{grid-template-columns:220px 1fr}
+.grid-image{grid-template-columns:300px 1fr}
+.grid-bookmark{grid-template-columns:1fr 1fr}
+.panel{border:1px solid #ded2c4;border-radius:4px;overflow:hidden;background:#fffdf9;min-width:0}
+.window-title{padding:9px 12px;background:#f2e9dd;color:#2c2622;font-weight:700;font-size:18px}
+.excel-title{background:#1d6748;color:#fff}
+.path{padding:10px 12px;background:#fbf7f0;border-bottom:1px solid #ded2c4;font-weight:700;overflow-wrap:anywhere}
+.panel-content{padding:14px}
+.step{margin:16px 0;padding:12px 14px;background:#f2e9dd;border-left:5px solid #8a622f}
+.step strong{color:#785326}
+.step-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 0}
+.menu-action{display:inline-block;border:1px solid #b7894e;background:#fffdf9;border-radius:5px;padding:8px 12px;font-weight:700;font-size:18px;color:#785326}
+.menu-action.selected{background:#f2e9dd;border:2px solid #8a622f}
+.arrow{font-size:24px;color:#8a622f;font-weight:700}
+.note{margin:12px 0 0;padding:10px 12px;background:#f7edda;border-left:4px solid #b7894e}
+.result{margin-top:16px;border:2px solid #8a622f;border-radius:4px;overflow:hidden}
+.result-title{background:#f2e9dd;padding:10px 12px;color:#785326;font-weight:700;font-size:20px}
+.result-body{padding:14px}
+.plain-result{padding:14px;border:2px solid #8a622f;border-radius:4px;background:#fbf7f0;margin-top:16px}
+.result-label{font-size:20px;font-weight:700;color:#785326;margin-bottom:8px}
+table{width:100%;border-collapse:collapse;table-layout:auto;font-size:18px}
+th,td{padding:8px 10px;border:1px solid #ded2c4;text-align:left;vertical-align:middle}
+th{background:#f2e9dd;font-weight:700}
+td{background:#fffdf9}
+.row-no{width:42px;text-align:center;background:#fbf7f0;color:#6e6258;font-weight:400}
+.col-letter{text-align:center;background:#f2e9dd;color:#6e6258;font-weight:400}
+.sheet-tab{padding:9px 12px;background:#f2e9dd;font-weight:700;color:#1d6748;border-top:1px solid #ded2c4}
+.selected-cell{background:#e6f5ec;border:2px solid #1d8158;font-weight:700}
+.changed td{background:#eaf7f0}
+.preserved td{background:#fbf7f0}
+.quiet{color:#6e6258}
+.hidden-guide{background:#eee8e0!important;color:#6e6258}
+.short-table td,.short-table th{padding:6px 9px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.stat{padding:12px;background:#f2e9dd;border:1px solid #ded2c4;border-radius:4px;text-align:center}
+.stat strong{display:block;font-size:27px;color:#785326}
+.footer{margin-top:18px;padding-top:12px;border-top:1px solid #ded2c4;color:#6e6258;font-size:18px}
+.sticker{display:flex;align-items:center;gap:10px;margin:16px 0;background:#fff1a8;border:1px solid #d5b548;border-radius:4px;padding:14px 10px 14px 16px;box-shadow:2px 3px 0 #e1d6b5;font-size:18px}
+.sticker-text{white-space:nowrap;flex:1}
+.sticker-arrow{width:34px;flex:none;text-align:center;font-size:27px;font-weight:700;border-left:1px solid #ccb752;color:#655011}
+.folder-list .folder-name{font-weight:700}
+.folder-symbol{display:inline-block;width:28px;height:21px;position:relative;background:#ead7b9;border:1px solid #b7894e;border-radius:3px;margin-right:10px;vertical-align:middle}
+.folder-symbol:before{content:"";position:absolute;left:2px;top:-6px;width:12px;height:6px;background:#ead7b9;border:1px solid #b7894e;border-bottom:0;border-radius:3px 3px 0 0}
+.state-symbol{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font-size:21px;font-weight:700;margin-right:8px;vertical-align:middle}
+.doing{border:4px solid #347ab8;border-right-color:#c0d7e9;background:#eff7ff}
+.issue{color:#fff;background:#bc4550}
+.todo{border:3px solid #858c96;background:#f4f5f6}
+.file-symbol{display:inline-block;width:21px;height:27px;border:1px solid #8a622f;border-radius:2px;background:#f2e9dd;vertical-align:middle;margin-right:10px}
+.timetable{border:2px solid #8a622f;background:#fffdf9;padding:16px}
+.timetable h3{text-align:center;color:#785326;font-size:24px;margin-bottom:14px}
+.timetable th,.timetable td{padding:12px 10px}
+.image-file{border:1px solid #ded2c4;border-radius:4px;padding:12px;margin-top:12px;background:#fbf7f0}
+.tiny-preview{padding:8px;border:1px solid #ded2c4;background:#fffdf9;margin-bottom:10px}
+.tiny-preview h3{font-size:20px;text-align:center;margin:0 0 6px}
+.tiny-preview p{font-size:18px;margin:0;text-align:center}
+.selection-description{padding:10px 12px;background:#edf7f1;border-top:1px solid #c2dacf;color:#245c45;font-weight:700}
+.source-data{font-weight:700;font-size:20px}
+.book-location{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.cell-address{padding:7px 12px;background:#eef7f1;border:1px solid #92b9a6;font-weight:700}
+.export-source{table-layout:fixed}
+.export-source th,.export-source td{padding:7px 6px;overflow-wrap:anywhere}
+.export-source col:nth-child(1){width:114px}
+.export-source col:nth-child(2){width:153px}
+.export-source col:nth-child(3){width:55px}
+.export-source col:nth-child(4){width:210px}
+.export-source col:nth-child(5){width:76px}
+/* Retain the published PNG canvas sizes, including fractional layout rounding. */
+#compare{min-height:1105px}
+#paste{min-height:1159px}
+#export{min-height:1020px}
+#collect{min-height:1255px}
+#image{min-height:858px}
+#bookmark{min-height:923px}
+#state{min-height:998px}
 </style>
 </head>
 <body>
@@ -74,7 +162,7 @@
 <section class="scene" id="export" aria-labelledby="export-title">
   <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
   <div class="scene-title"><div class="scene-number">3</div><h1 id="export-title">안내에 필요한 세 사람·세 열만 따로 만들기</h1></div>
-  <p class="tool-name">선택범위 내보내기 · 안내명단_합성.xlsx · 현재 배포본은 평가판</p>
+  <p class="tool-name">선택범위 내보내기 · 안내명단_합성.xlsx</p>
   <div class="panel"><div class="window-title excel-title">준비할 원본 · 필터와 숨김을 적용하기 전</div><table class="export-source" aria-label="내보내기 원본"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>A · 교육생ID</th><th>B · 표시명</th><th>C · 반</th><th class="hidden-guide">D · 내부 검토 메모</th><th>E · 상태</th></tr></thead><tbody>
     <tr><td>TEST001</td><td>가상교육생A</td><td>A</td><td class="hidden-guide">합성 내부메모1</td><td>확정</td></tr>
     <tr class="preserved"><td>TEST002</td><td>가상교육생B</td><td>A</td><td class="hidden-guide">합성 내부메모2</td><td>대기</td></tr>

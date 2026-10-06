@@ -6,10 +6,10 @@
     "mode": "compare",
     "panels": [
       {"icon": "pc", "title": "PC 환경 확인", "lines": ["Windows 11 x64", "업데이트 전 기록 백업"]},
-      {"icon": "install", "title": "MSI로 설치", "lines": ["0.2.8 설치 파일", "회사 설치 기준 확인"]},
+      {"icon": "install", "title": "MSI로 설치", "lines": ["0.2.10 설치 파일", "회사 설치 기준 확인"]},
       {"icon": "folder", "title": "ZIP으로 실행", "lines": ["폴더 전체 압축 해제", "실행 파일만 옮기지 않기"]}
     ],
-    "caption": "MSI 설치와 ZIP 실행 중 필요한 방식을 선택하세요. 전자 서명이 없는 0.2.8 배포이며, 이전 버전의 사용자 지정 설치 경로는 별도 업데이트 절차를 먼저 확인합니다."
+    "caption": "MSI 설치와 ZIP 실행 중 필요한 방식을 선택하세요. 전자 서명이 없는 0.2.10 배포이며, 이전 버전의 사용자 지정 설치 경로는 별도 업데이트 절차를 먼저 확인합니다."
   },
   {
     "page": "tools/bookmark/index.md",
@@ -19,7 +19,7 @@
     "panels": [
       {"icon": "folder", "title": "폴더에서 시작", "lines": ["설치 후 프로그램 실행", "폴더의 파일 선택 해제"]},
       {"icon": "bookmark", "title": "현재 위치 남기기", "lines": ["Ctrl+Alt+B 누르기", "책갈피 저장 알림 확인"]},
-      {"icon": "restore", "title": "저장한 작업 열기", "lines": ["Ctrl+Alt+J로 불러오기", "스티커 오른쪽 화살표"]}
+      {"icon": "restore", "title": "저장한 작업 열기", "lines": ["트레이 → 책갈피 보기", "스티커 오른쪽 화살표"]}
     ],
     "caption": "실제 폴더 하나로 연습하세요. 스티커의 오른쪽 화살표로 저장한 위치를 열고, 목록 모드에서는 항목을 고른 뒤 Enter를 누릅니다."
   },
@@ -81,7 +81,31 @@
       {"icon": "link", "title": "오른쪽 화살표", "lines": ["저장한 작업 열기", "누른 스티커에 처리 중 표시"]},
       {"icon": "menu", "title": "나머지는 우클릭", "lines": ["접기·숨기기·지우기", "숨기기는 화면에서만 숨김"]}
     ],
-    "caption": "0.2.8 스티커는 한 줄 메모와 오른쪽 화살표를 표시합니다. 메모 편집 중에는 필요할 때 높이가 늘고, 저장·취소 뒤 원래 크기로 돌아갑니다."
+    "caption": "스티커는 한 줄 메모와 오른쪽 화살표를 표시합니다. 편집할 때만 필요한 높이로 늘고, 저장·취소 후 원래 크기로 돌아갑니다. 편집 중 직접 옮기거나 정렬한 위치는 유지합니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "스티커를 모두 숨기고 다시 표시하기 {#sticker-visibility}",
+    "id": "bookmark-guide-sticker-visibility",
+    "mode": "compare",
+    "panels": [
+      {"icon": "keyboard", "title": "하나라도 보이면", "lines": ["Ctrl+Alt+J → 모두 숨김", "일부만 숨긴 상태도 같음"]},
+      {"icon": "note", "title": "모두 숨겨져 있으면", "lines": ["Ctrl+Alt+J → 모두 표시", "위치·크기·메모 유지"]},
+      {"icon": "menu", "title": "항상 모두 표시", "lines": ["트레이 → 책갈피 보기", "아이콘 두 번 눌러도 표시"]}
+    ],
+    "caption": "스티커 모드의 보기 단축키는 전체 표시·숨기기를 바꿉니다. 일부만 숨긴 상태에서 누르면 나머지도 숨깁니다. 트레이의 책갈피 보기와 아이콘 두 번 누르기는 항상 전체를 표시합니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "가까운 스티커에 맞추거나 한꺼번에 정렬하기 {#sticker-arrangement}",
+    "id": "bookmark-guide-sticker-arrangement",
+    "mode": "compare",
+    "panels": [
+      {"icon": "note", "title": "가까이 끌어 맞추기", "lines": ["보이는 주변 스티커에 붙임", "Alt를 누르면 자유 이동"]},
+      {"icon": "menu", "title": "스티커 위치 모으기", "lines": ["격자·가로·세로 중 선택", "마우스가 있는 모니터로"]},
+      {"icon": "records", "title": "새 위치 유지", "lines": ["숨긴 스티커까지 정렬", "크기·메모·접힘은 유지"]}
+    ],
+    "caption": "자석 정렬은 기본으로 켜져 있으며 설정에서 끌 수 있습니다. 일괄 정렬은 숨긴 스티커도 함께 모으고 새 위치를 저장합니다. 편집 중 정렬한 위치도 저장·취소 후 유지합니다."
   },
   {
     "page": "tools/bookmark/index.md",
@@ -101,8 +125,8 @@
     "id": "bookmark-guide-settings",
     "mode": "compare",
     "panels": [
-      {"icon": "window", "title": "표시 방식", "lines": ["목록 또는 포스트잇", "스티커는 시작할 때 표시"]},
-      {"icon": "keyboard", "title": "단축키", "lines": ["Ctrl 또는 Alt 포함", "다른 앱과 충돌 여부 확인"]},
+      {"icon": "window", "title": "표시·정렬 방식", "lines": ["목록 또는 포스트잇", "스티커 자석 정렬 켜기·끄기"]},
+      {"icon": "keyboard", "title": "보기 단축키", "lines": ["스티커 전체 표시·숨기기", "목록 모드에서는 목록 열기"]},
       {"icon": "pc", "title": "로그인 시 실행", "lines": ["이 사용자만 자동 실행", "바꾼 뒤 적용 누르기"]}
     ],
     "caption": "시계 옆 아이콘의 설정에서 바꾼 뒤 적용을 누르세요. 종료는 현재 실행만 끝내며 다음 로그인 때의 자동 실행 선택은 바꾸지 않습니다."

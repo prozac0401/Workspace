@@ -7,7 +7,7 @@
 <!-- tool-figure:image-copy-save-before-install:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../../assets/tool-guides/image-copy-save-before-install-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-before-install-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-before-install.svg" width="720" height="244" alt="Windows 11 x64: 실제 로컬 폴더에서 사용 네트워크·온라인 전용 제외 / 설치에는 관리자 승인: 0.2.1 MSI는 전자 서명 없음 평소 작업은 일반 사용자 / 붙여넣는 앱도 확인: 이미지가 압축되거나 투명 배경이 달라질 수 있음" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 설치·업데이트·복구·제거 권한과 평소 실행 권한을 구분합니다. 회사 PC는 허용된 설치 절차를 따르고 지원 환경을 먼저 확인하세요.</figcaption>
@@ -27,7 +27,7 @@ Windows 10, ARM64 방식의 PC, 네트워크 저장장치와 온라인에만 있
 <!-- tool-figure:image-copy-save-install:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../../assets/tool-guides/image-copy-save-install-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-install-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-install.svg" width="720" height="244" alt="0.2.1 MSI 실행: 버전에 맞는 설치 파일 열기 실행에 필요한 파일도 포함 → 설치 안내 확인: 관리자 승인 후 설치 PC의 프로그램 폴더에 설치 → 로컬 폴더 열기: 탐색기에서 두 메뉴 사용 별도 설정 화면 없음" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 설치 후 PC에 실제로 저장된 폴더를 엽니다. Windows가 재시작을 요청하면 작업을 저장한 뒤 직접 재시작하세요.</figcaption>
@@ -45,7 +45,7 @@ Windows 10, ARM64 방식의 PC, 네트워크 저장장치와 온라인에만 있
 <!-- tool-figure:image-copy-save-save:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../../assets/tool-guides/image-copy-save-save-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-save-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-save.svg" width="720" height="244" alt="이미지 복사: 캡처·그림 앱에서 복사 파일 이름 복사와 구분 → 폴더 빈 곳 우클릭: 더 많은 옵션 표시에서 복사한 그림 저장 선택 → 같은 폴더에 PNG: 이름이 겹치면 번호 추가 기존 파일·복사 내용 유지" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 이전 방식의 메뉴가 바로 열리는 PC에서는 복사한 그림 저장을 바로 고릅니다. 메뉴 표시 설정을 바꿀 필요 없이 같은 폴더에 PNG를 저장합니다.</figcaption>
@@ -67,7 +67,7 @@ Windows 11에서 **더 많은 옵션 표시**를 거치지 않고 이전 방식�
 <!-- tool-figure:image-copy-save-copy:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../../assets/tool-guides/image-copy-save-copy-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-copy-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-copy.svg" width="720" height="244" alt="그림 파일 한 개: PNG·JPEG·BMP 선택 원본 파일은 그대로 유지 → 그림으로 복사: 탐색기 메뉴에서 선택 파일 경로 대신 그림 자체 → 사용할 앱에 붙이기: 복사 완료 안내 확인 Ctrl+V로 붙여넣기" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 그림으로 복사는 이미지 데이터를 복사합니다. Windows 11 기본 메뉴에서는 더 많은 옵션 표시로 들어가고, 기존 방식의 메뉴가 바로 열리면 곧바로 선택합니다.</figcaption>
@@ -85,7 +85,7 @@ Windows 11에서 **더 많은 옵션 표시**를 거치지 않고 이전 방식�
 <!-- tool-figure:image-copy-save-scope:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../../assets/tool-guides/image-copy-save-scope-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-scope-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-scope.svg" width="720" height="244" alt="화면용 정지 이미지: PNG·JPEG·BMP 한 장 저장 결과는 PNG / 실제 로컬 위치: 접근할 수 있는 내부 저장장치 연결된 위치는 제외 / 상한을 넘으면 중단: 최대 총 5천만 픽셀 임의로 크기·비율 축소 안 함" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 확장자가 맞아도 색상 저장 방식·크기·위치에 따라 처리하지 않을 수 있습니다. 지원 범위와 가로·세로 및 데이터 상한을 함께 확인하세요.</figcaption>
@@ -112,7 +112,7 @@ GIF·TIFF·WebP·HEIC·AVIF·SVG·PDF와 움직이는 그림은 지원하지 않
 <!-- tool-figure:image-copy-save-maintenance:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../../assets/tool-guides/image-copy-save-maintenance-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-maintenance-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-maintenance.svg" width="720" height="244" alt="업데이트: 새 버전 MSI 실행 자동으로 새 버전 설치 안 함 / 복구: 현재 설치된 버전의 MSI 없어진 프로그램 파일 채우기 / 제거: Windows 설치된 앱에서 원본·저장 PNG는 보존" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 세 작업 모두 관리자 승인이 필요합니다. 외부에서 바뀐 파일이나 겹친 설정 때문에 중단되면 일괄 삭제하지 말고 안내된 충돌 확인 절차를 따르세요.</figcaption>
@@ -136,7 +136,7 @@ GIF·TIFF·WebP·HEIC·AVIF·SVG·PDF와 움직이는 그림은 지원하지 않
 <!-- tool-figure:image-copy-save-troubleshooting:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../../assets/tool-guides/image-copy-save-troubleshooting-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-troubleshooting-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-troubleshooting.svg" width="720" height="244" alt="메뉴가 없으면: 더 많은 옵션 표시 확인 이미지와 위치를 다시 확인 / 선택 표시가 없으면: 메뉴를 누른 폴더 확인 만들어진 PNG가 있는지 확인 / 탐색기가 멈추면: 반복 실행을 멈추기 재현 순서와 버전으로 문의" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 저장 성공과 탐색기에서 파일을 선택하는 동작은 별개입니다. 문의에는 업무 이미지·개인 정보·실제 경로나 문제 확인용 기록 전체를 공개하지 마세요.</figcaption>

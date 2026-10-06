@@ -1,21 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="432" viewBox="0 0 320 432" role="img" aria-labelledby="title desc">
 <title id="title">명단을 기준 열별로 나누기</title><desc id="desc">분리 기준은 Excel에 보이는 표시값입니다. 미리보기 한 화면이 아니라 전체 계획을 처리합니다.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="360" height="432" rx="12" fill="#fffcf7"/>
-<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><rect x="24" y="48" width="96" height="17" fill="#e8e8e5"/><path d="M100 53L131 53L120 65V78L111 82V65Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 37H80M56 75H79" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">분리 기준 선택</text>
-<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">시트와 시작 행 확인</text>
-<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">부서·지역 등 한 열</text>
-<path d="M335 123V137M330 132L335 137L340 132" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="62" cy="42" r="29" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M84 65L111 90" fill="none" stroke="#277a73" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M48 36H76M48 46H66" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">값별 계획 확인</text>
-<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">표시값으로 묶음 구분</text>
-<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">최종 이름·행 수 확인</text>
-<path d="M335 267V281M330 276L335 281L340 276" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#be8740" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">전체 계획 실행</text>
-<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">기준값마다 파일 생성</text>
-<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">완료·실패 항목 확인</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="320" height="432" rx="4" fill="#fffdf9"/>
+<text x="27" y="18" font-size="10" fill="#8a622f" font-weight="700" text-anchor="middle">01</text>
+<g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#ded2c4" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#ece5d7"/><rect x="24" y="48" width="96" height="17" fill="#e4ddd3"/><path d="M100 53L131 53L120 65V78L111 82V65Z" fill="#ece5d7" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 37H80M56 75H79" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120" y="35" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">분리 기준 선택</text>
+<text x="120" y="60" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">시트와 시작 행 확인</text>
+<text x="120" y="80" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">부서·지역 등 한 열</text>
+<path d="M300 123V137M295 132L300 137L305 132" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="27" y="162" font-size="10" fill="#8a622f" font-weight="700" text-anchor="middle">02</text>
+<path d="M18 144H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><circle cx="62" cy="42" r="29" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M84 65L111 90" fill="none" stroke="#8a622f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M48 36H76M48 46H66" fill="none" stroke="#6e6258" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">값별 계획 확인</text>
+<text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">표시값으로 묶음 구분</text>
+<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">최종 이름·행 수 확인</text>
+<path d="M300 267V281M295 276L300 281L305 276" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="27" y="306" font-size="10" fill="#8a622f" font-weight="700" text-anchor="middle">03</text>
+<path d="M18 288H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#ead7b9" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#f4e7d2" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#b7894e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120" y="323" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">전체 계획 실행</text>
+<text x="120" y="348" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">기준값마다 파일 생성</text>
+<text x="120" y="368" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">완료·실패 항목 확인</text>
 </g></svg>

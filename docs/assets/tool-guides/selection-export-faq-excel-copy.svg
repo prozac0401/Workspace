@@ -1,19 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
 <title id="title">시트 탭 자체를 별도 파일로 저장하는 기능은 Excel에도 있나요?</title><desc id="desc">Excel 기본 이동/복사는 시트 전체를 복사합니다. 원본을 남기려면 복사본 만들기를 체크하세요.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="720" height="244" rx="12" fill="#fffcf7"/>
-<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="28" y="5" width="96" height="86" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M43 21H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 40H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="49" width="84" height="19" rx="3" fill="#dcece7" stroke="#dcece7" stroke-width="2"/><path d="M43 60H94" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 79H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 60L10 84L18 78L24 90L31 86L24 74L35 72Z" fill="#fff" stroke="#283f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">탭에서 이동/복사</text>
-<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">시트 탭을 우클릭</text>
-<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">Excel 기본 메뉴 사용</text>
-<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M52 48L66 63L93 34" fill="none" stroke="#277a73" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">복사본 만들기 체크</text>
-<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">새 통합 문서를 선택</text>
-<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">원본 시트를 남기기</text>
-<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">새 파일 확인·저장</text>
-<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">여러 탭은 파일 하나에</text>
-<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">각각의 시트로 복사</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="720" height="244" rx="4" fill="#fffdf9"/>
+<text x="120.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">01</text>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="28" y="5" width="96" height="86" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M43 21H94" fill="none" stroke="#6e6258" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 40H94" fill="none" stroke="#6e6258" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="49" width="84" height="19" rx="3" fill="#ece5d7" stroke="#ece5d7" stroke-width="2"/><path d="M43 60H94" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 79H94" fill="none" stroke="#6e6258" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 60L10 84L18 78L24 90L31 86L24 74L35 72Z" fill="#fffdf9" stroke="#2c2622" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">탭에서 이동/복사</text>
+<text x="120.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">시트 탭을 우클릭</text>
+<text x="120.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">Excel 기본 메뉴 사용</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="360.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">02</text>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#ece5d7" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M52 48L66 63L93 34" fill="none" stroke="#8a622f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">복사본 만들기 체크</text>
+<text x="360.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">새 통합 문서를 선택</text>
+<text x="360.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">원본 시트를 남기기</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="600.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">03</text>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">새 파일 확인·저장</text>
+<text x="600.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">여러 탭은 파일 하나에</text>
+<text x="600.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">각각의 시트로 복사</text>
 </g></svg>

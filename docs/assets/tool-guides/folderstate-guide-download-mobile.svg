@@ -1,21 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="432" viewBox="0 0 320 432" role="img" aria-labelledby="title desc">
 <title id="title">설치 파일 받기</title><desc id="desc">Windows 11 x64용 FolderState 0.1.3을 받으세요. 기존 0.1.3 RC1과 같은 설치 파일이며, 사용 중이라면 다시 설치할 필요가 없습니다.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="360" height="432" rx="12" fill="#fffcf7"/>
-<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><path d="M65 82V91M79 82V91M51 92H93" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="37" y="36" width="69" height="31" rx="8" fill="#eef4f1" stroke="#d6e0dc" stroke-width="2"/></g>
-<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">PC 환경 확인</text>
-<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">Windows 11 64비트</text>
-<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">회사 설치 기준 확인</text>
-<path d="M335 123V137M330 132L335 137L340 132" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">0.1.3 설치 파일</text>
-<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">버전별 MSI 내려받기</text>
-<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">전자 서명 없음 확인</text>
-<path d="M335 267V281M330 276L335 281L340 276" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#be8740" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">연습용 폴더 준비</text>
-<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">이름과 업무 파일 유지</text>
-<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">폴더 상태만 표시</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="320" height="432" rx="4" fill="#fffdf9"/>
+<text x="27" y="18" font-size="10" fill="#8a622f" font-weight="700" text-anchor="middle">01</text>
+<g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M65 82V91M79 82V91M51 92H93" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="37" y="36" width="69" height="31" rx="8" fill="#f2e9dd" stroke="#ded2c4" stroke-width="2"/></g>
+<text x="120" y="35" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">PC 환경 확인</text>
+<text x="120" y="60" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">Windows 11 64비트</text>
+<text x="120" y="80" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">회사 설치 기준 확인</text>
+<path d="M300 123V137M295 132L300 137L305 132" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="27" y="162" font-size="10" fill="#8a622f" font-weight="700" text-anchor="middle">02</text>
+<path d="M18 144H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">0.1.3 설치 파일</text>
+<text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">버전별 MSI 내려받기</text>
+<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">전자 서명 없음 확인</text>
+<path d="M300 267V281M295 276L300 281L305 276" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="27" y="306" font-size="10" fill="#8a622f" font-weight="700" text-anchor="middle">03</text>
+<path d="M18 288H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#ead7b9" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#f4e7d2" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#b7894e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120" y="323" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">연습용 폴더 준비</text>
+<text x="120" y="348" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">이름과 업무 파일 유지</text>
+<text x="120" y="368" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">폴더 상태만 표시</text>
 </g></svg>

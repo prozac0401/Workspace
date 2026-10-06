@@ -1,19 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
 <title id="title">설정과 기록 보관하기</title><desc id="desc">설정 백업에 원본·템플릿·결과 파일은 포함되지 않습니다. 덮어쓰기 같은 허용 선택은 다시 확인하세요.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="720" height="244" rx="12" fill="#fffcf7"/>
-<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M27 24H119" fill="none" stroke="#d6e0dc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="53" cy="24" r="9" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M27 49H119" fill="none" stroke="#d6e0dc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="93" cy="49" r="9" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M27 74H119" fill="none" stroke="#d6e0dc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="65" cy="74" r="9" fill="#fff" stroke="#277a73" stroke-width="2"/></g>
-<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">업무 설정</text>
-<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">경로·행·파일명 규칙</text>
-<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">불러온 뒤 다시 분석</text>
-<path d="M240 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="55" width="64" height="10" rx="2" fill="#eef4f1" stroke="#eef4f1" stroke-width="2"/><path d="M50 60H93" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">실행 기록·로그</text>
-<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">완료 파일·오류 확인</text>
-<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">업무 경로는 가려 공유</text>
-<path d="M480 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="68" y="39" width="34" height="39" rx="3" fill="#fff" stroke="#277a73" stroke-width="2"/><rect x="77" y="48" width="34" height="39" rx="3" fill="#fffcf7" stroke="#277a73" stroke-width="2"/></g>
-<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">설정 백업</text>
-<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">종료 후 설정 파일 복사</text>
-<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">원본·결과는 별도 보관</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="720" height="244" rx="4" fill="#fffdf9"/>
+<path d="M108 16H132" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M27 24H119" fill="none" stroke="#ded2c4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="53" cy="24" r="9" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M27 49H119" fill="none" stroke="#ded2c4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="93" cy="49" r="9" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M27 74H119" fill="none" stroke="#ded2c4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="65" cy="74" r="9" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/></g>
+<text x="120.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">업무 설정</text>
+<text x="120.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">경로·행·파일명 규칙</text>
+<text x="120.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">불러온 뒤 다시 분석</text>
+<path d="M240 29V212" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M348 16H372" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="55" width="64" height="10" rx="2" fill="#f2e9dd" stroke="#f2e9dd" stroke-width="2"/><path d="M50 60H93" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">실행 기록·로그</text>
+<text x="360.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">완료 파일·오류 확인</text>
+<text x="360.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">업무 경로는 가려 공유</text>
+<path d="M480 29V212" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M588 16H612" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#ead7b9" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#f4e7d2" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="68" y="39" width="34" height="39" rx="3" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><rect x="77" y="48" width="34" height="39" rx="3" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/></g>
+<text x="600.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">설정 백업</text>
+<text x="600.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">종료 후 설정 파일 복사</text>
+<text x="600.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">원본·결과는 별도 보관</text>
 </g></svg>

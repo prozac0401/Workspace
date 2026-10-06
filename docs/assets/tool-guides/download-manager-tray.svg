@@ -1,19 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
 <title id="title">창을 닫고 다시 열기</title><desc id="desc">0.2.1에서는 창을 닫아도 프로그램이 알림 영역에 남습니다. 감시 상태는 창에서 확인하고 완전히 끝낼 때는 종료를 사용하세요.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="720" height="244" rx="12" fill="#fffcf7"/>
-<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><rect x="26" y="34" width="42" height="35" rx="8" fill="#eef4f1" stroke="#d6e0dc" stroke-width="2"/><path d="M79 38H112M79 48H109M79 58H97" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">X로 창 닫기</text>
-<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">창만 숨기고 아이콘은 유지</text>
-<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">기존 감시 상태도 유지</text>
-<path d="M240 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="28" y="5" width="96" height="86" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M43 21H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 40H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="49" width="84" height="19" rx="3" fill="#dcece7" stroke="#dcece7" stroke-width="2"/><path d="M43 60H94" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 79H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 60L10 84L18 78L24 90L31 86L24 74L35 72Z" fill="#fff" stroke="#283f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">알림 영역에서 열기</text>
-<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">아이콘 더블클릭 또는 열기</text>
-<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">창에서 감시 상태 확인</text>
-<path d="M480 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#be8740" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">프로그램 완전 종료</text>
-<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">알림 영역 아이콘 메뉴에서</text>
-<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">종료를 선택</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="720" height="244" rx="4" fill="#fffdf9"/>
+<path d="M108 16H132" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><rect x="26" y="34" width="42" height="35" rx="8" fill="#f2e9dd" stroke="#ded2c4" stroke-width="2"/><path d="M79 38H112M79 48H109M79 58H97" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">X로 창 닫기</text>
+<text x="120.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">창만 숨기고 아이콘은 유지</text>
+<text x="120.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">기존 감시 상태도 유지</text>
+<path d="M240 29V212" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M348 16H372" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="28" y="5" width="96" height="86" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M43 21H94" fill="none" stroke="#6e6258" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 40H94" fill="none" stroke="#6e6258" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="49" width="84" height="19" rx="3" fill="#ece5d7" stroke="#ece5d7" stroke-width="2"/><path d="M43 60H94" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 79H94" fill="none" stroke="#6e6258" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 60L10 84L18 78L24 90L31 86L24 74L35 72Z" fill="#fffdf9" stroke="#2c2622" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">알림 영역에서 열기</text>
+<text x="360.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">아이콘 더블클릭 또는 열기</text>
+<text x="360.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">창에서 감시 상태 확인</text>
+<path d="M480 29V212" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M588 16H612" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#b7894e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">프로그램 완전 종료</text>
+<text x="600.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">알림 영역 아이콘 메뉴에서</text>
+<text x="600.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">종료를 선택</text>
 </g></svg>

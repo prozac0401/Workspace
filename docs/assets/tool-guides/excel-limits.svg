@@ -1,21 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
 <title id="title">비교할 때 알아둘 점</title><desc id="desc">두 목록을 같은 행 수로 나누면 잘못된 차이가 생길 수 있습니다. 입력 상한 이내라도 시간 제한으로 중단될 수 있습니다.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="720" height="244" rx="12" fill="#fffcf7"/>
-<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><rect x="24" y="48" width="96" height="17" fill="#e8e8e5"/><path d="M100 53L131 53L120 65V78L111 82V65Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 37H80M56 75H79" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">보이는 값 비교</text>
-<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">숨김·필터 셀 제외</text>
-<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">빈칸·오류도 제외</text>
-<path d="M240 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><path d="M49 48H120V65H49Z" fill="#f6e7cd" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="69" y="43" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">A</text><text x="104" y="43" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">3</text><text x="69" y="62" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">B</text><text x="104" y="62" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">1</text><text x="69" y="81" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">C</text><text x="104" y="81" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">2</text></g>
-<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">나눌 때는 값 기준</text>
-<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">같은 비교값은 양쪽에서</text>
-<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">같은 묶음에 넣기</text>
-<path d="M480 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#be8740" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">취소 후 종료 확인</text>
-<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">Esc 또는 작업 취소</text>
-<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">도구 모음의 취소 완료 확인</text>
-<rect x="565.0" y="109" width="70" height="23" rx="10" fill="#eef4f1" stroke="#eef4f1" stroke-width="2"/>
-<text x="600.0" y="125" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">Esc</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="720" height="244" rx="4" fill="#fffdf9"/>
+<path d="M108 16H132" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#ded2c4" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#ece5d7"/><rect x="24" y="48" width="96" height="17" fill="#e4ddd3"/><path d="M100 53L131 53L120 65V78L111 82V65Z" fill="#ece5d7" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 37H80M56 75H79" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">보이는 값 비교</text>
+<text x="120.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">숨김·필터 셀 제외</text>
+<text x="120.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">빈칸·오류도 제외</text>
+<path d="M240 29V212" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M348 16H372" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#ded2c4" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#ece5d7"/><path d="M49 48H120V65H49Z" fill="#f6e7cd" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="69" y="43" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">A</text><text x="104" y="43" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">3</text><text x="69" y="62" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">B</text><text x="104" y="62" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">1</text><text x="69" y="81" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">C</text><text x="104" y="81" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">2</text></g>
+<text x="360.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">나눌 때는 값 기준</text>
+<text x="360.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">같은 비교값은 양쪽에서</text>
+<text x="360.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">같은 묶음에 넣기</text>
+<path d="M480 29V212" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M588 16H612" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#b7894e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">취소 후 종료 확인</text>
+<text x="600.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">Esc 또는 작업 취소</text>
+<text x="600.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">도구 모음의 취소 완료 확인</text>
+<rect x="565.0" y="109" width="70" height="23" rx="3" fill="#f2e9dd" stroke="#f2e9dd" stroke-width="2"/>
+<text x="600.0" y="125" font-size="12" fill="#8a622f" font-weight="700" text-anchor="middle">Esc</text>
 </g></svg>

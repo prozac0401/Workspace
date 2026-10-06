@@ -11,7 +11,7 @@ Excel 파일 여러 개를 하나로 합치고, 명단을 부서별 파일로 �
 <!-- tool-figure:office-download:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-download-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-download-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-download.svg" width="720" height="244" alt="Windows 64비트: Windows 10·11에서 사용 필요한 Office 준비 → 배포 형식 선택: EXE 또는 ZIP 받기 ZIP은 모두 풀기 → 실행 파일 열기: Python 설치 없이 실행 폴더형은 구성 함께 유지" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 단독 EXE는 바로 실행합니다. 폴더형 ZIP은 EXE와 _internal 폴더를 함께 유지하세요.</figcaption>
@@ -38,7 +38,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-formats:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-formats-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-formats-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-formats.svg" width="720" height="244" alt="병합·분리: Excel 값과 서식 이동 수식·매크로 복사 안 함 / 템플릿 채우기: Excel 명단의 표시값 Office 양식에 넣기 / 결과 파일: 선택한 형식으로 저장 입력과 다른 경로 사용" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 병합·분리와 템플릿 채우기는 처리 범위가 다릅니다. 아래 표에서 읽는 파일과 만드는 파일을 확인하세요.</figcaption>
@@ -60,7 +60,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-start:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-start-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-start-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-start.svg" width="720" height="244" alt="작은 연습 명단: 가짜 부서·이름 3행 헤더 1행·데이터 시작 2행 → 부서로 분리: 행 설정 후 분석 부서 열과 출력 폴더 선택 → 두 파일 확인: 연습팀A는 2행 연습팀B는 1행" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 실제 업무자료를 넣기 전에 가짜 명단으로 행 설정과 분리 결과를 확인하세요.</figcaption>
@@ -94,7 +94,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-common:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-common-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-common-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-common.svg" width="720" height="244" alt="원본 행 확인: 시트·헤더·시작 행 실제 자료에 맞추기 → 출력 계획 분석: 예상 이름·건수 확인 변경 뒤에는 다시 분석 → 실행 후 확인: 계획 확인 후 실행 결과·기록에서 파일 열기" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 분석 목록은 아직 만들어진 파일이 아닙니다. 행이나 시트 설정을 바꾸면 다시 분석하세요.</figcaption>
@@ -122,7 +122,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-merge:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-merge-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-merge-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-merge.svg" width="720" height="244" alt="입력 파일 정렬: 첫 시트의 헤더 맞추기 위에서 아래로 합치기 → 행 수 분석: 헤더·시작 열 확인 새 출력 파일 선택 → 한 파일로 병합: 첫 열에 원본 파일명 행 수와 열 배치 확인" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 병합은 각 파일의 첫 시트를 읽습니다. 같은 헤더 구간과 열 순서를 먼저 맞추세요.</figcaption>
@@ -148,7 +148,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-split:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-split-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-split-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-split.svg" width="720" height="244" alt="분리 기준 선택: 시트와 시작 행 확인 부서·지역 등 한 열 → 값별 계획 확인: 표시값으로 묶음 구분 최종 이름·행 수 확인 → 전체 계획 실행: 기준값마다 파일 생성 완료·실패 항목 확인" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 분리 기준은 Excel에 보이는 표시값입니다. 미리보기 한 화면이 아니라 전체 계획을 처리합니다.</figcaption>
@@ -183,7 +183,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-template:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-template-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-template-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-template.svg" width="720" height="244" alt="명단 준비: 열마다 다른 이름 보이는 값 확인 → 양식과 연결: {{필드명}}에 값 넣기 출력 이름·방식 정하기 → 문서 생성: 한 건 먼저 확인 전체 결과 확인" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> Excel 명단의 한 행을 Office 양식에 넣습니다. 실제 값과 배치를 한 건 먼저 확인한 뒤 전체를 생성하세요.</figcaption>
@@ -197,7 +197,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-prepare:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-prepare-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-prepare-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-prepare.svg" width="720" height="244" alt="명단의 열 이름: 이름 · 부서 · 금액 Excel 표시값 사용 / 양식의 본문: {{이름}} · {{부서}} 중괄호 두 쌍 사용 / 출력 파일명: {이름}_안내 중괄호 한 쌍 사용" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 본문 표시와 파일명 규칙의 중괄호 개수가 다릅니다. 명단의 열 이름과 양식 필드명을 맞추세요.</figcaption>
@@ -237,7 +237,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-trial:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-trial-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-trial-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-trial.svg" width="720" height="244" alt="필드 상세 확인: 출력 이름·건수 분석 미해결·제외 사유 보기 → 한 건 시험 생성: 별도 임시 폴더에 생성 값·줄바꿈·배치 확인 → 전체 생성: 고쳤다면 다시 분석 결과·기록에서 확인" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 한 건 시험 생성은 한 항목의 개별 문서입니다. 여러 항목을 합친 최종 배치까지 확인하는 단계는 아닙니다.</figcaption>
@@ -264,7 +264,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-outputs:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-outputs-mobile.svg" width="360" height="288">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-outputs-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/office-outputs.svg" width="720" height="244" alt="개별 파일: 명단 항목마다 문서 하나 중복 이름은 번호로 구분 / 단일 파일: 시트·본문·슬라이드 모음 Word는 합치기 방식 선택" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 단일 파일은 항목별 내용을 한 파일에 모읍니다. Word의 머리말·꼬리말 값이 다르면 새 페이지 또는 개별 파일을 사용하세요.</figcaption>
@@ -287,7 +287,7 @@ ZIP 안의 `run-office-tools.bat`나 `run-office-tools.ps1`로도 실행할 수 
 <!-- tool-figure:office-protection:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-protection-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-protection-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-protection.svg" width="720" height="244" alt="원본 보존: 원본·양식과 다른 경로 덮어쓰기 기본 해제 / 최종 이름 확인: 같은 이름은 번호 추가 분석 후 충돌하면 중단 / 완료 파일 유지: 중지 전 완료본은 남음 여러 파일 일괄 복구 없음" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 출력 계획의 이름과 경로를 확인하세요. 중지하거나 실패해도 이미 완료한 다른 파일은 그대로 남습니다.</figcaption>
@@ -309,7 +309,7 @@ Windows에서 사용할 수 없는 파일명이나 예약 이름은 사용할 �
 <!-- tool-figure:office-resume:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-resume-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-resume-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-resume.svg" width="720" height="244" alt="중지 요청: 현재 Office 작업 대기 멈출 수 있는 지점에서 중지 → 결과·기록 확인: 완료·실패·미처리 구분 원본 변경 여부 확인 → 남은 작업 계속: 같은 실행 중에 사용 재실행 뒤에는 새 분석" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 프로그램을 닫지 않은 동안 미완료 항목을 이어갈 수 있습니다. 재시작 후 JSON 기록을 불러와 재개할 수는 없습니다.</figcaption>
@@ -332,7 +332,7 @@ Windows에서 사용할 수 없는 파일명이나 예약 이름은 사용할 �
 <!-- tool-figure:office-settings:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-settings-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-settings-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-settings.svg" width="720" height="244" alt="업무 설정: 경로·행·파일명 규칙 불러온 뒤 다시 분석 / 실행 기록·로그: 완료 파일·오류 확인 업무 경로는 가려 공유 / 설정 백업: 종료 후 설정 파일 복사 원본·결과는 별도 보관" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 설정 백업에 원본·템플릿·결과 파일은 포함되지 않습니다. 덮어쓰기 같은 허용 선택은 다시 확인하세요.</figcaption>
@@ -359,7 +359,7 @@ Windows에서 사용할 수 없는 파일명이나 예약 이름은 사용할 �
 <!-- tool-figure:office-maintenance:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-maintenance-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-maintenance-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-maintenance.svg" width="720" height="244" alt="업데이트: 기존 실행을 종료 ZIP은 새 폴더에 풀기 / 설정 다시 확인: 행·경로 확인 후 분석 이전 구성과 섞지 않기 / 제거: 종료 후 실행 파일 삭제 사용자 자료는 별도 남음" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 업데이트 전에 설정과 결과를 보관하세요. 실행 파일을 제거해도 원본·템플릿·결과와 사용자 설정은 따로 남습니다.</figcaption>
@@ -377,7 +377,7 @@ Windows에서 사용할 수 없는 파일명이나 예약 이름은 사용할 �
 <!-- tool-figure:office-troubleshooting:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/office-troubleshooting-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/office-troubleshooting-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/office-troubleshooting.svg" width="720" height="244" alt="상황 확인: 오류 문구·사용 탭 기록 원본 행과 Office 확인 → 원인에 맞게 수정: 필드·행·경로 점검 기존 완료 파일 확인 → 다시 분석: 최종 계획부터 확인 필요한 로그만 가려 문의" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 오류 표에서 현재 상황에 맞는 조치를 확인하세요. 업무 원본이나 가리지 않은 로그는 공개하지 않습니다.</figcaption>

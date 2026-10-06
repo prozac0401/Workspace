@@ -52,7 +52,7 @@ hide:
 | 폴더 속 파일 목록을 만들고 필요한 파일을 모으고 싶어요 | **[File List to Excel 1.2.0 받기](tools/file-list-to-excel/index.md)** — 파일 목록을 Excel로 열고, 필요하면 선택한 파일을 복사하세요. |
 | Excel에서 숨긴 행을 건너뛰어 값을 넣고 싶어요 | **[보이는 칸 붙여넣기 받기](tools/visible-cells-paste/index.md)** — 복사할 값의 순서와 대상 칸의 개수를 먼저 확인하세요. |
 | 복사한 그림을 파일로 저장하고 싶어요 | **[그림 복사·저장 0.2.1 받기](tools/image-copy-save/guide.md)** — 폴더 안 빈 곳에서 오른쪽 버튼을 눌러 실행하세요. |
-| 보던 문서나 웹페이지로 다시 돌아가고 싶어요 | **[업무 책갈피 0.2.8 받기](tools/bookmark/index.md)** — Ctrl+Alt+B로 남기고, 목록이나 작은 메모창에서 다시 여세요. |
+| 보던 문서나 웹페이지로 다시 돌아가고 싶어요 | **[업무 책갈피 0.2.10 받기](tools/bookmark/index.md)** — Ctrl+Alt+B로 남기고 목록이나 스티커에서 다시 여세요. 스티커 전체를 숨기거나 표시하고, 가로·세로·격자로 정리할 수 있습니다. |
 | 다시 받은 파일에 원래 이름을 주고 싶어요 | **[다운로드 이름 유지 0.2.1 설치 안내](tools/download-version-manager/index.md)** — 이전 파일을 수정 시각 이름으로 보관하고 알림 영역에서 열기·종료를 사용합니다. |
 | Excel 파일을 합치거나 나누고, 양식 문서를 한꺼번에 만들고 싶어요 | **[오피스 자동화 도구 0.3.1 받기](tools/office-automation/index.md)** — MS Office Excel·PowerPoint(PPT)·Word용 도구입니다. 원본 행과 출력 계획을 확인한 뒤 실행하세요. |
 

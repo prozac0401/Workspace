@@ -1,19 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
 <title id="title">여러 시트 탭을 선택해도 새 파일로 만들어 주나요?</title><desc id="desc">이 도구는 한 시트의 선택 범위를 새 시트 하나로 만듭니다. 여러 시트 탭을 함께 선택하면 중단합니다.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="720" height="244" rx="12" fill="#fffcf7"/>
-<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><rect x="50" y="29" width="38" height="18" rx="1" fill="#dcece7" stroke="#277a73" stroke-width="2"/><text x="68" y="43" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">A1</text><path d="M56 56H80M56 75H76" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">시트 하나만 선택</text>
-<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">여러 탭 선택을 해제</text>
-<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">필요한 시트만 고르기</text>
-<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><rect x="50" y="29" width="38" height="18" rx="1" fill="#dcece7" stroke="#277a73" stroke-width="2"/><text x="68" y="43" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">A1</text><path d="M56 56H80M56 75H76" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">범위 하나 선택</text>
-<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">이어진 네모 모양 범위</text>
-<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">한 칸 선택도 가능</text>
-<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">새 파일 한 개</text>
-<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">결과 시트는 한 개</text>
-<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">확인한 뒤 직접 저장</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="720" height="244" rx="4" fill="#fffdf9"/>
+<text x="120.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">01</text>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#ded2c4" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#ece5d7"/><rect x="50" y="29" width="38" height="18" rx="1" fill="#ece5d7" stroke="#8a622f" stroke-width="2"/><text x="68" y="43" font-size="12" fill="#2c2622" font-weight="700" text-anchor="middle">A1</text><path d="M56 56H80M56 75H76" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">시트 하나만 선택</text>
+<text x="120.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">여러 탭 선택을 해제</text>
+<text x="120.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">필요한 시트만 고르기</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="360.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">02</text>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#ded2c4" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#ece5d7"/><rect x="50" y="29" width="38" height="18" rx="1" fill="#ece5d7" stroke="#8a622f" stroke-width="2"/><text x="68" y="43" font-size="12" fill="#2c2622" font-weight="700" text-anchor="middle">A1</text><path d="M56 56H80M56 75H76" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">범위 하나 선택</text>
+<text x="360.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">이어진 네모 모양 범위</text>
+<text x="360.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">한 칸 선택도 가능</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="600.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">03</text>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">새 파일 한 개</text>
+<text x="600.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">결과 시트는 한 개</text>
+<text x="600.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">확인한 뒤 직접 저장</text>
 </g></svg>

@@ -1,19 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="432" viewBox="0 0 320 432" role="img" aria-labelledby="title desc">
 <title id="title">설치 전에 확인하세요</title><desc id="desc">Windows 10과 ARM64용 설치 파일은 지원하지 않습니다. 회사 PC에서는 설치 기준을 확인하고 연습용 폴더에서 시작하세요.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="360" height="432" rx="12" fill="#fffcf7"/>
-<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><path d="M65 82V91M79 82V91M51 92H93" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="37" y="36" width="69" height="31" rx="8" fill="#eef4f1" stroke="#d6e0dc" stroke-width="2"/></g>
-<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">지원 환경</text>
-<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">Windows 11 x64</text>
-<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">실행 파일도 함께 포함</text>
-<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="55" y="43" width="34" height="26" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M62 43V33Q72 18 82 33V43" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">설치 기준 확인</text>
-<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">회사 절차에 따라 설치</text>
-<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">보안 경고는 담당자 확인</text>
-<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="105" cy="72" r="17" fill="#fffcf7" stroke="#55676b" stroke-width="2"/></g>
-<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">먼저 연습하기</text>
-<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">연습용 폴더 하나</text>
-<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">상태와 아이콘 확인</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="320" height="432" rx="4" fill="#fffdf9"/>
+<g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M65 82V91M79 82V91M51 92H93" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="37" y="36" width="69" height="31" rx="8" fill="#f2e9dd" stroke="#ded2c4" stroke-width="2"/></g>
+<text x="120" y="35" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">지원 환경</text>
+<text x="120" y="60" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">Windows 11 x64</text>
+<text x="120" y="80" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">실행 파일도 함께 포함</text>
+<path d="M18 144H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#ece5d7" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="55" y="43" width="34" height="26" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M62 43V33Q72 18 82 33V43" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">설치 기준 확인</text>
+<text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">회사 절차에 따라 설치</text>
+<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">보안 경고는 담당자 확인</text>
+<path d="M18 288H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#ead7b9" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#f4e7d2" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="105" cy="72" r="17" fill="#fffdf9" stroke="#6e6258" stroke-width="2"/></g>
+<text x="120" y="323" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">먼저 연습하기</text>
+<text x="120" y="348" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">연습용 폴더 하나</text>
+<text x="120" y="368" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">상태와 아이콘 확인</text>
 </g></svg>

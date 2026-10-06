@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="288" viewBox="0 0 360 288" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="288" viewBox="0 0 320 288" role="img" aria-labelledby="title desc">
 <title id="title">파일을 한곳에 모으기만 하면 기본 복사 기능 쓰기</title><desc id="desc">한곳에 모을 때는 기본 복사 기능을 사용합니다. 파일마다 다른 목적지로 나누려면 확정 목록에 맞춘 별도 스크립트가 필요합니다.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="360" height="288" rx="12" fill="#fffcf7"/>
-<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="68" y="39" width="34" height="39" rx="3" fill="#fff" stroke="#277a73" stroke-width="2"/><rect x="77" y="48" width="34" height="39" rx="3" fill="#fffcf7" stroke="#277a73" stroke-width="2"/></g>
-<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">한 폴더에 모으기</text>
-<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">원래 Files 표의 행 선택</text>
-<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">선택형 Excel 복사 기능</text>
-<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="15" y="12" width="115" height="72" rx="6" fill="#283f43" stroke="#283f43" stroke-width="2"/><path d="M29 30L38 37L29 44" fill="none" stroke="#a8d8cb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 37H90M29 57H104M29 69H73" fill="none" stroke="#a8d8cb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">업무별 폴더에 나누기</text>
-<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">확정한 목적지를 기준으로</text>
-<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">별도 복사 스크립트 요청</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="320" height="288" rx="4" fill="#fffdf9"/>
+<g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#ead7b9" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#f4e7d2" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="68" y="39" width="34" height="39" rx="3" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><rect x="77" y="48" width="34" height="39" rx="3" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/></g>
+<text x="120" y="35" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">한 폴더에 모으기</text>
+<text x="120" y="60" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">원래 Files 표의 행 선택</text>
+<text x="120" y="80" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">선택형 Excel 복사 기능</text>
+<path d="M18 144H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="15" y="12" width="115" height="72" rx="6" fill="#2c2622" stroke="#2c2622" stroke-width="2"/><path d="M29 30L38 37L29 44" fill="none" stroke="#e3c799" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 37H90M29 57H104M29 69H73" fill="none" stroke="#e3c799" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">업무별 폴더에 나누기</text>
+<text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">확정한 목적지를 기준으로</text>
+<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">별도 복사 스크립트 요청</text>
 </g></svg>

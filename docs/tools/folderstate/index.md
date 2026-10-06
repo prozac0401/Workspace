@@ -9,7 +9,7 @@
 <!-- tool-figure:folderstate-guide-download:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-download-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-download-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-download.svg" width="720" height="244" alt="PC 환경 확인: Windows 11 64비트 회사 설치 기준 확인 → 0.1.3 설치 파일: 버전별 MSI 내려받기 전자 서명 없음 확인 → 연습용 폴더 준비: 이름과 업무 파일 유지 폴더 상태만 표시" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> Windows 11 x64용 FolderState 0.1.3을 받으세요. 기존 0.1.3 RC1과 같은 설치 파일이며, 사용 중이라면 다시 설치할 필요가 없습니다.</figcaption>
@@ -30,7 +30,7 @@
 <!-- tool-figure:folderstate-guide-requirements:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-requirements-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-requirements-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-requirements.svg" width="720" height="244" alt="지원 환경: Windows 11 x64 실행 파일도 함께 포함 / 설치 기준 확인: 회사 절차에 따라 설치 보안 경고는 담당자 확인 / 먼저 연습하기: 연습용 폴더 하나 상태와 아이콘 확인" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> Windows 10과 ARM64용 설치 파일은 지원하지 않습니다. 회사 PC에서는 설치 기준을 확인하고 연습용 폴더에서 시작하세요.</figcaption>
@@ -48,7 +48,7 @@
 <!-- tool-figure:folderstate-guide-installation:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-installation-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-installation-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-installation.svg" width="720" height="244" alt="MSI 열고 설치: 현재 Windows 계정에 설치 관리자 권한 불필요 → 폴더 우클릭: 연습용 폴더 하나 선택 더 많은 옵션 표시 → 업무 상태 선택: 원하는 상태 누르기 탐색기에서 아이콘 확인" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 설치 후 폴더의 오른쪽 클릭 메뉴에서 바로 상태를 바꿀 수 있습니다. 메뉴가 없으면 탐색기 창을 다시 여세요.</figcaption>
@@ -69,7 +69,7 @@
 <!-- tool-figure:folderstate-guide-use:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-use-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-use-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-use.svg" width="720" height="244" alt="대상 폴더 확인: 이름과 전체 위치 확인 현재 저장 상태 읽기 → 업무 상태 선택: 담당자가 상황을 판단 상태를 누르면 저장 → 결과 확인: 완료·주의·실패 읽기 탐색기 아이콘 확인" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 폴더를 확인하고 상태를 선택한 뒤 작업 결과를 읽으세요. 상태 판단은 사용자가 하며 프로그램이 업무 완료를 자동으로 확인하지 않습니다.</figcaption>
@@ -81,7 +81,7 @@
 <!-- tool-figure:folderstate-guide-states:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-states-mobile.svg" width="360" height="288">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-states-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/folderstate-guide-states.svg" width="720" height="244" alt="시작과 진행: 시작 전: 아직 시작 안 함 진행 중: 작업·답변 대기 / 완료와 확인: 완료: 결과·전달 확인 확인 필요: 문제·결정 대기" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 업무 상황에 맞는 상태를 바로 선택하세요. 회색 원·파란 진행 표시·초록 체크·빨간 느낌표로 색과 기호를 함께 구분합니다.</figcaption>
@@ -104,7 +104,7 @@
 <!-- tool-figure:folderstate-guide-start:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-start-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-start-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-start.svg" width="720" height="244" alt="폴더 선택: 폴더 하나 고르기 직접 입력 후 폴더 확인 → 상태 누르기: 이름·위치·현재 상태 확인 네 상태 중 하나 선택 → 저장 결과 읽기: 대상과 완료 안내 확인 탐색기에서 보기" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 직접 경로를 입력했다면 폴더 확인 또는 Enter를 먼저 누릅니다. 상태는 버튼을 누르면 바로 저장되며 결과와 탐색기 표시를 확인하세요.</figcaption>
@@ -124,7 +124,7 @@
 <!-- tool-figure:folderstate-guide-next-ui:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-next-ui-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-next-ui-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-next-ui.svg" width="720" height="244" alt="폴더 위치 변경: 이전 화면 정보 지워짐 폴더의 저장 상태는 유지 → 폴더 확인: 새 폴더의 상태 읽기 확인 후 변경 버튼 사용 → 결과 구분: 저장 결과 먼저 확인 추가 확인 안내도 읽기" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 위치를 바꾸면 먼저 새 폴더를 확인합니다. 저장 완료와 저장 뒤 다시 읽기 실패는 구분되므로 화면의 결과와 추가 안내를 함께 보세요.</figcaption>
@@ -144,7 +144,7 @@
 <!-- tool-figure:folderstate-guide-explorer:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-explorer-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-explorer-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-explorer.svg" width="720" height="244" alt="폴더 하나 우클릭: 업무 폴더 선택 더 많은 옵션 표시 → 업무 상태 열기: 상황에 맞는 상태 선택 선택하면 바로 저장 → 아이콘 확인: 성공하면 별도 창 없음 주의·실패 시 안내 표시" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> Windows 11에서는 더 많은 옵션 표시 안의 업무 상태 메뉴를 사용합니다. 상태가 저장되면 별도 창 없이 폴더 아이콘으로 확인합니다.</figcaption>
@@ -164,7 +164,7 @@
 <!-- tool-figure:folderstate-guide-reset:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-reset-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-reset-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-reset.svg" width="720" height="244" alt="시작 전: 아직 시작하지 않은 일 시작 전 상태를 저장 / 상태 표시 지우기: 저장된 상태를 지움 이전 아이콘 설정 복원 / 아이콘 다시 표시: 현재 상태 아이콘 복구 상태와 변경 시각 유지" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 시작 전은 상태를 저장하고, 상태 표시 지우기는 상태 자체를 없앱니다. 아이콘 다시 표시는 저장된 상태를 유지한 채 아이콘만 다시 설정합니다.</figcaption>
@@ -188,7 +188,7 @@
 <!-- tool-figure:folderstate-guide-portable:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-portable-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-portable-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-portable.svg" width="720" height="244" alt="저장 상태 확인: 처음이면 먼저 상태 지정 아이콘 저장 위치 펼치기 → 선택한 폴더 안: 아이콘 위치 고르기 아이콘 저장 위치 적용 → 다른 PC에서 확인: 폴더와 아이콘 함께 이동 환경에 따라 표시 확인" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 아이콘 파일을 함께 옮기려면 선택한 폴더 안을 고른 뒤 아이콘 저장 위치 적용을 누르세요. 상태 버튼을 누르는 것만으로는 위치가 바뀌지 않습니다.</figcaption>
@@ -215,7 +215,7 @@
 <!-- tool-figure:folderstate-guide-master:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-master-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-master-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-master.svg" width="720" height="244" alt="기본 폴더 준비: MASTER의 단계 폴더 상태를 쓰면 시작 전 → 업무별로 복사: 새 업무의 복사본 만들기 연습도 복사본에서 → 복사본에서 진행: 실제 업무 상태 선택 기본 폴더는 그대로 유지" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 기본 폴더가 이미 시작 전이면 매번 상태를 지울 필요는 없습니다. 하위 폴더를 자동으로 찾아 상태를 바꾸지는 않습니다.</figcaption>
@@ -235,7 +235,7 @@
 <!-- tool-figure:folderstate-guide-state-choice:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-state-choice-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-state-choice-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-state-choice.svg" width="720" height="244" alt="예정된 답변 대기: 아직 정한 기한 안 진행 중으로 표시 제안 / 기한 초과·결정 대기: 일을 계속하기 어려움 확인 필요로 표시 제안 / 결과와 전달 확인: 필요한 승인까지 확인 완료 상태 선택" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 답변 대기는 진행 중, 기한 초과나 결정 대기는 확인 필요로 표시하는 예시입니다. 회사에서 정한 기준이 있다면 그 기준을 따르세요.</figcaption>
@@ -253,7 +253,7 @@
 <!-- tool-figure:folderstate-guide-files:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-files-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-files-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-files.svg" width="720" height="244" alt="도구가 다루는 것: 선택한 폴더의 상태 아이콘 설정 파일 / 그대로 두는 것: 폴더 이름과 업무 파일 하위 폴더 목록 / 위치 그대로: 문서 링크와 바로가기 같은 폴더 위치 유지" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 선택한 폴더의 상태와 아이콘 설정만 다룹니다. 업무 파일 내용이나 하위 폴더 목록을 읽거나 바꾸지 않습니다.</figcaption>
@@ -267,7 +267,7 @@
 <!-- tool-figure:folderstate-guide-maintenance:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-maintenance-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-maintenance-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-maintenance.svg" width="720" height="244" alt="프로그램 복구: 같은 설치 파일 실행 파일과 메뉴 다시 설치 / 새 버전 설치: 새 설치 파일 실행 설치 위치 그대로 유지 / 프로그램 제거: 상태 삭제는 제거 전에 업무 폴더와 파일 유지" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 필요한 작업에 맞춰 복구·업데이트·제거를 선택하세요. 폴더 상태까지 지우려면 프로그램을 제거하기 전에 각 폴더에서 상태 표시 지우기를 사용합니다.</figcaption>
@@ -279,7 +279,7 @@
 <!-- tool-figure:folderstate-guide-repair:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-repair-mobile.svg" width="360" height="288">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-repair-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/folderstate-guide-repair.svg" width="720" height="244" alt="프로그램·메뉴 문제: 같은 MSI 다시 열기 프로그램 복구 선택 / 상태 아이콘만 문제: 저장된 상태 확인 아이콘 다시 표시" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 프로그램 파일과 메뉴를 복구하는 작업과 폴더의 상태 아이콘을 다시 표시하는 작업을 구분하세요.</figcaption>
@@ -295,7 +295,7 @@
 <!-- tool-figure:folderstate-guide-update:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-update-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-update-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-update.svg" width="720" height="244" alt="새 MSI 실행: 설치된 프로그램 교체 기존 설치 위치 유지 → 기존 상태 읽기: 0.1.0 상태도 읽기 가능 변경·복구 시 새 형식 → 호환 버전 유지: 새 형식은 0.1.1 이상 사용자 파일은 보존" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 업데이트 후 상태를 바꾸거나 아이콘을 복구해 새 형식으로 저장한 폴더는 0.1.1 이상에서 사용하세요. 오래된 버전으로 덮어 설치할 수 없습니다.</figcaption>
@@ -313,7 +313,7 @@
 <!-- tool-figure:folderstate-guide-remove:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-remove-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-remove-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-remove.svg" width="720" height="244" alt="상태 삭제는 먼저: 표시도 없앨 때만 선택 폴더별 상태 표시 지우기 → 설치 파일 다시 열기: 프로그램 제거 선택 프로그램과 메뉴 제거 → 업무 자료 유지: 업무 폴더·파일 그대로 폴더 안 상태도 남음" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 프로그램 제거는 업무 폴더를 검색하거나 그 안의 상태를 지우지 않습니다. 이 PC의 아이콘을 쓰던 폴더는 제거 후 상태 아이콘이 보이지 않을 수 있습니다.</figcaption>
@@ -332,7 +332,7 @@
 <!-- tool-figure:folderstate-guide-troubleshooting:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-troubleshooting-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-troubleshooting-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-troubleshooting.svg" width="720" height="244" alt="증상 확인: 아이콘·버튼·오류 구분 화면의 안내 먼저 읽기 → 해당 절차 사용: 폴더 확인·아이콘 복구 원인에 맞게 다시 확인 → 기록으로 확인: 오류 코드와 작업 확인 지원 전 개인 경로 가리기" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 화면에 나온 증상과 안내에 맞춰 확인하세요. 설정 파일이 손상되거나 외부에서 바뀌었다는 안내가 나오면 파일을 보존하고 지원을 요청합니다.</figcaption>
@@ -344,7 +344,7 @@
 <!-- tool-figure:folderstate-guide-icon-refresh:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-icon-refresh-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-icon-refresh-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-icon-refresh.svg" width="720" height="244" alt="새로 고침: 탐색기에서 F5 아이콘이 바뀌는지 확인 → 폴더 창 다시 열기: 창을 닫았다가 열기 화면 표시 다시 확인 → 아이콘 다시 표시: 해당 폴더 선택 저장된 상태 아이콘 복구" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> F5, 폴더 창 다시 열기, 아이콘 다시 표시 순으로 확인하세요. 설치된 아이콘 파일이 없다는 안내가 나오면 설치 파일의 프로그램 복구를 사용합니다.</figcaption>
@@ -366,7 +366,7 @@
 <!-- tool-figure:folderstate-guide-buttons:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-buttons-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-buttons-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-buttons.svg" width="720" height="244" alt="폴더 확인부터: 경로를 입력·변경했다면 폴더 확인 또는 Enter → 첫 상태 저장: 상태가 없으면 먼저 선택 첫 저장은 이 PC 설정 → 아이콘 위치 적용: 저장할 위치를 다시 선택 아이콘 저장 위치 적용" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 폴더 확인 전에는 상태를 바꿀 수 없습니다. 아이콘 위치는 상태를 먼저 저장한 뒤 별도의 적용 버튼으로 바꾸세요. 중단·읽기 오류는 화면의 안내를 따릅니다.</figcaption>
@@ -388,7 +388,7 @@
 <!-- tool-figure:folderstate-guide-error-codes:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-error-codes-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-error-codes-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-error-codes.svg" width="720" height="244" alt="안내와 코드 확인: 화면 안내 읽기 작업 기록의 오류 코드 → 원인별 조치: 경로·권한·연결 확인 아래 오류 표와 비교 → 설정 파일 보존: 손상·외부 변경 시 보존 반복 삭제 대신 지원 요청" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 오류 안내와 표의 조치를 함께 확인하세요. 상태·아이콘 설정과 되돌릴 때 쓸 파일은 삭제하거나 임의로 덮어쓰지 않습니다.</figcaption>
@@ -433,7 +433,7 @@
 <!-- tool-figure:folderstate-guide-logs:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-logs-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-logs-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-logs.svg" width="720" height="244" alt="작업 기록 열기: 프로그램에서 버튼 클릭 operations.jsonl 확인 → 문제 작업 찾기: 작업 시각·대상·결과 오류 코드와 안내 확인 → 전달 전 가리기: 사용자 이름 제거 실제 업무 경로 가리기" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 작업 기록은 이 PC의 사용자 데이터 폴더에 저장되며 자동 전송하지 않습니다. 도움을 요청할 때는 필요한 오류 안내만 확인하고 개인 경로를 가리세요.</figcaption>
@@ -449,7 +449,7 @@ FolderState에서 **작업 기록 열기**를 누릅니다. 폴더가 열리면 
 <!-- tool-figure:folderstate-guide-advanced:start -->
 <figure class="tool-figure">
   <picture>
-    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/folderstate-guide-advanced-mobile.svg" width="360" height="432">
+    <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-advanced-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-advanced.svg" width="720" height="244" alt="설치 위치 확인: 프로그램·기록 위치 보기 설정은 직접 바꾸지 않기 / 명령으로 설치: 담당자용 설치·복구·제거 필요한 명령 하나만 실행 / 명령으로 상태 관리: 대상 폴더를 직접 지정 결과와 종료 코드 확인" loading="lazy" decoding="async">
   </picture>
   <figcaption><span>설명용 도해</span> 보통은 프로그램 화면이나 탐색기 메뉴로 충분합니다. 명령이 필요한 경우에만 아래 설명을 펼쳐 대상 경로와 작업을 확인하세요.</figcaption>

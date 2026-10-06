@@ -1,19 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
 <title id="title">수식은 값으로 복사하나요? 수식을 유지하는 옵션도 있나요?</title><desc id="desc">수식은 현재 계산 결과 값으로 내보냅니다. 최신 값이 필요하면 원본의 계산이 끝났는지 먼저 확인하세요.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="720" height="244" rx="12" fill="#fffcf7"/>
-<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><rect x="50" y="29" width="38" height="18" rx="1" fill="#dcece7" stroke="#277a73" stroke-width="2"/><text x="68" y="43" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">A1</text><path d="M56 56H80M56 75H76" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">원본 계산 결과</text>
-<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">수식의 결과는 1500</text>
-<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">표시 형식은 1,500원</text>
-<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><text x="36" y="43" font-size="11" fill="#55676b" font-weight="400" text-anchor="middle">1</text><rect x="51" y="30" width="36" height="17" rx="2" fill="#dcece7" stroke="#dcece7" stroke-width="2"/><text x="69" y="43" font-size="13" fill="#277a73" font-weight="700" text-anchor="middle">1500</text><text x="36" y="62" font-size="11" fill="#55676b" font-weight="400" text-anchor="middle">2</text><text x="36" y="81" font-size="11" fill="#55676b" font-weight="400" text-anchor="middle">3</text></g>
-<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">값과 표시 형식</text>
-<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">숫자 1500을 옮기기</text>
-<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">수식은 남지 않음</text>
-<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M72 23V50L90 61" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">내보낸 값은 고정</text>
-<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">원본이 나중에 바뀌어도</text>
-<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">결과는 자동 변경 안 됨</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="720" height="244" rx="4" fill="#fffdf9"/>
+<text x="120.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">01</text>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#ded2c4" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#ece5d7"/><rect x="50" y="29" width="38" height="18" rx="1" fill="#ece5d7" stroke="#8a622f" stroke-width="2"/><text x="68" y="43" font-size="12" fill="#2c2622" font-weight="700" text-anchor="middle">A1</text><path d="M56 56H80M56 75H76" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">원본 계산 결과</text>
+<text x="120.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">수식의 결과는 1500</text>
+<text x="120.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">표시 형식은 1,500원</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="360.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">02</text>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#ded2c4" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#ece5d7"/><text x="36" y="43" font-size="11" fill="#6e6258" font-weight="400" text-anchor="middle">1</text><rect x="51" y="30" width="36" height="17" rx="2" fill="#ece5d7" stroke="#ece5d7" stroke-width="2"/><text x="69" y="43" font-size="13" fill="#2c2622" font-weight="700" text-anchor="middle">1500</text><text x="36" y="62" font-size="11" fill="#6e6258" font-weight="400" text-anchor="middle">2</text><text x="36" y="81" font-size="11" fill="#6e6258" font-weight="400" text-anchor="middle">3</text></g>
+<text x="360.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">값과 표시 형식</text>
+<text x="360.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">숫자 1500을 옮기기</text>
+<text x="360.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">수식은 남지 않음</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="600.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">03</text>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M72 23V50L90 61" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">내보낸 값은 고정</text>
+<text x="600.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">원본이 나중에 바뀌어도</text>
+<text x="600.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">결과는 자동 변경 안 됨</text>
 </g></svg>

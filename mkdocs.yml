@@ -61,6 +61,10 @@ exclude_docs: |
   !/assets/tool-guides/bookmark-guide-start.svg
   !/assets/tool-guides/bookmark-guide-stickers-mobile.svg
   !/assets/tool-guides/bookmark-guide-stickers.svg
+  !/assets/tool-guides/bookmark-guide-sticker-arrangement-mobile.svg
+  !/assets/tool-guides/bookmark-guide-sticker-arrangement.svg
+  !/assets/tool-guides/bookmark-guide-sticker-visibility-mobile.svg
+  !/assets/tool-guides/bookmark-guide-sticker-visibility.svg
   !/assets/tool-guides/bookmark-guide-troubleshooting-mobile.svg
   !/assets/tool-guides/bookmark-guide-troubleshooting.svg
   !/assets/tool-guides/bookmark-guide-url-mobile.svg

@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="288" viewBox="0 0 360 288" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="288" viewBox="0 0 320 288" role="img" aria-labelledby="title desc">
 <title id="title">개별 파일과 한 파일로 합치기</title><desc id="desc">단일 파일은 항목별 내용을 한 파일에 모읍니다. Word의 머리말·꼬리말 값이 다르면 새 페이지 또는 개별 파일을 사용하세요.</desc>
-<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
-<rect width="360" height="288" rx="12" fill="#fffcf7"/>
-<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#be8740" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">개별 파일</text>
-<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">명단 항목마다 문서 하나</text>
-<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">중복 이름은 번호로 구분</text>
-<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">단일 파일</text>
-<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">시트·본문·슬라이드 모음</text>
-<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">Word는 합치기 방식 선택</text>
+<g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
+<rect width="320" height="288" rx="4" fill="#fffdf9"/>
+<g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#ead7b9" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#f4e7d2" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#b7894e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120" y="35" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">개별 파일</text>
+<text x="120" y="60" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">명단 항목마다 문서 하나</text>
+<text x="120" y="80" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">중복 이름은 번호로 구분</text>
+<path d="M18 144H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">단일 파일</text>
+<text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">시트·본문·슬라이드 모음</text>
+<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">Word는 합치기 방식 선택</text>
 </g></svg>

@@ -63,9 +63,23 @@ body {
 .md-nav__title { color: var(--handbook-muted); }
 .md-nav--primary .md-nav__title { box-shadow: none; }
 .md-sidebar--secondary .md-nav { border-left: 1px solid var(--handbook-line); }
-.md-typeset table:not([class]) { background: var(--handbook-paper); border-color: var(--handbook-line); font-size: .75rem; box-shadow: none; }
+.md-typeset table:not([class]) { background: var(--handbook-paper); border-color: var(--handbook-line); font-size: .75rem; box-shadow: none; margin-inline: auto; }
 .md-typeset table:not([class]) th { background: var(--handbook-soft); color: var(--md-default-fg-color); min-width: 5rem; font-weight: 700; }
 .md-typeset table:not([class]) :is(th, td) { padding: .8em 1em; border-color: var(--handbook-line); }
+/* Center each table as a block; keep cell alignment and horizontal scrolling. */
+.md-typeset .md-typeset__scrollwrap { margin-inline: 0; }
+.md-typeset .md-typeset__table { display: table; margin-inline: auto; padding-inline: 0; }
+/* Screenshots and Markdown images use the same centered paper frame as diagrams. */
+.md-typeset p > img,
+.md-typeset p > a:only-child > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.25rem auto;
+  border: 1px solid var(--handbook-line);
+  border-radius: 4px;
+  background: var(--handbook-paper);
+}
 .md-typeset .admonition, .md-typeset details { font-size: .75rem; box-shadow: none; }
 .md-typeset .admonition.info { border-color: var(--handbook-brass); }
 .md-typeset .info > .admonition-title { background: var(--handbook-soft); }
@@ -87,7 +101,7 @@ body {
 .hero-note { display: block; color: var(--handbook-muted); font-size: .65rem; margin-top: 1rem; }
 .md-typeset .hero-visual { position: relative; margin: 0; max-width: none; align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
 .hero-visual img { width: 100%; height: auto; aspect-ratio: 1672 / 940; object-fit: contain; border-radius: 5px; box-shadow: var(--handbook-shadow); }
-.md-typeset .hero-visual figcaption, .md-typeset .lifecycle-visual figcaption { color: var(--handbook-muted); font-size: .65rem; font-style: normal; margin: .7em 0 0; text-align: left; max-width: none; }
+.md-typeset .hero-visual figcaption, .md-typeset .lifecycle-visual figcaption { color: var(--handbook-muted); font-size: .65rem; font-style: normal; margin: .7em 0 0; text-align: center; max-width: none; }
 .handbook-section { border-top: 1px solid var(--handbook-line); padding: 2.6rem 0; }
 .md-typeset .handbook-section h2 { margin: .5rem 0 .7rem; font-size: 1.6rem; }
 .handbook-section > p { max-width: 45rem; color: var(--handbook-muted); }
@@ -170,7 +184,7 @@ body {
 .md-typeset .guide-figure { margin: 0 auto; max-width: 13rem; }
 .guide-figure p { margin: 0; }
 .guide-figure img { display: block; width: 100%; height: auto; border-radius: 4px; }
-.md-typeset .guide-figure figcaption { color: var(--handbook-muted); font-size: .65rem; line-height: 1.7; font-style: normal; text-align: left; margin-top: .6rem; }
+.md-typeset .guide-figure figcaption { color: var(--handbook-muted); font-size: .65rem; line-height: 1.7; font-style: normal; text-align: center; margin-top: .6rem; }
 .handbook-closing--illustrated { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.6rem; align-items: center; padding: 1.3rem; }
 .md-typeset .closing-visual { margin: 0; max-width: none; }
 .closing-visual img { display: block; width: 100%; height: auto; border-radius: 3px; }
@@ -184,38 +198,49 @@ body {
   .guide-figure, .closing-visual { display: none !important; }
 }
 
-/* Chapter diagrams: compact landscape on desktop, legible vertical art on phones. */
+/* Existing handbook art and chapter diagrams share one paper-and-brass frame. */
+.md-typeset :is(.hero-visual, .lifecycle-visual, .guide-figure, .closing-visual) img {
+  box-sizing: border-box;
+  border: 1px solid var(--handbook-line);
+  border-radius: 4px;
+  background: var(--handbook-paper);
+  box-shadow: none;
+}
+/* Chapter diagrams: centered landscape on desktop, readable vertical art on phones. */
 .md-typeset .tool-figure {
-  max-width: 42rem;
-  margin: 1.1rem auto 1.5rem;
+  width: 100%;
+  max-width: 36rem;
+  margin: 1.35rem auto 1.75rem;
   overflow: hidden;
   border: 1px solid var(--handbook-line);
-  border-radius: 10px;
+  border-top: 2px solid var(--handbook-brass);
+  border-radius: 4px;
   background: var(--handbook-paper);
   break-inside: avoid;
 }
-.tool-figure picture { display: block; background: #fffcf7; }
-.tool-figure img { display: block; width: 100%; height: auto; margin: 0; }
+.tool-figure picture { display: block; background: #fffdf9; }
+.tool-figure img { display: block; width: 100%; height: auto; margin: 0 auto; }
 .md-typeset .tool-figure figcaption {
   max-width: none;
   margin: 0;
-  padding: .75rem 1rem;
+  padding: .8rem 1.15rem;
   border-top: 1px solid var(--handbook-line);
   color: var(--handbook-muted);
   font-size: .7rem;
   line-height: 1.75;
   font-style: normal;
-  text-align: left;
+  text-align: center;
 }
 .tool-figure figcaption > span {
-  display: inline-block;
-  margin-right: .45em;
-  color: var(--md-default-fg-color);
+  display: block;
+  margin-bottom: .25em;
+  color: var(--handbook-brass);
+  font-size: .62rem;
+  letter-spacing: .05em;
   font-weight: 700;
 }
-[data-md-color-scheme="slate"] .tool-figure picture { filter: brightness(.9); }
-@media (max-width: 600px) {
-  .md-typeset .tool-figure { max-width: 24rem; margin: 1rem auto 1.25rem; }
+@media (max-width: 760px) {
+  .md-typeset .tool-figure { max-width: 18rem; margin: 1rem auto 1.25rem; }
   .md-typeset .tool-figure figcaption { padding: .7rem .8rem; }
 }
 @media print {
