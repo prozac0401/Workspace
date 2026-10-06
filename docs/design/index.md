@@ -1,5 +1,7 @@
 # 설계 결정 목록
 
+- [ADR-0034 · ProbPacker 오피스 자동화 도구의 공개 안내와 배포 연결](0034-office-automation-public-guide.md) — 비공개 제품 원본 보존, Workspace에 0.3.1 EXE·ZIP 공개, 기능·사용 안내 한 페이지와 검증 범위 표시
+
 - [ADR-0033 · DVM 설치기의 관리자 승인과 일반 권한 앱 실행](0033-download-version-manager-installer-consent.md) — 현재 사용자 설치 유지, 사용자 UAC, 같은 PC 후반 실패 자동 복구와 일반 권한 실행 확인
 
 - [ADR-0032 · 감시 창 닫기와 트레이 수명 분리](0032-download-version-manager-tray-lifetime.md) — 같은 창과 감시 상태 보존, 트레이 명시적 종료, 로컬 ADR 번호 이관

@@ -20,6 +20,7 @@ public_routes = {
     'tools/visible-cells-paste/',
     'tools/image-copy-save/guide/',
     'tools/download-version-manager/',
+    'tools/office-automation/',
 }
 public_redirects = {
     'tools/folderstate/installation/': '../#installation',

@@ -14,8 +14,9 @@
 | 업무 책갈피 0.2.8 | 일반 배포 | [설치·사용](../tools/bookmark/index.md) | [별도 저장소의 배포 페이지](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) · [일반 배포 전환](stable-tools-release-20261005.md) · [0.2.8 안내 반영](bookmark-028-publication-20260927.md) |
 | 그림 복사·저장 0.2.1 | 일반 배포 | [설치·사용](../tools/image-copy-save/guide.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) · [0.2.1 제작·확인·게시 기록](image-copy-save-021-20261003.md) |
 | 내려받은 파일 관리 0.2.0 | 평가판 | [설치·사용](../tools/download-version-manager/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0) · [0.2.0 설치·파일 보존·게시 기록](download-version-manager-watcher-release-20261004.md) |
+| 오피스 자동화 도구 0.3.1 | 평가판 | [받기·사용](../tools/office-automation/index.md) | [Workspace 공개 배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1) · [2026-10-06 배포·문서 게시 기록](probpacker-031-publication-20261006.md) |
 
-현재 설치 파일에는 전자 서명이 없습니다. **일반 배포**는 GitHub에서 평가판 표시 없이 제공한다는 뜻입니다. 모든 환경에서의 확인이나 회사별 사용 승인을 뜻하지 않습니다. 두 평가판의 알려진 문제와 아직 확인하지 않은 환경은 내려받기 전에 설치 안내에서 읽으세요.
+기존 도구의 설치 파일에는 전자 서명이 없습니다. 오피스 자동화 도구 0.3.1의 두 EXE는 자체 서명이며 이번 PC에서는 `Valid`로 확인했습니다. 다른 PC의 신뢰를 보장하지 않습니다. **일반 배포**는 GitHub에서 평가판 표시 없이 제공한다는 뜻입니다. 모든 환경에서의 확인이나 회사별 사용 승인을 뜻하지 않습니다. 평가판의 알려진 문제와 아직 확인하지 않은 환경은 내려받기 전에 설치 안내에서 읽으세요.
 
 FolderState 0.1.3과 업무 책갈피 0.2.8은 기존 설치 파일을 그대로 일반 배포로 전환했습니다. 이 전환을 위해 새 파일을 만들거나 설치 시험을 다시 실행하지 않았습니다. Excel 명단 비교 0.2.1은 바뀐 파일에서 비교·설정·복구와 정상 종료를 확인했습니다. [2026-10-05 배포 기록](stable-tools-release-20261005.md)은 새 확인, 재사용한 근거, 사용자 확인과 남은 한계를 구분합니다.
 

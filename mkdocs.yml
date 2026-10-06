@@ -23,6 +23,7 @@ exclude_docs: |
   !/tools/visible-cells-paste/index.md
   !/tools/image-copy-save/guide.md
   !/tools/download-version-manager/index.md
+  !/tools/office-automation/index.md
   !/assets/extra.css
   !/assets/folderstate.png
   !/assets/handbook/workspace-flow.webp
@@ -110,6 +111,7 @@ nav:
       - 보이는 칸 붙여넣기 설치·사용: tools/visible-cells-paste/index.md
       - 그림 복사·저장 설치·사용: tools/image-copy-save/guide.md
       - 다운로드 이름 유지 설치·사용: tools/download-version-manager/index.md
+      - 오피스 자동화 도구 받기·사용: tools/office-automation/index.md
   - 불편할 때 더 살펴보기:
       - 반복되는 불편 줄이기: policies/work-efficiency.md
       - 일을 이어서 하고 다른 사람에게 넘기기: policies/folder-workflow.md

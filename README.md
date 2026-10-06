@@ -1,6 +1,6 @@
 # Workspace
 
-**필요한 자료를 찾고, 다음에 할 일을 확인하는 방법을 안내합니다.** 파일과 메일 정리 방법과 여덟 가지 업무 도구의 설치·사용법을 볼 수 있습니다.
+**필요한 자료를 찾고, 다음에 할 일을 확인하는 방법을 안내합니다.** 파일과 메일 정리 방법과 아홉 가지 업무 도구의 설치·사용법을 볼 수 있습니다.
 
 [안내 사이트](https://prozac0401.github.io/Workspace/)에서 필요한 상황을 고르세요. 처음 시작한다면 [업무 하나로 시작하기](docs/getting-started.md)를 보세요. 명단 비교나 제출물 정리에 도구를 쓰려면 [교육 업무에 도구 써 보기](docs/education-operations.md)를 따라 해 보세요.
 
@@ -8,7 +8,7 @@
 
 ## 프로그램 고르기
 
-GitHub의 공개 배포 목록을 **2026년 10월 5일**에 확인했습니다. 아래 링크는 각 도구의 최신 설치·사용 안내입니다. 설치 파일에는 제작자의 전자 서명이 없습니다. 설치 전에 사용할 PC와 알려진 제한을 확인하세요.
+기존 도구의 공개 배포 목록은 **2026년 10월 5일**에 확인했습니다. 오피스 자동화 도구 안내는 **2026년 10월 6일의 0.3.1**을 기준으로 추가했습니다. 기존 도구의 설치 파일에는 제작자의 전자 서명이 없습니다. 오피스 자동화 도구는 자체 서명을 사용합니다. 설치 전에 사용할 PC와 알려진 제한을 확인하세요.
 
 | 하고 싶은 일 | 최신 안내 | 공개 파일 |
 |---|---|---|
@@ -20,6 +20,9 @@ GitHub의 공개 배포 목록을 **2026년 10월 5일**에 확인했습니다. 
 | 복사한 그림을 파일로 저장하기 | [그림 복사·저장 0.2.1](docs/tools/image-copy-save/guide.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) |
 | 보던 문서나 웹페이지 다시 열기 | [업무 책갈피 0.2.8](docs/tools/bookmark/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) |
 | 다시 받은 파일에 원래 이름 주기 | [다운로드 이름 유지 0.2.0 시험용](docs/tools/download-version-manager/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0) |
+| Excel 파일 합치기·나누기와 양식 문서 만들기 | [오피스 자동화 도구 0.3.1 시험용](docs/tools/office-automation/index.md) | [단일 EXE](https://github.com/prozac0401/Workspace/releases/download/office-automation-tools-v0.3.1/OfficeAutomationTools.exe) · [ZIP·배포 안내](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1) |
+
+오피스 자동화 도구(Office Automation Tools)는 비공개 ProbPacker 저장소에서 개발합니다. 같은 EXE·ZIP을 Workspace의 공개 릴리스에서 받도록 연결합니다. Python 설치 없이 EXE를 바로 실행하지만 Excel과 템플릿용 Word·PowerPoint는 필요합니다. 이번 EXE의 전체 화면·생성·종료 재검증과 임시 폴더 삭제 경고의 해결 확인은 남아 있습니다. [받기·사용 안내](docs/tools/office-automation/index.md)에서 원본 행 확인, 분석, 실행, 결과 확인과 세 기능의 상세 방법을 설명합니다.
 
 보이는 칸 붙여넣기의 확인한 최신 배포 파일은 0.1.2입니다. 설치 안내는 기존 요청에 따라 배포 목록에서 파일을 고르는 방식으로 제공합니다.
 
