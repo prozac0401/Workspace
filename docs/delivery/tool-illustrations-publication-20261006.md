@@ -37,12 +37,27 @@
 
 로컬의 Store Python 가상환경 실행기는 현재 환경에서 실행되지 않아 제공된 Python 3.12와 기존 문서 의존성을 사용했습니다. 원시 출력과 스테이징 자료는 로컬 `artifacts/publication-20261006/`에 보관하며 게시하지 않습니다.
 
-## 게시 상태
+## 최초 게시 시도 (이전 대화)
 
 게시용 파일 252개와 원격 기준 트리로 GitHub tree 생성을 요청했으나, 도구가 승인을 요구하고 세션 승인 정책이 `never`여서 호출이 차단됐습니다. 반환 결과는 `MCP tool call requires approval, but approval policy is never`입니다. 같은 외부 쓰기를 다른 경로로 우회하지 않았습니다.
 
-이번 게시 요청으로 원격 커밋·main 변경·Pages 배포는 수행하지 못했습니다. Documentation 실행 성공과 실제 공개 반영은 미확인입니다. 승인 가능한 세션에서 아래 준비 파일을 사용하되, 그때의 원격 main이 기준 커밋 이후 바뀌었다면 변경 파일을 다시 대조해야 합니다.
+이전 대화의 게시 시도에서는 원격 커밋·main 변경·Pages 배포를 수행하지 못했습니다. Documentation 실행 성공과 실제 공개 반영은 미확인입니다. 승인 가능한 세션에서 아래 준비 파일을 사용하되, 그때의 원격 main이 기준 커밋 이후 바뀌었다면 변경 파일을 다시 대조해야 합니다.
 
 검토·재개용 자료는 로컬 `artifacts/publication-20261006/`의 `publication.patch`, `publication-files.zip`, `manifest.json` 및 `stage/`입니다. 패치의 기준은 위에 적은 원격 커밋이며, 기존 사용자 작업이 있는 로컬 checkout에는 바로 적용하지 않습니다. 저장소의 기존 `.git`·작업 변경은 보존했습니다.
 
 실제 휴대전화·다른 브라우저·화면 읽기 프로그램·초보 사용자 이해도 검사는 수행하지 않았습니다. 회사 정책의 제안 상태와 제품별 실제 지원·보존 제한을 유지합니다.
+
+## 재개 후 게시 결과 · 2026-10-06
+
+사용자가 새 대화에서 게시를 다시 명시 승인한 뒤 최신 원격 main을 확인했습니다. 준비 기준 `5db4e8a85c2d67c4128ea30cd065046cb3579e46`과 같았습니다. 별도 복사본에서 준비 당시 원본 31개를 실제 원격 Git 내용과 대조하고, manifest 252개 파일의 크기·SHA-256 및 정확한 변경 범위를 확인했습니다. 원래 작업 폴더의 HEAD·작업 상태·staged/unstaged diff 해시는 작업 전후 동일합니다.
+
+현재 세션의 GitHub 도구에서 트리·커밋 생성과 main 갱신이 성공했습니다. 기존 원격 트리에 manifest 파일만 적용해 계산한 Git 트리 해시 `e18df62f9f541e0a3dfb8669bc8abd6339bd59dc`가 서버 응답과 일치했습니다. main 갱신은 예상 이전 커밋을 지정한 fast-forward로 수행했습니다.
+
+- 게시 커밋: [fce9dbb8faeca0a9d793ae8043664cc5b5b5375a](https://github.com/prozac0401/Workspace/commit/fce9dbb8faeca0a9d793ae8043664cc5b5b5375a).
+- [Documentation 실행 37447269934](https://github.com/prozac0401/Workspace/actions/runs/37447269934): 해당 커밋의 build·deploy 모두 `success`, 전체 실행 `completed / success` 확인.
+- 최신 원격 위의 최종 파일로 `python -m mkdocs build --strict`와 `python scripts/check-site.py site`를 다시 실행해 통과했습니다. Actions에서도 같은 두 검사가 통과했습니다.
+- [실제 공개 사이트](https://prozac0401.github.io/Workspace/)의 258개 URL에 500개 HTTP·내용 검사를 수행해 모두 통과했습니다. 9개 안내의 그림 ID·순서·가로/모바일 참조와 113개 그림, SVG 226개 및 CSS의 로컬 빌드 대비 SHA-256 일치를 확인했습니다.
+- 공개 안내 21개, 검색 위치·공개 경로, 사이트맵, 이전 주소 이동 2개와 도착 문단을 확인했습니다. 개발 정책·검증 기록·설계·그림 원본·생성기·JSON의 대표 6개 제외 주소는 모두 404입니다. 캐시 갱신용 query 없는 홈·FolderState·Office Automation Tools URL도 HTTP 200이며 HTML 전체가 로컬 최종 빌드와 일치했습니다.
+- 기존 사용자 변경과 준비 manifest·stage 원본을 보존했습니다. raw 검사 출력·HTTP 결과·로컬 경로가 포함된 상세 자료는 `artifacts/publication-20261006/`에만 남기며 Git과 Pages에 올리지 않습니다. 이 검증 기록도 Pages에서 제외합니다.
+
+검사는 HTTP 응답과 소스·자산 대조이며 새 브라우저 화면 검사로 표시하지 않습니다. 실제 휴대전화·화면 읽기·초보 사용자 이해도·설치 시험은 추가 실행하지 않았습니다. 추가 `git diff --check`는 준비 CSS 끝의 빈 줄 1개를 보고했습니다. manifest 원본 해시를 보존했으며 필수 strict 빌드·공개 검사·Actions 배포에는 영향이 없었습니다.
