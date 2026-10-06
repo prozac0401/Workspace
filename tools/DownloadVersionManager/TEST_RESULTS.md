@@ -1,5 +1,9 @@
 # DownloadVersionManager · 실제 시험 기록
 
+## 게시 CI의 합성 배율 검사 · 2026-10-06
+
+PR 자동 검사 37404594810은 엔진·watcher·review·guidance·log를 통과했지만 합성 144-DPI 화면 검사에서 실패했습니다. 시험이 요청한 900×800 DIP client를 실제 확보했는지 확인하지 않았고 Windows의 기본 최대 tracking 크기는 가상 화면에 의존합니다. 시험 전용 WindowProc가 제품 handler를 그대로 호출한 뒤, 실제 크기 제한이 관찰된 경우에만 이 시험 창의 최대 canvas를 확장합니다. 합성 DPI는 실제 HWND frame DPI를 바꾸지 않으므로 client는 시험 DPI로, non-client는 실제 GetDpiForWindow와 style/exstyle로 계산합니다. 요청/실제 client·nativeDPI·최대 tracking과 DPI/geometry/render 판정을 분리해 기록하며 세 크기 사례에 실제 client 일치 검사를 추가합니다. 제품 app·installer source와 정상 MSI는 변경하지 않습니다. 재검사 결과는 PR 본문에 확인 후 기록합니다. 최초 CI FAIL은 보존합니다.
+
 ## 0.2.1 정식 배포 기준 · 2026-10-06
 
 사용자가 검증된 정상 0.2.1의 정식 Release와 Pages 게시를 승인했습니다. 배포 파일은 `DownloadVersionManager-Watcher-0.2.1-x64.msi`와 `SHA256SUMS.txt` 두 개이며 이미 시험한 정상 MSI를 그대로 재사용합니다. MSI SHA-256은 `0feea2fc119bad780da9dcb57d2a0303ef0e2e0c6f6a20a746fd3ab3f86a0ef5`입니다. 실패 기능은 없으며 시험 MSI·개인 진단·백업은 배포하지 않습니다.
