@@ -244,7 +244,7 @@ def figure(entry):
     <source media="(max-width: 760px)" srcset="{prefix}assets/tool-guides/{name}-mobile.svg" width="{MOBILE_WIDTH}" height="{MOBILE_ROW*len(entry['panels'])}">
     <img src="{prefix}assets/tool-guides/{name}.svg" width="720" height="244" alt="{escape(alt, quote=True)}" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> {escape(entry['caption'])}</figcaption>
+  <figcaption>{escape(entry['caption'])}</figcaption>
 </figure>
 <!-- tool-figure:{name}:end -->'''
 

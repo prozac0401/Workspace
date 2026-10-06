@@ -3,10 +3,10 @@
     "page":"tools/file-list-to-excel/index.md","heading":"설치 전에 확인하세요","id":"filelist-download","mode":"compare",
     "panels":[
       {"icon":"pc","title":"Windows 11 x64","lines":["64비트 Windows용","ARM64 PC 제외"]},
-      {"icon":"install","title":"1.2.0 설치 파일","lines":["MSI와 확인 자료 제공","제작자 전자 서명 없음"]},
-      {"icon":"shield","title":"회사 설치 기준 확인","lines":["허용된 설치 절차로","사용 환경 먼저 확인"]}
+      {"icon":"install","title":"1.2.0 설치 파일","lines":["MSI와 확인 자료 제공","설치 마법사로 진행"]},
+      {"icon":"shield","title":"설치 준비","lines":["받은 MSI 실행","사용 환경 먼저 확인"]}
     ],
-    "caption":"공개된 1.2.0 설치 파일을 사용합니다. PC의 종류와 회사에서 허용한 설치 절차를 확인하세요."
+    "caption":"공개된 1.2.0 설치 파일을 사용합니다. 설치 파일을 실행하고 마법사의 순서대로 진행하세요."
   },
   {
     "page":"tools/file-list-to-excel/index.md","heading":"탐색기에서 목록 만들기","id":"filelist-list","mode":"flow",
@@ -49,7 +49,7 @@
     "panels":[
       {"icon":"folder","title":"작업 폴더 하나 선택","lines":["하위 폴더까지 목록 만들기","Excel을 따로 저장"]},
       {"icon":"sheet","title":"누락과 범위 확인","lines":["나뉜 목록 시트 모두 확인","폴더 행·실패 항목 구분"]},
-      {"icon":"shield","title":"제공할 자료 준비","lines":["허용 범위만 AI에 제공","원래 목록과 경로는 보관"]}
+      {"icon":"shield","title":"제공할 자료 준비","lines":["작업에 필요한 목록 제공","원래 목록과 경로는 보관"]}
     ],
     "caption":"목록은 이름·경로 등의 정보이며 파일 본문을 읽지 않습니다. AI에 자료를 제공할 때는 전체경로·원본 링크·숨겨진 정보도 확인하세요."
   },

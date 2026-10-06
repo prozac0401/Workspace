@@ -16,7 +16,7 @@ Excel에서 선택한 범위의 **숨기지 않은 행과 열만 새 Excel 파�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-before-download-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-before-download.svg" width="720" height="244" alt="범위 하나 선택: 한 시트의 이어진 네모 중요한 편집은 먼저 저장 → 중단 안내 읽기: 지원하지 않는 모양 발견 원본 행·열 번호 확인 → 원본에서 칸 찾기: 27행 5열은 원본 E27 범위를 확인하고 다시 선택" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 처리할 수 없는 모양이 있으면 원본의 행·열을 알려 줍니다. 해당 칸을 자동으로 빼거나 원본을 고치지 않습니다.</figcaption>
+  <figcaption>처리할 수 없는 모양이 있으면 원본의 행·열을 알려 줍니다. 해당 칸을 자동으로 빼거나 원본을 고치지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-before-download:end -->
 
@@ -24,7 +24,7 @@ Excel에서 선택한 범위의 **숨기지 않은 행과 열만 새 Excel 파�
 
 - **선택할 범위:** 한 시트에서 이어진 네모 모양 범위 하나만 고르세요. 보이는 행·열의 현재 값을 새 파일로 만듭니다. 결과는 직접 저장합니다.
 - **처리할 수 없는 서식:** 한 칸 안에 여러 글꼴이나 위·아래 작은 글자가 섞이거나, 배경색이 차츰 바뀌면 중단합니다. 처음 발견한 칸의 원본 행·열을 알려 줍니다. 그 칸을 자동으로 빼거나 원본을 고치지 않습니다.
-- **설치와 원본 보호:** 제작자를 확인하는 전자 서명이 없습니다. 회사가 허용한 설치 절차를 따르세요. 중요한 편집은 먼저 저장합니다.
+- **작업 준비:** 편집 중인 Excel 문서를 저장한 뒤 사용할 범위를 선택합니다.
 
 예를 들어 “원본 27행 5열”은 원본의 E27입니다. 숨긴 행·열을 제외하고 만든 결과의 위치가 아닙니다. 한글을 입력할 때 Excel이 글꼴을 자동으로 바꾸어 한 칸 안에 다른 글꼴이 섞일 수도 있습니다. [모양·선택 범위와 처리 한도](#supported-range)를 더 읽어 보세요.
 
@@ -36,7 +36,7 @@ Excel에서 선택한 범위의 **숨기지 않은 행과 열만 새 Excel 파�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-download-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/selection-export-download.svg" width="720" height="244" alt="Excel 64비트 (x64): Excel이 64비트일 때 x64 설치 파일 받기 / Excel 32비트 (x86): Excel이 32비트일 때 x86 설치 파일 받기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> Excel의 파일 → 계정 → Excel 정보에서 비트수를 확인하세요. Excel 비트수에 맞는 설치 파일을 고릅니다.</figcaption>
+  <figcaption>Excel의 파일 → 계정 → Excel 정보에서 비트수를 확인하세요. Excel 비트수에 맞는 설치 파일을 고릅니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-download:end -->
 
@@ -57,7 +57,7 @@ Excel의 **파일 → 계정 → Excel 정보**에서 비트수를 확인한 뒤
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-install-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-install.svg" width="720" height="244" alt="저장하고 닫기: 작업 파일을 저장 Excel 창을 모두 닫기 → 현재 계정에 설치: 비트수에 맞는 EXE 실행 안내에 따라 설치 → Excel에서 확인: Excel을 다시 열기 셀 우클릭에서 메뉴 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 한 번 설치하면 Excel 시작 시 메뉴가 준비됩니다. 내보내기는 선택범위 내보내기 → 새 Excel로를 눌렀을 때만 실행합니다.</figcaption>
+  <figcaption>한 번 설치하면 Excel 시작 시 메뉴가 준비됩니다. 내보내기는 선택범위 내보내기 → 새 Excel로를 눌렀을 때만 실행합니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-install:end -->
 
@@ -68,8 +68,6 @@ Excel의 **파일 → 계정 → Excel 정보**에서 비트수를 확인한 뒤
 
 지금 로그인한 Windows 계정에 설치합니다. 관리자 권한이나 개발용 프로그램은 필요하지 않습니다. 이후 Excel을 시작할 때 메뉴가 자동으로 준비됩니다. **명령을 직접 써 넣거나 따로 실행할 필요가 없습니다. Alt+F8·Alt+F11을 누르거나 추가 기능을 따로 찾아 켜지 않아도 됩니다.**
 
-회사 정책이 설치나 추가 기능 실행을 막으면 회사의 승인된 설치 절차를 따르세요. 설치 프로그램은 회사 정책이나 Excel 보안 설정을 낮추지 않습니다. Office가 문제 때문에 꺼 둔 추가 기능을 강제로 켜지 않습니다.
-
 ## 선택한 범위를 새 Excel로 만들기 {#export}
 
 <!-- tool-figure:selection-export-export:start -->
@@ -78,7 +76,7 @@ Excel의 **파일 → 계정 → Excel 정보**에서 비트수를 확인한 뒤
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-export-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-export.svg" width="720" height="244" alt="범위 하나 선택: 직사각형 셀 범위 선택 필요한 제목·합계도 포함 → 보이는 셀 내보내기: 우클릭 → 새 Excel로 숨긴 행·열은 제외 → 결과 확인 후 저장: 저장 전 새 통합문서 원하는 위치·이름으로 저장" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 남은 셀의 순서와 빈칸을 유지하고 수식은 현재 계산 결과로 옮깁니다. 결과를 보관하려면 Excel에서 직접 저장하세요.</figcaption>
+  <figcaption>남은 셀의 순서와 빈칸을 유지하고 수식은 현재 계산 결과로 옮깁니다. 결과를 보관하려면 Excel에서 직접 저장하세요.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-export:end -->
 
@@ -104,7 +102,7 @@ Excel의 **파일 → 계정 → Excel 정보**에서 비트수를 확인한 뒤
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq.svg" width="720" height="244" alt="무엇을 선택하나요?: 한 시트의 범위 하나 필요한 칸을 직접 선택 / 무엇이 남나요?: 숨기지 않은 행·열 현재 값과 기본 모양 / 어디에 저장하나요?: 새 파일이 열린 뒤 위치와 이름을 직접 지정" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 선택 범위, 내보내는 내용, 저장 방법을 아래 질문에서 확인하세요.</figcaption>
+  <figcaption>선택 범위, 내보내는 내용, 저장 방법을 아래 질문에서 확인하세요.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq:end -->
 
@@ -118,7 +116,7 @@ Excel의 **파일 → 계정 → Excel 정보**에서 비트수를 확인한 뒤
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-tabs-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq-tabs.svg" width="720" height="244" alt="시트 하나만 선택: 여러 탭 선택을 해제 필요한 시트만 고르기 → 범위 하나 선택: 이어진 네모 모양 범위 한 칸 선택도 가능 → 새 파일 한 개: 결과 시트는 한 개 확인한 뒤 직접 저장" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 이 도구는 한 시트의 선택 범위를 새 시트 하나로 만듭니다. 여러 시트 탭을 함께 선택하면 중단합니다.</figcaption>
+  <figcaption>이 도구는 한 시트의 선택 범위를 새 시트 하나로 만듭니다. 여러 시트 탭을 함께 선택하면 중단합니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-tabs:end -->
 
@@ -132,7 +130,7 @@ Excel의 **파일 → 계정 → Excel 정보**에서 비트수를 확인한 뒤
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-excel-copy-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq-excel-copy.svg" width="720" height="244" alt="탭에서 이동/복사: 시트 탭을 우클릭 Excel 기본 메뉴 사용 → 복사본 만들기 체크: 새 통합 문서를 선택 원본 시트를 남기기 → 새 파일 확인·저장: 여러 탭은 파일 하나에 각각의 시트로 복사" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> Excel 기본 이동/복사는 시트 전체를 복사합니다. 원본을 남기려면 복사본 만들기를 체크하세요.</figcaption>
+  <figcaption>Excel 기본 이동/복사는 시트 전체를 복사합니다. 원본을 남기려면 복사본 만들기를 체크하세요.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-excel-copy:end -->
 
@@ -156,7 +154,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-visible-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq-visible.svg" width="720" height="244" alt="A1:C10 선택: 1·4·7행만 보임 B열은 숨김 → 숨긴 행·열 제외: 남은 칸을 순서대로 빈칸의 자리는 유지 → 3행 × 2열 결과: A·C열의 값이 연결됨 결과의 행·열은 모두 보임" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 선택한 범위에서 숨긴 행·열을 빼고 남은 칸을 원래 순서대로 이어 붙입니다.</figcaption>
+  <figcaption>선택한 범위에서 숨긴 행·열을 빼고 남은 칸을 원래 순서대로 이어 붙입니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-visible:end -->
 
@@ -172,7 +170,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-scroll-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/selection-export-faq-scroll.svg" width="720" height="244" alt="화면 밖의 칸: 선택 범위에 포함되고 숨기지 않았다면 포함 / 숨김 처리한 칸: 필터로 가린 행과 수동으로 숨긴 행·열 제외" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 보이는 칸은 필터나 행·열 숨김으로 가려지지 않은 칸입니다. 화면 밖으로 스크롤되었다는 이유로 빠지지 않습니다.</figcaption>
+  <figcaption>보이는 칸은 필터나 행·열 숨김으로 가려지지 않은 칸입니다. 화면 밖으로 스크롤되었다는 이유로 빠지지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-scroll:end -->
 
@@ -186,7 +184,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-values-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq-values.svg" width="720" height="244" alt="원본 계산 결과: 수식의 결과는 1500 표시 형식은 1,500원 → 값과 표시 형식: 숫자 1500을 옮기기 수식은 남지 않음 → 내보낸 값은 고정: 원본이 나중에 바뀌어도 결과는 자동 변경 안 됨" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 수식은 현재 계산 결과 값으로 내보냅니다. 최신 값이 필요하면 원본의 계산이 끝났는지 먼저 확인하세요.</figcaption>
+  <figcaption>수식은 현재 계산 결과 값으로 내보냅니다. 최신 값이 필요하면 원본의 계산이 끝났는지 먼저 확인하세요.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-values:end -->
 
@@ -204,7 +202,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-format-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq-format.svg" width="720" height="244" alt="기본 모양 유지: 글꼴·색·테두리·정렬 행 높이와 열 너비 / 그림·그래프 제외: 도형·그래프·그림 칸 안의 작은 그래프 / 지원 밖 모양은 중단: 한 칸 안에 섞인 글꼴 색이 차츰 바뀌는 배경" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 지원하는 기본 모양을 옮깁니다. 그림·그래프는 대상이 아니며 처리할 수 없는 모양은 원본 행·열과 함께 알립니다.</figcaption>
+  <figcaption>지원하는 기본 모양을 옮깁니다. 그림·그래프는 대상이 아니며 처리할 수 없는 모양은 원본 행·열과 함께 알립니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-format:end -->
 
@@ -222,7 +220,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-selection-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/selection-export-faq-selection.svg" width="720" height="244" alt="이어진 범위 하나: 한 칸이나 네모 범위 필터·숨김이 있어도 가능 / 다시 골라야 할 범위: Ctrl로 고른 여러 범위 전체 행·열·시트 선택" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 필요한 칸만 이어진 네모 모양으로 선택하세요. 숨기지 않은 칸을 따로 골라 둘 필요는 없습니다.</figcaption>
+  <figcaption>필요한 칸만 이어진 네모 모양으로 선택하세요. 숨기지 않은 칸을 따로 골라 둘 필요는 없습니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-selection:end -->
 
@@ -238,7 +236,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-layout-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq-layout.svg" width="720" height="244" alt="빈칸 자리 유지: 빈칸·빈 행·빈 열 숨기지 않았다면 유지 / 제목·합계 직접 포함: 필요한 제목과 합계는 선택 범위에 넣기 / 합쳐진 칸 전체 포함: 전체가 선택되어야 함 모든 행·열이 보여야 함" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 제목과 합계를 자동으로 추가하지 않습니다. 합쳐진 칸이 일부만 포함되거나 숨김으로 잘리면 중단합니다.</figcaption>
+  <figcaption>제목과 합계를 자동으로 추가하지 않습니다. 합쳐진 칸이 일부만 포함되거나 숨김으로 잘리면 중단합니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-layout:end -->
 
@@ -254,7 +252,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-save-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq-save.svg" width="720" height="244" alt="새 파일 열림: 아직 저장하지 않은 상태 결과를 먼저 확인 → 저장 실행: Ctrl+S 또는 파일 → 저장 위치와 이름 직접 지정 → 원하는 곳에 보관: 결과 파일을 직접 저장 원본을 자동 덮어쓰기 안 함" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 새 파일의 저장 위치와 이름은 사용자가 정합니다. 보관하지 않을 결과는 저장하지 않고 닫을 수 있습니다.</figcaption>
+  <figcaption>새 파일의 저장 위치와 이름은 사용자가 정합니다. 보관하지 않을 결과는 저장하지 않고 닫을 수 있습니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-save:end -->
 
@@ -270,7 +268,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-original-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/selection-export-faq-original.svg" width="720" height="244" alt="원본 상태 유지: 값·수식·기본 모양 필터·숨김 상태 유지 / 결과는 별도 파일: 내보낸 현재 값 보관 원본과 자동 연결 안 됨" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 원본을 자동 저장하거나 바꾸지 않도록 만들었습니다. 중요한 편집은 먼저 저장하고 결과를 확인하세요.</figcaption>
+  <figcaption>작업 전에 원본의 편집 내용을 저장하고, 내보낸 통합문서에서 결과를 확인하세요.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-original:end -->
 
@@ -286,7 +284,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-limits-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq-limits.svg" width="720" height="244" alt="입력 최대 100만 칸: 숨긴 칸도 입력에 포함 넘으면 범위를 나누기 / 결과 최대 10만 칸: 글자 수 합계 1,000만 자 보이는 칸만 결과에 포함 / 중간에 취소 가능: 진행 창에서 취소 누르기 작업 종료까지 기다리기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 보이는 칸이 20,000개를 넘으면 시작 전에 확인합니다. 취소 뒤에는 이번 작업의 미완성 결과를 정리할 때까지 기다리세요.</figcaption>
+  <figcaption>보이는 칸이 20,000개를 넘으면 시작 전에 확인합니다. 취소 뒤에는 이번 작업의 미완성 결과를 정리할 때까지 기다리세요.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-limits:end -->
 
@@ -302,13 +300,13 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-faq-startup-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-faq-startup.svg" width="720" height="244" alt="한 번 설치: Excel 비트수에 맞춰 설치 파일 실행 → Excel 평소처럼 열기: 메뉴가 자동으로 준비됨 따로 명령을 쓰지 않음 → 필요할 때 메뉴 클릭: 선택범위 내보내기 새 Excel로 눌러 실행" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> Excel 시작 시 메뉴가 준비됩니다. 실제 내보내기는 사용자가 메뉴를 눌렀을 때만 실행합니다.</figcaption>
+  <figcaption>Excel 시작 시 메뉴가 준비됩니다. 실제 내보내기는 사용자가 메뉴를 눌렀을 때만 실행합니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-faq-startup:end -->
 
 아니요. 한 번 설치하면 Excel 시작 시 메뉴가 자동으로 준비됩니다. **내보내기는 사용자가 메뉴를 눌렀을 때만** 실행합니다. Alt+F8·Alt+F11을 누르거나 명령을 써 넣어 따로 실행하거나 추가 기능을 직접 켤 필요가 없습니다.
 
-설치 파일은 Windows가 아닌 **Excel의 32/64비트**에 맞춰 고르세요. 메뉴가 없거나 회사 정책에 의해 차단된 경우에는 [설치 안내](#install)와 [문제 해결](#troubleshooting)을 확인하세요. 보안 설정을 낮추는 방식으로 해결하지 않습니다.
+설치 파일은 **Excel의 32/64비트**에 맞춰 고르세요. 메뉴가 없으면 [설치 안내](#install)와 [문제 해결](#troubleshooting)에 따라 Excel을 다시 엽니다.
 
 ## 모양·선택 범위와 처리 한도 {#supported-range}
 
@@ -318,7 +316,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-supported-range-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-supported-range.svg" width="720" height="244" alt="선택 범위: 숨긴 셀 포함 100만 칸 직사각형 범위 하나 / 결과 범위: 보이는 셀 10만 칸 문자열 합계 1,000만 자 / 큰 작업은 나누기: 초과하면 범위를 나누기 취소 뒤 종료까지 기다리기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 선택 범위와 결과 범위의 한도를 따로 확인하세요. 처리할 수 없는 모양이나 범위가 있으면 안내 후 중단합니다.</figcaption>
+  <figcaption>선택 범위와 결과 범위의 한도를 따로 확인하세요. 처리할 수 없는 모양이나 범위가 있으면 안내 후 중단합니다.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-supported-range:end -->
 
@@ -344,7 +342,7 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-maintenance-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-maintenance.svg" width="720" height="244" alt="업데이트: 작업을 저장하고 설치 Excel을 모두 닫고 다시 열기 / 도구 제거: 모든 Excel 창을 닫기 Windows 설치된 앱에서 제거 / 업무 파일 보존: 원본 Excel 파일 유지 직접 저장한 결과도 유지" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 열려 있던 Excel에는 다시 시작한 뒤 새 버전이 적용됩니다. 같은 버전 재설치·제거 전에는 모든 Excel 창을 닫으세요.</figcaption>
+  <figcaption>열려 있던 Excel에는 다시 시작한 뒤 새 버전이 적용됩니다. 같은 버전 재설치·제거 전에는 모든 Excel 창을 닫으세요.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-maintenance:end -->
 
@@ -362,16 +360,16 @@ Excel 기본 기능은 수식과 숨긴 행·열을 포함한 **시트 전체**�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/selection-export-troubleshooting-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/selection-export-troubleshooting.svg" width="720" height="244" alt="메뉴가 없을 때: Excel 비트수 확인 저장 후 Excel 다시 열기 / 서식으로 중단될 때: 안내의 원본 행·열 확인 필요한 범위를 다시 선택 / 문의할 때: 제품·Excel 버전 준비 실행 순서와 안내 문구 전달" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 먼저 안내 문구에 맞는 항목을 확인하세요. 문의할 때 원본 문서·개인 경로·설치 로그를 그대로 공개하지 마세요.</figcaption>
+  <figcaption>먼저 안내 문구에 맞는 항목을 확인하세요. 문의할 때는 사용한 메뉴와 안내 문구를 적어 주세요.</figcaption>
 </figure>
 <!-- tool-figure:selection-export-troubleshooting:end -->
 
 | 증상 | 확인할 일 |
 |---|---|
-| 설치 후 메뉴가 없어요 | Excel 비트수에 맞는 파일인지 확인하고, 작업을 저장한 뒤 모든 Excel 창을 닫았다가 다시 여세요. 정책 차단 안내가 있으면 회사 담당자에게 승인 절차를 확인하세요. |
+| 설치 후 메뉴가 없어요 | Excel 비트수에 맞는 파일인지 확인하고, 작업을 저장한 뒤 모든 Excel 창을 닫았다가 다시 여세요. 추가 기능 목록에서 이 도구의 설치 상태도 확인하세요. |
 | 범위를 다시 선택하라고 해요 | 한 시트의 이어진 네모 모양 범위 하나로 줄이세요. 합쳐진 칸이 있으면 합쳐진 칸의 전체 범위와 그 행·열이 모두 보이는지 확인하세요. |
 | 한 칸에 섞인 글꼴·모양을 처리할 수 없다고 해요 | 안내에 표시된 원본 행·열의 칸을 확인하세요. 칸 안에 서로 다른 글꼴이나 위·아래 작은 글자가 섞였거나 색이 차츰 바뀌는 배경이 포함됐을 수 있습니다. 지원하지 않는 칸을 제외한 범위로 다시 선택하세요. Excel이 한글 글꼴을 자동으로 바꾼 경우도 해당할 수 있습니다. |
 | 계산 중이거나 Excel이 작업에 반응하는 기능이 꺼졌다고 해요 | 계산이 끝난 뒤 시도하세요. 이 기능에 관한 안내가 계속되면 작업을 저장하고 Excel을 정상 종료한 뒤 다시 여세요. |
-| Excel 창을 닫았는데 설치·제거가 계속 막혀요 | 화면에 창이 없어도 Excel이 뒤에서 실행 중일 수 있습니다. 다른 작업이 진행 중인지 확인하고 담당자에게 문의하세요. 열려 있는 업무 문서나 누구의 작업인지 알 수 없는 프로그램을 강제로 닫지 마세요. |
+| Excel 창을 닫았는데 설치·제거가 계속 막혀요 | 화면에 창이 없어도 Excel이 뒤에서 실행 중일 수 있습니다. 진행 중인 Excel 작업을 확인하고 문서 저장과 정상 종료를 마친 뒤 다시 설치하세요. |
 
-문의할 때는 제품 버전, Excel 버전·비트수, 실행 순서와 안내 문구를 적어 주세요. 원본 문서·개인 경로·설치 과정의 기록을 그대로 공개하지 마세요.
+문의할 때는 제품 버전, Excel 버전·비트수, 실행 순서와 안내 문구를 적어 주세요.

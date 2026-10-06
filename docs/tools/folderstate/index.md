@@ -10,9 +10,9 @@
 <figure class="tool-figure">
   <picture>
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-download-mobile.svg" width="320" height="432">
-    <img src="../../assets/tool-guides/folderstate-guide-download.svg" width="720" height="244" alt="PC 환경 확인: Windows 11 64비트 회사 설치 기준 확인 → 0.1.3 설치 파일: 버전별 MSI 내려받기 전자 서명 없음 확인 → 연습용 폴더 준비: 이름과 업무 파일 유지 폴더 상태만 표시" loading="lazy" decoding="async">
+    <img src="../../assets/tool-guides/folderstate-guide-download.svg" width="720" height="244" alt="PC 환경 확인: Windows 11 64비트 설치 준비 → 0.1.3 설치 파일: 버전별 MSI 내려받기 MSI를 실행해 설치 → 연습용 폴더 준비: 이름과 업무 파일 유지 폴더 상태만 표시" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> Windows 11 x64용 FolderState 0.1.3을 받으세요. 기존 0.1.3 RC1과 같은 설치 파일이며, 사용 중이라면 다시 설치할 필요가 없습니다.</figcaption>
+  <figcaption>Windows 11 x64용 FolderState 0.1.3을 받으세요. 기존 0.1.3 RC1과 같은 설치 파일이며, 사용 중이라면 다시 설치할 필요가 없습니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-download:end -->
 
@@ -21,7 +21,7 @@
 [FolderState 0.1.3 설치 파일 받기](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3/FolderState-0.1.3-win-x64.msi){ .md-button .md-button--primary }
 [배포 내용 확인](https://github.com/prozac0401/Workspace/releases/tag/folderstate-v0.1.3){ .md-button }
 
-파일 이름: `FolderState-0.1.3-win-x64.msi` · 제작자를 확인하는 전자 서명 없음
+파일 이름: `FolderState-0.1.3-win-x64.msi`
 
 0.1.3에는 **폴더 확인**, 현재 상태 강조, 대상별 결과 안내와 별도의 **아이콘 저장 위치 적용**이 포함됩니다. [현재 화면의 사용 순서](#use)를 확인하세요. [설치 파일이 바뀌지 않았는지 확인할 자료](https://github.com/prozac0401/Workspace/releases/download/folderstate-v0.1.3/FolderState-0.1.3-win-x64.msi.sha256)로 내려받은 파일을 확인할 수 있습니다.
 
@@ -31,9 +31,9 @@
 <figure class="tool-figure">
   <picture>
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-requirements-mobile.svg" width="320" height="432">
-    <img src="../../assets/tool-guides/folderstate-guide-requirements.svg" width="720" height="244" alt="지원 환경: Windows 11 x64 실행 파일도 함께 포함 / 설치 기준 확인: 회사 절차에 따라 설치 보안 경고는 담당자 확인 / 먼저 연습하기: 연습용 폴더 하나 상태와 아이콘 확인" loading="lazy" decoding="async">
+    <img src="../../assets/tool-guides/folderstate-guide-requirements.svg" width="720" height="244" alt="지원 환경: Windows 11 x64 실행 파일도 함께 포함 / 설치 기준 확인: 받은 MSI 실행 설치 마법사 완료 / 먼저 연습하기: 연습용 폴더 하나 상태와 아이콘 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> Windows 10과 ARM64용 설치 파일은 지원하지 않습니다. 회사 PC에서는 설치 기준을 확인하고 연습용 폴더에서 시작하세요.</figcaption>
+  <figcaption>Windows 10과 ARM64용 설치 파일은 지원하지 않습니다. 회사 PC에서는 설치 기준을 확인하고 연습용 폴더에서 시작하세요.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-requirements:end -->
 
@@ -41,7 +41,7 @@
 
 기존 0.1.3 RC1과 설치 파일이 같으므로 이미 사용 중이면 다시 설치할 필요가 없습니다.
 
-회사 PC에서는 회사의 설치 기준을 따르고 연습용 폴더에서 시작하세요. 보안 경고가 나오면 회사 담당자에게 확인하세요. 보안 설정을 끄고 설치하지 마세요.
+처음 사용할 때는 폴더 하나를 골라 상태를 바꾸고 아이콘을 확인하세요.
 
 ## 설치하기 {#installation}
 
@@ -51,7 +51,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-installation-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-installation.svg" width="720" height="244" alt="MSI 열고 설치: 현재 Windows 계정에 설치 관리자 권한 불필요 → 폴더 우클릭: 연습용 폴더 하나 선택 더 많은 옵션 표시 → 업무 상태 선택: 원하는 상태 누르기 탐색기에서 아이콘 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 설치 후 폴더의 오른쪽 클릭 메뉴에서 바로 상태를 바꿀 수 있습니다. 메뉴가 없으면 탐색기 창을 다시 여세요.</figcaption>
+  <figcaption>설치 후 폴더의 오른쪽 클릭 메뉴에서 바로 상태를 바꿀 수 있습니다. 메뉴가 없으면 탐색기 창을 다시 여세요.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-installation:end -->
 
@@ -72,7 +72,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-use-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-use.svg" width="720" height="244" alt="대상 폴더 확인: 이름과 전체 위치 확인 현재 저장 상태 읽기 → 업무 상태 선택: 담당자가 상황을 판단 상태를 누르면 저장 → 결과 확인: 완료·주의·실패 읽기 탐색기 아이콘 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 폴더를 확인하고 상태를 선택한 뒤 작업 결과를 읽으세요. 상태 판단은 사용자가 하며 프로그램이 업무 완료를 자동으로 확인하지 않습니다.</figcaption>
+  <figcaption>폴더를 확인하고 상태를 선택한 뒤 작업 결과를 읽으세요. 상태 판단은 사용자가 하며 프로그램이 업무 완료를 자동으로 확인하지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-use:end -->
 
@@ -84,7 +84,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-states-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/folderstate-guide-states.svg" width="720" height="244" alt="시작과 진행: 시작 전: 아직 시작 안 함 진행 중: 작업·답변 대기 / 완료와 확인: 완료: 결과·전달 확인 확인 필요: 문제·결정 대기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 업무 상황에 맞는 상태를 바로 선택하세요. 회색 원·파란 진행 표시·초록 체크·빨간 느낌표로 색과 기호를 함께 구분합니다.</figcaption>
+  <figcaption>업무 상황에 맞는 상태를 바로 선택하세요. 회색 원·파란 진행 표시·초록 체크·빨간 느낌표로 색과 기호를 함께 구분합니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-states:end -->
 
@@ -107,7 +107,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-start-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-start.svg" width="720" height="244" alt="폴더 선택: 폴더 하나 고르기 직접 입력 후 폴더 확인 → 상태 누르기: 이름·위치·현재 상태 확인 네 상태 중 하나 선택 → 저장 결과 읽기: 대상과 완료 안내 확인 탐색기에서 보기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 직접 경로를 입력했다면 폴더 확인 또는 Enter를 먼저 누릅니다. 상태는 버튼을 누르면 바로 저장되며 결과와 탐색기 표시를 확인하세요.</figcaption>
+  <figcaption>직접 경로를 입력했다면 폴더 확인 또는 Enter를 먼저 누릅니다. 상태는 버튼을 누르면 바로 저장되며 결과와 탐색기 표시를 확인하세요.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-start:end -->
 
@@ -127,7 +127,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-next-ui-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-next-ui.svg" width="720" height="244" alt="폴더 위치 변경: 이전 화면 정보 지워짐 폴더의 저장 상태는 유지 → 폴더 확인: 새 폴더의 상태 읽기 확인 후 변경 버튼 사용 → 결과 구분: 저장 결과 먼저 확인 추가 확인 안내도 읽기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 위치를 바꾸면 먼저 새 폴더를 확인합니다. 저장 완료와 저장 뒤 다시 읽기 실패는 구분되므로 화면의 결과와 추가 안내를 함께 보세요.</figcaption>
+  <figcaption>위치를 바꾸면 먼저 새 폴더를 확인합니다. 저장 완료와 저장 뒤 다시 읽기 실패는 구분되므로 화면의 결과와 추가 안내를 함께 보세요.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-next-ui:end -->
 
@@ -147,7 +147,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-explorer-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-explorer.svg" width="720" height="244" alt="폴더 하나 우클릭: 업무 폴더 선택 더 많은 옵션 표시 → 업무 상태 열기: 상황에 맞는 상태 선택 선택하면 바로 저장 → 아이콘 확인: 성공하면 별도 창 없음 주의·실패 시 안내 표시" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> Windows 11에서는 더 많은 옵션 표시 안의 업무 상태 메뉴를 사용합니다. 상태가 저장되면 별도 창 없이 폴더 아이콘으로 확인합니다.</figcaption>
+  <figcaption>Windows 11에서는 더 많은 옵션 표시 안의 업무 상태 메뉴를 사용합니다. 상태가 저장되면 별도 창 없이 폴더 아이콘으로 확인합니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-explorer:end -->
 
@@ -167,7 +167,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-reset-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-reset.svg" width="720" height="244" alt="시작 전: 아직 시작하지 않은 일 시작 전 상태를 저장 / 상태 표시 지우기: 저장된 상태를 지움 이전 아이콘 설정 복원 / 아이콘 다시 표시: 현재 상태 아이콘 복구 상태와 변경 시각 유지" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 시작 전은 상태를 저장하고, 상태 표시 지우기는 상태 자체를 없앱니다. 아이콘 다시 표시는 저장된 상태를 유지한 채 아이콘만 다시 설정합니다.</figcaption>
+  <figcaption>시작 전은 상태를 저장하고, 상태 표시 지우기는 상태 자체를 없앱니다. 아이콘 다시 표시는 저장된 상태를 유지한 채 아이콘만 다시 설정합니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-reset:end -->
 
@@ -191,7 +191,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-portable-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-portable.svg" width="720" height="244" alt="저장 상태 확인: 처음이면 먼저 상태 지정 아이콘 저장 위치 펼치기 → 선택한 폴더 안: 아이콘 위치 고르기 아이콘 저장 위치 적용 → 다른 PC에서 확인: 폴더와 아이콘 함께 이동 환경에 따라 표시 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 아이콘 파일을 함께 옮기려면 선택한 폴더 안을 고른 뒤 아이콘 저장 위치 적용을 누르세요. 상태 버튼을 누르는 것만으로는 위치가 바뀌지 않습니다.</figcaption>
+  <figcaption>아이콘 파일을 함께 옮기려면 선택한 폴더 안을 고른 뒤 아이콘 저장 위치 적용을 누르세요. 상태 버튼을 누르는 것만으로는 위치가 바뀌지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-portable:end -->
 
@@ -206,7 +206,7 @@
 
 위치를 선택한 것만으로는 저장되지 않습니다. 상태 버튼을 눌러도 새 위치가 적용되지는 않습니다. 상태 저장·폴더 확인 후에는 선택 표시가 저장된 위치로 돌아오므로, 위치를 바꾸려면 다시 골라 **아이콘 저장 위치 적용**을 누르세요.
 
-아이콘 파일을 함께 옮겨도 공유 폴더, 여러 PC의 파일을 맞추는 프로그램, 회사 보안 설정에 따라 표시가 달라질 수 있습니다.
+공유 폴더나 여러 PC 사이에 복사한 폴더는 사용하는 PC에서 아이콘을 확인하고, 표시되지 않으면 **아이콘 다시 표시**를 누르세요.
 
 <span id="_4"></span>
 
@@ -218,7 +218,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-master-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-master.svg" width="720" height="244" alt="기본 폴더 준비: MASTER의 단계 폴더 상태를 쓰면 시작 전 → 업무별로 복사: 새 업무의 복사본 만들기 연습도 복사본에서 → 복사본에서 진행: 실제 업무 상태 선택 기본 폴더는 그대로 유지" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 기본 폴더가 이미 시작 전이면 매번 상태를 지울 필요는 없습니다. 하위 폴더를 자동으로 찾아 상태를 바꾸지는 않습니다.</figcaption>
+  <figcaption>기본 폴더가 이미 시작 전이면 매번 상태를 지울 필요는 없습니다. 하위 폴더를 자동으로 찾아 상태를 바꾸지는 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-master:end -->
 
@@ -238,7 +238,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-state-choice-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-state-choice.svg" width="720" height="244" alt="예정된 답변 대기: 아직 정한 기한 안 진행 중으로 표시 제안 / 기한 초과·결정 대기: 일을 계속하기 어려움 확인 필요로 표시 제안 / 결과와 전달 확인: 필요한 승인까지 확인 완료 상태 선택" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 답변 대기는 진행 중, 기한 초과나 결정 대기는 확인 필요로 표시하는 예시입니다. 회사에서 정한 기준이 있다면 그 기준을 따르세요.</figcaption>
+  <figcaption>답변 대기는 진행 중, 기한 초과나 결정 대기는 확인 필요로 표시하는 예시입니다. 회사에서 정한 기준이 있다면 그 기준을 따르세요.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-state-choice:end -->
 
@@ -256,7 +256,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-files-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-files.svg" width="720" height="244" alt="도구가 다루는 것: 선택한 폴더의 상태 아이콘 설정 파일 / 그대로 두는 것: 폴더 이름과 업무 파일 하위 폴더 목록 / 위치 그대로: 문서 링크와 바로가기 같은 폴더 위치 유지" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 선택한 폴더의 상태와 아이콘 설정만 다룹니다. 업무 파일 내용이나 하위 폴더 목록을 읽거나 바꾸지 않습니다.</figcaption>
+  <figcaption>선택한 폴더의 상태와 아이콘 설정만 다룹니다. 업무 파일 내용이나 하위 폴더 목록을 읽거나 바꾸지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-files:end -->
 
@@ -270,7 +270,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-maintenance-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-maintenance.svg" width="720" height="244" alt="프로그램 복구: 같은 설치 파일 실행 파일과 메뉴 다시 설치 / 새 버전 설치: 새 설치 파일 실행 설치 위치 그대로 유지 / 프로그램 제거: 상태 삭제는 제거 전에 업무 폴더와 파일 유지" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 필요한 작업에 맞춰 복구·업데이트·제거를 선택하세요. 폴더 상태까지 지우려면 프로그램을 제거하기 전에 각 폴더에서 상태 표시 지우기를 사용합니다.</figcaption>
+  <figcaption>필요한 작업에 맞춰 복구·업데이트·제거를 선택하세요. 폴더 상태까지 지우려면 프로그램을 제거하기 전에 각 폴더에서 상태 표시 지우기를 사용합니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-maintenance:end -->
 
@@ -282,7 +282,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-repair-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/folderstate-guide-repair.svg" width="720" height="244" alt="프로그램·메뉴 문제: 같은 MSI 다시 열기 프로그램 복구 선택 / 상태 아이콘만 문제: 저장된 상태 확인 아이콘 다시 표시" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 프로그램 파일과 메뉴를 복구하는 작업과 폴더의 상태 아이콘을 다시 표시하는 작업을 구분하세요.</figcaption>
+  <figcaption>프로그램 파일과 메뉴를 복구하는 작업과 폴더의 상태 아이콘을 다시 표시하는 작업을 구분하세요.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-repair:end -->
 
@@ -298,7 +298,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-update-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-update.svg" width="720" height="244" alt="새 MSI 실행: 설치된 프로그램 교체 기존 설치 위치 유지 → 기존 상태 읽기: 0.1.0 상태도 읽기 가능 변경·복구 시 새 형식 → 호환 버전 유지: 새 형식은 0.1.1 이상 사용자 파일은 보존" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 업데이트 후 상태를 바꾸거나 아이콘을 복구해 새 형식으로 저장한 폴더는 0.1.1 이상에서 사용하세요. 오래된 버전으로 덮어 설치할 수 없습니다.</figcaption>
+  <figcaption>업데이트 후 상태를 바꾸거나 아이콘을 복구해 새 형식으로 저장한 폴더는 0.1.1 이상에서 사용하세요. 오래된 버전으로 덮어 설치할 수 없습니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-update:end -->
 
@@ -316,7 +316,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-remove-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-remove.svg" width="720" height="244" alt="상태 삭제는 먼저: 표시도 없앨 때만 선택 폴더별 상태 표시 지우기 → 설치 파일 다시 열기: 프로그램 제거 선택 프로그램과 메뉴 제거 → 업무 자료 유지: 업무 폴더·파일 그대로 폴더 안 상태도 남음" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 프로그램 제거는 업무 폴더를 검색하거나 그 안의 상태를 지우지 않습니다. 이 PC의 아이콘을 쓰던 폴더는 제거 후 상태 아이콘이 보이지 않을 수 있습니다.</figcaption>
+  <figcaption>프로그램 제거는 업무 폴더를 검색하거나 그 안의 상태를 지우지 않습니다. 이 PC의 아이콘을 쓰던 폴더는 제거 후 상태 아이콘이 보이지 않을 수 있습니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-remove:end -->
 
@@ -335,7 +335,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-troubleshooting-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-troubleshooting.svg" width="720" height="244" alt="증상 확인: 아이콘·버튼·오류 구분 화면의 안내 먼저 읽기 → 해당 절차 사용: 폴더 확인·아이콘 복구 원인에 맞게 다시 확인 → 기록으로 확인: 오류 코드와 작업 확인 지원 전 개인 경로 가리기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 화면에 나온 증상과 안내에 맞춰 확인하세요. 설정 파일이 손상되거나 외부에서 바뀌었다는 안내가 나오면 파일을 보존하고 지원을 요청합니다.</figcaption>
+  <figcaption>화면에 나온 증상과 안내에 맞춰 확인하세요. 설정 파일이 손상되거나 외부에서 바뀌었다는 안내가 나오면 파일을 보존하고 지원을 요청합니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-troubleshooting:end -->
 
@@ -347,7 +347,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-icon-refresh-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-icon-refresh.svg" width="720" height="244" alt="새로 고침: 탐색기에서 F5 아이콘이 바뀌는지 확인 → 폴더 창 다시 열기: 창을 닫았다가 열기 화면 표시 다시 확인 → 아이콘 다시 표시: 해당 폴더 선택 저장된 상태 아이콘 복구" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> F5, 폴더 창 다시 열기, 아이콘 다시 표시 순으로 확인하세요. 설치된 아이콘 파일이 없다는 안내가 나오면 설치 파일의 프로그램 복구를 사용합니다.</figcaption>
+  <figcaption>F5, 폴더 창 다시 열기, 아이콘 다시 표시 순으로 확인하세요. 설치된 아이콘 파일이 없다는 안내가 나오면 설치 파일의 프로그램 복구를 사용합니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-icon-refresh:end -->
 
@@ -357,7 +357,7 @@
 
 다른 PC로 옮긴 폴더라면 그 PC에도 FolderState를 설치해야 할 수 있습니다. 아이콘 파일이 없다는 안내가 나오면 [설치 파일의 프로그램 복구](#repair)를 먼저 사용하세요.
 
-탐색기나 회사 보안 설정에 따라 아이콘이 늦게 바뀌거나 표시되지 않을 수 있습니다. 프로그램은 탐색기를 강제로 종료하거나 PC 전체의 아이콘 기록을 지우지 않습니다. 인터넷에서 받은 설정 파일의 보안 표시도 자동으로 지우지 않습니다.
+아이콘 표시가 늦게 바뀌면 위 순서로 탐색기 화면을 새로 고칩니다. 프로그램은 탐색기를 종료하거나 PC 전체의 아이콘 기록을 지우지 않으며, 인터넷에서 받은 설정 파일의 출처 표시를 유지합니다.
 
 탐색기 목록의 아이콘은 바뀌었는데 오른쪽 **세부 정보**에만 이전 아이콘이 보이면 다른 항목을 선택했다가 돌아와 보세요. 폴더 위치를 나타내는 글자가 260자 이상이면 Windows의 표시 처리 제한으로 갱신이 늦어질 수 있습니다.
 
@@ -369,7 +369,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-buttons-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-buttons.svg" width="720" height="244" alt="폴더 확인부터: 경로를 입력·변경했다면 폴더 확인 또는 Enter → 첫 상태 저장: 상태가 없으면 먼저 선택 첫 저장은 이 PC 설정 → 아이콘 위치 적용: 저장할 위치를 다시 선택 아이콘 저장 위치 적용" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 폴더 확인 전에는 상태를 바꿀 수 없습니다. 아이콘 위치는 상태를 먼저 저장한 뒤 별도의 적용 버튼으로 바꾸세요. 중단·읽기 오류는 화면의 안내를 따릅니다.</figcaption>
+  <figcaption>폴더 확인 전에는 상태를 바꿀 수 없습니다. 아이콘 위치는 상태를 먼저 저장한 뒤 별도의 적용 버튼으로 바꾸세요. 중단·읽기 오류는 화면의 안내를 따릅니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-buttons:end -->
 
@@ -391,17 +391,17 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-error-codes-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-error-codes.svg" width="720" height="244" alt="안내와 코드 확인: 화면 안내 읽기 작업 기록의 오류 코드 → 원인별 조치: 경로·권한·연결 확인 아래 오류 표와 비교 → 설정 파일 보존: 손상·외부 변경 시 보존 반복 삭제 대신 지원 요청" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 오류 안내와 표의 조치를 함께 확인하세요. 상태·아이콘 설정과 되돌릴 때 쓸 파일은 삭제하거나 임의로 덮어쓰지 않습니다.</figcaption>
+  <figcaption>오류 안내와 표의 조치를 함께 확인하세요. 상태·아이콘 설정과 되돌릴 때 쓸 파일은 삭제하거나 임의로 덮어쓰지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-error-codes:end -->
 
-**설정 파일이 손상되었거나 다른 곳에서 바뀌었다는 안내가 나오면 파일을 지우지 마세요.** 다시 실행해도 해결되지 않을 수 있습니다. `.folderstate.ini`, `desktop.ini`, `.folderstate-`로 시작하는 아이콘 파일, `.folderstate.transaction`은 상태 표시나 이전 상태로 되돌릴 때 쓰는 파일입니다.
+**설정 파일이 손상되었거나 다른 곳에서 바뀌었다는 안내가 나오면 현재 파일을 그대로 보관하고 아래 오류 코드에 맞춰 처리하세요.** `.folderstate.ini`, `desktop.ini`, `.folderstate-`로 시작하는 아이콘 파일, `.folderstate.transaction`은 상태 표시나 이전 상태로 되돌릴 때 쓰는 파일입니다.
 
 오류 코드는 작업 기록에서 확인할 수 있습니다. 글로 명령을 입력해 사용했다면 그 결과에서도 확인할 수 있습니다. 화면에 나온 안내와 아래 표를 함께 보세요.
 
 | 화면에서 알리는 문제 | 할 일 | 오류 코드 |
 |---|---|---|
-| 폴더에 접근할 수 없음 | 파일을 읽고 저장할 권한이 있는지, 회사 보안 설정이 막는지 확인합니다. | `access_denied` |
+| 폴더에 접근할 수 없음 | 해당 폴더를 읽고 저장할 수 있는 계정인지 확인합니다. | `access_denied` |
 | 파일을 읽거나 저장하지 못함 | 파일을 사용 중인 프로그램, 드라이브·네트워크 연결, 남은 저장 공간을 확인합니다. 원인을 해결한 뒤 다시 실행합니다. | `io_error` |
 | 폴더를 찾을 수 없음 | 입력한 경로와 드라이브·네트워크 연결을 확인합니다. | `folder_missing` |
 | 경로나 명령이 잘못됨 | 폴더 선택 버튼을 사용하거나 전체 경로를 입력합니다. 명령을 입력해 사용한다면 아래 예시와 비교합니다. | `invalid_path`, `usage`, `invalid_status` |
@@ -411,12 +411,12 @@
 | 아이콘 파일이 없거나 손상됨 | 설치 파일에서 **프로그램 복구**를 한 뒤 폴더의 **아이콘 다시 표시**를 누릅니다. | `icon_missing` |
 | 설치된 아이콘 경로를 쓸 수 없음 | 프로그램 설치 위치를 확인합니다. | `invalid_icon_path` |
 | FolderState 밖에서 아이콘이 바뀜 | 현재 아이콘을 먼저 확인합니다. FolderState 상태 아이콘을 쓰려면 **상태 표시 지우기**를 누른 뒤 원하는 상태를 고릅니다. | `icon_conflict` |
-| 폴더 안의 아이콘이 원래 파일과 다름 | 문제가 있는 아이콘 파일을 지우거나 덮어쓰지 말고 누가 바꿨는지 확인합니다. | `portable_conflict` |
-| 상태 파일에 다른 정보가 추가됨 | 상태 파일을 지우지 말고 추가된 내용을 확인합니다. 상태 표시 지우기는 중단되며 파일을 그대로 둡니다. | `metadata_conflict` |
+| 폴더 안의 아이콘이 원래 파일과 다름 | 현재 아이콘 파일을 그대로 보관하고 변경한 내용을 확인합니다. | `portable_conflict` |
+| 상태 파일에 다른 정보가 추가됨 | 현재 상태 파일에서 추가된 내용을 확인합니다. 상태 표시 지우기는 중단되며 파일을 그대로 둡니다. | `metadata_conflict` |
 | Windows가 설정 파일을 예상과 다르게 바꿈 | 설정 파일과 되돌릴 때 쓸 파일을 보존하고 지원을 요청합니다. | `shell_metadata_changed` |
 | 상태 파일을 읽을 수 없음 | `.folderstate.ini`를 그대로 두고 지원을 요청합니다. 다른 버전에서 만든 파일일 수도 있습니다. | `invalid_metadata` |
 | 이전 작업이 도중에 멈춤 | **아이콘 다시 표시**를 누릅니다. ‘저장된 상태가 없음’이 나오면 중단 전에는 상태가 없었던 것이므로 원하는 상태를 고릅니다. | `recovery_pending` |
-| 멈춘 뒤 설정이 바뀜 | 되돌릴 때 쓸 파일을 그대로 두고 바뀐 내용을 확인합니다. 반복 실행이나 파일 삭제로 해결하려 하지 않습니다. | `recovery_conflict` |
+| 멈춘 뒤 설정이 바뀜 | 되돌릴 때 쓸 파일을 그대로 두고 바뀐 내용을 확인합니다. 현재 파일과 복원 기록을 기준으로 원인을 확인합니다. | `recovery_conflict` |
 | 변경도 되돌리기도 끝내지 못함 | 설정 파일과 작업 기록을 보존합니다. 파일 사용 중 여부·접근 권한과 외부 변경을 확인한 뒤 지원을 요청합니다. | `recovery_failed` |
 | 되돌릴 때 쓸 파일이 손상됨 | `.folderstate.transaction`을 포함한 설정 파일을 그대로 두고 지원을 요청합니다. | `invalid_journal` |
 | 작업하는 동안 설정이 바뀜 | 설정 파일을 그대로 두고 다른 프로그램이나 사용자가 바꾼 내용을 확인합니다. | `concurrent_edit` |
@@ -436,7 +436,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-logs-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/folderstate-guide-logs.svg" width="720" height="244" alt="작업 기록 열기: 프로그램에서 버튼 클릭 operations.jsonl 확인 → 문제 작업 찾기: 작업 시각·대상·결과 오류 코드와 안내 확인 → 전달 전 가리기: 사용자 이름 제거 실제 업무 경로 가리기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 작업 기록은 이 PC의 사용자 데이터 폴더에 저장되며 자동 전송하지 않습니다. 도움을 요청할 때는 필요한 오류 안내만 확인하고 개인 경로를 가리세요.</figcaption>
+  <figcaption>작업 기록은 이 PC의 사용자 데이터 폴더에 저장되며 자동 전송하지 않습니다. 도움을 요청할 때는 필요한 오류 안내만 확인하고 개인 경로를 가리세요.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-logs:end -->
 
@@ -450,91 +450,91 @@ FolderState에서 **작업 기록 열기**를 누릅니다. 폴더가 열리면 
 <figure class="tool-figure">
   <picture>
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/folderstate-guide-advanced-mobile.svg" width="320" height="432">
-    <img src="../../assets/tool-guides/folderstate-guide-advanced.svg" width="720" height="244" alt="설치 위치 확인: 프로그램·기록 위치 보기 설정은 직접 바꾸지 않기 / 명령으로 설치: 담당자용 설치·복구·제거 필요한 명령 하나만 실행 / 명령으로 상태 관리: 대상 폴더를 직접 지정 결과와 종료 코드 확인" loading="lazy" decoding="async">
+    <img src="../../assets/tool-guides/folderstate-guide-advanced.svg" width="720" height="244" alt="설치 위치 확인: 프로그램·기록 위치 보기 현재 버전 확인 / 명령으로 설치: 담당자용 설치·복구·제거 필요한 명령 하나만 실행 / 명령으로 상태 관리: 대상 폴더를 직접 지정 결과와 종료 코드 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 보통은 프로그램 화면이나 탐색기 메뉴로 충분합니다. 명령이 필요한 경우에만 아래 설명을 펼쳐 대상 경로와 작업을 확인하세요.</figcaption>
+  <figcaption>보통은 프로그램 화면이나 탐색기 메뉴로 충분합니다. 명령이 필요한 경우에만 아래 설명을 펼쳐 대상 경로와 작업을 확인하세요.</figcaption>
 </figure>
 <!-- tool-figure:folderstate-guide-advanced:end -->
 
 <span id="locations"></span>
 
-??? note "설치 위치 확인하기"
+**설치 위치 확인하기**
 
-    | 항목 | 위치 |
-    |---|---|
-    | 프로그램·아이콘 | `%LOCALAPPDATA%\Programs\FolderState` |
-    | 시작 메뉴 | FolderState |
-    | 탐색기 메뉴 설정 | `HKCU\Software\Classes\Directory\shell\Workspace.FolderState` |
-    | 작업 기록 | `%LOCALAPPDATA%\FolderState\logs` |
-    | 저장된 업무 상태 | 선택한 폴더의 `.folderstate.ini` |
+| 항목 | 위치 |
+|---|---|
+| 프로그램·아이콘 | `%LOCALAPPDATA%\Programs\FolderState` |
+| 시작 메뉴 | FolderState |
+| 탐색기 메뉴 설정 | `HKCU\Software\Classes\Directory\shell\Workspace.FolderState` |
+| 작업 기록 | `%LOCALAPPDATA%\FolderState\logs` |
+| 저장된 업무 상태 | 선택한 폴더의 `.folderstate.ini` |
 
-    `%LOCALAPPDATA%`는 지금 로그인한 Windows 계정에서 프로그램이 쓰는 자료를 저장하는 폴더입니다. 탐색기 주소창에 그대로 붙여 넣고 Enter를 누르면 열 수 있습니다. `HKCU`는 이 계정의 Windows 설정이 저장되는 곳입니다. FolderState를 사용할 때 이 설정을 직접 바꿀 필요는 없습니다.
+`%LOCALAPPDATA%`는 지금 로그인한 Windows 계정에서 프로그램이 쓰는 자료를 저장하는 폴더입니다. 탐색기 주소창에 그대로 붙여 넣고 Enter를 누르면 열 수 있습니다. `HKCU`는 이 계정의 Windows 설정이 저장되는 곳입니다. FolderState를 사용할 때 이 설정을 직접 바꿀 필요는 없습니다.
 
 <span id="installer-cli"></span>
 
-??? note "명령으로 설치하는 담당자용"
+**명령으로 설치하는 담당자용**
 
-    설치 화면 대신 명령으로 처리할 때만 사용합니다. `/qn`은 화면을 표시하지 않는 옵션입니다.
+설치 화면 대신 명령으로 처리할 때만 사용합니다. `/qn`은 화면을 표시하지 않는 옵션입니다.
 
-    ```powershell
-    msiexec /i "FolderState-0.1.3-win-x64.msi" /qn /norestart /l*v install.log
-    msiexec /fa "FolderState-0.1.3-win-x64.msi" /qn /norestart /l*v repair.log
-    msiexec /x "FolderState-0.1.3-win-x64.msi" /qn /norestart /l*v uninstall.log
-    ```
+```powershell
+msiexec /i "FolderState-0.1.3-win-x64.msi" /qn /norestart /l*v install.log
+msiexec /fa "FolderState-0.1.3-win-x64.msi" /qn /norestart /l*v repair.log
+msiexec /x "FolderState-0.1.3-win-x64.msi" /qn /norestart /l*v uninstall.log
+```
 
-    위 명령은 순서대로 설치, 프로그램 복구, 프로그램 제거입니다. 필요한 명령 하나만 실행하세요. 종료 코드가 `0`이면 작업을 마친 것이고, `3010`이면 PC를 다시 시작해야 합니다. 다른 코드가 나오면 해당 설치 기록 파일을 확인하세요. 기록을 외부에 보낼 때는 사용자 이름이나 업무 폴더 경로가 들어 있는지 확인하고 가려 주세요.
+위 명령은 순서대로 설치, 프로그램 복구, 프로그램 제거입니다. 필요한 명령 하나만 실행하세요. 종료 코드가 `0`이면 작업을 마친 것이고, `3010`이면 PC를 다시 시작해야 합니다. 다른 코드가 나오면 해당 설치 기록 파일을 확인하세요. 문의에는 종료 코드와 해당 단계의 오류 문구를 적어 주세요.
 
 <span id="cli"></span>
 
-??? note "명령으로 사용하기 — 필요한 경우만"
+**명령으로 사용하기 — 필요한 경우만**
 
-    PowerShell 등에서 글로 명령을 입력해 사용할 수도 있습니다. 보통은 프로그램 화면이나 탐색기 메뉴만 사용하면 됩니다.
+PowerShell 등에서 글로 명령을 입력해 사용할 수도 있습니다. 보통은 프로그램 화면이나 탐색기 메뉴만 사용하면 됩니다.
 
-    | 하고 싶은 일 | 명령 |
-    |---|---|
-    | 상태 바꾸기 | `set` |
-    | 저장된 상태 확인 | `status` |
-    | 아이콘 다시 표시 | `repair` |
-    | 상태 표시 지우기 | `reset` |
+| 하고 싶은 일 | 명령 |
+|---|---|
+| 상태 바꾸기 | `set` |
+| 저장된 상태 확인 | `status` |
+| 아이콘 다시 표시 | `repair` |
+| 상태 표시 지우기 | `reset` |
 
-    상태값은 `todo`(시작 전), `doing`(진행 중), `done`(완료), `issue`(확인 필요)입니다. 아래 예시의 폴더 경로를 실제 경로로 바꿔서 필요한 명령만 실행하세요.
+상태값은 `todo`(시작 전), `doing`(진행 중), `done`(완료), `issue`(확인 필요)입니다. 아래 예시의 폴더 경로를 실제 경로로 바꿔서 필요한 명령만 실행하세요.
 
-    진행 중으로 바꾸기:
+진행 중으로 바꾸기:
 
-    ```powershell
-    FolderState.Cli.exe set doing "D:\Work\교육 준비"
-    ```
+```powershell
+FolderState.Cli.exe set doing "D:\Work\교육 준비"
+```
 
-    아이콘을 폴더 안에 함께 저장하면서 완료로 바꾸기:
+아이콘을 폴더 안에 함께 저장하면서 완료로 바꾸기:
 
-    ```powershell
-    FolderState.Cli.exe set done "D:\Work\교육 준비" --mode portable
-    ```
+```powershell
+FolderState.Cli.exe set done "D:\Work\교육 준비" --mode portable
+```
 
-    저장된 상태 확인하기:
+저장된 상태 확인하기:
 
-    ```powershell
-    FolderState.Cli.exe status "D:\Work\교육 준비"
-    ```
+```powershell
+FolderState.Cli.exe status "D:\Work\교육 준비"
+```
 
-    아이콘 다시 표시하기:
+아이콘 다시 표시하기:
 
-    ```powershell
-    FolderState.Cli.exe repair "D:\Work\교육 준비"
-    ```
+```powershell
+FolderState.Cli.exe repair "D:\Work\교육 준비"
+```
 
-    상태 표시 지우기:
+상태 표시 지우기:
 
-    ```powershell
-    FolderState.Cli.exe reset "D:\Work\교육 준비"
-    ```
+```powershell
+FolderState.Cli.exe reset "D:\Work\교육 준비"
+```
 
-    여러 폴더를 시작 전으로 바꾸고 자동 처리용 결과 받기:
+여러 폴더를 시작 전으로 바꾸고 자동 처리용 결과 받기:
 
-    ```powershell
-    FolderState.Cli.exe set todo "D:\Work\단계1" "D:\Work\단계2" --json
-    ```
+```powershell
+FolderState.Cli.exe set todo "D:\Work\단계1" "D:\Work\단계2" --json
+```
 
-    폴더 경로는 드라이브 이름부터 모두 입력하고 큰따옴표로 감쌉니다. 공유 폴더라면 서버 이름을 포함합니다. 최대 100개 폴더를 직접 나열할 수 있습니다. 하위 폴더를 찾아다니거나 `*`로 여러 폴더를 검색하지 않습니다. 한 폴더에서 실패해도 다른 폴더의 성공은 그대로 유지합니다.
+폴더 경로는 드라이브 이름부터 모두 입력하고 큰따옴표로 감쌉니다. 공유 폴더라면 서버 이름을 포함합니다. 최대 100개 폴더를 직접 나열할 수 있습니다. 하위 폴더를 찾아다니거나 `*`로 여러 폴더를 검색하지 않습니다. 한 폴더에서 실패해도 다른 폴더의 성공은 그대로 유지합니다.
 
-    `--json`은 결과를 다른 프로그램이 읽기 좋은 형식으로 출력합니다. 종료 코드는 `0` 성공, `1` 작업 실패, `2` 명령 입력 오류입니다. 화면용 실행 파일 `FolderState.exe`도 `set/reset/repair` 명령을 받아 탐색기 메뉴에서 사용합니다. 기존 명령과 저장된 상태값은 문구 변경 후에도 같습니다.
+`--json`은 결과를 다른 프로그램이 읽기 좋은 형식으로 출력합니다. 종료 코드는 `0` 성공, `1` 작업 실패, `2` 명령 입력 오류입니다. 화면용 실행 파일 `FolderState.exe`도 `set/reset/repair` 명령을 받아 탐색기 메뉴에서 사용합니다. 기존 명령과 저장된 상태값은 문구 변경 후에도 같습니다.

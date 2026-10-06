@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
-<title id="title">막혔을 때</title><desc id="desc">안내 문구에 맞춰 선택 범위와 복사한 내용을 확인하세요. 문의할 때 이름·명단·수식·업무 파일을 공개하지 마세요.</desc>
+<title id="title">막혔을 때</title><desc id="desc">안내 문구에 맞춰 선택 범위와 복사한 내용을 확인하세요. 문의할 때는 선택한 범위와 안내 문구를 적어 주세요.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="720" height="244" rx="4" fill="#fffdf9"/>
 <path d="M108 16H132" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

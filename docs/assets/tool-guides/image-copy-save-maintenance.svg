@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
-<title id="title">업데이트·복구·제거하기</title><desc id="desc">세 작업 모두 관리자 승인이 필요합니다. 외부에서 바뀐 파일이나 겹친 설정 때문에 중단되면 일괄 삭제하지 말고 안내된 충돌 확인 절차를 따르세요.</desc>
+<title id="title">업데이트·복구·제거하기</title><desc id="desc">세 작업 모두 관리자 승인이 필요합니다. 외부에서 바뀐 파일이나 겹친 설정 때문에 중단되면 충돌 확인 절차에 따라 해당 항목을 처리합니다.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="720" height="244" rx="4" fill="#fffdf9"/>
 <path d="M108 16H132" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

@@ -3,10 +3,10 @@
     "page":"tools/image-copy-save/guide.md","heading":"설치 전에 확인하세요","id":"image-copy-save-before-install","mode":"compare",
     "panels":[
       {"icon":"pc","title":"Windows 11 x64","lines":["실제 로컬 폴더에서 사용","네트워크·온라인 전용 제외"]},
-      {"icon":"install","title":"설치에는 관리자 승인","lines":["0.2.1 MSI는 전자 서명 없음","평소 작업은 일반 사용자"]},
+      {"icon":"install","title":"설치에는 관리자 승인","lines":["0.2.1 MSI 실행","평소 작업은 일반 사용자"]},
       {"icon":"image","title":"붙여넣는 앱도 확인","lines":["이미지가 압축되거나","투명 배경이 달라질 수 있음"]}
     ],
-    "caption":"설치·업데이트·복구·제거 권한과 평소 실행 권한을 구분합니다. 회사 PC는 허용된 설치 절차를 따르고 지원 환경을 먼저 확인하세요."
+    "caption":"설치·업데이트·복구·제거 권한과 평소 실행 권한을 구분합니다. 평소 복사·저장은 일반 사용자 권한으로 실행합니다."
   },
   {
     "page":"tools/image-copy-save/guide.md","heading":"설치하기","id":"image-copy-save-install","mode":"flow",
@@ -51,7 +51,7 @@
       {"icon":"restore","title":"복구","lines":["현재 설치된 버전의 MSI","없어진 프로그램 파일 채우기"]},
       {"icon":"trash","title":"제거","lines":["Windows 설치된 앱에서","원본·저장 PNG는 보존"]}
     ],
-    "caption":"세 작업 모두 관리자 승인이 필요합니다. 외부에서 바뀐 파일이나 겹친 설정 때문에 중단되면 일괄 삭제하지 말고 안내된 충돌 확인 절차를 따르세요."
+    "caption":"세 작업 모두 관리자 승인이 필요합니다. 외부에서 바뀐 파일이나 겹친 설정 때문에 중단되면 충돌 확인 절차에 따라 해당 항목을 처리합니다."
   },
   {
     "page":"tools/image-copy-save/guide.md","heading":"메뉴가 없거나 작업이 실패할 때","id":"image-copy-save-troubleshooting","mode":"compare",
@@ -60,6 +60,6 @@
       {"icon":"folder-check","title":"선택 표시가 없으면","lines":["메뉴를 누른 폴더 확인","만들어진 PNG가 있는지 확인"]},
       {"icon":"pause","title":"탐색기가 멈추면","lines":["반복 실행을 멈추기","재현 순서와 버전으로 문의"]}
     ],
-    "caption":"저장 성공과 탐색기에서 파일을 선택하는 동작은 별개입니다. 문의에는 업무 이미지·개인 정보·실제 경로나 문제 확인용 기록 전체를 공개하지 마세요."
+    "caption":"저장 성공과 탐색기에서 파일을 선택하는 동작은 별개입니다. 문의할 때는 사용한 메뉴와 안내 문구를 적어 주세요."
   }
 ]

@@ -17,6 +17,6 @@
 <text x="600.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">03</text>
 <g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#ece5d7" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="55" y="43" width="34" height="26" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M62 43V33Q72 18 82 33V43" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="600.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">제공할 자료 준비</text>
-<text x="600.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">허용 범위만 AI에 제공</text>
+<text x="600.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">작업에 필요한 목록 제공</text>
 <text x="600.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">원래 목록과 경로는 보관</text>
 </g></svg>

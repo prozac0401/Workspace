@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>교육 업무의 설명용 예시 화면</title>
+<title>교육 업무에 도구 써 보기</title>
 <style>
 /* Handbook paper, ink and brass; Excel selection, sticky-note and state colors retain their meaning. */
 *{box-sizing:border-box}
@@ -11,8 +11,7 @@ html,body{margin:0;padding:0}
 body{background:#fbf7f0;color:#2c2622;font-family:"Malgun Gothic","맑은 고딕",system-ui,sans-serif;font-size:18px;line-height:1.5}
 main{width:900px;margin:0 auto}
 .scene{width:900px;background:#fffdf9;padding:24px;margin:0 0 24px;overflow:hidden}
-.example-label{background:#f2e9dd;border:2px solid #8a622f;border-radius:4px;color:#785326;padding:10px 14px;font-weight:700;font-size:18px}
-.scene-title{display:flex;align-items:center;gap:14px;margin:18px 0 6px}
+.scene-title{display:flex;align-items:center;gap:14px;margin:0 0 6px}
 .scene-number{flex:none;display:grid;place-items:center;width:44px;height:44px;background:#8a622f;border-radius:4px;color:#fff;font-weight:700;font-size:24px}
 h1{margin:0;font-size:28px;line-height:1.3}
 h2{margin:0 0 10px;font-size:24px;line-height:1.4}
@@ -56,7 +55,6 @@ td{background:#fffdf9}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
 .stat{padding:12px;background:#f2e9dd;border:1px solid #ded2c4;border-radius:4px;text-align:center}
 .stat strong{display:block;font-size:27px;color:#785326}
-.footer{margin-top:18px;padding-top:12px;border-top:1px solid #ded2c4;color:#6e6258;font-size:18px}
 .sticker{display:flex;align-items:center;gap:10px;margin:16px 0;background:#fff1a8;border:1px solid #d5b548;border-radius:4px;padding:14px 10px 14px 16px;box-shadow:2px 3px 0 #e1d6b5;font-size:18px}
 .sticker-text{white-space:nowrap;flex:1}
 .sticker-arrow{width:34px;flex:none;text-align:center;font-size:27px;font-weight:700;border-left:1px solid #ccb752;color:#655011}
@@ -86,20 +84,11 @@ td{background:#fffdf9}
 .export-source col:nth-child(3){width:55px}
 .export-source col:nth-child(4){width:210px}
 .export-source col:nth-child(5){width:76px}
-/* Retain the published PNG canvas sizes, including fractional layout rounding. */
-#compare{min-height:1105px}
-#paste{min-height:1159px}
-#export{min-height:1020px}
-#collect{min-height:1255px}
-#image{min-height:858px}
-#bookmark{min-height:923px}
-#state{min-height:998px}
 </style>
 </head>
 <body>
 <main>
 <section class="scene" id="compare" aria-labelledby="compare-title">
-  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
   <div class="scene-title"><div class="scene-number">1</div><h1 id="compare-title">두 명단에서 값과 개수가 다른 항목 찾기</h1></div>
   <p class="tool-name">Excel 명단 비교 · 명단대조_합성.xlsx</p>
   <div class="grid">
@@ -134,12 +123,10 @@ td{background:#fffdf9}
   <div class="result"><div class="result-title">예상 결과 · 명단비교_결과</div>
     <table aria-label="예상 차이"><thead><tr><th>값</th><th>첫 목록 개수</th><th>둘째 목록 개수</th></tr></thead><tbody><tr><td>TEST003</td><td>2</td><td>1</td></tr><tr><td>TEST006</td><td>0</td><td>1</td></tr></tbody></table>
   </div>
-  <div class="note">항목 수가 같아도 내용은 다릅니다. 이 결과만 보고 교육 대상자를 확정하지 마세요.</div>
-  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+  <div class="note">두 목록은 각각 6항목입니다. TEST003과 TEST006의 개수를 비교하세요.</div>
 </section>
 
 <section class="scene" id="paste" aria-labelledby="paste-title">
-  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
   <div class="scene-title"><div class="scene-number">2</div><h1 id="paste-title">A반의 보이는 세 칸에만 ‘확정’ 넣기</h1></div>
   <p class="tool-name">보이는 칸 붙여넣기 · 상태입력_합성.xlsx</p>
   <div class="grid grid-paste">
@@ -155,12 +142,10 @@ td{background:#fffdf9}
     <tr class="changed"><td>TEST005</td><td>A반</td><td>확정</td><td>A반만 변경</td></tr>
     <tr class="preserved"><td>TEST006</td><td>B반</td><td>대기</td><td>기존 값 유지</td></tr>
   </tbody></table></div>
-  <div class="note">한 칸을 세 칸에 반복하는 기능이 아닙니다. 값 3개와 보이는 대상 3칸의 순서를 먼저 맞추세요.</div>
-  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+  <div class="note">원본 값 3개와 보이는 대상 3칸의 개수·순서를 맞춘 뒤 붙여넣습니다.</div>
 </section>
 
 <section class="scene" id="export" aria-labelledby="export-title">
-  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
   <div class="scene-title"><div class="scene-number">3</div><h1 id="export-title">안내에 필요한 세 사람·세 열만 따로 만들기</h1></div>
   <p class="tool-name">선택범위 내보내기 · 안내명단_합성.xlsx</p>
   <div class="panel"><div class="window-title excel-title">준비할 원본 · 필터와 숨김을 적용하기 전</div><table class="export-source" aria-label="내보내기 원본"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>A · 교육생ID</th><th>B · 표시명</th><th>C · 반</th><th class="hidden-guide">D · 내부 검토 메모</th><th>E · 상태</th></tr></thead><tbody>
@@ -171,12 +156,10 @@ td{background:#fffdf9}
   </tbody></table></div>
   <div class="step"><strong>할 일</strong><p>확정인 사람만 보이게 하기 · D열 숨기기 · <strong>A1:D5 선택</strong></p><p class="quiet">제목을 포함합니다. E열의 상태는 선택 범위 밖입니다.</p><div class="step-row"><span>마우스 오른쪽 버튼</span><span class="arrow">→</span><span class="menu-action">선택범위 내보내기</span><span class="arrow">→</span><span class="menu-action selected">새 Excel로</span></div></div>
   <div class="result"><div class="result-title">예상 결과 · 아직 저장하지 않은 새 Excel 파일</div><table aria-label="세 사람과 세 열 예상 결과"><thead><tr><th>교육생ID</th><th>표시명</th><th>반</th></tr></thead><tbody><tr><td>TEST001</td><td>가상교육생A</td><td>A</td></tr><tr><td>TEST003</td><td>가상교육생C</td><td>A</td></tr><tr><td>TEST004</td><td>가상교육생D</td><td>A</td></tr></tbody></table></div>
-  <div class="note">TEST002·내부 검토 메모·상태 열은 없어야 합니다. 새 파일을 직접 살펴본 뒤 저장하세요.</div>
-  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+  <div class="note">새 파일에는 TEST001·TEST003·TEST004의 세 열을 담습니다. 내용을 확인한 뒤 저장하세요.</div>
 </section>
 
 <section class="scene" id="collect" aria-labelledby="collect-title">
-  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
   <div class="scene-title"><div class="scene-number">4</div><h1 id="collect-title">파일 수와 제출한 사람 수를 나누어 확인하기</h1></div>
   <p class="tool-name">File List to Excel · 이미 이 PC에 받아 둔 연습 파일</p>
   <div class="panel"><div class="window-title">탐색기 목록의 예</div><div class="path">교육운영_합성 › 과정A</div><table aria-label="준비할 다섯 파일"><thead><tr><th>안쪽 폴더</th><th>파일 이름</th></tr></thead><tbody>
@@ -188,40 +171,34 @@ td{background:#fffdf9}
   </tbody></table></div>
   <div class="step"><strong>할 일</strong> · 과정A에서 마우스 오른쪽 버튼<div class="step-row"><span>더 많은 옵션 표시</span><span class="arrow">→</span><span class="menu-action selected">하위 폴더까지 Excel로</span><span class="arrow">→</span><span>과제1 파일만 보이게 하기</span></div></div>
   <div class="stats"><div class="stat"><strong>전체 5파일</strong>강의자료 2 + 과제1 3</div><div class="stat"><strong>과제1 3파일</strong>TEST002 파일은 2개</div><div class="stat"><strong>제출자 2명</strong>TEST001 · TEST002</div></div>
-  <div class="plain-result"><div class="result-label">예상 결과와 사람이 정할 일</div><p>기준 명단: TEST001 · TEST002 · TEST003</p><p><strong>TEST002의 수정본을 쓸지는 사람이 결정합니다.</strong><br>TEST003은 제출 여부를 추가로 확인합니다.</p><p class="quiet">파일이 없다는 이유만으로 미제출을 확정하지 마세요.</p></div>
+  <div class="plain-result"><div class="result-label">예상 결과와 사람이 정할 일</div><p>기준 명단: TEST001 · TEST002 · TEST003</p><p><strong>TEST002의 수정본을 쓸지는 사람이 결정합니다.</strong><br>TEST003은 제출 여부를 추가로 확인합니다.</p><p class="quiet">기준 명단과 제출 경로를 함께 확인합니다.</p></div>
   <div class="step"><strong>필요한 파일을 모으려면 · 선택 기능을 설치한 경우</strong><div class="step-row"><span>필요한 파일 행 선택</span><span class="arrow">→</span><span class="menu-action">파일목록 → 선택한 파일 복사…</span><span class="arrow">→</span><span class="menu-action">여기에 복사</span></div><p style="margin:10px 0 0">선택한 파일의 복사본은 <strong>모은파일</strong>로 시작하는 새 폴더에 모입니다.</p></div>
-  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
 </section>
 
 <section class="scene" id="image" aria-labelledby="image-title">
-  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
   <div class="scene-title"><div class="scene-number">5</div><h1 id="image-title">복사한 시간표를 과정 폴더의 PNG로 저장하기</h1></div>
-  <p class="tool-name">그림 복사·저장 · 시간표는 그림 프로그램에서 만든 가짜 자료</p>
+  <p class="tool-name">그림 복사·저장 · 과정 A 시간표를 PNG로 저장</p>
   <div class="grid grid-image">
-    <div><h2>복사할 그림</h2><div class="timetable"><h3>합성 과정 A</h3><table aria-label="연습 시간표"><thead><tr><th>시간</th><th>내용</th></tr></thead><tbody><tr><td>09:00</td><td>안내</td></tr><tr><td>10:00</td><td>실습</td></tr><tr><td>11:00</td><td>질의응답</td></tr></tbody></table></div><div class="note">그림 자체를 복사합니다.<br>다른 내용을 이어서 복사하지 마세요.</div></div>
+    <div><h2>복사할 그림</h2><div class="timetable"><h3>합성 과정 A</h3><table aria-label="연습 시간표"><thead><tr><th>시간</th><th>내용</th></tr></thead><tbody><tr><td>09:00</td><td>안내</td></tr><tr><td>10:00</td><td>실습</td></tr><tr><td>11:00</td><td>질의응답</td></tr></tbody></table></div><div class="note">시간표를 그림으로 복사하고<br>바로 폴더에 저장합니다.</div></div>
     <div class="panel"><div class="window-title">탐색기 · 저장할 폴더</div><div class="path">교육운영_합성 › 과정A › 안내이미지</div><div class="panel-content"><p>폴더 안 빈 곳에서<br><strong>마우스 오른쪽 버튼</strong></p><div class="step-row"><span>더 많은 옵션 표시</span><span class="arrow">→</span><span class="menu-action selected">복사한 그림 저장</span></div><div class="image-file"><div class="result-label">예상 결과 · PNG 파일 1개</div><div class="tiny-preview"><h3>합성 과정 A</h3><p>09:00 안내 · 10:00 실습<br>11:00 질의응답</p></div><p><span class="file-symbol"></span>그림_날짜_시간.png</p><p class="quiet">만들어진 파일을 열어 글자와 잘림을 확인합니다.</p></div></div></div>
   </div>
-  <div class="note">탐색기에서 파일을 Ctrl+C로 복사하는 것과 다릅니다. 파일의 그림을 복사할 때는 <strong>그림으로 복사</strong> 메뉴를 쓰세요.</div>
-  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+  <div class="note">파일에서 그림을 복사할 때는 <strong>그림으로 복사</strong> 메뉴를 쓰고, 저장할 폴더에서 <strong>복사한 그림 저장</strong>을 누릅니다.</div>
 </section>
 
 <section class="scene" id="bookmark" aria-labelledby="bookmark-title">
-  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
   <div class="scene-title"><div class="scene-number">6</div><h1 id="bookmark-title">문서 위치와 다음 할 일을 남겨 다시 돌아오기</h1></div>
   <p class="tool-name">업무 책갈피 · 과정A_운영연습.xlsx를 먼저 저장합니다.</p>
   <div class="grid grid-bookmark">
     <div class="panel"><div class="window-title excel-title">기억할 Excel 위치</div><div class="panel-content"><div class="book-location"><span class="cell-address">B4</span><span>안내준비 시트</span></div><table aria-label="책갈피 위치"><thead><tr><th class="row-no"></th><th class="col-letter">B</th></tr></thead><tbody><tr><td class="row-no">1</td><td>&nbsp;</td></tr><tr><td class="row-no">2</td><td>&nbsp;</td></tr><tr><td class="row-no">3</td><td>&nbsp;</td></tr><tr><td class="row-no">4</td><td class="selected-cell">합성 안내표 검토 지점</td></tr></tbody></table></div><div class="sheet-tab">안내준비</div><div class="selection-description">입력을 마친 뒤 Ctrl+Alt+B</div></div>
-    <div class="panel"><div class="window-title">남겨 둘 한 줄 메모의 예</div><div class="panel-content"><p>스티커 제목을 누르거나 <strong>Ctrl+E</strong></p><div class="sticker"><span class="sticker-text">과정A 안내표 4행부터 확인</span><span class="sticker-arrow">→</span></div><p>메모를 쓴 뒤 <strong>Enter</strong>로 저장합니다.</p><div class="step"><strong>다시 돌아올 때</strong><p style="margin:8px 0 0">Ctrl+Alt+J →<br><strong>오른쪽 화살표(바로가기)</strong></p></div><p class="quiet">위 화살표는 뜻을 설명하기 위해<br>그린 기호입니다.</p></div></div>
+    <div class="panel"><div class="window-title">남겨 둘 한 줄 메모의 예</div><div class="panel-content"><p>스티커 제목을 누르거나 <strong>Ctrl+E</strong></p><div class="sticker"><span class="sticker-text">과정A 안내표 4행부터 확인</span><span class="sticker-arrow">→</span></div><p>메모를 쓴 뒤 <strong>Enter</strong>로 저장합니다.</p><div class="step"><strong>다시 돌아올 때</strong><p style="margin:8px 0 0">시계 옆 아이콘 → 책갈피 보기<br><strong>오른쪽 화살표(바로가기)</strong></p></div></div></div>
   </div>
   <div class="plain-result"><div class="result-label">예상 결과 · 안내준비 시트의 B4로 돌아오기</div><p><strong>과정A_운영연습.xlsx → 안내준비 → B4</strong><br>「합성 안내표 검토 지점」인지 확인하고 일을 이어 갑니다.</p></div>
-  <div class="note">문서 내용을 보관하는 기능은 아닙니다. 행이나 열을 바꿨다면 돌아온 내용을 확인하세요.</div>
-  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+  <div class="note">문서 내용은 Excel에서 저장합니다. 행이나 열을 바꿨다면 새 위치에 책갈피를 남기세요.</div>
 </section>
 
 <section class="scene" id="state" aria-labelledby="state-title">
-  <div class="example-label">설명용 예시 화면 · 가짜 연습 자료</div>
   <div class="scene-title"><div class="scene-number">7</div><h1 id="state-title">과정 폴더마다 사람이 고른 상태 표시하기</h1></div>
-  <p class="tool-name">FolderState · 아래 상태는 연습용 제안입니다.</p>
+  <p class="tool-name">FolderState · 폴더의 진행 상태를 골라 표시</p>
   <div class="panel"><div class="window-title">탐색기 목록의 예 · 사람이 각각 상태를 지정한 뒤</div><div class="path">교육운영_합성 › 과정A</div><table class="folder-list" aria-label="연습 폴더 상태"><thead><tr><th>폴더 이름</th><th>연습 상황</th><th>고른 상태</th></tr></thead><tbody>
     <tr><td class="folder-name"><span class="folder-symbol"></span>01_입과안내</td><td>안내 내용을 검토 중</td><td><span class="state-symbol doing"></span>진행 중</td></tr>
     <tr><td class="folder-name"><span class="folder-symbol"></span>02_강의자료</td><td>배포할지 결정이 필요함</td><td><span class="state-symbol issue">!</span>확인 필요</td></tr>
@@ -229,8 +206,7 @@ td{background:#fffdf9}
   </tbody></table></div>
   <div class="step"><strong>할 일</strong> · 폴더를 하나씩 직접 고릅니다.<div class="step-row"><span>마우스 오른쪽 버튼</span><span class="arrow">→</span><span>더 많은 옵션 표시</span><span class="arrow">→</span><span class="menu-action">업무 상태</span></div><div class="step-row"><span class="menu-action">시작 전</span><span class="menu-action">진행 중</span><span class="menu-action">완료</span><span class="menu-action">확인 필요</span></div><p style="margin:10px 0 0">각 폴더의 상황에 맞는 상태 하나를 누릅니다.</p></div>
   <div class="plain-result"><div class="result-label">예상 결과 · 이름과 연습 파일은 그대로</div><p>사람이 고른 상태를 표시합니다.<br>폴더 안 파일을 읽거나 일을 끝냈는지 자동으로 판단하지 않습니다.</p></div>
-  <div class="note">원·느낌표는 뜻을 설명하기 위한 기호입니다. 실제 아이콘과 같다는 뜻은 아닙니다.<br><strong>시작 전</strong>은 상태를 저장하고, <strong>상태 표시 지우기</strong>는 상태 자체를 없앱니다.</div>
-  <div class="footer">실제 프로그램 화면과 다를 수 있습니다.</div>
+  <div class="note"><strong>시작 전</strong>은 상태를 저장하고, <strong>상태 표시 지우기</strong>는 상태 자체를 없앱니다.</div>
 </section>
 </main>
 </body>

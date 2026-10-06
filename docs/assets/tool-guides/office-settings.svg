@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
-<title id="title">설정과 기록 보관하기</title><desc id="desc">설정 백업에 원본·템플릿·결과 파일은 포함되지 않습니다. 덮어쓰기 같은 허용 선택은 다시 확인하세요.</desc>
+<title id="title">설정과 기록 보관하기</title><desc id="desc">설정 백업에 원본·템플릿·결과 파일은 포함되지 않습니다. 복원한 뒤 덮어쓰기 여부를 선택합니다.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="720" height="244" rx="4" fill="#fffdf9"/>
 <path d="M108 16H132" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

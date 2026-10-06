@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="432" viewBox="0 0 320 432" role="img" aria-labelledby="title desc">
-<title id="title">설치 전에 확인하세요</title><desc id="desc">공개된 1.2.0 설치 파일을 사용합니다. PC의 종류와 회사에서 허용한 설치 절차를 확인하세요.</desc>
+<title id="title">설치 전에 확인하세요</title><desc id="desc">공개된 1.2.0 설치 파일을 사용합니다. 설치 파일을 실행하고 마법사의 순서대로 진행하세요.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="320" height="432" rx="4" fill="#fffdf9"/>
 <g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M65 82V91M79 82V91M51 92H93" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="37" y="36" width="69" height="31" rx="8" fill="#f2e9dd" stroke="#ded2c4" stroke-width="2"/></g>
@@ -10,10 +10,10 @@
 <g transform="translate(9 163) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">1.2.0 설치 파일</text>
 <text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">MSI와 확인 자료 제공</text>
-<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">제작자 전자 서명 없음</text>
+<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">설치 마법사로 진행</text>
 <path d="M18 288H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 <g transform="translate(9 307) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#ece5d7" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="55" y="43" width="34" height="26" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M62 43V33Q72 18 82 33V43" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-<text x="120" y="323" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">회사 설치 기준 확인</text>
-<text x="120" y="348" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">허용된 설치 절차로</text>
+<text x="120" y="323" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">설치 준비</text>
+<text x="120" y="348" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">받은 MSI 실행</text>
 <text x="120" y="368" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">사용 환경 먼저 확인</text>
 </g></svg>

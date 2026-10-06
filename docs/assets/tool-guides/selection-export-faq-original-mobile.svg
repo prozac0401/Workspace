@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="288" viewBox="0 0 320 288" role="img" aria-labelledby="title desc">
-<title id="title">원본의 수식이나 필터가 바뀌나요?</title><desc id="desc">원본을 자동 저장하거나 바꾸지 않도록 만들었습니다. 중요한 편집은 먼저 저장하고 결과를 확인하세요.</desc>
+<title id="title">원본의 수식이나 필터가 바뀌나요?</title><desc id="desc">작업 전에 원본의 편집 내용을 저장하고, 내보낸 통합문서에서 결과를 확인하세요.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="320" height="288" rx="4" fill="#fffdf9"/>
 <g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#ece5d7" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="55" y="43" width="34" height="26" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M62 43V33Q72 18 82 33V43" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>

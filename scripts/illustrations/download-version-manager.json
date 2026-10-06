@@ -51,7 +51,7 @@
       {"icon":"menu","title":"종료한 뒤 제거","lines":["알림 영역에서 종료 선택","Windows 설치된 앱에서 제거"]},
       {"icon":"folder-check","title":"사용자 자료는 보존","lines":["감시 폴더와 _history 유지","사용자 실행 설정도 유지"]}
     ],
-    "caption":"지원하는 로컬 폴더 한 곳에 저장된 파일을 처리합니다. 제거해도 자료는 남으며, 구버전 확장과 같은 폴더에서 함께 실행하지 마세요."
+    "caption":"지원하는 로컬 폴더 한 곳에 저장된 파일을 처리합니다. 제거해도 자료는 남으며, 구버전 확장을 사용했다면 종료한 뒤 새 프로그램을 실행합니다."
   },
   {
     "page":"tools/download-version-manager/index.md","heading":"이전 버전에서 바뀐 점","id":"download-manager-versions","mode":"compare",

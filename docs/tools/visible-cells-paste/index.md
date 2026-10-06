@@ -8,9 +8,9 @@ Excel에서 복사한 값을 **선택한 한 열의 보이는 칸에만** 순서
 <figure class="tool-figure">
   <picture>
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/visible-paste-download-mobile.svg" width="320" height="432">
-    <img src="../../assets/tool-guides/visible-paste-download.svg" width="720" height="244" alt="배포 파일 목록 열기: 보이는 칸 붙여넣기 선택 Assets의 설치 파일 받기 / Windows PC용 Excel: 설치된 Excel에서 사용 웹·Mac용 Excel은 제외 / 회사 설치 절차 확인: 전자 서명 없는 설치 파일 Office 보안 정책 유지" loading="lazy" decoding="async">
+    <img src="../../assets/tool-guides/visible-paste-download.svg" width="720" height="244" alt="배포 파일 목록 열기: 보이는 칸 붙여넣기 선택 Assets의 설치 파일 받기 / Windows PC용 Excel: 설치된 Excel에서 사용 웹·Mac용 Excel은 제외 / 회사 설치 절차 확인: 설치 파일 실행 설치 마법사로 진행" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 배포 목록에서 보이는 칸 붙여넣기 버전을 고르고 Setup.exe를 받으세요. ZIP을 제공하는 배포에서는 ZIP 방식도 사용할 수 있습니다.</figcaption>
+  <figcaption>배포 목록에서 보이는 칸 붙여넣기 버전을 고르고 Setup.exe를 받으세요. ZIP을 제공하는 배포에서는 ZIP 방식도 사용할 수 있습니다.</figcaption>
 </figure>
 <!-- tool-figure:visible-paste-download:end -->
 
@@ -22,8 +22,6 @@ Excel에서 복사한 값을 **선택한 한 열의 보이는 칸에만** 순서
 
 웹용 Excel과 Mac용 Excel에서는 사용할 수 없습니다. 여러 열 붙여넣기는 지원하지 않습니다. 아래 [지원 범위](#supported)와 [되돌리기 조건](#undo)을 먼저 확인하세요.
 
-설치 파일에는 제작자를 확인하는 전자 서명이 없습니다. 회사에서 서명된 추가 기능이나 사전 승인을 요구하면 담당자의 배포 절차를 따르세요. 설치 프로그램은 Office 보안 정책을 바꾸지 않습니다.
-
 ## 설치하기 {#install}
 
 <!-- tool-figure:visible-paste-install:start -->
@@ -32,7 +30,7 @@ Excel에서 복사한 값을 **선택한 한 열의 보이는 칸에만** 순서
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/visible-paste-install-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/visible-paste-install.svg" width="720" height="244" alt="저장하고 Excel 종료 (1): 열린 파일을 먼저 저장 모든 Excel 종료 → 설치 파일 실행 (2): Setup.exe 실행 ZIP은 풀고 Install.cmd → 우클릭 메뉴 확인 (3): Excel을 다시 실행 붙여넣기·되돌리기 메뉴" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 설치는 한 번만 하면 됩니다. 이후 Excel을 평소처럼 실행해 셀 우클릭 메뉴를 사용합니다.</figcaption>
+  <figcaption>설치는 한 번만 하면 됩니다. 이후 Excel을 평소처럼 실행해 셀 우클릭 메뉴를 사용합니다.</figcaption>
 </figure>
 <!-- tool-figure:visible-paste-install:end -->
 
@@ -41,7 +39,7 @@ Excel에서 복사한 값을 **선택한 한 열의 보이는 칸에만** 순서
 3. 설치 안내를 확인합니다. 설치 프로그램이 Excel의 32·64비트를 확인하고 맞는 파일을 설치합니다.
 4. 평소처럼 Excel을 실행합니다. 셀을 우클릭하면 **보이는 칸에 붙여넣기**와 **마지막 붙여넣기 되돌리기**가 나타납니다.
 
-ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행합니다. 파일 일부만 따로 옮기지 마세요.
+ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행합니다. 압축을 푼 파일은 같은 폴더에 함께 둡니다.
 
 현재 Windows 사용자 계정에 설치하며 기본 위치는 `%LOCALAPPDATA%\VisibleCellsPaste`입니다. 관리자 권한이나 개발용 프로그램은 필요하지 않습니다. 명령을 직접 써 넣거나 따로 실행할 필요는 없습니다. 설치 후 Excel을 열면 사용할 준비가 됩니다.
 
@@ -55,7 +53,7 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/visible-paste-use-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/visible-paste-use.svg" width="720" height="244" alt="한 행·한 열 복사: 85 → 90 → 78 Ctrl+C로 복사 → 대상 한 열 선택: 2·4·5행이 보이는 예 숨긴 3행은 건너뛰기 → 보이는 칸에 붙여넣기: 2행 85 · 4행 90 · 5행 78 개수가 다르면 중단" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 복사한 값 3개를 보이는 대상 3칸에 위에서 아래로 넣습니다. 숨긴 행은 유지하며 이름이나 사번을 찾아 연결하지 않습니다.</figcaption>
+  <figcaption>복사한 값 3개를 보이는 대상 3칸에 위에서 아래로 넣습니다. 숨긴 행은 유지하며 이름이나 사번을 찾아 연결하지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:visible-paste-use:end -->
 
@@ -87,7 +85,7 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/visible-paste-values-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/visible-paste-values.svg" width="720" height="244" alt="빈칸도 자리 유지: 해당 순서의 내용을 비움 빈칸을 빼고 당기지 않음 / 수식은 결과만: 계산 결과 값을 입력 대상의 표시 형식 유지 / 날짜는 원래 숫자: 1900·1904 보정 안 함 날짜 표시가 달라질 수 있음" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 빈칸·숫자·문자열의 위치와 값을 보존합니다. 날짜 숫자와 대상 서식을 그대로 쓰므로 원본과 표시가 달라질 수 있습니다.</figcaption>
+  <figcaption>빈칸·숫자·문자열의 위치와 값을 보존합니다. 날짜 숫자와 대상 서식을 그대로 쓰므로 원본과 표시가 달라질 수 있습니다.</figcaption>
 </figure>
 <!-- tool-figure:visible-paste-values:end -->
 
@@ -95,10 +93,10 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
 - 수식은 **복사된 계산 결과**를 넣습니다. 수식 자체를 옮기거나 원본을 다시 계산하지 않습니다.
 - 실제 빈칸도 한 항목으로 셉니다. 처음·가운데·마지막의 빈칸은 대응하는 대상의 내용을 비웁니다. 수식 `=""`처럼 아무 글자도 보이지 않는 결과도 한 항목으로 셉니다. 이 결과는 붙여넣을 때 실제 빈칸으로 저장될 수 있습니다.
 - 대상의 숫자 표시 형식, 글꼴, 배경, 테두리와 조건부 서식을 유지합니다. 원본의 표시 형식을 복사하지 않습니다.
-- 날짜·시간·백분율은 원래 숫자 값을 사용합니다. 날짜·시간의 숫자 값을 복사 정보에서 안전하게 확인할 수 없으면 중단합니다. 대상의 표시 형식에 따라 보이는 모양은 달라질 수 있으며, 날짜를 숫자로 바꾸는 기준 연도가 1900년 또는 1904년으로 다를 때 그 차이를 자동으로 고치지는 않습니다.
+- 날짜·시간·백분율은 원래 숫자 값을 사용합니다. 복사 정보에서 날짜·시간의 숫자 값을 확인할 수 없으면 중단합니다. 대상의 표시 형식에 따라 보이는 모양은 달라질 수 있으며, 날짜를 숫자로 바꾸는 기준 연도가 1900년 또는 1904년으로 다를 때 그 차이를 자동으로 고치지는 않습니다.
 - 실제 숫자 `123`이 표시 형식 때문에 `00123`으로 보이는 경우, 넣는 값은 숫자 `123`입니다. 글자 `00123`과는 다릅니다.
 
-값의 종류나 빈칸을 포함한 개수를 안전하게 읽을 수 없으면 중단합니다. 일반 텍스트를 숫자나 날짜로 추측해서 바꾸지 않습니다.
+값의 종류나 빈칸을 포함한 개수를 읽을 수 없으면 중단합니다. 일반 텍스트를 숫자나 날짜로 추측해서 바꾸지 않습니다.
 
 ## 지원 범위 {#supported}
 
@@ -108,7 +106,7 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/visible-paste-limits-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/visible-paste-limits.svg" width="720" height="244" alt="한 열의 보이는 칸: 값만 있는 표 열도 가능 보이는 대상 최대 50,000칸 / 지원 제외 범위: 합쳐진 칸·보호된 시트 여러 열·잘라내기 제외 / 대량 작업 확인: 5,000칸 또는 1,000구간 이상부터 진행 여부 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 지원하지 않는 범위는 쓰기 전에 중단합니다. 항목 수 외에도 선택 범위·복사 데이터 크기·보이는 구간 수의 상한이 있습니다.</figcaption>
+  <figcaption>지원하지 않는 범위는 쓰기 전에 중단합니다. 항목 수 외에도 선택 범위·복사 데이터 크기·보이는 구간 수의 상한이 있습니다.</figcaption>
 </figure>
 <!-- tool-figure:visible-paste-limits:end -->
 
@@ -119,10 +117,10 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
 - 여러 행과 여러 열로 된 원본, 잘라내기.
 - 여러 열 대상, 전체 행·열 선택, 직접 만든 여러 영역 선택, 숨긴 대상 열.
 - 합쳐진 칸, 여러 칸에 결과를 함께 표시하는 수식, 자료를 모아 합계·평균 등으로 요약하는 표, 입력할 값을 제한하는 규칙이 있는 대상.
-- 수정을 막아 둔 시트, 읽기 전용 파일, 보안을 위해 편집이 제한된 보기, 여러 시트를 함께 선택한 상태.
+- 수정을 막아 둔 시트, 읽기 전용 파일, **제한된 보기**, 여러 시트를 함께 선택한 상태.
 - 웹 표·일반 텍스트·그림·파일 복사, 지원하지 않는 새로운 오류 종류(예: `#SPILL!`, `#CALC!`).
 
-표에서는 값만 있는 데이터 열을 사용합니다. 같은 표 열의 숨긴 행에 수식이 있어도 중단합니다. 일반 셀의 기존 수식을 값으로 바꿀 때는 실행 전에 확인합니다. 다른 프로그램이나 추가 기능이 동시에 셀·행·정렬을 변경하는 동안에는 사용하지 마세요.
+표에서는 값만 있는 데이터 열을 사용합니다. 같은 표 열의 숨긴 행에 수식이 있어도 중단합니다. 일반 셀의 기존 수식을 값으로 바꿀 때는 실행 전에 확인합니다. 다른 프로그램이나 추가 기능의 셀·행·정렬 변경이 끝난 뒤 실행하세요.
 
 한 번에 원본과 보이는 대상 각각 **50,000개**, 선택 범위 **200,000칸**, 숨김으로 나뉜 구간 **20,000개**, 복사한 내용 **32 MiB**까지 처리합니다. 5,000칸 또는 1,000구간부터 진행 여부를 확인합니다. 숨긴 행이 번갈아 많으면 같은 개수의 연속 범위보다 오래 걸릴 수 있습니다.
 
@@ -134,7 +132,7 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/visible-paste-undo-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/visible-paste-undo.svg" width="720" height="244" alt="붙여넣기 직후: 같은 선택 그대로 유지 다른 편집 전에 실행 → 자체 메뉴로 되돌리기: 마지막 성공 작업 한 번 원래 값과 수식 복구 → 제한 안내 확인: 정렬 설정 등이 있으면 제한 기존 Ctrl+Z 기록 소실 가능" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 최근 한 번만 자체 메뉴로 되돌립니다. 선택·편집·정렬 상태 등에 따라 제한되며, 파일을 닫은 뒤에는 복구할 수 없습니다.</figcaption>
+  <figcaption>최근 한 번만 자체 메뉴로 되돌립니다. 선택·편집·정렬 상태 등에 따라 제한되며, 파일을 닫은 뒤에는 복구할 수 없습니다.</figcaption>
 </figure>
 <!-- tool-figure:visible-paste-undo:end -->
 
@@ -144,7 +142,7 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
 
 - 선택 범위·시트·Excel 파일을 바꾸거나 셀을 편집한 뒤.
 - 행 삽입·삭제·정렬 등 구조를 바꾸거나 파일을 닫은 뒤.
-- Excel을 다시 시작했거나 안전하게 같은 위치인지 확인할 수 없을 때.
+- Excel을 다시 시작했거나 원래 붙여넣은 위치를 확인할 수 없을 때.
 - **기존 정렬 설정이 남아 있는 시트 또는 표.** 이 경우 방금 붙여넣었어도 되돌리기를 제공하지 않습니다.
 
 이 도구로 값을 쓰면 Excel의 기존 **Ctrl+Z 기록이 지워질 수 있습니다.** 방금 실행한 작업은 이 도구의 **마지막 붙여넣기 되돌리기** 메뉴로 복구하세요. 파일을 닫은 뒤에도 남는 백업 기능은 아닙니다.
@@ -159,7 +157,7 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/visible-paste-maintenance-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/visible-paste-maintenance.svg" width="720" height="244" alt="업데이트: 파일 저장·Excel 종료 새 설치 파일 실행 / 도구 제거: Windows 설치된 앱 또는 Uninstall.cmd / 사용자 자료 보존: 통합문서·다른 도구 유지 외부 수정 파일은 안내 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 업데이트와 제거 전에 Excel을 저장하고 종료하세요. 이 도구의 자동 로드 등록과 소유 파일을 정리합니다.</figcaption>
+  <figcaption>업데이트와 제거 전에 Excel을 저장하고 종료하세요. 이 도구의 자동 로드 등록과 소유 파일을 정리합니다.</figcaption>
 </figure>
 <!-- tool-figure:visible-paste-maintenance:end -->
 
@@ -175,19 +173,17 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/visible-paste-troubleshooting-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/visible-paste-troubleshooting.svg" width="720" height="244" alt="메뉴가 없으면: Excel 종료·다시 실행 추가 기능 차단 여부 확인 / 개수가 다르면: 빈칸 포함 원본 개수 확인 보이는 대상 개수와 대조 / 되돌리기가 안 되면: 선택·편집·정렬 상태 확인 기존 정렬 설정도 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 안내 문구에 맞춰 선택 범위와 복사한 내용을 확인하세요. 문의할 때 이름·명단·수식·업무 파일을 공개하지 마세요.</figcaption>
+  <figcaption>안내 문구에 맞춰 선택 범위와 복사한 내용을 확인하세요. 문의할 때는 선택한 범위와 안내 문구를 적어 주세요.</figcaption>
 </figure>
 <!-- tool-figure:visible-paste-troubleshooting:end -->
 
 | 안내 또는 상황 | 다음에 할 일 |
 |---|---|
-| 메뉴가 없어요 | Excel을 완전히 종료한 뒤 다시 여세요. Excel의 **파일 → 옵션 → 추가 기능 → 관리: COM 추가 기능**에서 **보이는 칸 붙여넣기**를 확인하세요. 조직이 사용을 차단했다면 담당자에게 문의하세요. |
+| 메뉴가 없어요 | Excel을 완전히 종료한 뒤 다시 여세요. Excel의 **파일 → 옵션 → 추가 기능 → 관리: COM 추가 기능**에서 **보이는 칸 붙여넣기**를 확인하세요. |
 | 원본과 대상 개수가 다르대요 | 빈칸도 한 항목입니다. 복사 범위와 선택 범위를 다시 확인하세요. 숨긴 대상 행은 개수에서 빠집니다. |
 | 복사 내용을 읽을 수 없대요 | 원본 Excel을 열어 둔 채 한 행 또는 한 열을 Ctrl+C로 다시 복사하세요. 지원 범위에 해당하는지도 확인하세요. |
 | 표나 셀을 처리할 수 없대요 | 병합, 보호, 입력할 값을 제한하는 규칙, 여러 셀에 결과를 함께 표시하는 수식과 표 열의 수식 여부를 확인하세요. |
 | 되돌리기를 할 수 없대요 | 선택·편집·정렬·파일 전환 여부와 기존 정렬 설정을 확인하세요. 조건이 달라졌으면 도구가 이전 위치에 강제로 쓰지 않습니다. |
 | 설치·제거가 중단돼요 | 문서를 저장하고 Excel이 정상 종료됐는지 확인한 뒤 다시 실행하세요. |
 
-추가 기능 차단을 풀기 위해 자동으로 작업하는 모든 기능을 허용하거나, 개발용 설정을 켜거나, 실행을 허용하는 폴더를 늘릴 필요는 없습니다. 회사 보안 기준에 따라 설치하세요.
-
-문의할 때는 Windows·Excel 버전, 실행 순서와 오류 표시를 알려 주세요. 이름·명단·수식·복사한 내용과 업무 파일을 공개 게시물에 첨부하지 마세요. 이 도구는 외부 서비스에 연결하거나 사용 통계를 보내지 않습니다.
+문의할 때는 Windows·Excel 버전, 실행 순서와 오류 표시를 알려 주세요. 이 도구는 외부 서비스에 연결하거나 사용 통계를 보내지 않습니다.

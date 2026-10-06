@@ -12,7 +12,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/excel-download-mobile.svg" width="320" height="288">
     <img src="../../assets/tool-guides/excel-download.svg" width="720" height="244" alt="설치 파일 (EXE): 받은 파일을 실행 안내에 따라 설치 / 압축 파일 (ZIP): 모두 풀고 Release 열기 Install.cmd 실행" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 설치 파일을 실행하거나 ZIP을 모두 풀고 Release 폴더의 Install.cmd를 실행합니다.</figcaption>
+  <figcaption>설치 파일을 실행하거나 ZIP을 모두 풀고 Release 폴더의 Install.cmd를 실행합니다.</figcaption>
 </figure>
 <!-- tool-figure:excel-download:end -->
 
@@ -29,7 +29,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/excel-install-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/excel-install.svg" width="720" height="244" alt="저장하고 닫기: 작업 파일을 저장 Excel 창을 모두 닫기 → 설치 실행: 현재 Windows 계정에 도구를 설치 → 버튼 확인: Excel 추가 기능 탭 명단 비교 버튼 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 64비트 Windows와 설치된 데스크톱 Excel에서 사용합니다. 설치 후 추가 기능 탭이나 셀 우클릭 메뉴로 시작하세요.</figcaption>
+  <figcaption>64비트 Windows와 설치된 데스크톱 Excel에서 사용합니다. 설치 후 추가 기능 탭이나 셀 우클릭 메뉴로 시작하세요.</figcaption>
 </figure>
 <!-- tool-figure:excel-install:end -->
 
@@ -37,7 +37,7 @@
 2. **ExcelSmartListCompare-0.2.1-Setup.exe**를 실행하고 **설치**를 누릅니다.
 3. Excel의 **추가 기능** 탭에서 명단 비교 버튼을 확인합니다. 셀을 마우스 오른쪽 버튼으로 눌러도 사용할 수 있습니다.
 
-ZIP은 모두 푼 뒤 `Release` 폴더의 **Install.cmd**를 실행합니다. 지금 로그인한 Windows 계정에 설치합니다. 관리자 권한이나 개발용 프로그램은 필요하지 않습니다. 설치 폴더는 Excel이 실행을 허용하는 위치로 등록합니다. 이 폴더에는 명단 비교 프로그램 파일만 보관하세요. 설치 파일에는 제작자를 확인하는 전자 서명이 없습니다. 회사 PC에서는 승인된 설치 절차를 따르세요.
+ZIP은 모두 푼 뒤 `Release` 폴더의 **Install.cmd**를 실행합니다. 지금 로그인한 Windows 계정에 설치합니다. 관리자 권한이나 개발용 프로그램은 필요하지 않습니다. 설치 폴더는 Excel이 실행을 허용하는 위치로 등록합니다. 이 폴더에는 명단 비교 프로그램 파일만 보관하세요.
 
 Mac용 Excel과 웹페이지에서 쓰는 Excel은 지원하지 않습니다.
 
@@ -49,7 +49,7 @@ Mac용 Excel과 웹페이지에서 쓰는 Excel은 지원하지 않습니다.
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/excel-compare-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/excel-compare.svg" width="720" height="244" alt="첫 목록 선택 (1): 제목을 빼고 셀 선택 첫 번째 목록 담기 → 필요하면 확인: 담은 목록 확인에서 가져온 위치·값 확인 → 둘째 목록 비교 (2): 같은 Excel에서 선택 두 번째 목록 담아 비교" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 셀 순서와 가로·세로 방향은 달라도 됩니다. 같은 값이 각 목록에 몇 개씩 있는지를 비교합니다.</figcaption>
+  <figcaption>셀 순서와 가로·세로 방향은 달라도 됩니다. 같은 값이 각 목록에 몇 개씩 있는지를 비교합니다.</figcaption>
 </figure>
 <!-- tool-figure:excel-compare:end -->
 
@@ -67,7 +67,7 @@ Mac용 Excel과 웹페이지에서 쓰는 Excel은 지원하지 않습니다.
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/excel-results-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/excel-results.svg" width="720" height="244" alt="첫 목록 (3): 같은 비교값 A가 3개 들어 있음 / 둘째 목록 (1): 같은 비교값 A가 1개 들어 있음 / 차이 결과 (+2): A의 개수가 다름 첫 목록에 2개 더 많음" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 차이 결과는 값별 개수 차이를 보여줍니다. 원본 값과 셀 위치는 예시 하나이며, 그 셀이 잘못됐다는 뜻은 아닙니다.</figcaption>
+  <figcaption>차이 결과는 값별 개수 차이를 보여줍니다. 원본 값과 셀 위치는 예시 하나이며, 그 셀이 잘못됐다는 뜻은 아닙니다.</figcaption>
 </figure>
 <!-- tool-figure:excel-results:end -->
 
@@ -80,7 +80,7 @@ Mac용 Excel과 웹페이지에서 쓰는 Excel은 지원하지 않습니다.
 
 추가 개수와 원본 셀 위치는 G:J열에 보관합니다. 필요하면 **F~K열 머리글 선택 → 우클릭 → 숨기기 취소**로 펼치세요. ‘더 많은 개수’는 두 목록의 개수 차이입니다. 예를 들어 첫 목록 3개·둘째 목록 1개이면 첫 목록이 2개 더 많습니다. 원본 값과 셀 위치는 예시 하나이며, 그 셀이 잘못됐다는 뜻은 아닙니다.
 
-결과 파일은 원하는 위치에 직접 저장하세요. 원본과 이전 결과는 바뀌지 않습니다. 기본 설정에서는 비교가 끝나면 기억한 첫 목록을 비웁니다. 실패·취소·경고 거절 시에는 유지합니다.
+결과 파일은 원하는 위치에 직접 저장하세요. 원본과 이전 결과는 바뀌지 않습니다. 기본 설정에서는 비교가 끝나면 기억한 첫 목록을 비웁니다. 실패하거나 진행 확인에서 취소하면 유지합니다.
 
 ## 담은 목록 확인하기
 
@@ -90,7 +90,7 @@ Mac용 Excel과 웹페이지에서 쓰는 Excel은 지원하지 않습니다.
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/excel-snapshot-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/excel-snapshot.svg" width="720" height="244" alt="원본을 수정해도: 현재 셀의 값만 변경 담은 값은 자동 갱신 안 됨 / 담을 때의 값 확인: 이미 담아 둔 첫 목록 일부 값과 위치를 표시 / 새 값을 담으려면: 수정한 범위를 선택 첫 번째 목록 바꾸기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 담은 목록 확인은 현재 선택을 다시 읽지 않습니다. 화면에 일부 위치만 표시해도 비교할 때는 전체 개수를 셉니다.</figcaption>
+  <figcaption>담은 목록 확인은 현재 선택을 다시 읽지 않습니다. 화면에 일부 위치만 표시해도 비교할 때는 전체 개수를 셉니다.</figcaption>
 </figure>
 <!-- tool-figure:excel-snapshot:end -->
 
@@ -108,7 +108,7 @@ Mac용 Excel과 웹페이지에서 쓰는 Excel은 지원하지 않습니다.
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/excel-settings-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/excel-settings.svg" width="720" height="244" alt="메일 전체 주소 비교 (@): 끄면 @ 앞부분만 켜면 전체 주소 비교 / 대소문자 무시 (Aa): 끄면 ABC ≠ abc 켜면 ABC = abc / 비교 후 첫 목록 유지: 끄면 성공 후 비우기 켜면 다음 비교에 재사용" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 처음에는 세 설정 모두 꺼져 있습니다. 메일·대소문자 기준을 바꾸려면 첫 목록을 비운 뒤 설정하고 다시 담으세요.</figcaption>
+  <figcaption>처음에는 세 설정 모두 꺼져 있습니다. 메일·대소문자 기준을 바꾸려면 첫 목록을 비운 뒤 설정하고 다시 담으세요.</figcaption>
 </figure>
 <!-- tool-figure:excel-settings:end -->
 
@@ -132,7 +132,7 @@ Mac용 Excel과 웹페이지에서 쓰는 Excel은 지원하지 않습니다.
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/excel-limits-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/excel-limits.svg" width="720" height="244" alt="보이는 값 비교: 숨김·필터 셀 제외 빈칸·오류도 제외 / 나눌 때는 값 기준: 같은 비교값은 양쪽에서 같은 묶음에 넣기 / 취소 후 종료 확인 (Esc): Esc 또는 작업 취소 도구 모음의 취소 완료 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 두 목록을 같은 행 수로 나누면 잘못된 차이가 생길 수 있습니다. 입력 상한 이내라도 시간 제한으로 중단될 수 있습니다.</figcaption>
+  <figcaption>두 목록을 같은 행 수로 나누면 잘못된 차이가 생길 수 있습니다. 입력 상한 이내라도 시간 제한으로 중단될 수 있습니다.</figcaption>
 </figure>
 <!-- tool-figure:excel-limits:end -->
 
@@ -150,12 +150,12 @@ Mac용 Excel과 웹페이지에서 쓰는 Excel은 지원하지 않습니다.
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/excel-maintenance-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/excel-maintenance.svg" width="720" height="244" alt="업데이트: 저장하고 Excel 종료 새 설치 파일 실행 / 설치 방식별 제거: EXE는 Windows 설정 ZIP은 Uninstall.cmd / 비교 설정은 보존: 같은 계정에 남음 도구에서 기본값 복원" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 업데이트·제거 전에는 파일을 저장하고 Excel을 닫으세요. 비교 설정을 초기화하려면 설치된 도구의 기본값으로 되돌리기를 사용합니다.</figcaption>
+  <figcaption>업데이트·제거 전에는 파일을 저장하고 Excel을 닫으세요. 비교 설정을 초기화하려면 설치된 도구의 기본값으로 되돌리기를 사용합니다.</figcaption>
 </figure>
 <!-- tool-figure:excel-maintenance:end -->
 
 파일을 저장하고 Excel을 닫은 뒤 새 설치 파일을 실행합니다. EXE로 설치했다면 **Windows 설정 → 앱 → 설치된 앱 → Excel 명단 비교 → 제거**, ZIP으로 설치했다면 **Uninstall.cmd**로 제거합니다.
 
-비교 설정은 업데이트·제거 후에도 같은 계정에 남습니다. 초기화하려면 설치된 도구의 **비교 설정 → 기본값으로 되돌리기**를 사용하세요. 설치 오류를 문의할 때는 사용자 이름과 실제 폴더 위치가 들어간 기록을 그대로 공개하지 마세요.
+비교 설정은 업데이트·제거 후에도 같은 계정에 남습니다. 초기화하려면 설치된 도구의 **비교 설정 → 기본값으로 되돌리기**를 사용하세요. 설치 오류를 문의할 때는 프로그램·Excel 버전과 실행 순서, 오류 문구를 적어 주세요.
 
 [0.2.1 배포 파일](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.1)

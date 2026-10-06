@@ -42,7 +42,7 @@ hide:
 
 ## 프로그램 받기 {#programs}
 
-다른 도구의 버전 확인일은 **2026년 10월 5일**이며, 다운로드 이름 유지 0.2.1과 오피스 자동화 도구 0.3.1 안내는 **2026년 10월 6일**에 갱신했습니다. 각 안내에서 사용할 수 있는 PC와 알려진 제한을 먼저 확인하세요. 기존 도구의 설치 파일에는 제작자의 전자 서명이 없습니다.
+다른 도구의 버전 확인일은 **2026년 10월 5일**이며, 다운로드 이름 유지 0.2.1과 오피스 자동화 도구 0.3.1 안내는 **2026년 10월 6일**에 갱신했습니다. 각 도구 안내에서 사용 환경과 설치 방법을 볼 수 있습니다.
 
 | 하고 싶은 일 | 프로그램과 설치 안내 |
 |---|---|
@@ -222,7 +222,6 @@ hide:
 </div>
 </div>
 
-!!! info "회사 기준을 먼저 확인하세요"
-    이 업무 안내는 **제안 단계**입니다. 회사에서 허용한 저장 위치와 자료 보관 기간, 기준으로 쓸 원본, 백업 방법은 [회사에서 정할 항목](policies/decisions.md)을 참고해 결정하세요. 상태를 바꾸거나 업무를 끝내도 되는지는 담당자가 확인합니다. 프로그램별 사용 환경과 방법은 [FolderState 설치 안내](tools/folderstate/index.md), [Excel 명단 비교 안내](tools/excel-list-compare/index.md), [업무 책갈피 안내](tools/bookmark/index.md), [선택범위 내보내기 안내](tools/excel-selection-export/index.md), [File List to Excel 안내](tools/file-list-to-excel/index.md), [그림 복사·저장 안내](tools/image-copy-save/guide.md)를 보세요.
+이 업무 안내는 **제안 단계**입니다. 저장 위치·자료 보관 기간·기준 원본·백업 방법은 [회사에서 정할 항목](policies/decisions.md)에 정리했습니다. 프로그램별 사용 환경과 방법은 [FolderState 설치 안내](tools/folderstate/index.md), [Excel 명단 비교 안내](tools/excel-list-compare/index.md), [업무 책갈피 안내](tools/bookmark/index.md), [선택범위 내보내기 안내](tools/excel-selection-export/index.md), [File List to Excel 안내](tools/file-list-to-excel/index.md), [그림 복사·저장 안내](tools/image-copy-save/guide.md)를 보세요.
 
 </div>

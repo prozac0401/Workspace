@@ -231,14 +231,6 @@ body {
   font-style: normal;
   text-align: center;
 }
-.tool-figure figcaption > span {
-  display: block;
-  margin-bottom: .25em;
-  color: var(--handbook-brass);
-  font-size: .62rem;
-  letter-spacing: .05em;
-  font-weight: 700;
-}
 @media (max-width: 760px) {
   .md-typeset .tool-figure { max-width: 18rem; margin: 1rem auto 1.25rem; }
   .md-typeset .tool-figure figcaption { padding: .7rem .8rem; }
@@ -247,4 +239,3 @@ body {
   .md-typeset .tool-figure { max-width: 160mm; }
   .tool-figure picture { filter: none !important; }
 }
-

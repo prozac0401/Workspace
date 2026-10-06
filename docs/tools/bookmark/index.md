@@ -8,8 +8,9 @@
 
 **한 줄 메모와 오른쪽 화살표** 스티커, 제목 클릭·**Ctrl+E** 편집과 다른 창으로 이동할 때 자동 저장하는 방식은 그대로입니다. Edge·Chrome·**네이버 Whale**에서는 확장 없이 웹페이지 제목과 주소를 기록합니다.
 
-!!! warning "업데이트 전 백업과 표시 변경을 확인하세요"
-    **직접 선택한 목록/스티커 모드와 조절한 크기는 유지합니다.** 0.2.6에서 기본 내용 크기 260×88을 쓰던 항목만 한 줄 크기로 줄이며 위치·모니터·접힘 상태는 보존합니다. 다만 표시 규칙을 한 번도 적용하지 않은 옛 설정에는 기존 최초 적용 정책에 따라 스티커 모드와 새 기본 크기를 적용합니다. 먼저 [백업](#backup)하세요. 이전 버전으로 돌아가도 예전 크기가 자동 복구되지는 않습니다.
+**업데이트와 표시 설정**
+
+**직접 선택한 목록/스티커 모드와 조절한 크기는 유지합니다.** 0.2.6에서 기본 내용 크기 260×88을 쓰던 항목만 한 줄 크기로 줄이며 위치·모니터·접힘 상태는 보존합니다. 다만 표시 규칙을 한 번도 적용하지 않은 옛 설정에는 기존 최초 적용 정책에 따라 스티커 모드와 새 기본 크기를 적용합니다. 먼저 [백업](#backup)하세요. 이전 버전으로 돌아가도 예전 크기가 자동 복구되지는 않습니다.
 
 ## 설치 파일 받기 {#download}
 
@@ -17,21 +18,23 @@
 <figure class="tool-figure">
   <picture>
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-download-mobile.svg" width="320" height="432">
-    <img src="../../assets/tool-guides/bookmark-guide-download.svg" width="720" height="244" alt="PC 환경 확인: Windows 11 x64 업데이트 전 기록 백업 / MSI로 설치: 0.2.10 설치 파일 회사 설치 기준 확인 / ZIP으로 실행: 폴더 전체 압축 해제 실행 파일만 옮기지 않기" loading="lazy" decoding="async">
+    <img src="../../assets/tool-guides/bookmark-guide-download.svg" width="720" height="244" alt="PC 환경 확인: Windows 11 x64 업데이트 전 기록 백업 / MSI로 설치: 0.2.10 설치 파일 설치 준비 / ZIP으로 실행: 폴더 전체 압축 해제 폴더 안에서 프로그램 실행" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> MSI 설치와 ZIP 실행 중 필요한 방식을 선택하세요. 전자 서명이 없는 0.2.10 배포이며, 이전 버전의 사용자 지정 설치 경로는 별도 업데이트 절차를 먼저 확인합니다.</figcaption>
+  <figcaption>MSI 설치와 ZIP 실행 중 필요한 방식을 선택하세요. 이전 버전의 사용자 지정 설치 경로는 해당 업데이트 순서를 따릅니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-download:end -->
 
 기본 대상은 **64비트 Windows 11 PC**입니다. Excel·Word·PowerPoint의 문서 위치를 기록하려면 PC에 설치된 해당 프로그램이 설치되어 있어야 합니다. 웹페이지 기록에는 Office나 브라우저 확장이 필요하지 않습니다. Windows 10과 ARM64 방식의 PC는 기본 지원 대상에 포함하지 않습니다.
 
-이미 0.2.10을 사용 중이면 다시 설치할 필요가 없습니다. 설치 파일에는 **제작자를 확인하는 전자 서명이 없습니다.** 회사 PC에서는 허용된 설치 절차를 따르세요.
+이미 0.2.10을 사용 중이면 현재 설치를 그대로 사용합니다.
 
-!!! warning "이전 버전에서 업데이트한다면 먼저 백업하세요"
-    0.2.x는 책갈피를 저장하는 방식 v5를 사용합니다. **0.1.7은 새 방식으로 바꾼 기록을 읽을 수 없습니다.** 0.2.0~0.2.9에서 0.2.10으로 바꿀 때 저장된 기록의 형식을 다시 바꾸지 않습니다. [백업과 이전 버전으로 돌아가는 방법](#backup)을 확인하세요.
+**이전 버전의 기록 가져오기**
 
-!!! warning "다른 폴더에 설치했다면 바꾸는 순서를 먼저 확인하세요"
-    0.2.3 이하를 기본 위치가 아닌 폴더에 설치했다면 **기존 설치 파일과 원래 설치 경로를 지정해 제거한 뒤** 새로 설치해야 합니다. 아래 [다른 폴더에 설치한 이전 버전 바꾸기](#custom-path)을 먼저 확인하세요.
+0.2.x는 책갈피를 저장하는 방식 v5를 사용합니다. **0.1.7은 새 방식으로 바꾼 기록을 읽을 수 없습니다.** 0.2.0~0.2.9에서 0.2.10으로 바꿀 때 저장된 기록의 형식을 다시 바꾸지 않습니다. [백업과 이전 버전으로 돌아가는 방법](#backup)을 확인하세요.
+
+**사용자 지정 경로에서 업데이트하기**
+
+0.2.3 이하를 기본 위치가 아닌 폴더에 설치했다면 **기존 설치 파일과 원래 설치 경로를 지정해 제거한 뒤** 새로 설치해야 합니다. 아래 [다른 폴더에 설치한 이전 버전 바꾸기](#custom-path)을 먼저 확인하세요.
 
 [0.2.10 설치 파일 받기 (MSI)](https://github.com/prozac0401/BookMark/releases/download/v0.2.10/WorkBookmark-0.2.10-win-x64.msi){ .md-button .md-button--primary }
 [0.2.10 · 설치 없이 실행하기 (ZIP)](https://github.com/prozac0401/BookMark/releases/download/v0.2.10/WorkBookmark-0.2.10-win-x64.zip){ .md-button }
@@ -46,7 +49,7 @@
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-start-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-start.svg" width="720" height="244" alt="폴더에서 시작: 설치 후 프로그램 실행 폴더의 파일 선택 해제 → 현재 위치 남기기: Ctrl+Alt+B 누르기 책갈피 저장 알림 확인 → 저장한 작업 열기: 트레이 → 책갈피 보기 스티커 오른쪽 화살표" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 실제 폴더 하나로 연습하세요. 스티커의 오른쪽 화살표로 저장한 위치를 열고, 목록 모드에서는 항목을 고른 뒤 Enter를 누릅니다.</figcaption>
+  <figcaption>실제 폴더 하나로 연습하세요. 스티커의 오른쪽 화살표로 저장한 위치를 열고, 목록 모드에서는 항목을 고른 뒤 Enter를 누릅니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-start:end -->
 
@@ -71,11 +74,11 @@ ZIP은 **폴더 전체를 압축 해제**한 뒤 맨 위의 `WorkBookmark.exe`�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-apps-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-apps.svg" width="720" height="244" alt="설치형 Office: 셀·본문·슬라이드 위치 문서 내용은 별도로 저장 / 메모장: 기록 당시 본문도 보관 새 복원 파일로 열기 / 웹페이지: Edge·Chrome·Whale 페이지 제목과 주소 기록" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 기록할 창에서 위치를 고른 뒤 Ctrl+Alt+B를 누릅니다. 기록이 끝날 때까지 창·탭을 유지하고 Office 문서는 별도로 저장하세요.</figcaption>
+  <figcaption>기록할 창에서 위치를 고른 뒤 Ctrl+Alt+B를 누릅니다. 기록이 끝날 때까지 창·탭을 유지하고 Office 문서는 별도로 저장하세요.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-apps:end -->
 
-기록할 창을 앞에 띄우고 아래처럼 위치를 고른 뒤 **Ctrl+Alt+B**를 누르세요. 기록이 끝날 때까지 다른 창이나 탭으로 이동하지 마세요.
+기록할 창을 앞에 띄우고 아래처럼 위치를 고른 뒤 **Ctrl+Alt+B**를 누르세요. 기록이 끝날 때까지 선택한 창과 탭을 유지하세요.
 
 | 기록할 대상 | 단축키를 누르기 전에 | 다시 열었을 때 |
 |---|---|---|
@@ -99,7 +102,7 @@ ZIP은 **폴더 전체를 압축 해제**한 뒤 맨 위의 `WorkBookmark.exe`�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-notepad-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-notepad.svg" width="720" height="244" alt="글과 위치 고르기: 새 글·빈 탭도 가능 커서 또는 글 일부 선택 → 기록 당시 글 보관: Ctrl+Alt+B로 기록 바뀐 글은 다시 기록 → 새 복원 파일 열기: 원래 파일은 그대로 이어 쓴 글은 직접 저장" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 메모장 책갈피는 기록 당시 글을 보관하고 열 때마다 새 복원 파일을 만듭니다. 기록 이후 수정한 글까지 보관하려면 책갈피를 다시 남기세요.</figcaption>
+  <figcaption>메모장 책갈피는 기록 당시 글을 보관하고 열 때마다 새 복원 파일을 만듭니다. 기록 이후 수정한 글까지 보관하려면 책갈피를 다시 남기세요.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-notepad:end -->
 
@@ -115,15 +118,15 @@ ZIP은 **폴더 전체를 압축 해제**한 뒤 맨 위의 `WorkBookmark.exe`�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-url-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-url.svg" width="720" height="244" alt="전체 주소 복사: 주소창의 전체 웹 주소 http 또는 https 사용 → 시계 옆 아이콘: 웹페이지 URL로 추가… 복사한 주소 붙여 넣기 → 책갈피 저장: 제목은 필요할 때 입력 기본 브라우저로 다시 열기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 자동 기록이 안 되면 웹 주소를 직접 추가하세요. 페이지 제목과 주소만 기억하며 스크롤 위치·입력 중인 글·로그인 상태는 보관하지 않습니다.</figcaption>
+  <figcaption>자동 기록이 안 되면 웹 주소를 직접 추가하세요. 페이지 제목과 주소만 기억하며 스크롤 위치·입력 중인 글·로그인 상태는 보관하지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-url:end -->
 
-Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이동을 마친 뒤 본문을 눌러 **Ctrl+Alt+B**를 사용하세요. 확장은 필요하지 않습니다. 전체 화면·주소창이 없는 창·분할 화면·관리자 권한 브라우저 등에서는 주소를 읽지 못할 수 있습니다. 저장한 주소는 **Windows 기본 브라우저**로 열며 원래 브라우저나 그 브라우저의 사용자 설정, 같은 탭으로 돌아가는 것은 보장하지 않습니다.
+Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이동을 마친 뒤 본문을 눌러 **Ctrl+Alt+B**를 사용하세요. 확장은 필요하지 않습니다. 전체 화면·주소창이 없는 창·분할 화면·관리자 권한 브라우저 등에서는 주소를 읽지 못할 수 있습니다. 저장한 주소는 **Windows 기본 브라우저**로 엽니다. 원래 브라우저의 사용자 설정과 탭은 복원 대상에 포함하지 않습니다.
 
 자동 기록이 안 되면 주소창의 전체 주소를 복사한 뒤 **시계 옆 아이콘 → 웹페이지 URL로 추가…**에 붙여 넣습니다. 필요하면 **제목 (선택)**을 적고 **저장**을 누르세요. `http://` 또는 `https://`로 시작하는 주소만 사용할 수 있습니다. 다른 브라우저에서 복사한 주소도 이 방법으로 추가할 수 있습니다.
 
-페이지의 스크롤 위치·입력 중인 글·로그인 상태는 보관하지 않습니다. 브라우저 안에서 편집하는 Office도 웹 주소만 기록합니다. PDF는 탐색기에서 파일을 기록해 여는 방식으로 사용하세요. PDF 페이지 위치는 SumatraPDF 대상의 실험 기능이며 Adobe Reader·Edge PDF의 페이지 복원은 지원하지 않습니다.
+페이지의 스크롤 위치·입력 중인 글·로그인 상태는 보관하지 않습니다. 브라우저 안에서 편집하는 Office도 웹 주소만 기록합니다. PDF는 탐색기에서 파일을 기록해 여는 방식으로 사용하세요. PDF 페이지 위치는 SumatraPDF에서 다루며 Adobe Reader·Edge PDF의 페이지 복원은 지원하지 않습니다.
 
 ### 회사 사이트의 Office 문서 다시 열기
 
@@ -133,13 +136,13 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-office-site-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-office-site.svg" width="720" height="244" alt="설치형 Office: PC의 Office에서 열기 필요한 작업 위치 기록 → 로그인 안내 확인: 안내가 나오면 사이트 로그인 문서가 열릴 때까지 대기 → 같은 책갈피 재실행: 문서가 열린 뒤 다시 실행 저장한 작업 위치 확인" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> Office가 실제 웹 문서 주소를 제공할 때 사용할 수 있습니다. 문서 준비는 최대 45초 확인하며 회사 인증·보안 설정에 따라 동작이 달라집니다.</figcaption>
+  <figcaption>Office가 실제 웹 문서 주소를 제공할 때 사용할 수 있습니다. 문서 준비는 최대 45초 확인하며 회사 인증·보안 설정에 따라 동작이 달라집니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-office-site:end -->
 
 셀·본문·슬라이드 위치가 필요하면 회사 문서를 **PC에 설치된 Office**로 열고 책갈피를 남깁니다. Office가 실제 웹 문서 주소를 알려 주는 경우에 사용할 수 있습니다.
 
-다시 열 때는 문서 준비를 최대 **45초** 확인합니다. 로그인 안내가 나오면 **사이트 로그인**을 눌러 로그인하고, 문서가 열린 뒤 **같은 책갈피를 다시 실행**하세요. 열리는 동안 다른 창을 누르거나 입력하면 이후 위치 이동이 멈출 수 있습니다. 회사의 인증 방식과 보안 설정에 따라 동작이 달라집니다.
+다시 열 때는 문서 준비를 최대 **45초** 확인합니다. 로그인 안내가 나오면 **사이트 로그인**을 눌러 로그인하고, 문서가 열린 뒤 **같은 책갈피를 다시 실행**하세요. 열리는 동안 다른 창을 누르거나 입력하면 이후 위치 이동이 멈출 수 있습니다. 로그인이 필요한 문서는 해당 사이트의 로그인 절차를 마친 뒤 사용합니다.
 
 ## 포스트잇 스티커로 보기 {#stickers}
 
@@ -149,7 +152,7 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-stickers-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-stickers.svg" width="720" height="244" alt="한 줄 메모: 제목 클릭·Ctrl+E로 편집 다른 창으로 이동하면 저장 / 오른쪽 화살표: 저장한 작업 열기 누른 스티커에 처리 중 표시 / 나머지는 우클릭: 접기·숨기기·지우기 숨기기는 화면에서만 숨김" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 스티커는 한 줄 메모와 오른쪽 화살표를 표시합니다. 편집할 때만 필요한 높이로 늘고, 저장·취소 후 원래 크기로 돌아갑니다. 편집 중 직접 옮기거나 정렬한 위치는 유지합니다.</figcaption>
+  <figcaption>스티커는 한 줄 메모와 오른쪽 화살표를 표시합니다. 편집할 때만 필요한 높이로 늘고, 저장·취소 후 원래 크기로 돌아갑니다. 편집 중 직접 옮기거나 정렬한 위치는 유지합니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-stickers:end -->
 
@@ -173,7 +176,7 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
 
 **메모 편집 때는 폭을 유지합니다.** 메모 부분의 높이가 160픽셀보다 작으면 편집하는 동안만 170픽셀로 늘립니다. 이미 160픽셀 이상이면 현재 크기를 유지합니다. 저장 성공·취소·창 전환 자동 저장 성공 후에는 편집 직전 크기와 접힘 상태로 돌아갑니다. 화면 안쪽으로 잠시 옮긴 위치도 복구하지만, 편집 중 직접 옮기거나 일괄 정렬한 위치는 유지합니다. 저장에 실패하면 초안·실패 안내·편집 크기를 유지하며, **Enter** 또는 다른 창으로 이동해 다시 저장할 수 있습니다.
 
-위치·직접 조절한 펼친 크기·접기 상태는 다음 실행에도 유지됩니다. 전체를 숨긴 동안은 새 책갈피를 저장해도 숨김을 유지합니다. **시계 옆 아이콘 → 책갈피 보기**로 다시 표시하거나 프로그램을 다시 실행하면 돌아옵니다. Windows 보안 화면·전체 화면 앱·모든 가상 데스크톱에서의 표시는 보장하지 않습니다.
+위치·직접 조절한 펼친 크기·접기 상태는 다음 실행에도 유지됩니다. 전체를 숨긴 동안은 새 책갈피를 저장해도 숨김을 유지합니다. **시계 옆 아이콘 → 책갈피 보기**로 다시 표시하거나 프로그램을 다시 실행하면 돌아옵니다. 스티커는 현재 데스크톱의 일반 창 위에 표시하는 방식입니다. 잠금 화면·전체 화면 앱·다른 가상 데스크톱은 이 표시 범위에 포함하지 않습니다.
 
 다른 스티커의 버튼은 처리 중 표시로 바뀌지 않습니다. 문서 열기는 한 번에 하나씩 처리하므로, 다른 작업을 열려면 진행 중인 요청이 끝난 뒤 **오른쪽 화살표(바로가기)**를 누르세요.
 
@@ -187,7 +190,7 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-sticker-visibility-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-sticker-visibility.svg" width="720" height="244" alt="하나라도 보이면: Ctrl+Alt+J → 모두 숨김 일부만 숨긴 상태도 같음 / 모두 숨겨져 있으면: Ctrl+Alt+J → 모두 표시 위치·크기·메모 유지 / 항상 모두 표시: 트레이 → 책갈피 보기 아이콘 두 번 눌러도 표시" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 스티커 모드의 보기 단축키는 전체 표시·숨기기를 바꿉니다. 일부만 숨긴 상태에서 누르면 나머지도 숨깁니다. 트레이의 책갈피 보기와 아이콘 두 번 누르기는 항상 전체를 표시합니다.</figcaption>
+  <figcaption>스티커 모드의 보기 단축키는 전체 표시·숨기기를 바꿉니다. 일부만 숨긴 상태에서 누르면 나머지도 숨깁니다. 트레이의 책갈피 보기와 아이콘 두 번 누르기는 항상 전체를 표시합니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-sticker-visibility:end -->
 
@@ -205,7 +208,7 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-sticker-arrangement-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-sticker-arrangement.svg" width="720" height="244" alt="가까이 끌어 맞추기: 보이는 주변 스티커에 붙임 Alt를 누르면 자유 이동 / 스티커 위치 모으기: 격자·가로·세로 중 선택 마우스가 있는 모니터로 / 새 위치 유지: 숨긴 스티커까지 정렬 크기·메모·접힘은 유지" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 자석 정렬은 기본으로 켜져 있으며 설정에서 끌 수 있습니다. 일괄 정렬은 숨긴 스티커도 함께 모으고 새 위치를 저장합니다. 편집 중 정렬한 위치도 저장·취소 후 유지합니다.</figcaption>
+  <figcaption>자석 정렬은 기본으로 켜져 있으며 설정에서 끌 수 있습니다. 일괄 정렬은 숨긴 스티커도 함께 모으고 새 위치를 저장합니다. 편집 중 정렬한 위치도 저장·취소 후 유지합니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-sticker-arrangement:end -->
 
@@ -231,7 +234,7 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-manage-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-manage.svg" width="720" height="244" alt="목록에서 찾기: 이름·경로·메모로 검색 검색 결과 최대 100개 / 다음 할 일 메모: 한 줄, 최대 500자 스티커 제목 클릭해 편집 / 지운 책갈피 복원: 10초 안에는 삭제 되돌리기 이후에는 최근 삭제…" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 검색과 메모로 작업을 찾고 이어가세요. 지운 책갈피는 10초 안에 되돌리거나 최근 삭제 100개에서 복원할 수 있으며 원본 파일은 지우지 않습니다.</figcaption>
+  <figcaption>검색과 메모로 작업을 찾고 이어가세요. 지운 책갈피는 10초 안에 되돌리거나 최근 삭제 100개에서 복원할 수 있으며 원본 파일은 지우지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-manage:end -->
 
@@ -259,7 +262,7 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-settings-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-settings.svg" width="720" height="244" alt="표시·정렬 방식: 목록 또는 포스트잇 스티커 자석 정렬 켜기·끄기 / 보기 단축키: 스티커 전체 표시·숨기기 목록 모드에서는 목록 열기 / 로그인 시 실행: 이 사용자만 자동 실행 바꾼 뒤 적용 누르기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 시계 옆 아이콘의 설정에서 바꾼 뒤 적용을 누르세요. 종료는 현재 실행만 끝내며 다음 로그인 때의 자동 실행 선택은 바꾸지 않습니다.</figcaption>
+  <figcaption>시계 옆 아이콘의 설정에서 바꾼 뒤 적용을 누르세요. 종료는 현재 실행만 끝내며 다음 로그인 때의 자동 실행 선택은 바꾸지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-settings:end -->
 
@@ -282,7 +285,7 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-backup-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-backup.svg" width="720" height="244" alt="저장하고 종료: 메모장 복원 파일 저장·닫기 업무 책갈피도 종료 → 데이터 전체 백업: 데이터 폴더 전체 복사 Office 원본은 별도 백업 → 백업 상태로 복원: 현재 데이터 먼저 보존 백업을 원래 위치로 복사" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 설치 폴더가 아닌 WorkBookmark 데이터 폴더 전체를 백업하세요. 복원하면 백업 당시 상태로 돌아가며 현재 기록과 자동으로 합쳐지지 않습니다.</figcaption>
+  <figcaption>설치 폴더가 아닌 WorkBookmark 데이터 폴더 전체를 백업하세요. 복원하면 백업 당시 상태로 돌아가며 현재 기록과 자동으로 합쳐지지 않습니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-backup:end -->
 
@@ -308,7 +311,7 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-maintenance-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-maintenance.svg" width="720" height="244" alt="MSI 업데이트: 먼저 데이터 전체 백업 설치 경로별 절차 확인 / ZIP 업데이트: 새 폴더에 전체 압축 해제 기존 종료 후 새 프로그램 / 제거 후 기록: 책갈피와 메모는 남음 기록 삭제는 별도 작업" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 업데이트 전에 백업하고 설치 경로별 절차를 확인하세요. 프로그램 제거 후에도 데이터는 남으며, ZIP 실행 위치를 바꿨다면 자동 실행 설정도 적용합니다.</figcaption>
+  <figcaption>업데이트 전에 백업하고 설치 경로별 절차를 확인하세요. 프로그램 제거 후에도 데이터는 남으며, ZIP 실행 위치를 바꿨다면 자동 실행 설정도 적용합니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-maintenance:end -->
 
@@ -326,7 +329,7 @@ Edge·Chrome·Whale의 일반 웹페이지에서 주소 입력과 페이지 이�
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-custom-path-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-custom-path.svg" width="720" height="244" alt="백업 후 정상 종료: 데이터 폴더 전체 보관 기존 설치 경로 확인 → 기존 버전 제거: 0.2.3 이하 사용자 지정 옛 MSI와 원래 경로 지정 → 성공 확인 후 설치: 제거 성공 여부 확인 원하는 위치에 새 MSI 설치" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 0.2.3 이하를 기본 위치 밖에 설치했다면 기존 MSI와 원래 경로를 지정해 제거한 뒤 새로 설치합니다. 경로가 불명확하면 먼저 확인하고 남은 폴더를 일괄 삭제하지 마세요.</figcaption>
+  <figcaption>0.2.3 이하를 기본 위치 밖에 설치했다면 기존 MSI와 원래 경로를 지정해 제거한 뒤 새로 설치합니다. 제거할 때는 기존 설치 경로를 사용합니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-custom-path:end -->
 
@@ -344,7 +347,7 @@ msiexec /x "WorkBookmark-0.2.3-win-x64.msi" INSTALLFOLDER="D:\Apps\WorkBookmark"
 msiexec /i "WorkBookmark-0.2.10-win-x64.msi" INSTALLFOLDER="D:\Apps\WorkBookmark"
 ```
 
-기존 설치 경로가 불명확하면 시작 메뉴 바로가기 대상이나 이전 설치 기록을 먼저 확인하세요. 기본 제거 후 파일이 남았더라도 폴더를 일괄 삭제하지 마세요. 데이터 폴더는 설치 위치와 별도로 보존됩니다.
+기존 설치 경로가 불명확하면 시작 메뉴 바로가기 대상이나 이전 설치 기록을 먼저 확인하세요. 제거 후 남은 파일은 기존 설치 경로와 대조해 정리합니다. 데이터 폴더는 설치 위치와 별도로 보존됩니다.
 
 ## 문제가 생겼을 때 {#troubleshooting}
 
@@ -354,7 +357,7 @@ msiexec /i "WorkBookmark-0.2.10-win-x64.msi" INSTALLFOLDER="D:\Apps\WorkBookmark
     <source media="(max-width: 760px)" srcset="../../assets/tool-guides/bookmark-guide-troubleshooting-mobile.svg" width="320" height="432">
     <img src="../../assets/tool-guides/bookmark-guide-troubleshooting.svg" width="720" height="244" alt="증상과 안내 확인: 아래 문제 해결 표 확인 실행 중인 버전도 확인 → 대상 화면 재확인: 창·문서·로그인 상태 확인 진행 중 요청은 중단 가능 → 필요한 정보만 전달: 버전·순서·알림 문구 업무 기록은 그대로 공개 안 함" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 열기 요청 알림이 나오더라도 실제 열린 화면을 확인하세요. 문의할 때는 버전·실행 순서·알림을 정리하고 업무 내용이 든 데이터와 백업은 보호합니다.</figcaption>
+  <figcaption>열기 요청 알림이 나오더라도 실제 열린 화면을 확인하세요. 문의할 때는 버전·실행 순서·알림을 정리하고 업무 내용이 든 데이터와 백업은 보호합니다.</figcaption>
 </figure>
 <!-- tool-figure:bookmark-guide-troubleshooting:end -->
 
@@ -375,8 +378,8 @@ msiexec /i "WorkBookmark-0.2.10-win-x64.msi" INSTALLFOLDER="D:\Apps\WorkBookmark
 | 새 Office 문서를 기록하지 못해요 | 문서를 먼저 저장하고 셀 입력·대화상자를 마치세요. 메모장 글은 저장 전에도 기록할 수 있습니다. |
 | 웹 주소를 읽지 못해요 | 페이지 이동을 마친 뒤 본문에서 다시 시도하거나 **웹페이지 URL로 추가…**를 쓰세요. |
 | 파일은 열렸는데 위치가 달라요 | 문서가 준비된 뒤 책갈피를 다시 실행하세요. 문서 구조가 바뀌었다면 원하는 위치에서 새 책갈피를 남기세요. |
-| 회사 문서가 안 열려요 | 로그인과 문서 접근 권한을 확인하세요. 보안·보호 설정은 담당자의 안내를 따르세요. |
+| 회사 문서가 안 열려요 | 로그인한 계정으로 해당 문서를 열 수 있는지 확인하세요. |
 
 처리 중인 요청은 알림의 **요청 중단** 또는 **시계 옆 아이콘 → 진행 중 요청 중단**으로 멈출 수 있습니다. 이미 전달한 파일 열기는 나중에 실행될 수 있으므로 다시 시도하기 전에 대상 프로그램을 확인하세요. **열기를 요청했습니다**는 열기를 요청했다는 뜻이며, 실제로 열린 화면을 확인해야 합니다.
 
-문의할 때는 프로그램·Windows 버전, 사용한 프로그램, 실행 순서와 알림 문구를 적어 주세요. **설정 → 진단 로그**로 로그 폴더를 열 수 있습니다. 책갈피 저장 파일·백업·메모장 복원 파일에는 업무 내용이 있으므로 그대로 공개하지 마세요.
+문의할 때는 프로그램·Windows 버전, 사용한 프로그램, 실행 순서와 알림 문구를 적어 주세요. **설정 → 진단 로그**로 로그 폴더를 열 수 있습니다.

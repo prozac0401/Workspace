@@ -5,8 +5,8 @@
     "id": "folderstate-guide-download",
     "mode": "flow",
     "panels": [
-      {"icon": "pc", "title": "PC 환경 확인", "lines": ["Windows 11 64비트", "회사 설치 기준 확인"]},
-      {"icon": "install", "title": "0.1.3 설치 파일", "lines": ["버전별 MSI 내려받기", "전자 서명 없음 확인"]},
+      {"icon": "pc", "title": "PC 환경 확인", "lines": ["Windows 11 64비트", "설치 준비"]},
+      {"icon": "install", "title": "0.1.3 설치 파일", "lines": ["버전별 MSI 내려받기", "MSI를 실행해 설치"]},
       {"icon": "folder", "title": "연습용 폴더 준비", "lines": ["이름과 업무 파일 유지", "폴더 상태만 표시"]}
     ],
     "caption": "Windows 11 x64용 FolderState 0.1.3을 받으세요. 기존 0.1.3 RC1과 같은 설치 파일이며, 사용 중이라면 다시 설치할 필요가 없습니다."
@@ -18,7 +18,7 @@
     "mode": "compare",
     "panels": [
       {"icon": "pc", "title": "지원 환경", "lines": ["Windows 11 x64", "실행 파일도 함께 포함"]},
-      {"icon": "shield", "title": "설치 기준 확인", "lines": ["회사 절차에 따라 설치", "보안 경고는 담당자 확인"]},
+      {"icon": "shield", "title": "설치 기준 확인", "lines": ["받은 MSI 실행", "설치 마법사 완료"]},
       {"icon": "folder-empty", "title": "먼저 연습하기", "lines": ["연습용 폴더 하나", "상태와 아이콘 확인"]}
     ],
     "caption": "Windows 10과 ARM64용 설치 파일은 지원하지 않습니다. 회사 PC에서는 설치 기준을 확인하고 연습용 폴더에서 시작하세요."
@@ -267,7 +267,7 @@
     "id": "folderstate-guide-advanced",
     "mode": "compare",
     "panels": [
-      {"icon": "folder", "title": "설치 위치 확인", "lines": ["프로그램·기록 위치 보기", "설정은 직접 바꾸지 않기"]},
+      {"icon": "folder", "title": "설치 위치 확인", "lines": ["프로그램·기록 위치 보기", "현재 버전 확인"]},
       {"icon": "install", "title": "명령으로 설치", "lines": ["담당자용 설치·복구·제거", "필요한 명령 하나만 실행"]},
       {"icon": "terminal", "title": "명령으로 상태 관리", "lines": ["대상 폴더를 직접 지정", "결과와 종료 코드 확인"]}
     ],

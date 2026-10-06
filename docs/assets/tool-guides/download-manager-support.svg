@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
-<title id="title">제거와 지원 범위</title><desc id="desc">지원하는 로컬 폴더 한 곳에 저장된 파일을 처리합니다. 제거해도 자료는 남으며, 구버전 확장과 같은 폴더에서 함께 실행하지 마세요.</desc>
+<title id="title">제거와 지원 범위</title><desc id="desc">지원하는 로컬 폴더 한 곳에 저장된 파일을 처리합니다. 제거해도 자료는 남으며, 구버전 확장을 사용했다면 종료한 뒤 새 프로그램을 실행합니다.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="720" height="244" rx="4" fill="#fffdf9"/>
 <path d="M108 16H132" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

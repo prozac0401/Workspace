@@ -8,13 +8,13 @@
 <figure class="tool-figure">
   <picture>
     <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-before-install-mobile.svg" width="320" height="432">
-    <img src="../../../assets/tool-guides/image-copy-save-before-install.svg" width="720" height="244" alt="Windows 11 x64: 실제 로컬 폴더에서 사용 네트워크·온라인 전용 제외 / 설치에는 관리자 승인: 0.2.1 MSI는 전자 서명 없음 평소 작업은 일반 사용자 / 붙여넣는 앱도 확인: 이미지가 압축되거나 투명 배경이 달라질 수 있음" loading="lazy" decoding="async">
+    <img src="../../../assets/tool-guides/image-copy-save-before-install.svg" width="720" height="244" alt="Windows 11 x64: 실제 로컬 폴더에서 사용 네트워크·온라인 전용 제외 / 설치에는 관리자 승인: 0.2.1 MSI 실행 평소 작업은 일반 사용자 / 붙여넣는 앱도 확인: 이미지가 압축되거나 투명 배경이 달라질 수 있음" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 설치·업데이트·복구·제거 권한과 평소 실행 권한을 구분합니다. 회사 PC는 허용된 설치 절차를 따르고 지원 환경을 먼저 확인하세요.</figcaption>
+  <figcaption>설치·업데이트·복구·제거 권한과 평소 실행 권한을 구분합니다. 평소 복사·저장은 일반 사용자 권한으로 실행합니다.</figcaption>
 </figure>
 <!-- tool-figure:image-copy-save-before-install:end -->
 
-**64비트 Windows 11용 설치 파일입니다. 제작자를 확인하는 전자 서명은 없습니다.** 설치·업데이트·복구·제거에는 Windows의 관리자 승인이 필요합니다. 평소 복사·저장은 관리자 권한 없이 사용합니다. 실행에 필요한 파일도 포함되어 있습니다. 회사 PC에서는 허용된 설치 절차를 따르세요.
+**64비트 Windows 11용 설치 파일입니다.** 설치·업데이트·복구·제거는 관리자 권한으로 진행하며 Windows의 요청 화면을 확인합니다. 평소 복사·저장은 일반 사용자 권한으로 사용합니다. 실행에 필요한 파일도 포함되어 있습니다.
 
 Windows 10, ARM64 방식의 PC, 네트워크 저장장치와 온라인에만 있는 파일은 지원하지 않습니다. 사용하는 프로그램에 따라 이미지가 압축되거나 투명 배경이 달라질 수 있습니다.
 
@@ -30,12 +30,12 @@ Windows 10, ARM64 방식의 PC, 네트워크 저장장치와 온라인에만 있
     <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-install-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-install.svg" width="720" height="244" alt="0.2.1 MSI 실행: 버전에 맞는 설치 파일 열기 실행에 필요한 파일도 포함 → 설치 안내 확인: 관리자 승인 후 설치 PC의 프로그램 폴더에 설치 → 로컬 폴더 열기: 탐색기에서 두 메뉴 사용 별도 설정 화면 없음" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 설치 후 PC에 실제로 저장된 폴더를 엽니다. Windows가 재시작을 요청하면 작업을 저장한 뒤 직접 재시작하세요.</figcaption>
+  <figcaption>설치 후 PC에 실제로 저장된 폴더를 엽니다. Windows가 재시작을 요청하면 작업을 저장한 뒤 직접 재시작하세요.</figcaption>
 </figure>
 <!-- tool-figure:image-copy-save-install:end -->
 
 1. **ImageCopySave-0.2.1-x64.msi**를 실행합니다.
-2. 설치 안내와 관리자 승인 화면을 확인하고 설치합니다.
+2. 설치 안내와 Windows의 관리자 권한 요청을 확인하고 설치합니다.
 3. 이 PC에 실제로 저장된 폴더를 탐색기로 열어 아래 두 메뉴를 사용합니다.
 
 프로그램은 이 PC의 프로그램 폴더에 설치합니다. 따로 설정할 화면은 없습니다. Windows를 시작할 때 자동으로 실행하지 않습니다. 탐색기를 강제로 닫거나 PC를 자동으로 다시 시작하지 않습니다. Windows가 사용 중인 파일 때문에 재시작을 요청하면 작업을 저장한 뒤 직접 재시작하세요.
@@ -48,7 +48,7 @@ Windows 10, ARM64 방식의 PC, 네트워크 저장장치와 온라인에만 있
     <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-save-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-save.svg" width="720" height="244" alt="이미지 복사: 캡처·그림 앱에서 복사 파일 이름 복사와 구분 → 폴더 빈 곳 우클릭: 더 많은 옵션 표시에서 복사한 그림 저장 선택 → 같은 폴더에 PNG: 이름이 겹치면 번호 추가 기존 파일·복사 내용 유지" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 이전 방식의 메뉴가 바로 열리는 PC에서는 복사한 그림 저장을 바로 고릅니다. 메뉴 표시 설정을 바꿀 필요 없이 같은 폴더에 PNG를 저장합니다.</figcaption>
+  <figcaption>이전 방식의 메뉴가 바로 열리는 PC에서는 복사한 그림 저장을 바로 고릅니다. 메뉴 표시 설정을 바꿀 필요 없이 같은 폴더에 PNG를 저장합니다.</figcaption>
 </figure>
 <!-- tool-figure:image-copy-save-save:end -->
 
@@ -70,7 +70,7 @@ Windows 11에서 **더 많은 옵션 표시**를 거치지 않고 이전 방식�
     <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-copy-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-copy.svg" width="720" height="244" alt="그림 파일 한 개: PNG·JPEG·BMP 선택 원본 파일은 그대로 유지 → 그림으로 복사: 탐색기 메뉴에서 선택 파일 경로 대신 그림 자체 → 사용할 앱에 붙이기: 복사 완료 안내 확인 Ctrl+V로 붙여넣기" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 그림으로 복사는 이미지 데이터를 복사합니다. Windows 11 기본 메뉴에서는 더 많은 옵션 표시로 들어가고, 기존 방식의 메뉴가 바로 열리면 곧바로 선택합니다.</figcaption>
+  <figcaption>그림으로 복사는 이미지 데이터를 복사합니다. Windows 11 기본 메뉴에서는 더 많은 옵션 표시로 들어가고, 기존 방식의 메뉴가 바로 열리면 곧바로 선택합니다.</figcaption>
 </figure>
 <!-- tool-figure:image-copy-save-copy:end -->
 
@@ -88,7 +88,7 @@ Windows 11에서 **더 많은 옵션 표시**를 거치지 않고 이전 방식�
     <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-scope-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-scope.svg" width="720" height="244" alt="화면용 정지 이미지: PNG·JPEG·BMP 한 장 저장 결과는 PNG / 실제 로컬 위치: 접근할 수 있는 내부 저장장치 연결된 위치는 제외 / 상한을 넘으면 중단: 최대 총 5천만 픽셀 임의로 크기·비율 축소 안 함" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 확장자가 맞아도 색상 저장 방식·크기·위치에 따라 처리하지 않을 수 있습니다. 지원 범위와 가로·세로 및 데이터 상한을 함께 확인하세요.</figcaption>
+  <figcaption>확장자가 맞아도 색상 저장 방식·크기·위치에 따라 처리하지 않을 수 있습니다. 지원 범위와 가로·세로 및 데이터 상한을 함께 확인하세요.</figcaption>
 </figure>
 <!-- tool-figure:image-copy-save-scope:end -->
 
@@ -98,7 +98,7 @@ Windows 11에서 **더 많은 옵션 표시**를 거치지 않고 이전 방식�
 | 저장 형식 | PNG 고정. 크기·비율을 임의로 줄이지 않으며 같은 이름은 번호를 붙임 |
 | 투명도 | 지원하는 PNG 또는 투명한 부분을 알려 주는 정보가 있는 그림에서 유지합니다. 붙여넣는 프로그램에 따라 달라질 수 있습니다. |
 | 이미지 크기 | 가로·세로 각각 16,384픽셀 이하이며 총 50,000,000픽셀 이하 |
-| 데이터 크기 | 입력 파일과 압축된 그림 데이터는 각각 128MiB 이하입니다. PC가 한 번에 처리할 수 있는 용량이 부족하거나 안전한 처리 한도를 넘으면 중단합니다. |
+| 데이터 크기 | 입력 파일과 압축된 그림 데이터는 각각 128MiB 이하입니다. PC가 한 번에 처리할 수 있는 용량이 부족하거나 처리 한도를 넘으면 중단합니다. |
 | 파일 위치 | 접근할 수 있는 PC 내부 저장장치의 실제 파일·폴더 |
 
 GIF·TIFF·WebP·HEIC·AVIF·SVG·PDF와 움직이는 그림은 지원하지 않습니다. 밝고 어두운 부분이나 색상을 특별한 방식으로 저장한 고화질 그림도 지원하지 않습니다. 별도 색상 설정이나 기본 방식과 다른 밝기 설정을 쓰는 PNG, 별도 색상 설정·인쇄용 색상·여러 사진을 담은 JPEG, 색상 목록을 따로 저장하거나 압축한 BMP도 처리하지 못할 수 있습니다.
@@ -115,11 +115,11 @@ GIF·TIFF·WebP·HEIC·AVIF·SVG·PDF와 움직이는 그림은 지원하지 않
     <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-maintenance-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-maintenance.svg" width="720" height="244" alt="업데이트: 새 버전 MSI 실행 자동으로 새 버전 설치 안 함 / 복구: 현재 설치된 버전의 MSI 없어진 프로그램 파일 채우기 / 제거: Windows 설치된 앱에서 원본·저장 PNG는 보존" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 세 작업 모두 관리자 승인이 필요합니다. 외부에서 바뀐 파일이나 겹친 설정 때문에 중단되면 일괄 삭제하지 말고 안내된 충돌 확인 절차를 따르세요.</figcaption>
+  <figcaption>세 작업 모두 관리자 승인이 필요합니다. 외부에서 바뀐 파일이나 겹친 설정 때문에 중단되면 충돌 확인 절차에 따라 해당 항목을 처리합니다.</figcaption>
 </figure>
 <!-- tool-figure:image-copy-save-maintenance:end -->
 
-복구·제거에는 **현재 설치된 버전의 설치 파일**을 사용하세요. 이전 버전 업데이트가 기존 설정과 겹치거나 바뀐 파일 때문에 중단되면, 구버전으로 먼저 제거하지 말고 아래 충돌 안내를 따르세요.
+복구·제거에는 **현재 설치된 버전의 설치 파일**을 사용하세요. 이전 버전 업데이트가 기존 설정과 겹치거나 바뀐 파일 때문에 중단되면, 기존 설치를 유지한 채 아래 충돌 안내에 따라 처리하세요.
 
 - **업데이트:** 새 버전 설치 파일을 실행합니다. 자동으로 새 버전을 설치하지는 않습니다.
 - **복구:** 현재 설치된 버전의 설치 파일을 다시 열어 **복구**를 선택합니다. 설치된 프로그램 파일이 없어진 경우 다시 채울 수 있습니다.
@@ -129,7 +129,7 @@ GIF·TIFF·WebP·HEIC·AVIF·SVG·PDF와 움직이는 그림은 지원하지 않
 
 0.2.0부터 설치기는 PC 전체나 현재 사용자의 기존 프로그램 설정과 같은 이름이 겹치거나 누구의 것인지 알 수 없는 설치 폴더가 있으면 설치를 중단합니다. 설치 후 외부에서 바꾼 프로그램 파일이나 설정값이 발견되면 복구·업데이트·제거도 중단하여 변경 내용을 보존합니다.
 
-**기존 설정과 겹치거나 파일이 바뀌어서 중단된 경우:** 오류 문구와 사용 중인 버전을 확인해 [제품 문의](https://github.com/prozac0401/Workspace/issues)에 전달하세요. 회사 PC라면 설치 담당자에게 확인을 요청하세요. 기존 폴더나 설정을 한꺼번에 지우지 마세요. 담당자가 겹친 항목이 누구의 것인지 확인해야 합니다. 필요한 사본을 먼저 보관한 뒤 되돌릴 방법을 정합니다. 설치 파일을 다시 실행하는 것만으로 외부 변경을 강제로 덮어쓰지는 않습니다.
+**기존 설정과 겹치거나 파일이 바뀌어서 중단된 경우:** 오류 문구와 사용 중인 버전을 확인해 [제품 문의](https://github.com/prozac0401/Workspace/issues)에 전달하세요. 현재 폴더·설정과 필요한 사본을 보관한 뒤 겹친 항목의 설치 출처를 확인하고 되돌릴 방법을 정합니다. 설치 파일을 다시 실행하는 것만으로 외부 변경을 강제로 덮어쓰지는 않습니다.
 
 ## 메뉴가 없거나 작업이 실패할 때
 
@@ -139,7 +139,7 @@ GIF·TIFF·WebP·HEIC·AVIF·SVG·PDF와 움직이는 그림은 지원하지 않
     <source media="(max-width: 760px)" srcset="../../../assets/tool-guides/image-copy-save-troubleshooting-mobile.svg" width="320" height="432">
     <img src="../../../assets/tool-guides/image-copy-save-troubleshooting.svg" width="720" height="244" alt="메뉴가 없으면: 더 많은 옵션 표시 확인 이미지와 위치를 다시 확인 / 선택 표시가 없으면: 메뉴를 누른 폴더 확인 만들어진 PNG가 있는지 확인 / 탐색기가 멈추면: 반복 실행을 멈추기 재현 순서와 버전으로 문의" loading="lazy" decoding="async">
   </picture>
-  <figcaption><span>설명용 도해</span> 저장 성공과 탐색기에서 파일을 선택하는 동작은 별개입니다. 문의에는 업무 이미지·개인 정보·실제 경로나 문제 확인용 기록 전체를 공개하지 마세요.</figcaption>
+  <figcaption>저장 성공과 탐색기에서 파일을 선택하는 동작은 별개입니다. 문의할 때는 사용한 메뉴와 안내 문구를 적어 주세요.</figcaption>
 </figure>
 <!-- tool-figure:image-copy-save-troubleshooting:end -->
 
@@ -150,6 +150,6 @@ GIF·TIFF·WebP·HEIC·AVIF·SVG·PDF와 움직이는 그림은 지원하지 않
 | 저장·복사 중 오류 | 원본 이동·손상, 폴더 쓰기 권한, 남은 디스크 공간, 그림 크기와 파일 크기가 한도 안에 있는지 확인하세요. 저장 위치를 임의로 바꾸거나 관리자 권한으로 다시 실행하지 않습니다. |
 | 처리 중 다른 내용을 복사함 | 새 복사 내용을 덮어쓰지 않도록 작업이 중단될 수 있습니다. 필요한 그림을 다시 선택해 실행하세요. |
 | 저장 파일은 있지만 선택되지 않음 | 메뉴를 눌렀던 폴더에서 생성된 PNG를 확인하세요. 저장 성공과 탐색기의 파일 선택은 별개입니다. |
-| 탐색기가 일시적으로 응답하지 않음 | 작업이 회복되는지 확인하고 반복 실행을 멈추세요. 재현 순서와 Windows 버전을 문의에 남기세요. 원인 확인 없이 다른 프로그램의 메뉴나 업무 파일을 삭제하지 마세요. |
+| 탐색기가 일시적으로 응답하지 않음 | 작업이 회복되는지 확인하고 반복 실행을 멈추세요. 재현 순서와 Windows 버전을 문의에 남기세요. |
 
-제품은 이미지나 복사한 내용을 외부로 보내지 않습니다. 복사한 내용의 기록도 따로 모으지 않습니다. Windows나 다른 프로그램이 복사한 내용을 기록하거나 다른 PC와 함께 쓰도록 한 설정은 그대로 둡니다. 문의에는 업무 이미지·개인 정보·실제 폴더 위치·문제 확인용 기록 전체를 공개하지 마세요.
+제품은 이미지나 복사한 내용을 외부로 보내지 않습니다. 복사한 내용의 기록도 따로 모으지 않습니다. Windows나 다른 프로그램이 복사한 내용을 기록하거나 다른 PC와 함께 쓰도록 한 설정은 그대로 둡니다. 문의에는 프로그램·Windows 버전, 사용한 메뉴와 오류 문구를 적어 주세요.

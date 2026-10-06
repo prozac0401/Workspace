@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="432" viewBox="0 0 320 432" role="img" aria-labelledby="title desc">
-<title id="title">설치 파일 받기</title><desc id="desc">MSI 설치와 ZIP 실행 중 필요한 방식을 선택하세요. 전자 서명이 없는 0.2.10 배포이며, 이전 버전의 사용자 지정 설치 경로는 별도 업데이트 절차를 먼저 확인합니다.</desc>
+<title id="title">설치 파일 받기</title><desc id="desc">MSI 설치와 ZIP 실행 중 필요한 방식을 선택하세요. 이전 버전의 사용자 지정 설치 경로는 해당 업데이트 순서를 따릅니다.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="320" height="432" rx="4" fill="#fffdf9"/>
 <g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M65 82V91M79 82V91M51 92H93" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="37" y="36" width="69" height="31" rx="8" fill="#f2e9dd" stroke="#ded2c4" stroke-width="2"/></g>
@@ -10,10 +10,10 @@
 <g transform="translate(9 163) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">MSI로 설치</text>
 <text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">0.2.10 설치 파일</text>
-<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">회사 설치 기준 확인</text>
+<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">설치 준비</text>
 <path d="M18 288H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 <g transform="translate(9 307) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#ead7b9" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#f4e7d2" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#b7894e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="120" y="323" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">ZIP으로 실행</text>
 <text x="120" y="348" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">폴더 전체 압축 해제</text>
-<text x="120" y="368" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">실행 파일만 옮기지 않기</text>
+<text x="120" y="368" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">폴더 안에서 프로그램 실행</text>
 </g></svg>

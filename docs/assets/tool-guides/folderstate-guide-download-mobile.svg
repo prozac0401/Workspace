@@ -6,14 +6,14 @@
 <g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M65 82V91M79 82V91M51 92H93" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="37" y="36" width="69" height="31" rx="8" fill="#f2e9dd" stroke="#ded2c4" stroke-width="2"/></g>
 <text x="120" y="35" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">PC 환경 확인</text>
 <text x="120" y="60" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">Windows 11 64비트</text>
-<text x="120" y="80" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">회사 설치 기준 확인</text>
+<text x="120" y="80" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">설치 준비</text>
 <path d="M300 123V137M295 132L300 137L305 132" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <text x="27" y="162" font-size="10" fill="#8a622f" font-weight="700" text-anchor="middle">02</text>
 <path d="M18 144H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 <g transform="translate(9 163) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">0.1.3 설치 파일</text>
 <text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">버전별 MSI 내려받기</text>
-<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">전자 서명 없음 확인</text>
+<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">MSI를 실행해 설치</text>
 <path d="M300 267V281M295 276L300 281L305 276" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <text x="27" y="306" font-size="10" fill="#8a622f" font-weight="700" text-anchor="middle">03</text>
 <path d="M18 288H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>

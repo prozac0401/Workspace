@@ -67,7 +67,7 @@
   },
   {
     "page": "tools/office-automation/index.md",
-    "heading": "가짜 명단으로 첫 작업 해 보기 {#start}",
+    "heading": "연습 명단으로 첫 작업 해 보기 {#start}",
     "id": "office-start",
     "mode": "flow",
     "panels": [
@@ -75,7 +75,7 @@
         "icon": "sheet",
         "title": "작은 연습 명단",
         "lines": [
-          "가짜 부서·이름 3행",
+          "부서·이름 연습 자료 3행",
           "헤더 1행·데이터 시작 2행"
         ]
       },
@@ -96,7 +96,7 @@
         ]
       }
     ],
-    "caption": "실제 업무자료를 넣기 전에 가짜 명단으로 행 설정과 분리 결과를 확인하세요."
+    "caption": "연습 명단으로 행 설정과 분리 결과를 확인하세요."
   },
   {
     "page": "tools/office-automation/index.md",
@@ -418,7 +418,7 @@
         ]
       }
     ],
-    "caption": "설정 백업에 원본·템플릿·결과 파일은 포함되지 않습니다. 덮어쓰기 같은 허용 선택은 다시 확인하세요."
+    "caption": "설정 백업에 원본·템플릿·결과 파일은 포함되지 않습니다. 복원한 뒤 덮어쓰기 여부를 선택합니다."
   },
   {
     "page": "tools/office-automation/index.md",
@@ -439,7 +439,7 @@
         "title": "설정 다시 확인",
         "lines": [
           "행·경로 확인 후 분석",
-          "이전 구성과 섞지 않기"
+          "새 폴더에 전체 압축 해제"
         ]
       },
       {
