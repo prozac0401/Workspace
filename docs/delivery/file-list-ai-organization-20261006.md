@@ -33,4 +33,10 @@ File-List-To-Excel 원본 v1.2.0의 최초 명세·목록 작성 소스·Workboo
 
 ## 원격 게시 결과
 
-게시 후 Documentation 실행과 실제 공개 URL의 결과를 기록합니다.
+- 안내 소스 커밋 `e173ab0a433336c5e1c35732b97a8b7b6656903d`를 원격 `main`에 반영했습니다.
+- [Documentation 실행 37411882869](https://github.com/prozac0401/Workspace/actions/runs/37411882869)의 문서 빌드·공개 범위 검사와 Pages 배포가 모두 성공했습니다.
+- [공개 사용 예](https://prozac0401.github.io/Workspace/tools/file-list-to-excel/#ai-organization)의 비인증 HTTP 200과 새 사용 예 제목·앵커를 확인했습니다. 파일 목록 Excel, 대화에 따른 기준 수정, 확정한 목록의 BATCH 요청문이 게시됐습니다.
+- 첫 화면, `quick-reference/`, `policies/workspace/`의 HTTP 200과 각 새 연결·안내 문구를 확인했습니다. 공개 검색 인덱스에도 새 사용 예와 분류 기준 설명이 포함됐습니다.
+- 본 검증 기록의 Pages 주소는 HTTP 404로 공개 출력에서 제외됩니다. 새 업무자료·실행 로그·설치 파일은 게시하지 않았습니다.
+
+본 기록의 실제 게시 결과는 성공 확인 후의 별도 기록 변경으로 남깁니다.
