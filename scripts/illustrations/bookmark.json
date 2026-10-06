@@ -1,0 +1,158 @@
+[
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "설치 파일 받기 {#download}",
+    "id": "bookmark-guide-download",
+    "mode": "compare",
+    "panels": [
+      {"icon": "pc", "title": "PC 환경 확인", "lines": ["Windows 11 x64", "업데이트 전 기록 백업"]},
+      {"icon": "install", "title": "MSI로 설치", "lines": ["0.2.8 설치 파일", "회사 설치 기준 확인"]},
+      {"icon": "folder", "title": "ZIP으로 실행", "lines": ["폴더 전체 압축 해제", "실행 파일만 옮기지 않기"]}
+    ],
+    "caption": "MSI 설치와 ZIP 실행 중 필요한 방식을 선택하세요. 전자 서명이 없는 0.2.8 배포이며, 이전 버전의 사용자 지정 설치 경로는 별도 업데이트 절차를 먼저 확인합니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "설치하고 첫 책갈피 남기기 {#start}",
+    "id": "bookmark-guide-start",
+    "mode": "flow",
+    "panels": [
+      {"icon": "folder", "title": "폴더에서 시작", "lines": ["설치 후 프로그램 실행", "폴더의 파일 선택 해제"]},
+      {"icon": "bookmark", "title": "현재 위치 남기기", "lines": ["Ctrl+Alt+B 누르기", "책갈피 저장 알림 확인"]},
+      {"icon": "restore", "title": "저장한 작업 열기", "lines": ["Ctrl+Alt+J로 불러오기", "스티커 오른쪽 화살표"]}
+    ],
+    "caption": "실제 폴더 하나로 연습하세요. 스티커의 오른쪽 화살표로 저장한 위치를 열고, 목록 모드에서는 항목을 고른 뒤 Enter를 누릅니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "프로그램별로 위치 남기기 {#apps}",
+    "id": "bookmark-guide-apps",
+    "mode": "compare",
+    "panels": [
+      {"icon": "sheet", "title": "설치형 Office", "lines": ["셀·본문·슬라이드 위치", "문서 내용은 별도로 저장"]},
+      {"icon": "snapshot", "title": "메모장", "lines": ["기록 당시 본문도 보관", "새 복원 파일로 열기"]},
+      {"icon": "browser", "title": "웹페이지", "lines": ["Edge·Chrome·Whale", "페이지 제목과 주소 기록"]}
+    ],
+    "caption": "기록할 창에서 위치를 고른 뒤 Ctrl+Alt+B를 누릅니다. 기록이 끝날 때까지 창·탭을 유지하고 Office 문서는 별도로 저장하세요."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "메모장은 글 내용도 보관합니다",
+    "id": "bookmark-guide-notepad",
+    "mode": "flow",
+    "panels": [
+      {"icon": "note", "title": "글과 위치 고르기", "lines": ["새 글·빈 탭도 가능", "커서 또는 글 일부 선택"]},
+      {"icon": "snapshot", "title": "기록 당시 글 보관", "lines": ["Ctrl+Alt+B로 기록", "바뀐 글은 다시 기록"]},
+      {"icon": "file", "title": "새 복원 파일 열기", "lines": ["원래 파일은 그대로", "이어 쓴 글은 직접 저장"]}
+    ],
+    "caption": "메모장 책갈피는 기록 당시 글을 보관하고 열 때마다 새 복원 파일을 만듭니다. 기록 이후 수정한 글까지 보관하려면 책갈피를 다시 남기세요."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "웹 주소를 읽지 못하면 직접 추가하세요",
+    "id": "bookmark-guide-url",
+    "mode": "flow",
+    "panels": [
+      {"icon": "browser", "title": "전체 주소 복사", "lines": ["주소창의 전체 웹 주소", "http 또는 https 사용"]},
+      {"icon": "menu", "title": "시계 옆 아이콘", "lines": ["웹페이지 URL로 추가…", "복사한 주소 붙여 넣기"]},
+      {"icon": "bookmark", "title": "책갈피 저장", "lines": ["제목은 필요할 때 입력", "기본 브라우저로 다시 열기"]}
+    ],
+    "caption": "자동 기록이 안 되면 웹 주소를 직접 추가하세요. 페이지 제목과 주소만 기억하며 스크롤 위치·입력 중인 글·로그인 상태는 보관하지 않습니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "회사 사이트의 Office 문서 다시 열기",
+    "id": "bookmark-guide-office-site",
+    "mode": "flow",
+    "panels": [
+      {"icon": "pc", "title": "설치형 Office", "lines": ["PC의 Office에서 열기", "필요한 작업 위치 기록"]},
+      {"icon": "shield", "title": "로그인 안내 확인", "lines": ["안내가 나오면 사이트 로그인", "문서가 열릴 때까지 대기"]},
+      {"icon": "restore", "title": "같은 책갈피 재실행", "lines": ["문서가 열린 뒤 다시 실행", "저장한 작업 위치 확인"]}
+    ],
+    "caption": "Office가 실제 웹 문서 주소를 제공할 때 사용할 수 있습니다. 문서 준비는 최대 45초 확인하며 회사 인증·보안 설정에 따라 동작이 달라집니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "포스트잇 스티커로 보기 {#stickers}",
+    "id": "bookmark-guide-stickers",
+    "mode": "compare",
+    "panels": [
+      {"icon": "note", "title": "한 줄 메모", "lines": ["제목 클릭·Ctrl+E로 편집", "다른 창으로 이동하면 저장"]},
+      {"icon": "link", "title": "오른쪽 화살표", "lines": ["저장한 작업 열기", "누른 스티커에 처리 중 표시"]},
+      {"icon": "menu", "title": "나머지는 우클릭", "lines": ["접기·숨기기·지우기", "숨기기는 화면에서만 숨김"]}
+    ],
+    "caption": "0.2.8 스티커는 한 줄 메모와 오른쪽 화살표를 표시합니다. 메모 편집 중에는 필요할 때 높이가 늘고, 저장·취소 뒤 원래 크기로 돌아갑니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "찾기·메모·삭제 복원 {#manage}",
+    "id": "bookmark-guide-manage",
+    "mode": "compare",
+    "panels": [
+      {"icon": "search", "title": "목록에서 찾기", "lines": ["이름·경로·메모로 검색", "검색 결과 최대 100개"]},
+      {"icon": "note", "title": "다음 할 일 메모", "lines": ["한 줄, 최대 500자", "스티커 제목 클릭해 편집"]},
+      {"icon": "restore", "title": "지운 책갈피 복원", "lines": ["10초 안에는 삭제 되돌리기", "이후에는 최근 삭제…"]}
+    ],
+    "caption": "검색과 메모로 작업을 찾고 이어가세요. 지운 책갈피는 10초 안에 되돌리거나 최근 삭제 100개에서 복원할 수 있으며 원본 파일은 지우지 않습니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "표시 방식·단축키·자동 실행 바꾸기 {#settings}",
+    "id": "bookmark-guide-settings",
+    "mode": "compare",
+    "panels": [
+      {"icon": "window", "title": "표시 방식", "lines": ["목록 또는 포스트잇", "스티커는 시작할 때 표시"]},
+      {"icon": "keyboard", "title": "단축키", "lines": ["Ctrl 또는 Alt 포함", "다른 앱과 충돌 여부 확인"]},
+      {"icon": "pc", "title": "로그인 시 실행", "lines": ["이 사용자만 자동 실행", "바꾼 뒤 적용 누르기"]}
+    ],
+    "caption": "시계 옆 아이콘의 설정에서 바꾼 뒤 적용을 누르세요. 종료는 현재 실행만 끝내며 다음 로그인 때의 자동 실행 선택은 바꾸지 않습니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "기록 백업·복원하기 {#backup}",
+    "id": "bookmark-guide-backup",
+    "mode": "flow",
+    "panels": [
+      {"icon": "pause", "title": "저장하고 종료", "lines": ["메모장 복원 파일 저장·닫기", "업무 책갈피도 종료"]},
+      {"icon": "backup", "title": "데이터 전체 백업", "lines": ["데이터 폴더 전체 복사", "Office 원본은 별도 백업"]},
+      {"icon": "restore", "title": "백업 상태로 복원", "lines": ["현재 데이터 먼저 보존", "백업을 원래 위치로 복사"]}
+    ],
+    "caption": "설치 폴더가 아닌 WorkBookmark 데이터 폴더 전체를 백업하세요. 복원하면 백업 당시 상태로 돌아가며 현재 기록과 자동으로 합쳐지지 않습니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "업데이트·제거하기 {#maintenance}",
+    "id": "bookmark-guide-maintenance",
+    "mode": "compare",
+    "panels": [
+      {"icon": "install", "title": "MSI 업데이트", "lines": ["먼저 데이터 전체 백업", "설치 경로별 절차 확인"]},
+      {"icon": "folder", "title": "ZIP 업데이트", "lines": ["새 폴더에 전체 압축 해제", "기존 종료 후 새 프로그램"]},
+      {"icon": "records", "title": "제거 후 기록", "lines": ["책갈피와 메모는 남음", "기록 삭제는 별도 작업"]}
+    ],
+    "caption": "업데이트 전에 백업하고 설치 경로별 절차를 확인하세요. 프로그램 제거 후에도 데이터는 남으며, ZIP 실행 위치를 바꿨다면 자동 실행 설정도 적용합니다."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "다른 폴더에 설치한 이전 버전 바꾸기 {#custom-path}",
+    "id": "bookmark-guide-custom-path",
+    "mode": "flow",
+    "panels": [
+      {"icon": "backup", "title": "백업 후 정상 종료", "lines": ["데이터 폴더 전체 보관", "기존 설치 경로 확인"]},
+      {"icon": "install", "title": "기존 버전 제거", "lines": ["0.2.3 이하 사용자 지정", "옛 MSI와 원래 경로 지정"]},
+      {"icon": "check", "title": "성공 확인 후 설치", "lines": ["제거 성공 여부 확인", "원하는 위치에 새 MSI 설치"]}
+    ],
+    "caption": "0.2.3 이하를 기본 위치 밖에 설치했다면 기존 MSI와 원래 경로를 지정해 제거한 뒤 새로 설치합니다. 경로가 불명확하면 먼저 확인하고 남은 폴더를 일괄 삭제하지 마세요."
+  },
+  {
+    "page": "tools/bookmark/index.md",
+    "heading": "문제가 생겼을 때 {#troubleshooting}",
+    "id": "bookmark-guide-troubleshooting",
+    "mode": "flow",
+    "panels": [
+      {"icon": "search", "title": "증상과 안내 확인", "lines": ["아래 문제 해결 표 확인", "실행 중인 버전도 확인"]},
+      {"icon": "restore", "title": "대상 화면 재확인", "lines": ["창·문서·로그인 상태 확인", "진행 중 요청은 중단 가능"]},
+      {"icon": "shield", "title": "필요한 정보만 전달", "lines": ["버전·순서·알림 문구", "업무 기록은 그대로 공개 안 함"]}
+    ],
+    "caption": "열기 요청 알림이 나오더라도 실제 열린 화면을 확인하세요. 문의할 때는 버전·실행 순서·알림을 정리하고 업무 내용이 든 데이터와 백업은 보호합니다."
+  }
+]

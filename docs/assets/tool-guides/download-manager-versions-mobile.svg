@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="288" viewBox="0 0 360 288" role="img" aria-labelledby="title desc">
+<title id="title">이전 버전에서 바뀐 점</title><desc id="desc">버전에 따라 창을 닫는 동작과 보관 파일 이름의 기준이 다릅니다. 0.2.1은 설치 실패 뒤 설치 정보가 남는 문제도 고쳤습니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="288" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><rect x="26" y="34" width="42" height="35" rx="8" fill="#eef4f1" stroke="#d6e0dc" stroke-width="2"/><path d="M79 38H112M79 48H109M79 58H97" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">0.2.0</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">창을 닫으면 프로그램 종료</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">이전 파일은 보관 작업 시각으로</text>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M72 23V50L90 61" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">0.2.1</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">알림 영역의 종료로 끝내기</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">이전 파일은 마지막 수정</text>
+<text x="135" y="244" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">시각으로</text>
+</g></svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">큰 범위는 어디까지 처리하나요? 중간에 취소할 수 있나요?</title><desc id="desc">보이는 칸이 20,000개를 넘으면 시작 전에 확인합니다. 취소 뒤에는 이번 작업의 미완성 결과를 정리할 때까지 기다리세요.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><rect x="50" y="29" width="38" height="18" rx="1" fill="#dcece7" stroke="#277a73" stroke-width="2"/><text x="68" y="43" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">A1</text><path d="M56 56H80M56 75H76" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">입력 최대 100만 칸</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">숨긴 칸도 입력에 포함</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">넘으면 범위를 나누기</text>
+<path d="M240 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><rect x="24" y="48" width="96" height="17" fill="#e8e8e5"/><path d="M100 53L131 53L120 65V78L111 82V65Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 37H80M56 75H79" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">결과 최대 10만 칸</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">글자 수 합계 1,000만 자</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">보이는 칸만 결과에 포함</text>
+<path d="M480 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#be8740" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">중간에 취소 가능</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">진행 창에서 취소 누르기</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">작업 종료까지 기다리기</text>
+</g></svg>

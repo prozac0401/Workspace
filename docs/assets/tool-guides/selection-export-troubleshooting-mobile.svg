@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">메뉴가 없거나 작업이 중단될 때</title><desc id="desc">먼저 안내 문구에 맞는 항목을 확인하세요. 문의할 때 원본 문서·개인 경로·설치 로그를 그대로 공개하지 마세요.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="28" y="5" width="96" height="86" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M43 21H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 40H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="49" width="84" height="19" rx="3" fill="#dcece7" stroke="#dcece7" stroke-width="2"/><path d="M43 60H94" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 79H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 60L10 84L18 78L24 90L31 86L24 74L35 72Z" fill="#fff" stroke="#283f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">메뉴가 없을 때</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">Excel 비트수 확인</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">저장 후 Excel 다시 열기</text>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="62" cy="42" r="29" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M84 65L111 90" fill="none" stroke="#277a73" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M48 36H76M48 46H66" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">서식으로 중단될 때</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">안내의 원본 행·열 확인</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">필요한 범위를 다시 선택</text>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff6d8" stroke="#be8740" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M104 88L112 79H104Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">문의할 때</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">제품·Excel 버전 준비</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">실행 순서와 안내 문구 전달</text>
+</g></svg>

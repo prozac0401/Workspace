@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">찾기·메모·삭제 복원</title><desc id="desc">검색과 메모로 작업을 찾고 이어가세요. 지운 책갈피는 10초 안에 되돌리거나 최근 삭제 100개에서 복원할 수 있으며 원본 파일은 지우지 않습니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="62" cy="42" r="29" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M84 65L111 90" fill="none" stroke="#277a73" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M48 36H76M48 46H66" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">목록에서 찾기</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">이름·경로·메모로 검색</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">검색 결과 최대 100개</text>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff6d8" stroke="#be8740" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M104 88L112 79H104Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">다음 할 일 메모</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">한 줄, 최대 500자</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">스티커 제목 클릭해 편집</text>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M94 51A23 23 0 1 1 65 28M65 28L55 27M65 28L60 39" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">지운 책갈피 복원</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">10초 안에는 삭제 되돌리기</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">이후에는 최근 삭제…</text>
+</g></svg>

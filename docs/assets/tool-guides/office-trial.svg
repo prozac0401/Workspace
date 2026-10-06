@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">분석하고 한 건 먼저 만들어 보기</title><desc id="desc">한 건 시험 생성은 한 항목의 개별 문서입니다. 여러 항목을 합친 최종 배치까지 확인하는 단계는 아닙니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="62" cy="42" r="29" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M84 65L111 90" fill="none" stroke="#277a73" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M48 36H76M48 46H66" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">필드 상세 확인</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">출력 이름·건수 분석</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">미해결·제외 사유 보기</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">한 건 시험 생성</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">별도 임시 폴더에 생성</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">값·줄바꿈·배치 확인</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M52 48L66 63L93 34" fill="none" stroke="#277a73" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">전체 생성</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">고쳤다면 다시 분석</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">결과·기록에서 확인</text>
+</g></svg>

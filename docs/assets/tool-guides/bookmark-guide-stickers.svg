@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">포스트잇 스티커로 보기</title><desc id="desc">0.2.8 스티커는 한 줄 메모와 오른쪽 화살표를 표시합니다. 메모 편집 중에는 필요할 때 높이가 늘고, 저장·취소 뒤 원래 크기로 돌아갑니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff6d8" stroke="#be8740" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M104 88L112 79H104Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">한 줄 메모</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">제목 클릭·Ctrl+E로 편집</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">다른 창으로 이동하면 저장</text>
+<path d="M240 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><g transform="rotate(-35 72 50)"><rect x="23" y="33" width="64" height="33" rx="16" fill="#fff" stroke="#277a73" stroke-width="2"/><rect x="61" y="33" width="64" height="33" rx="16" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M57 50H90" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">오른쪽 화살표</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">저장한 작업 열기</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">누른 스티커에 처리 중 표시</text>
+<path d="M480 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="28" y="5" width="96" height="86" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M43 21H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 40H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="49" width="84" height="19" rx="3" fill="#dcece7" stroke="#dcece7" stroke-width="2"/><path d="M43 60H94" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 79H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 60L10 84L18 78L24 90L31 86L24 74L35 72Z" fill="#fff" stroke="#283f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">나머지는 우클릭</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">접기·숨기기·지우기</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">숨기기는 화면에서만 숨김</text>
+</g></svg>

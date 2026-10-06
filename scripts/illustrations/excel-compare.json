@@ -1,0 +1,279 @@
+[
+  {
+    "page": "tools/excel-list-compare/index.md",
+    "heading": "설치 파일 받기",
+    "id": "excel-download",
+    "mode": "compare",
+    "panels": [
+      {
+        "icon": "install",
+        "badge": "EXE",
+        "title": "설치 파일",
+        "lines": [
+          "받은 파일을 실행",
+          "안내에 따라 설치"
+        ]
+      },
+      {
+        "icon": "folder",
+        "badge": "ZIP",
+        "title": "압축 파일",
+        "lines": [
+          "모두 풀고 Release 열기",
+          "Install.cmd 실행"
+        ]
+      }
+    ],
+    "caption": "설치 파일을 실행하거나 ZIP을 모두 풀고 Release 폴더의 Install.cmd를 실행합니다."
+  },
+  {
+    "page": "tools/excel-list-compare/index.md",
+    "heading": "설치하기",
+    "id": "excel-install",
+    "mode": "flow",
+    "panels": [
+      {
+        "icon": "sheet",
+        "title": "저장하고 닫기",
+        "lines": [
+          "작업 파일을 저장",
+          "Excel 창을 모두 닫기"
+        ]
+      },
+      {
+        "icon": "install",
+        "title": "설치 실행",
+        "lines": [
+          "현재 Windows 계정에",
+          "도구를 설치"
+        ]
+      },
+      {
+        "icon": "menu",
+        "title": "버튼 확인",
+        "lines": [
+          "Excel 추가 기능 탭",
+          "명단 비교 버튼 확인"
+        ]
+      }
+    ],
+    "caption": "64비트 Windows와 설치된 데스크톱 Excel에서 사용합니다. 설치 후 추가 기능 탭이나 셀 우클릭 메뉴로 시작하세요."
+  },
+  {
+    "page": "tools/excel-list-compare/index.md",
+    "heading": "두 목록 비교하기",
+    "id": "excel-compare",
+    "mode": "flow",
+    "panels": [
+      {
+        "icon": "sheet",
+        "badge": "1",
+        "title": "첫 목록 선택",
+        "lines": [
+          "제목을 빼고 셀 선택",
+          "첫 번째 목록 담기"
+        ]
+      },
+      {
+        "icon": "snapshot",
+        "title": "필요하면 확인",
+        "lines": [
+          "담은 목록 확인에서",
+          "가져온 위치·값 확인"
+        ]
+      },
+      {
+        "icon": "sheet-counts",
+        "badge": "2",
+        "title": "둘째 목록 비교",
+        "lines": [
+          "같은 Excel에서 선택",
+          "두 번째 목록 담아 비교"
+        ]
+      }
+    ],
+    "caption": "셀 순서와 가로·세로 방향은 달라도 됩니다. 같은 값이 각 목록에 몇 개씩 있는지를 비교합니다."
+  },
+  {
+    "page": "tools/excel-list-compare/index.md",
+    "heading": "차이 결과 읽기",
+    "id": "excel-results",
+    "mode": "compare",
+    "panels": [
+      {
+        "icon": "sheet-values",
+        "badge": "3",
+        "title": "첫 목록",
+        "lines": [
+          "같은 비교값 A가",
+          "3개 들어 있음"
+        ],
+        "samples": [
+          "A",
+          "A",
+          "A"
+        ]
+      },
+      {
+        "icon": "sheet-values",
+        "badge": "1",
+        "title": "둘째 목록",
+        "lines": [
+          "같은 비교값 A가",
+          "1개 들어 있음"
+        ],
+        "samples": [
+          "A",
+          "",
+          ""
+        ]
+      },
+      {
+        "icon": "records",
+        "badge": "+2",
+        "title": "차이 결과",
+        "lines": [
+          "A의 개수가 다름",
+          "첫 목록에 2개 더 많음"
+        ]
+      }
+    ],
+    "caption": "차이 결과는 값별 개수 차이를 보여줍니다. 원본 값과 셀 위치는 예시 하나이며, 그 셀이 잘못됐다는 뜻은 아닙니다."
+  },
+  {
+    "page": "tools/excel-list-compare/index.md",
+    "heading": "담은 목록 확인하기",
+    "id": "excel-snapshot",
+    "mode": "compare",
+    "panels": [
+      {
+        "icon": "sheet",
+        "title": "원본을 수정해도",
+        "lines": [
+          "현재 셀의 값만 변경",
+          "담은 값은 자동 갱신 안 됨"
+        ]
+      },
+      {
+        "icon": "snapshot",
+        "title": "담을 때의 값 확인",
+        "lines": [
+          "이미 담아 둔 첫 목록",
+          "일부 값과 위치를 표시"
+        ]
+      },
+      {
+        "icon": "restore",
+        "title": "새 값을 담으려면",
+        "lines": [
+          "수정한 범위를 선택",
+          "첫 번째 목록 바꾸기"
+        ]
+      }
+    ],
+    "caption": "담은 목록 확인은 현재 선택을 다시 읽지 않습니다. 화면에 일부 위치만 표시해도 비교할 때는 전체 개수를 셉니다."
+  },
+  {
+    "page": "tools/excel-list-compare/index.md",
+    "heading": "비교 설정 바꾸기",
+    "id": "excel-settings",
+    "mode": "compare",
+    "panels": [
+      {
+        "icon": "note",
+        "badge": "@",
+        "title": "메일 전체 주소 비교",
+        "lines": [
+          "끄면 @ 앞부분만",
+          "켜면 전체 주소 비교"
+        ]
+      },
+      {
+        "icon": "settings",
+        "badge": "Aa",
+        "title": "대소문자 무시",
+        "lines": [
+          "끄면 ABC ≠ abc",
+          "켜면 ABC = abc"
+        ]
+      },
+      {
+        "icon": "snapshot",
+        "title": "비교 후 첫 목록 유지",
+        "lines": [
+          "끄면 성공 후 비우기",
+          "켜면 다음 비교에 재사용"
+        ]
+      }
+    ],
+    "caption": "처음에는 세 설정 모두 꺼져 있습니다. 메일·대소문자 기준을 바꾸려면 첫 목록을 비운 뒤 설정하고 다시 담으세요."
+  },
+  {
+    "page": "tools/excel-list-compare/index.md",
+    "heading": "비교할 때 알아둘 점",
+    "id": "excel-limits",
+    "mode": "compare",
+    "panels": [
+      {
+        "icon": "sheet-filter",
+        "title": "보이는 값 비교",
+        "lines": [
+          "숨김·필터 셀 제외",
+          "빈칸·오류도 제외"
+        ]
+      },
+      {
+        "icon": "sheet-counts",
+        "title": "나눌 때는 값 기준",
+        "lines": [
+          "같은 비교값은 양쪽에서",
+          "같은 묶음에 넣기"
+        ]
+      },
+      {
+        "icon": "pause",
+        "badge": "Esc",
+        "title": "취소 후 종료 확인",
+        "lines": [
+          "Esc 또는 작업 취소",
+          "도구 모음의 취소 완료 확인"
+        ]
+      }
+    ],
+    "caption": "두 목록을 같은 행 수로 나누면 잘못된 차이가 생길 수 있습니다. 입력 상한 이내라도 시간 제한으로 중단될 수 있습니다."
+  },
+  {
+    "page": "tools/excel-list-compare/index.md",
+    "heading": "업데이트·제거하기",
+    "id": "excel-maintenance",
+    "mode": "compare",
+    "panels": [
+      {
+        "icon": "install",
+        "title": "업데이트",
+        "lines": [
+          "저장하고 Excel 종료",
+          "새 설치 파일 실행"
+        ]
+      },
+      {
+        "icon": "trash",
+        "title": "설치 방식별 제거",
+        "lines": [
+          "EXE는 Windows 설정",
+          "ZIP은 Uninstall.cmd"
+        ]
+      },
+      {
+        "icon": "settings",
+        "title": "비교 설정은 보존",
+        "lines": [
+          "같은 계정에 남음",
+          "도구에서 기본값 복원"
+        ]
+      }
+    ],
+    "caption": "업데이트·제거 전에는 파일을 저장하고 Excel을 닫으세요. 비교 설정을 초기화하려면 설치된 도구의 기본값으로 되돌리기를 사용합니다."
+  }
+]
+

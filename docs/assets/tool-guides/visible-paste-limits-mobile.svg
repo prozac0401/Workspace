@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">지원 범위</title><desc id="desc">지원하지 않는 범위는 쓰기 전에 중단합니다. 항목 수 외에도 선택 범위·복사 데이터 크기·보이는 구간 수의 상한이 있습니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><rect x="24" y="48" width="96" height="17" fill="#e8e8e5"/><path d="M100 53L131 53L120 65V78L111 82V65Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 37H80M56 75H79" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">한 열의 보이는 칸</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">값만 있는 표 열도 가능</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">보이는 대상 최대 50,000칸</text>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#be8740" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">지원 제외 범위</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">합쳐진 칸·보호된 시트</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">여러 열·잘라내기 제외</text>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="55" width="64" height="10" rx="2" fill="#eef4f1" stroke="#eef4f1" stroke-width="2"/><path d="M50 60H93" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">대량 작업 확인</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">5,000칸 또는 1,000구간</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">이상부터 진행 여부 확인</text>
+</g></svg>

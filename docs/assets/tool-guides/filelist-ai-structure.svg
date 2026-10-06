@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">Workspace 안내의 폴더 구조에 맞춰 초안 다듬기</title><desc id="desc">폴더 구조는 제안입니다. 실제 업무와 회사 보관 기준에 맞춰 정하고, 끝난 업무의 결과물과 근거는 같은 맥락으로 보관합니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="108" cy="72" r="20" fill="#eaf0fb" stroke="#4276aa" stroke-width="2"/><path d="M108 60V73L116 77" fill="none" stroke="#4276aa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">진행 중인 업무</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">업무별로 한곳에 모으기</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">10_Active를 출발점으로</text>
+<path d="M240 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#be8740" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">양식과 참고자료</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">재사용 양식은 Operations</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">공통 자료는 Reference</text>
+<path d="M480 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="108" cy="72" r="20" fill="#eef4f1" stroke="#277a73" stroke-width="2"/><path d="M98 72L105 79L119 64" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">끝난 업무와 보류</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">확인한 기록은 Archive</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">판단이 어려우면 목적지 보류</text>
+</g></svg>

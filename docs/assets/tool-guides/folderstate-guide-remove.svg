@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">프로그램 제거하기</title><desc id="desc">프로그램 제거는 업무 폴더를 검색하거나 그 안의 상태를 지우지 않습니다. 이 PC의 아이콘을 쓰던 폴더는 제거 후 상태 아이콘이 보이지 않을 수 있습니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M94 51A23 23 0 1 1 65 28M65 28L55 27M65 28L60 39" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">상태 삭제는 먼저</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">표시도 없앨 때만 선택</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">폴더별 상태 표시 지우기</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M42 29L47 86H97L102 29M36 28H108M57 27V16H87V27M61 42V72M83 42V72" fill="#eef4f1" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">설치 파일 다시 열기</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">프로그램 제거 선택</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">프로그램과 메뉴 제거</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#be8740" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">업무 자료 유지</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">업무 폴더·파일 그대로</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">폴더 안 상태도 남음</text>
+</g></svg>

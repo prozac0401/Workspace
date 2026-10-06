@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">반복 업무의 기본 폴더를 복사할 때</title><desc id="desc">기본 폴더가 이미 시작 전이면 매번 상태를 지울 필요는 없습니다. 하위 폴더를 자동으로 찾아 상태를 바꾸지는 않습니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="105" cy="72" r="17" fill="#fffcf7" stroke="#55676b" stroke-width="2"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">기본 폴더 준비</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">MASTER의 단계 폴더</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">상태를 쓰면 시작 전</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="68" y="39" width="34" height="39" rx="3" fill="#fff" stroke="#277a73" stroke-width="2"/><rect x="77" y="48" width="34" height="39" rx="3" fill="#fffcf7" stroke="#277a73" stroke-width="2"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">업무별로 복사</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">새 업무의 복사본 만들기</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">연습도 복사본에서</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="108" cy="72" r="20" fill="#eaf0fb" stroke="#4276aa" stroke-width="2"/><path d="M108 60V73L116 77" fill="none" stroke="#4276aa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">복사본에서 진행</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">실제 업무 상태 선택</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">기본 폴더는 그대로 유지</text>
+</g></svg>

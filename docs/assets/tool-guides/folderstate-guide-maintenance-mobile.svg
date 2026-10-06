@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">업데이트·복구·제거</title><desc id="desc">필요한 작업에 맞춰 복구·업데이트·제거를 선택하세요. 폴더 상태까지 지우려면 프로그램을 제거하기 전에 각 폴더에서 상태 표시 지우기를 사용합니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M94 51A23 23 0 1 1 65 28M65 28L55 27M65 28L60 39" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">프로그램 복구</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">같은 설치 파일 실행</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">파일과 메뉴 다시 설치</text>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">새 버전 설치</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">새 설치 파일 실행</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">설치 위치 그대로 유지</text>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M42 29L47 86H97L102 29M36 28H108M57 27V16H87V27M61 42V72M83 42V72" fill="#eef4f1" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">프로그램 제거</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">상태 삭제는 제거 전에</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">업무 폴더와 파일 유지</text>
+</g></svg>

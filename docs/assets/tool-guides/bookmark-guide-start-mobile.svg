@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">설치하고 첫 책갈피 남기기</title><desc id="desc">실제 폴더 하나로 연습하세요. 스티커의 오른쪽 화살표로 저장한 위치를 열고, 목록 모드에서는 항목을 고른 뒤 Enter를 누릅니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#be8740" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">폴더에서 시작</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">설치 후 프로그램 실행</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">폴더의 파일 선택 해제</text>
+<path d="M335 123V137M330 132L335 137L340 132" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="26" y="13" width="91" height="74" rx="6" fill="#fff" stroke="#d6e0dc" stroke-width="2"/><path d="M75 13H98V61L86 52L75 61Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 40H62M40 52H60M40 69H98" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">현재 위치 남기기</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">Ctrl+Alt+B 누르기</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">책갈피 저장 알림 확인</text>
+<path d="M335 267V281M330 276L335 281L340 276" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M94 51A23 23 0 1 1 65 28M65 28L55 27M65 28L60 39" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">저장한 작업 열기</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">Ctrl+Alt+J로 불러오기</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">스티커 오른쪽 화살표</text>
+</g></svg>

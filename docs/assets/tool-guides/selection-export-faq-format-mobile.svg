@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">원본과 똑같은 모양으로 나오나요?</title><desc id="desc">지원하는 기본 모양을 옮깁니다. 그림·그래프는 대상이 아니며 처리할 수 없는 모양은 원본 행·열과 함께 알립니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><rect x="50" y="29" width="38" height="18" rx="1" fill="#dcece7" stroke="#277a73" stroke-width="2"/><text x="68" y="43" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">A1</text><path d="M56 56H80M56 75H76" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">기본 모양 유지</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">글꼴·색·테두리·정렬</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">행 높이와 열 너비</text>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="18" y="15" width="110" height="70" rx="6" fill="#eaf0fb" stroke="#277a73" stroke-width="2"/><circle cx="103" cy="33" r="8" fill="#f4dfb7" stroke="#be8740" stroke-width="2"/><path d="M24 78L54 36L80 66L95 49L122 79Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">그림·그래프 제외</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">도형·그래프·그림</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">칸 안의 작은 그래프</text>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#be8740" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">지원 밖 모양은 중단</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">한 칸 안에 섞인 글꼴</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">색이 차츰 바뀌는 배경</text>
+</g></svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">설치 파일 받기</title><desc id="desc">Excel의 파일 → 계정 → Excel 정보에서 비트수를 확인하세요. Excel 비트수에 맞는 설치 파일을 고릅니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(108 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="180.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">Excel 64비트</text>
+<text x="180.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">Excel이 64비트일 때</text>
+<text x="180.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">x64 설치 파일 받기</text>
+<rect x="145.0" y="109" width="70" height="23" rx="10" fill="#eef4f1" stroke="#eef4f1" stroke-width="2"/>
+<text x="180.0" y="125" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">x64</text>
+<path d="M360 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(468 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="540.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">Excel 32비트</text>
+<text x="540.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">Excel이 32비트일 때</text>
+<text x="540.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">x86 설치 파일 받기</text>
+<rect x="505.0" y="109" width="70" height="23" rx="10" fill="#eef4f1" stroke="#eef4f1" stroke-width="2"/>
+<text x="540.0" y="125" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">x86</text>
+</g></svg>

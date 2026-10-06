@@ -32,6 +32,8 @@ ProbPacker의 Office Automation Tools 0.3.1은 [ADR-0034](../design/0034-office-
 
 ## 게시 전 검사
 
+아홉 도구의 챕터별 삽화는 `assets/tool-guides/`의 가로·모바일 SVG를 각각 명시해 포함합니다. 원본 JSON과 생성기는 사이트에 복사하지 않습니다. 최신 본문과 다운로드·이전 주소 이동을 유지한 통합·화면·게시 확인은 [삽화 게시 기록](tool-illustrations-publication-20261006.md)에 남깁니다.
+
 ```powershell
 python -m mkdocs build --strict
 python scripts/check-site.py site

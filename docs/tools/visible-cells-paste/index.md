@@ -4,6 +4,16 @@ Excel에서 복사한 값을 **선택한 한 열의 보이는 칸에만** 순서
 
 ## 프로그램 받기 {#download}
 
+<!-- tool-figure:visible-paste-download:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/visible-paste-download-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/visible-paste-download.svg" width="720" height="244" alt="배포 파일 목록 열기: 보이는 칸 붙여넣기 선택 Assets의 설치 파일 받기 / Windows PC용 Excel: 설치된 Excel에서 사용 웹·Mac용 Excel은 제외 / 회사 설치 절차 확인: 전자 서명 없는 설치 파일 Office 보안 정책 유지" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 배포 목록에서 보이는 칸 붙여넣기 버전을 고르고 Setup.exe를 받으세요. ZIP을 제공하는 배포에서는 ZIP 방식도 사용할 수 있습니다.</figcaption>
+</figure>
+<!-- tool-figure:visible-paste-download:end -->
+
 **보이는 칸 붙여넣기** · Windows PC에 설치된 Excel용 · 실행에 필요한 .NET Framework 4.8 사용
 
 [배포 파일 목록](https://github.com/prozac0401/Workspace/releases){ .md-button .md-button--primary }
@@ -15,6 +25,16 @@ Excel에서 복사한 값을 **선택한 한 열의 보이는 칸에만** 순서
 설치 파일에는 제작자를 확인하는 전자 서명이 없습니다. 회사에서 서명된 추가 기능이나 사전 승인을 요구하면 담당자의 배포 절차를 따르세요. 설치 프로그램은 Office 보안 정책을 바꾸지 않습니다.
 
 ## 설치하기 {#install}
+
+<!-- tool-figure:visible-paste-install:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/visible-paste-install-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/visible-paste-install.svg" width="720" height="244" alt="저장하고 Excel 종료 (1): 열린 파일을 먼저 저장 모든 Excel 종료 → 설치 파일 실행 (2): Setup.exe 실행 ZIP은 풀고 Install.cmd → 우클릭 메뉴 확인 (3): Excel을 다시 실행 붙여넣기·되돌리기 메뉴" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 설치는 한 번만 하면 됩니다. 이후 Excel을 평소처럼 실행해 셀 우클릭 메뉴를 사용합니다.</figcaption>
+</figure>
+<!-- tool-figure:visible-paste-install:end -->
 
 1. 열려 있는 Excel 문서를 저장하고 모든 Excel을 종료합니다.
 2. 받은 **Setup.exe**를 실행합니다.
@@ -28,6 +48,16 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
 설치 중 Excel이 실행 중이라는 안내가 나오면 설치를 멈춥니다. 화면에 창이 없어도 Excel이 뒤에서 실행 중이면 같은 안내가 나올 수 있습니다. 문서를 저장하고 Excel이 정상 종료된 뒤 다시 실행하세요. 설치 프로그램이 Excel을 강제로 닫지는 않습니다.
 
 ## 보이는 칸에 값 넣기 {#paste}
+
+<!-- tool-figure:visible-paste-use:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/visible-paste-use-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/visible-paste-use.svg" width="720" height="244" alt="한 행·한 열 복사: 85 → 90 → 78 Ctrl+C로 복사 → 대상 한 열 선택: 2·4·5행이 보이는 예 숨긴 3행은 건너뛰기 → 보이는 칸에 붙여넣기: 2행 85 · 4행 90 · 5행 78 개수가 다르면 중단" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 복사한 값 3개를 보이는 대상 3칸에 위에서 아래로 넣습니다. 숨긴 행은 유지하며 이름이나 사번을 찾아 연결하지 않습니다.</figcaption>
+</figure>
+<!-- tool-figure:visible-paste-use:end -->
 
 1. 원본 Excel에서 **한 행 또는 한 열**을 선택하고 **Ctrl+C**로 복사합니다. 원본 Excel은 열어 둡니다.
 2. 대상에서 값을 넣을 **한 열의 연속된 범위**를 선택합니다. 필터나 행 숨김을 적용한 상태로 선택하면 됩니다.
@@ -51,6 +81,16 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
 
 ## 값과 표시 형식 {#values}
 
+<!-- tool-figure:visible-paste-values:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/visible-paste-values-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/visible-paste-values.svg" width="720" height="244" alt="빈칸도 자리 유지: 해당 순서의 내용을 비움 빈칸을 빼고 당기지 않음 / 수식은 결과만: 계산 결과 값을 입력 대상의 표시 형식 유지 / 날짜는 원래 숫자: 1900·1904 보정 안 함 날짜 표시가 달라질 수 있음" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 빈칸·숫자·문자열의 위치와 값을 보존합니다. 날짜 숫자와 대상 서식을 그대로 쓰므로 원본과 표시가 달라질 수 있습니다.</figcaption>
+</figure>
+<!-- tool-figure:visible-paste-values:end -->
+
 - 숫자, 글자, 참·거짓, 빈칸과 지원하는 Excel 오류값을 처리합니다. `00123` 같은 글자 값, 긴 식별번호, 셀 안의 줄바꿈을 유지합니다.
 - 수식은 **복사된 계산 결과**를 넣습니다. 수식 자체를 옮기거나 원본을 다시 계산하지 않습니다.
 - 실제 빈칸도 한 항목으로 셉니다. 처음·가운데·마지막의 빈칸은 대응하는 대상의 내용을 비웁니다. 수식 `=""`처럼 아무 글자도 보이지 않는 결과도 한 항목으로 셉니다. 이 결과는 붙여넣을 때 실제 빈칸으로 저장될 수 있습니다.
@@ -61,6 +101,16 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
 값의 종류나 빈칸을 포함한 개수를 안전하게 읽을 수 없으면 중단합니다. 일반 텍스트를 숫자나 날짜로 추측해서 바꾸지 않습니다.
 
 ## 지원 범위 {#supported}
+
+<!-- tool-figure:visible-paste-limits:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/visible-paste-limits-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/visible-paste-limits.svg" width="720" height="244" alt="한 열의 보이는 칸: 값만 있는 표 열도 가능 보이는 대상 최대 50,000칸 / 지원 제외 범위: 합쳐진 칸·보호된 시트 여러 열·잘라내기 제외 / 대량 작업 확인: 5,000칸 또는 1,000구간 이상부터 진행 여부 확인" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 지원하지 않는 범위는 쓰기 전에 중단합니다. 항목 수 외에도 선택 범위·복사 데이터 크기·보이는 구간 수의 상한이 있습니다.</figcaption>
+</figure>
+<!-- tool-figure:visible-paste-limits:end -->
 
 원본은 Excel에서 **Ctrl+C로 복사한 한 행 또는 한 열**이어야 합니다. 다른 Excel 파일이나 다른 Excel 창에서 복사할 수 있으며, 필터된 원본은 실제로 복사된 항목을 사용합니다. 대상은 한 열의 연속된 선택 범위 안에서 보이는 칸입니다.
 
@@ -78,6 +128,16 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
 
 ## 마지막 작업 되돌리기 {#undo}
 
+<!-- tool-figure:visible-paste-undo:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/visible-paste-undo-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/visible-paste-undo.svg" width="720" height="244" alt="붙여넣기 직후: 같은 선택 그대로 유지 다른 편집 전에 실행 → 자체 메뉴로 되돌리기: 마지막 성공 작업 한 번 원래 값과 수식 복구 → 제한 안내 확인: 정렬 설정 등이 있으면 제한 기존 Ctrl+Z 기록 소실 가능" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 최근 한 번만 자체 메뉴로 되돌립니다. 선택·편집·정렬 상태 등에 따라 제한되며, 파일을 닫은 뒤에는 복구할 수 없습니다.</figcaption>
+</figure>
+<!-- tool-figure:visible-paste-undo:end -->
+
 붙여넣은 직후 **같은 범위를 유지한 채** 우클릭하고 **마지막 붙여넣기 되돌리기**를 누릅니다. 이 도구로 마지막에 성공한 작업 한 번의 값과 수식을 복원합니다.
 
 되돌릴 기록은 현재 Excel이 켜져 있는 동안만 보관합니다. 다음 상황에서는 되돌리기가 제한됩니다.
@@ -93,11 +153,31 @@ ZIP 방식은 모든 파일을 한 폴더에 푼 뒤 **Install.cmd**를 실행�
 
 ## 업데이트·제거 {#remove}
 
+<!-- tool-figure:visible-paste-maintenance:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/visible-paste-maintenance-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/visible-paste-maintenance.svg" width="720" height="244" alt="업데이트: 파일 저장·Excel 종료 새 설치 파일 실행 / 도구 제거: Windows 설치된 앱 또는 Uninstall.cmd / 사용자 자료 보존: 통합문서·다른 도구 유지 외부 수정 파일은 안내 확인" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 업데이트와 제거 전에 Excel을 저장하고 종료하세요. 이 도구의 자동 로드 등록과 소유 파일을 정리합니다.</figcaption>
+</figure>
+<!-- tool-figure:visible-paste-maintenance:end -->
+
 업데이트할 때는 Excel을 저장·종료하고 새 **Setup.exe**를 실행합니다. 기존 ZIP으로 설치했어도 같은 방식으로 업데이트합니다.
 
 제거할 때는 Excel을 저장·종료한 뒤 Windows의 설치된 앱에서 **보이는 칸 붙여넣기**를 제거합니다. ZIP의 **Uninstall.cmd** 또는 설치 EXE의 `--uninstall`로도 제거할 수 있습니다. 이 도구의 자동 실행 설정과 프로그램 파일을 정리합니다. Excel 파일, 다른 추가 기능, PERSONAL.XLSB와 Office 보안 설정은 지우지 않습니다. 외부에서 바꾼 파일이 남았다는 안내가 나오면 내용을 확인하세요.
 
 ## 막혔을 때 {#help}
+
+<!-- tool-figure:visible-paste-troubleshooting:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/visible-paste-troubleshooting-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/visible-paste-troubleshooting.svg" width="720" height="244" alt="메뉴가 없으면: Excel 종료·다시 실행 추가 기능 차단 여부 확인 / 개수가 다르면: 빈칸 포함 원본 개수 확인 보이는 대상 개수와 대조 / 되돌리기가 안 되면: 선택·편집·정렬 상태 확인 기존 정렬 설정도 확인" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 안내 문구에 맞춰 선택 범위와 복사한 내용을 확인하세요. 문의할 때 이름·명단·수식·업무 파일을 공개하지 마세요.</figcaption>
+</figure>
+<!-- tool-figure:visible-paste-troubleshooting:end -->
 
 | 안내 또는 상황 | 다음에 할 일 |
 |---|---|

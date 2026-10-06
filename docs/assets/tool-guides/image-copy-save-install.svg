@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">설치하기</title><desc id="desc">설치 후 PC에 실제로 저장된 폴더를 엽니다. Windows가 재시작을 요청하면 작업을 저장한 뒤 직접 재시작하세요.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">0.2.1 MSI 실행</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">버전에 맞는 설치 파일 열기</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">실행에 필요한 파일도 포함</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">설치 안내 확인</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">관리자 승인 후 설치</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">PC의 프로그램 폴더에 설치</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#be8740" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">로컬 폴더 열기</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">탐색기에서 두 메뉴 사용</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">별도 설정 화면 없음</text>
+</g></svg>

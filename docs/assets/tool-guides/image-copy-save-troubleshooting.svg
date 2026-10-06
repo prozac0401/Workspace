@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">메뉴가 없거나 작업이 실패할 때</title><desc id="desc">저장 성공과 탐색기에서 파일을 선택하는 동작은 별개입니다. 문의에는 업무 이미지·개인 정보·실제 경로나 문제 확인용 기록 전체를 공개하지 마세요.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="28" y="5" width="96" height="86" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M43 21H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 40H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="49" width="84" height="19" rx="3" fill="#dcece7" stroke="#dcece7" stroke-width="2"/><path d="M43 60H94" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 79H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 60L10 84L18 78L24 90L31 86L24 74L35 72Z" fill="#fff" stroke="#283f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">메뉴가 없으면</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">더 많은 옵션 표시 확인</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">이미지와 위치를 다시 확인</text>
+<path d="M240 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="108" cy="72" r="20" fill="#eef4f1" stroke="#277a73" stroke-width="2"/><path d="M98 72L105 79L119 64" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">선택 표시가 없으면</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">메뉴를 누른 폴더 확인</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">만들어진 PNG가 있는지 확인</text>
+<path d="M480 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#be8740" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">탐색기가 멈추면</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">반복 실행을 멈추기</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">재현 순서와 버전으로 문의</text>
+</g></svg>

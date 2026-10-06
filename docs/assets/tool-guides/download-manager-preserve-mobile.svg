@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">파일을 보존했다는 안내가 나오면</title><desc id="desc">처리 중 멈추면 이전 파일이 보관 폴더나 임시 이름에 남을 수 있습니다. 자동 복원 화면은 없으므로 안내된 두 파일의 위치를 확인하세요.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="55" y="43" width="34" height="26" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M62 43V33Q72 18 82 33V43" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">보존 이유 확인</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">읽기 전용·접근 실패 구분</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">권한과 보호 속성은 유지</text>
+<path d="M335 123V137M330 132L335 137L340 132" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#be8740" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">겹친 파일은 직접 확인</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">동시에 들어온 파일은 보존</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">번호·시각으로 자동 선택 안 함</text>
+<path d="M335 267V281M330 276L335 281L340 276" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="62" cy="42" r="29" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M84 65L111 90" fill="none" stroke="#277a73" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M48 36H76M48 46H66" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">안내된 위치 모두 확인</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">이전 파일과 새 파일 확인</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">남은 파일을 일괄 삭제 안 함</text>
+</g></svg>

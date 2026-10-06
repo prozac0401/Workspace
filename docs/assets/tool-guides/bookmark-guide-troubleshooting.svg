@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">문제가 생겼을 때</title><desc id="desc">열기 요청 알림이 나오더라도 실제 열린 화면을 확인하세요. 문의할 때는 버전·실행 순서·알림을 정리하고 업무 내용이 든 데이터와 백업은 보호합니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="62" cy="42" r="29" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M84 65L111 90" fill="none" stroke="#277a73" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M48 36H76M48 46H66" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">증상과 안내 확인</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">아래 문제 해결 표 확인</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">실행 중인 버전도 확인</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M94 51A23 23 0 1 1 65 28M65 28L55 27M65 28L60 39" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">대상 화면 재확인</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">창·문서·로그인 상태 확인</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">진행 중 요청은 중단 가능</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="55" y="43" width="34" height="26" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M62 43V33Q72 18 82 33V43" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">필요한 정보만 전달</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">버전·순서·알림 문구</text>
+<text x="600.0" y="205" font-size="14.8" fill="#55676b" font-weight="400" text-anchor="middle">업무 기록은 그대로 공개 안 함</text>
+</g></svg>

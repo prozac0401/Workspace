@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">비교 설정 바꾸기</title><desc id="desc">처음에는 세 설정 모두 꺼져 있습니다. 메일·대소문자 기준을 바꾸려면 첫 목록을 비운 뒤 설정하고 다시 담으세요.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff6d8" stroke="#be8740" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M104 88L112 79H104Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">메일 전체 주소 비교</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">끄면 @ 앞부분만</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">켜면 전체 주소 비교</text>
+<rect x="85.0" y="109" width="70" height="23" rx="10" fill="#eef4f1" stroke="#eef4f1" stroke-width="2"/>
+<text x="120.0" y="125" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">@</text>
+<path d="M240 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M27 24H119" fill="none" stroke="#d6e0dc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="53" cy="24" r="9" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M27 49H119" fill="none" stroke="#d6e0dc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="93" cy="49" r="9" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M27 74H119" fill="none" stroke="#d6e0dc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="65" cy="74" r="9" fill="#fff" stroke="#277a73" stroke-width="2"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">대소문자 무시</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">끄면 ABC ≠ abc</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">켜면 ABC = abc</text>
+<rect x="325.0" y="109" width="70" height="23" rx="10" fill="#eef4f1" stroke="#eef4f1" stroke-width="2"/>
+<text x="360.0" y="125" font-size="12" fill="#277a73" font-weight="700" text-anchor="middle">Aa</text>
+<path d="M480 29V212" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="24" y="7" width="78" height="70" rx="5" fill="#eef4f1" stroke="#d6e0dc" stroke-width="2"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="109" cy="74" r="17" fill="#eef4f1" stroke="#277a73" stroke-width="2"/><path d="M109 64V75L117 79" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">비교 후 첫 목록 유지</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">끄면 성공 후 비우기</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">켜면 다음 비교에 재사용</text>
+</g></svg>

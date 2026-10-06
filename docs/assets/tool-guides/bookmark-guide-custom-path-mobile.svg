@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">다른 폴더에 설치한 이전 버전 바꾸기</title><desc id="desc">0.2.3 이하를 기본 위치 밖에 설치했다면 기존 MSI와 원래 경로를 지정해 제거한 뒤 새로 설치합니다. 경로가 불명확하면 먼저 확인하고 남은 폴더를 일괄 삭제하지 마세요.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="68" y="39" width="34" height="39" rx="3" fill="#fff" stroke="#277a73" stroke-width="2"/><rect x="77" y="48" width="34" height="39" rx="3" fill="#fffcf7" stroke="#277a73" stroke-width="2"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">백업 후 정상 종료</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">데이터 폴더 전체 보관</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">기존 설치 경로 확인</text>
+<path d="M335 123V137M330 132L335 137L340 132" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">기존 버전 제거</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">0.2.3 이하 사용자 지정</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">옛 MSI와 원래 경로 지정</text>
+<path d="M335 267V281M330 276L335 281L340 276" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M72 8L112 24V49Q112 75 72 91Q32 75 32 49V24Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M52 48L66 63L93 34" fill="none" stroke="#277a73" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">성공 확인 후 설치</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">제거 성공 여부 확인</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">원하는 위치에 새 MSI 설치</text>
+</g></svg>

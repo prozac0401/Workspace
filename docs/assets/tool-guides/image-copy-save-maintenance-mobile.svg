@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">업데이트·복구·제거하기</title><desc id="desc">세 작업 모두 관리자 승인이 필요합니다. 외부에서 바뀐 파일이나 겹친 설정 때문에 중단되면 일괄 삭제하지 말고 안내된 충돌 확인 절차를 따르세요.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#d6e0dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#be8740"/><circle cx="31" cy="18" r="2" fill="#be8740"/><circle cx="39" cy="18" r="2" fill="#be8740"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">업데이트</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">새 버전 MSI 실행</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">자동으로 새 버전 설치 안 함</text>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M94 51A23 23 0 1 1 65 28M65 28L55 27M65 28L60 39" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">복구</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">현재 설치된 버전의 MSI</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">없어진 프로그램 파일 채우기</text>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M42 29L47 86H97L102 29M36 28H108M57 27V16H87V27M61 42V72M83 42V72" fill="#eef4f1" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">제거</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">Windows 설치된 앱에서</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">원본·저장 PNG는 보존</text>
+</g></svg>

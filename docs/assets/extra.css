@@ -183,3 +183,43 @@ body {
   .guide-intro, .handbook-closing--illustrated { display: block; }
   .guide-figure, .closing-visual { display: none !important; }
 }
+
+/* Chapter diagrams: compact landscape on desktop, legible vertical art on phones. */
+.md-typeset .tool-figure {
+  max-width: 42rem;
+  margin: 1.1rem auto 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--handbook-line);
+  border-radius: 10px;
+  background: var(--handbook-paper);
+  break-inside: avoid;
+}
+.tool-figure picture { display: block; background: #fffcf7; }
+.tool-figure img { display: block; width: 100%; height: auto; margin: 0; }
+.md-typeset .tool-figure figcaption {
+  max-width: none;
+  margin: 0;
+  padding: .75rem 1rem;
+  border-top: 1px solid var(--handbook-line);
+  color: var(--handbook-muted);
+  font-size: .7rem;
+  line-height: 1.75;
+  font-style: normal;
+  text-align: left;
+}
+.tool-figure figcaption > span {
+  display: inline-block;
+  margin-right: .45em;
+  color: var(--md-default-fg-color);
+  font-weight: 700;
+}
+[data-md-color-scheme="slate"] .tool-figure picture { filter: brightness(.9); }
+@media (max-width: 600px) {
+  .md-typeset .tool-figure { max-width: 24rem; margin: 1rem auto 1.25rem; }
+  .md-typeset .tool-figure figcaption { padding: .7rem .8rem; }
+}
+@media print {
+  .md-typeset .tool-figure { max-width: 160mm; }
+  .tool-figure picture { filter: none !important; }
+}
+

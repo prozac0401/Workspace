@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">확정한 목록으로 BATCH 복사 스크립트 요청하기</title><desc id="desc">BATCH 스크립트는 별도로 요청하는 작업입니다. 확정한 파일만 처리하고, 원본 변경·기존 파일 덮어쓰기 없이 미리보기와 시험부터 진행합니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="15" y="12" width="115" height="72" rx="6" fill="#283f43" stroke="#283f43" stroke-width="2"/><path d="M29 30L38 37L29 44" fill="none" stroke="#a8d8cb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 37H90M29 57H104M29 69H73" fill="none" stroke="#a8d8cb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">확정 목록으로 요청</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">원본 밖의 새 대상 폴더</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">기본 실행은 복사 미리보기</text>
+<path d="M335 123V137M330 132L335 137L340 132" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="62" cy="42" r="29" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M84 65L111 90" fill="none" stroke="#277a73" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M48 36H76M48 46H66" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">계획 대조·소량 시험</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">Excel의 경로·개수와 대조</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">대표 파일로 먼저 확인</text>
+<path d="M335 267V281M330 276L335 281L340 276" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="68" y="39" width="34" height="39" rx="3" fill="#fff" stroke="#277a73" stroke-width="2"/><rect x="77" y="48" width="34" height="39" rx="3" fill="#fffcf7" stroke="#277a73" stroke-width="2"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">복사 뒤 결과 확인</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">성공·실패·제외 나누어 확인</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">검토가 끝날 때까지 원본 보관</text>
+</g></svg>

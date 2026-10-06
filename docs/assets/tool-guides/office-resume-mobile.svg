@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">중지하고 남은 작업 계속하기</title><desc id="desc">프로그램을 닫지 않은 동안 미완료 항목을 이어갈 수 있습니다. 재시작 후 JSON 기록을 불러와 재개할 수는 없습니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M61 33V65M83 33V65" fill="none" stroke="#be8740" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">중지 요청</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">현재 Office 작업 대기</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">멈출 수 있는 지점에서 중지</text>
+<path d="M335 123V137M330 132L335 137L340 132" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="42" y="55" width="64" height="10" rx="2" fill="#eef4f1" stroke="#eef4f1" stroke-width="2"/><path d="M50 60H93" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">결과·기록 확인</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">완료·실패·미처리 구분</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">원본 변경 여부 확인</text>
+<path d="M335 267V281M330 276L335 281L340 276" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M94 51A23 23 0 1 1 65 28M65 28L55 27M65 28L60 39" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">남은 작업 계속</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">같은 실행 중에 사용</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">재실행 뒤에는 새 분석</text>
+</g></svg>

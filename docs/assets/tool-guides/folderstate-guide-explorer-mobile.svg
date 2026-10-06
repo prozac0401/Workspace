@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="432" viewBox="0 0 360 432" role="img" aria-labelledby="title desc">
+<title id="title">탐색기에서 바로 바꾸기</title><desc id="desc">Windows 11에서는 더 많은 옵션 표시 안의 업무 상태 메뉴를 사용합니다. 상태가 저장되면 별도 창 없이 폴더 아이콘으로 확인합니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="360" height="432" rx="12" fill="#fffcf7"/>
+<g transform="translate(9 19) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 55H83M41 65H68" fill="none" stroke="#be8740" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="35" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">폴더 하나 우클릭</text>
+<text x="135" y="60" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">업무 폴더 선택</text>
+<text x="135" y="80" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">더 많은 옵션 표시</text>
+<path d="M335 123V137M330 132L335 137L340 132" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 144H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 163) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="28" y="5" width="96" height="86" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M43 21H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 40H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="49" width="84" height="19" rx="3" fill="#dcece7" stroke="#dcece7" stroke-width="2"/><path d="M43 60H94" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 79H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 60L10 84L18 78L24 90L31 86L24 74L35 72Z" fill="#fff" stroke="#283f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="179" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">업무 상태 열기</text>
+<text x="135" y="204" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">상황에 맞는 상태 선택</text>
+<text x="135" y="224" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">선택하면 바로 저장</text>
+<path d="M335 267V281M330 276L335 281L340 276" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 288H342" fill="none" stroke="#d6e0dc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(9 307) scale(.79)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><path d="M19 35V20Q19 15 25 15H53L65 27H119Q125 27 125 33V78Q125 85 118 85H26Q19 85 19 78Z" fill="#f4dfb7" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 37H125L116 85H27Z" fill="#ffeac5" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="108" cy="72" r="20" fill="#eef4f1" stroke="#277a73" stroke-width="2"/><path d="M98 72L105 79L119 64" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="135" y="323" font-size="16" fill="#283f43" font-weight="700" text-anchor="start">아이콘 확인</text>
+<text x="135" y="348" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">성공하면 별도 창 없음</text>
+<text x="135" y="368" font-size="13" fill="#55676b" font-weight="400" text-anchor="start">주의·실패 시 안내 표시</text>
+</g></svg>

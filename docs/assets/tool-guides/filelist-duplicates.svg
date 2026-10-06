@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">같은 내용의 파일 찾기</title><desc id="desc">이름이 달라도 내용이 같으면 한 묶음으로 표시합니다. 중복 검사는 내용을 읽지만 원본을 삭제하거나 이동하지 않습니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><circle cx="62" cy="42" r="29" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M84 65L111 90" fill="none" stroke="#277a73" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M48 36H76M48 46H66" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">비교 범위 선택</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">선택한 파일끼리 또는</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">폴더의 하위 항목까지</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#55676b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">내용으로 비교</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">크기로 후보를 좁힌 뒤</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">필요한 파일 내용을 읽음</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#d6e0dc" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#dcece7"/><path d="M49 48H120V65H49Z" fill="#f6e7cd" stroke="#be8740" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="69" y="43" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">A</text><text x="104" y="43" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">3</text><text x="69" y="62" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">B</text><text x="104" y="62" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">1</text><text x="69" y="81" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">C</text><text x="104" y="81" font-size="13" fill="#283f43" font-weight="400" text-anchor="middle">2</text></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">같은 파일 묶음 확인</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">실패·제외도 따로 확인</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">원본은 자동 정리하지 않음</text>
+</g></svg>

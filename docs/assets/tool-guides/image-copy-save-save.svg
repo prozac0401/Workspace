@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
+<title id="title">복사한 이미지를 PNG로 저장하기</title><desc id="desc">이전 방식의 메뉴가 바로 열리는 PC에서는 복사한 그림 저장을 바로 고릅니다. 메뉴 표시 설정을 바꿀 필요 없이 같은 폴더에 PNG를 저장합니다.</desc>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<rect width="720" height="244" rx="12" fill="#fffcf7"/>
+<g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="31" y="9" width="83" height="80" rx="7" fill="#fff" stroke="#277a73" stroke-width="2"/><rect x="55" y="4" width="36" height="14" rx="4" fill="#eef4f1" stroke="#277a73" stroke-width="2"/><rect x="40" y="28" width="65" height="48" rx="3" fill="#eaf0fb" stroke="#d6e0dc" stroke-width="2"/><circle cx="87" cy="40" r="5" fill="#f4dfb7" stroke="#be8740" stroke-width="2"/><path d="M43 71L60 49L74 63L83 56L103 73Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="120.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">이미지 복사</text>
+<text x="120.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">캡처·그림 앱에서 복사</text>
+<text x="120.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">파일 이름 복사와 구분</text>
+<path d="M227 71H253M246 64L253 71L246 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="28" y="5" width="96" height="86" rx="6" fill="#fff" stroke="#277a73" stroke-width="2"/><path d="M43 21H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 40H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="49" width="84" height="19" rx="3" fill="#dcece7" stroke="#dcece7" stroke-width="2"/><path d="M43 60H94" fill="none" stroke="#277a73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 79H94" fill="none" stroke="#55676b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 60L10 84L18 78L24 90L31 86L24 74L35 72Z" fill="#fff" stroke="#283f43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="360.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">폴더 빈 곳 우클릭</text>
+<text x="360.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">더 많은 옵션 표시에서</text>
+<text x="360.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">복사한 그림 저장 선택</text>
+<path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(528 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#d6e0dc" opacity=".5"/><rect x="18" y="15" width="110" height="70" rx="6" fill="#eaf0fb" stroke="#277a73" stroke-width="2"/><circle cx="103" cy="33" r="8" fill="#f4dfb7" stroke="#be8740" stroke-width="2"/><path d="M24 78L54 36L80 66L95 49L122 79Z" fill="#dcece7" stroke="#277a73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="600.0" y="155" font-size="18" fill="#283f43" font-weight="700" text-anchor="middle">같은 폴더에 PNG</text>
+<text x="600.0" y="182" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">이름이 겹치면 번호 추가</text>
+<text x="600.0" y="205" font-size="15" fill="#55676b" font-weight="400" text-anchor="middle">기존 파일·복사 내용 유지</text>
+</g></svg>

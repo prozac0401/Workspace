@@ -6,6 +6,16 @@
 
 ## 설치 전에 확인하세요
 
+<!-- tool-figure:filelist-download:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-download-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-download.svg" width="720" height="244" alt="Windows 11 x64: 64비트 Windows용 ARM64 PC 제외 / 1.2.0 설치 파일: MSI와 확인 자료 제공 제작자 전자 서명 없음 / 회사 설치 기준 확인: 허용된 설치 절차로 사용 환경 먼저 확인" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 공개된 1.2.0 설치 파일을 사용합니다. PC의 종류와 회사에서 허용한 설치 절차를 확인하세요.</figcaption>
+</figure>
+<!-- tool-figure:filelist-download:end -->
+
 **64비트 Windows 11용입니다. 설치 파일에는 제작자를 확인하는 전자 서명이 없습니다.** ARM64 방식의 PC에서는 사용할 수 없습니다. 회사 PC에서는 승인된 설치 절차를 따르세요.
 
 [v1.2.0 배포 내용](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0)
@@ -13,6 +23,16 @@
 [**v1.2.0 설치 파일 받기 (64비트 Windows용)**](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [설치 파일이 바뀌지 않았는지 확인할 자료](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/SHA256SUMS.txt) · [원본 저장소](https://github.com/prozac0401/File-List-To-Excel)
 
 ## 탐색기에서 목록 만들기
+
+<!-- tool-figure:filelist-list:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-list-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-list.svg" width="720" height="244" alt="파일·폴더 선택: 선택 항목만 담을지 하위 폴더도 담을지 결정 → 목록 메뉴 실행: 더 많은 옵션 표시에서 필요한 범위의 메뉴 선택 → Excel에서 확인: 필터·정렬로 살펴본 뒤 다른 이름으로 저장" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 선택한 대상과 메뉴가 목록 범위를 정합니다. 처음 만든 목록은 임시 파일이므로 보관할 위치에 따로 저장하세요.</figcaption>
+</figure>
+<!-- tool-figure:filelist-list:end -->
 
 1. 내려받은 **FileListToExcel-1.2.0-win-x64.msi**를 실행합니다. 지금 로그인한 Windows 계정에 설치합니다. 관리자 권한은 필요하지 않습니다. 실행에 필요한 프로그램을 따로 설치하지 않아도 됩니다.
 2. 탐색기에서 파일이나 폴더를 고르고 **마우스 오른쪽 버튼 → 더 많은 옵션 표시**를 누릅니다.
@@ -30,6 +50,16 @@
 
 ## 같은 내용의 파일 찾기
 
+<!-- tool-figure:filelist-duplicates:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-duplicates-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-duplicates.svg" width="720" height="244" alt="비교 범위 선택: 선택한 파일끼리 또는 폴더의 하위 항목까지 → 내용으로 비교: 크기로 후보를 좁힌 뒤 필요한 파일 내용을 읽음 → 같은 파일 묶음 확인: 실패·제외도 따로 확인 원본은 자동 정리하지 않음" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 이름이 달라도 내용이 같으면 한 묶음으로 표시합니다. 중복 검사는 내용을 읽지만 원본을 삭제하거나 이동하지 않습니다.</figcaption>
+</figure>
+<!-- tool-figure:filelist-duplicates:end -->
+
 목록과 같은 **더 많은 옵션 표시** 메뉴에서 실행합니다.
 
 | 고른 대상 | 메뉴와 비교 범위 |
@@ -45,6 +75,16 @@
 
 ## Excel에서 선택한 실제 파일 복사
 
+<!-- tool-figure:filelist-collect:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-collect-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-collect.svg" width="720" height="244" alt="필요한 파일 행 선택: 선택형 Excel 기능 설치 새 결과표의 보이는 행 선택 → 선택한 파일 복사…: 목적지와 개수 확인 여기에 복사 클릭 → 새 폴더에 복사본: 같은 이름은 번호로 구분 원본·기존 파일은 유지" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 선택형 Excel 연동을 설치하면 결과표에서 고른 실제 파일을 새 하위 폴더로 복사할 수 있습니다. 숨긴 행과 처리할 수 없는 원본은 제외합니다.</figcaption>
+</figure>
+<!-- tool-figure:filelist-collect:end -->
+
 1. 설치 화면에서 **Excel에서 선택한 파일 복사 (선택)**를 선택합니다. 기본 선택은 꺼져 있으며 사용자 선택 없이 이전 설치를 새 버전으로 바꿀 때는 자동으로 추가하지 않습니다. PC에 설치된 Excel이 필요합니다.
 2. Excel을 저장·종료한 뒤 다시 엽니다. 이 버전으로 새로 만든 **Files / Duplicates / Matches** 표에서 필요한 행을 선택합니다. 필터와 직접 숨긴 행은 제외합니다.
 3. **셀 우클릭 → 파일목록 → 선택한 파일 복사…**를 누릅니다.
@@ -57,11 +97,31 @@
 
 ## 사용 예 파일 목록 Excel을 보며 AI와 정리 초안 만들기 {#ai-organization}
 
+<!-- tool-figure:filelist-ai-organization:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-ai-organization-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-ai-organization.svg" width="720" height="244" alt="목록을 근거로: 하위 폴더까지 목록 작성 업무 상황을 함께 설명 → 분류 초안 다듬기: AI와 질문·수정 반복 대표 파일로 기준 확인 → 확정한 파일 복사: 사람이 복사 목록 확정 소량 시험 후 결과 확인" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> File List to Excel로 만든 목록을 바탕으로 AI와 별도로 대화합니다. 분류 초안을 검토하고 확정한 파일만 복사합니다.</figcaption>
+</figure>
+<!-- tool-figure:filelist-ai-organization:end -->
+
 저장해 둔 작업 폴더에서 자료를 찾기 어렵거나 업무별로 넘길 파일을 모아야 할 때 쓰는 방법입니다. **파일 목록 Excel을 바탕으로 AI와 대화하며 분류 기준의 초안을 잡고, 사람이 확인한 목록으로 일괄 복사합니다.** AI의 첫 답을 보고 바로 파일을 옮기지 않고, 실제 업무에 맞는 기준이 될 때까지 질문과 수정을 이어갑니다.
 
 흐름은 **하위 폴더까지 목록 만들기 → Excel을 보며 분류 기준 논의 → 대표 파일로 초안 수정 → 복사할 목록 확정 → BATCH 스크립트 요청·실행 → 결과 확인**입니다. File List to Excel로 목록을 만들고, AI와의 대화와 스크립트 작성은 별도로 진행합니다.
 
 ### 정리할 폴더의 목록을 Excel로 저장하기
+
+<!-- tool-figure:filelist-ai-inventory:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-ai-inventory-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-ai-inventory.svg" width="720" height="244" alt="작업 폴더 하나 선택: 하위 폴더까지 목록 만들기 Excel을 따로 저장 → 누락과 범위 확인: 나뉜 목록 시트 모두 확인 폴더 행·실패 항목 구분 → 제공할 자료 준비: 허용 범위만 AI에 제공 원래 목록과 경로는 보관" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 목록은 이름·경로 등의 정보이며 파일 본문을 읽지 않습니다. AI에 자료를 제공할 때는 전체경로·원본 링크·숨겨진 정보도 확인하세요.</figcaption>
+</figure>
+<!-- tool-figure:filelist-ai-inventory:end -->
 
 1. 정리가 필요한 작업 폴더 하나를 고릅니다. 이미 잘 보관한 자료 전체를 다시 정리할 필요는 없습니다.
 2. **하위 폴더까지 Excel로**를 눌러 안쪽 폴더의 파일도 목록으로 만듭니다.
@@ -73,6 +133,16 @@
 이름과 경로를 가려야 한다면 AI에 제공할 별도 파일을 만드세요. 전체경로·원본 링크·숨겨진 정보에도 실제 경로가 들어 있으므로 함께 빼야 합니다. 화면에 보이는 이름만 가리는 것으로는 충분하지 않습니다. 항목번호와 실제 경로의 대응, 원래 파일 목록 Excel은 로컬에 보존합니다.
 
 ### AI와 질문을 주고받으며 분류 기준 잡기
+
+<!-- tool-figure:filelist-ai-dialogue:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-ai-dialogue-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-ai-dialogue.svg" width="720" height="244" alt="업무의 쓰임 설명: 진행 중·보관·재사용 구분 애매한 파일은 질문으로 → 대표 파일로 검토: 분류 예가 업무와 맞는지 담당자가 답하고 수정 → 기준을 목록에 적용: 예외는 이유를 묻고 수정 AI 초안과 사람 확정 구분" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 파일명이나 날짜만으로 완료·보관·삭제를 정하지 않습니다. 실제 업무의 쓰임을 설명하고 대표 파일의 분류부터 함께 다듬습니다.</figcaption>
+</figure>
+<!-- tool-figure:filelist-ai-dialogue:end -->
 
 파일 목록 Excel과 현재 업무 상황을 함께 제시합니다. 처음에는 전체 파일의 목적지를 확정하기보다 **어떤 기준으로 나눌지, 무엇을 더 알아야 할지**를 논의합니다. 아래 요청문은 회사에서 허용한 AI에 자료를 제공할 때 쓸 수 있습니다.
 
@@ -102,6 +172,16 @@
 
 ### Workspace 안내의 폴더 구조에 맞춰 초안 다듬기
 
+<!-- tool-figure:filelist-ai-structure:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-ai-structure-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-ai-structure.svg" width="720" height="244" alt="진행 중인 업무: 업무별로 한곳에 모으기 10_Active를 출발점으로 / 양식과 참고자료: 재사용 양식은 Operations 공통 자료는 Reference / 끝난 업무와 보류: 확인한 기록은 Archive 판단이 어려우면 목적지 보류" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 폴더 구조는 제안입니다. 실제 업무와 회사 보관 기준에 맞춰 정하고, 끝난 업무의 결과물과 근거는 같은 맥락으로 보관합니다.</figcaption>
+</figure>
+<!-- tool-figure:filelist-ai-structure:end -->
+
 [자료를 둘 곳 정하기](../../policies/workspace.md)의 `Work` 구조를 출발점으로 삼을 수 있습니다. `Work`는 업무자료를 둘 폴더이며 이 프로그램을 개발하는 `Workspace` 저장소와는 다른 곳입니다. 아래 연결은 제안이며 실제 업무와 회사의 보관 기준에 맞춰 정합니다.
 
 | 대화에서 확인한 쓰임 | 복사할 위치의 초안 |
@@ -115,6 +195,16 @@
 끝난 업무는 결과물과 근거를 같은 업무 폴더로 모아 맥락을 유지합니다. 이미 폴더째 보관한 업무를 파일 종류별로 흩어 놓지 않습니다. 오래됐거나 중복으로 보인다는 이유만으로 삭제 대상으로 정하지 않습니다.
 
 ### Excel에 분류 초안과 확정한 복사 목록 남기기
+
+<!-- tool-figure:filelist-ai-review:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-ai-review-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-ai-review.svg" width="720" height="244" alt="원래 결과표 보존: 별도 분류 초안 시트 작성 항목번호로 원본과 연결 → 검토 내용 기록: 분류 이유·확인할 것 작성 사람이 목적지를 확정 → 복사할 행만 확정: 경로·개수·예상 크기 대조 확정 행만 실행 목록으로" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 원래 표와 숨겨진 정보는 보존합니다. 분류의 근거와 사람이 확정한 목적지를 Excel에 남겨 실행할 목록과 대조하세요.</figcaption>
+</figure>
+<!-- tool-figure:filelist-ai-review:end -->
 
 원래 결과표를 보존하고 같은 Excel의 별도 **분류 초안** 시트에 검토 내용을 모읍니다. 대화에서 기준을 바꿨다면 해당 시트도 최신 초안으로 맞춥니다. 원래 표와 숨겨진 정보는 그대로 두어야 기본 Excel 복사 기능도 사용할 수 있습니다.
 
@@ -131,6 +221,16 @@
 복사 전에 확정한 원본·목적지·개수·예상 크기를 살펴봅니다. 누락과 같은 목적지로 겹치는 파일을 확인한 뒤 스크립트 작성을 요청합니다. 실행용 CSV 목록이 필요하다면 **확정한 Excel 행에서만** 만듭니다. 분류의 근거는 계속 파일 목록 Excel에 남습니다.
 
 ### 확정한 목록으로 BATCH 복사 스크립트 요청하기
+
+<!-- tool-figure:filelist-ai-batch:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-ai-batch-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-ai-batch.svg" width="720" height="244" alt="확정 목록으로 요청: 원본 밖의 새 대상 폴더 기본 실행은 복사 미리보기 → 계획 대조·소량 시험: Excel의 경로·개수와 대조 대표 파일로 먼저 확인 → 복사 뒤 결과 확인: 성공·실패·제외 나누어 확인 검토가 끝날 때까지 원본 보관" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> BATCH 스크립트는 별도로 요청하는 작업입니다. 확정한 파일만 처리하고, 원본 변경·기존 파일 덮어쓰기 없이 미리보기와 시험부터 진행합니다.</figcaption>
+</figure>
+<!-- tool-figure:filelist-ai-batch:end -->
 
 업무별로 서로 다른 폴더에 복사하려면 확정한 목록과 원본·대상 폴더를 제시해 별도 BATCH 스크립트를 요청할 수 있습니다. BATCH는 여러 파일의 복사 명령을 한 번에 실행하는 `.bat` 파일입니다. 다음 요청문에서 폴더 위치는 실제 작업에 맞게 적으세요.
 
@@ -167,9 +267,29 @@ AI가 만든 스크립트의 미리보기에서 Excel의 확정 목록과 경로
 
 ### 파일을 한곳에 모으기만 하면 기본 복사 기능 쓰기
 
+<!-- tool-figure:filelist-ai-simple-copy:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-ai-simple-copy-mobile.svg" width="360" height="288">
+    <img src="../../assets/tool-guides/filelist-ai-simple-copy.svg" width="720" height="244" alt="한 폴더에 모으기: 원래 Files 표의 행 선택 선택형 Excel 복사 기능 / 업무별 폴더에 나누기: 확정한 목적지를 기준으로 별도 복사 스크립트 요청" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 한곳에 모을 때는 기본 복사 기능을 사용합니다. 파일마다 다른 목적지로 나누려면 확정 목록에 맞춘 별도 스크립트가 필요합니다.</figcaption>
+</figure>
+<!-- tool-figure:filelist-ai-simple-copy:end -->
+
 필요한 파일을 한 폴더에 모으는 작업은 위의 **Excel에서 선택한 실제 파일 복사** 기능으로 할 수 있습니다. 분류 초안에서 고른 파일을 원래 **Files** 표의 행과 대조한 뒤 선택하세요. 기본 기능은 하나의 새 폴더로 모으며, 행마다 다른 업무 폴더로 나누는 작업은 별도 스크립트로 진행합니다.
 
 ## 결과 확인·제거
+
+<!-- tool-figure:filelist-results:start -->
+<figure class="tool-figure">
+  <picture>
+    <source media="(max-width: 600px)" srcset="../../assets/tool-guides/filelist-results-mobile.svg" width="360" height="432">
+    <img src="../../assets/tool-guides/filelist-results.svg" width="720" height="244" alt="결과를 나누어 확인: 큰 목록은 여러 시트로 실패 항목은 Errors에서 / 메뉴가 없을 때: 새 탐색기 창에서 확인 계속 안 되면 배포 안내 확인 / 설치된 앱에서 제거: 만든 Excel 파일은 유지 중복 검사 저장 정보도 유지" loading="lazy" decoding="async">
+  </picture>
+  <figcaption><span>설명용 도해</span> 큰 목록은 시트별로 살펴보고 실패 항목도 확인하세요. 프로그램을 제거해도 보관한 Excel 파일과 중복 검사의 저장 정보는 남습니다.</figcaption>
+</figure>
+<!-- tool-figure:filelist-results:end -->
 
 - 오래 걸리는 작업은 진행 상황과 **취소**를 표시합니다. 네트워크 응답을 기다리는 중에는 취소 반영이 늦을 수 있습니다.
 - 큰 목록은 시트당 65,000행으로 나눕니다. 실패한 항목은 **Errors**를 확인하세요. 한 셀의 글자가 32,767자를 넘으면 뒤쪽 글자는 잘립니다.
