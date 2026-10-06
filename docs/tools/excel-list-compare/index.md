@@ -1,6 +1,6 @@
 # Excel 명단 비교 설치·사용
 
-0.2.1 정식 배포 · 64비트 Windows에서 쓰는 PC용 Excel 프로그램입니다.
+버전 0.2.1 · 64비트 Windows에서 쓰는 PC용 Excel 프로그램입니다.
 
 두 목록의 값과 개수를 비교합니다. 같으면 짧게 알려주고 차이가 있으면 새 Excel 파일에 표시합니다. 진행 상황과 취소 결과는 명단 비교 버튼이 모인 곳에 표시합니다. Excel 창 아래의 상태표시줄은 바꾸지 않습니다.
 
@@ -9,7 +9,7 @@
 [0.2.1 받기 (EXE)](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.1/ExcelSmartListCompare-0.2.1-Setup.exe){ .md-button .md-button--primary }
 [ZIP으로 받기](https://github.com/prozac0401/Workspace/releases/download/excel-smart-list-compare-v0.2.1/ExcelSmartListCompare-0.2.1-win-x64.zip){ .md-button }
 
-수정일: 2026-10-05 · [배포 내용·확인한 범위](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.1)
+수정일: 2026-10-05 · [배포 내용](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.1)
 
 ## 설치하기
 

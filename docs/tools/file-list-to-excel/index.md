@@ -6,11 +6,7 @@
 
 **64비트 Windows 11용입니다. 설치 파일에는 제작자를 확인하는 전자 서명이 없습니다.** ARM64 방식의 PC에서는 사용할 수 없습니다. 회사 PC에서는 승인된 설치 절차를 따르세요.
 
-1.2.0은 설치·복구·제거와 1.1.0에서 새 버전으로 바꾸기를 확인했습니다. 64비트 Excel에서 필터로 추린 파일을 복사하는 기능도 확인했습니다. 이전 시험에서 파일 메뉴를 불러오지 못한 문제는 시험 실행 방식을 나누어 다시 확인했습니다.
-
-2026-09-27에는 시험용 폴더로 목록 여섯 개를 만들고 실제 Excel에서 파일 10개를 복사했습니다. 원본 보존과 Excel 종료·프로그램 제거, 다른 도구 세 개와 함께 대표 기능을 사용하는 것도 확인했습니다. 실제 업무 자료나 모든 PC에서 확인한 결과는 아닙니다.
-
-32비트 Excel, 다시 로그인하거나 PC를 다시 시작한 뒤의 동작, 네트워크 연결이 끊긴 상황, 회사별 보안 설정은 아직 확인하지 못했습니다. 자세한 범위는 [v1.2.0 배포 안내](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0)를 확인하세요.
+[v1.2.0 배포 내용](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0)
 
 [**v1.2.0 설치 파일 받기 (64비트 Windows용)**](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/FileListToExcel-1.2.0-win-x64.msi) · [설치 파일이 바뀌지 않았는지 확인할 자료](https://github.com/prozac0401/File-List-To-Excel/releases/download/v1.2.0/SHA256SUMS.txt) · [원본 저장소](https://github.com/prozac0401/File-List-To-Excel)
 

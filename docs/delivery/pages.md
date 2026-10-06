@@ -18,7 +18,7 @@ mkdocs.yml의 exclude_docs에서 전체 문서를 제외하고 검토한 문서�
 
 현재 공개 안내는 21개입니다. FolderState의 이전 설치·문제 해결 주소 2개에는 통합 안내로 이동하는 문서를 생성합니다. 이 두 주소를 메뉴·검색·사이트맵의 별도 안내로 싣지 않습니다. 공개 자산은 CSS와 FolderState 화면, 기존 WebP 이미지 6개와 교육 예시 화면 7개로 모두 15개입니다. 오피스 자동화 도구 안내를 추가하면서 공개 자산은 늘리지 않습니다.
 
-ProbPacker의 Office Automation Tools 0.3.1은 [ADR-0034](../design/0034-office-automation-public-guide.md)에 따라 `tools/office-automation/` 한 페이지와 Workspace 공개 릴리스의 고정 태그 EXE·ZIP 링크로 안내합니다. 원본 ProbPacker는 비공개이므로 배포물만 Workspace에 동일 해시로 게시합니다. Python과 Office 설치의 차이, 자체 서명과 남은 검증 범위를 공개 안내에 직접 적습니다. 바이너리·QA 자료·인증서·원시 진단은 Pages로 복사하지 않습니다.
+ProbPacker의 Office Automation Tools 0.3.1은 [ADR-0034](../design/0034-office-automation-public-guide.md)에 따라 `tools/office-automation/` 한 페이지와 Workspace 공개 릴리스의 고정 태그 EXE·ZIP 링크로 안내합니다. 원본 ProbPacker는 비공개이므로 배포물만 Workspace에 동일 해시로 게시합니다. 공개 소개는 MS Office Excel·PowerPoint(PPT)·Word용 도구이며 Python 없이 실행하는 방법으로 설명합니다. 서명과 남은 검증 범위는 제외한 배포 기록에 보존합니다. 바이너리·QA 자료·인증서·원시 진단은 Pages로 복사하지 않습니다.
 
 [정책 문서 작성 규칙](../policies/documentation.md), [교육 업무 안내 공개 결정](../design/0029-education-public-guide.md)을 따릅니다. 새 공개 문서가 생기면 메뉴·허용 목록·검사 목록을 함께 고칩니다.
 
@@ -28,7 +28,7 @@ ProbPacker의 Office Automation Tools 0.3.1은 [ADR-0034](../design/0034-office-
 
 보이는 칸 붙여넣기는 기존 사용자 요청과 [ADR-0014](../design/0014-visible-cells-paste-download-list.md)에 따라 공개 설치 안내에서 Workspace Releases 목록을 연결합니다. 사용자는 도구 이름을 찾고 단일 EXE를 고릅니다. ZIP은 대안입니다. 상세 안내에는 특정 버전·직접 자산 URL과 개발 시험 결과를 넣지 않으며 사용에 필요한 제한은 유지합니다.
 
-나머지 도구의 최신 버전과 파일명은 [배포 색인](index.md)과 [2026-10-05 문서 수정 기록](document-review-20261005.md)에서 확인합니다. 시험용 여부와 알려진 실패를 다운로드 전에 쉬운 말로 설명합니다. 일반 배포 전환을 코드 서명·상용 인수·회사 도입 승인으로 해석하지 않습니다.
+나머지 도구의 최신 버전과 파일명은 [배포 색인](index.md)과 [2026-10-05 문서 수정 기록](document-review-20261005.md)에서 확인합니다. [ADR-0035](../design/0035-public-tool-wording.md)에 따라 Pages에는 기능·설치·사용 방법을 적고 배포 단계 표현과 내부 시험 결과·미확인 경고는 넣지 않습니다. 실제 지원 제한·데이터 보존·알려진 문제 해결 방법은 유지합니다. 배포 채널과 검증 판정은 제외한 기록에 보존하며 문구 변경을 코드 서명·상용 인수·회사 도입 승인으로 해석하지 않습니다.
 
 ## 게시 전 검사
 

@@ -42,23 +42,23 @@ hide:
 
 ## 프로그램 받기 {#programs}
 
-다른 도구의 버전 확인일은 **2026년 10월 5일**이며, 다운로드 이름 유지 0.2.1과 오피스 자동화 도구 0.3.1 안내는 **2026년 10월 6일**에 갱신했습니다. 각 안내에서 사용할 수 있는 PC와 알려진 제한을 먼저 확인하세요. 기존 도구의 설치 파일에는 제작자의 전자 서명이 없습니다. 오피스 자동화 도구는 자체 서명을 사용하므로 다른 PC에서 제작자를 신뢰하는 것으로 표시되지 않을 수 있습니다.
+다른 도구의 버전 확인일은 **2026년 10월 5일**이며, 다운로드 이름 유지 0.2.1과 오피스 자동화 도구 0.3.1 안내는 **2026년 10월 6일**에 갱신했습니다. 각 안내에서 사용할 수 있는 PC와 알려진 제한을 먼저 확인하세요. 기존 도구의 설치 파일에는 제작자의 전자 서명이 없습니다.
 
 | 하고 싶은 일 | 프로그램과 설치 안내 |
 |---|---|
 | 폴더에 업무 진행 상태를 표시하고 싶어요 | **[FolderState 0.1.3 받기](tools/folderstate/index.md)** — 폴더를 고르고 현재 상태를 누르세요. |
 | 두 Excel 명단에서 빠진 값과 중복 개수를 찾고 싶어요 | **[Excel 명단 비교 0.2.1 받기](tools/excel-list-compare/index.md)** — 첫 명단을 담고 둘째 명단과 비교하세요. |
-| Excel에서 보이는 칸만 새 파일로 만들고 싶어요 | **[선택범위 내보내기 0.1.0-rc.11 시험용 받기](tools/excel-selection-export/index.md)** — 필요한 행과 열을 고르고 새 파일을 만드세요. |
+| Excel에서 보이는 칸만 새 파일로 만들고 싶어요 | **[선택범위 내보내기 0.1.0-rc.11 받기](tools/excel-selection-export/index.md)** — 필요한 행과 열을 고르고 새 파일을 만드세요. |
 | 폴더 속 파일 목록을 만들고 필요한 파일을 모으고 싶어요 | **[File List to Excel 1.2.0 받기](tools/file-list-to-excel/index.md)** — 파일 목록을 Excel로 열고, 필요하면 선택한 파일을 복사하세요. |
 | Excel에서 숨긴 행을 건너뛰어 값을 넣고 싶어요 | **[보이는 칸 붙여넣기 받기](tools/visible-cells-paste/index.md)** — 복사할 값의 순서와 대상 칸의 개수를 먼저 확인하세요. |
 | 복사한 그림을 파일로 저장하고 싶어요 | **[그림 복사·저장 0.2.1 받기](tools/image-copy-save/guide.md)** — 폴더 안 빈 곳에서 오른쪽 버튼을 눌러 실행하세요. |
 | 보던 문서나 웹페이지로 다시 돌아가고 싶어요 | **[업무 책갈피 0.2.8 받기](tools/bookmark/index.md)** — Ctrl+Alt+B로 남기고, 목록이나 작은 메모창에서 다시 여세요. |
 | 다시 받은 파일에 원래 이름을 주고 싶어요 | **[다운로드 이름 유지 0.2.1 설치 안내](tools/download-version-manager/index.md)** — 이전 파일을 수정 시각 이름으로 보관하고 알림 영역에서 열기·종료를 사용합니다. |
-| Excel 파일을 합치거나 나누고, 양식 문서를 한꺼번에 만들고 싶어요 | **[오피스 자동화 도구 0.3.1 시험용 받기](tools/office-automation/index.md)** — 원본 행과 출력 계획을 확인한 뒤 실행하세요. Excel이 필요하며 Word·PowerPoint 양식에는 해당 프로그램도 필요합니다. |
+| Excel 파일을 합치거나 나누고, 양식 문서를 한꺼번에 만들고 싶어요 | **[오피스 자동화 도구 0.3.1 받기](tools/office-automation/index.md)** — MS Office Excel·PowerPoint(PPT)·Word용 도구입니다. 원본 행과 출력 계획을 확인한 뒤 실행하세요. |
 
-오피스 자동화 도구는 ProbPacker에서 만든 단일 실행 파일을 Workspace의 공개 배포 페이지에서 제공합니다. Python을 따로 설치할 필요가 없습니다. **이번 실행 파일의 전체 화면·생성·종료 확인과 단일 EXE의 종료 경고 해결 여부는 미확인**이므로, 먼저 사본으로 시험하세요. [다운로드와 사용 방법](tools/office-automation/index.md)에서 세 기능과 남은 제한을 확인할 수 있습니다.
+오피스 자동화 도구는 ProbPacker에서 만든 단일 실행 파일을 Workspace의 공개 배포 페이지에서 제공합니다. Python을 따로 설치할 필요가 없습니다. [다운로드와 사용 방법](tools/office-automation/index.md)에서 세 기능의 사용 순서를 확인하세요.
 
-**시험용으로 표시한 선택범위 내보내기는 정식 배포 전 단계입니다.** 확인하지 못한 환경이 남아 있습니다. **다운로드 이름 유지 0.2.1은 정식 배포입니다.** Windows 11 64비트 PC 한 대에서 취소·설치 실패 뒤 자동 복구와 정상 설치·실행·제거를 확인했습니다. 설치와 제거 중 관리자 승인이 요청될 수 있으며 설치 후에는 일반 권한으로 실행합니다. 각 안내에서 자세한 범위와 제한을 읽어 보세요.
+다운로드 이름 유지의 설치와 제거 중에는 관리자 승인이 요청될 수 있으며 설치 후에는 일반 권한으로 실행합니다. 각 프로그램 안내에서 설치 순서와 사용 방법을 확인하세요.
 
 [교육 업무에서 도구 써 보기](education-operations.md){ .md-button } — 명단 비교, 전달할 파일 만들기, 제출물 모으기 등 일곱 가지 예시입니다.
 
@@ -221,6 +221,6 @@ hide:
 </div>
 
 !!! info "회사 기준을 먼저 확인하세요"
-    이 업무 안내는 **제안 단계**입니다. 회사에서 허용한 저장 위치와 자료 보관 기간, 기준으로 쓸 원본, 백업 방법은 [회사에서 정할 항목](policies/decisions.md)을 참고해 결정하세요. 상태를 바꾸거나 업무를 끝내도 되는지는 담당자가 확인합니다. 프로그램별 배포 상태와 사용 환경·제한은 [FolderState 설치 안내](tools/folderstate/index.md), [Excel 명단 비교 안내](tools/excel-list-compare/index.md), [업무 책갈피 안내](tools/bookmark/index.md), [선택범위 내보내기 안내](tools/excel-selection-export/index.md), [File List to Excel 안내](tools/file-list-to-excel/index.md), [그림 복사·저장 안내](tools/image-copy-save/guide.md)를 보세요.
+    이 업무 안내는 **제안 단계**입니다. 회사에서 허용한 저장 위치와 자료 보관 기간, 기준으로 쓸 원본, 백업 방법은 [회사에서 정할 항목](policies/decisions.md)을 참고해 결정하세요. 상태를 바꾸거나 업무를 끝내도 되는지는 담당자가 확인합니다. 프로그램별 사용 환경과 방법은 [FolderState 설치 안내](tools/folderstate/index.md), [Excel 명단 비교 안내](tools/excel-list-compare/index.md), [업무 책갈피 안내](tools/bookmark/index.md), [선택범위 내보내기 안내](tools/excel-selection-export/index.md), [File List to Excel 안내](tools/file-list-to-excel/index.md), [그림 복사·저장 안내](tools/image-copy-save/guide.md)를 보세요.
 
 </div>

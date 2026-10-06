@@ -2,15 +2,15 @@
 
 DownloadVersionManager 0.2.1은 선택한 폴더의 새 파일을 감지해 원래 이름을 유지하고, 내용이 달라진 이전 파일만 `_history`에 보관하는 Windows 프로그램입니다. 브라우저 확장 설치는 필요하지 않습니다.
 
-[0.2.1 설치 파일 받기](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.1/DownloadVersionManager-Watcher-0.2.1-x64.msi) · [정식 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [설치 파일이 바뀌지 않았는지 확인할 자료](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.1/SHA256SUMS.txt)
+[0.2.1 설치 파일 받기](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.1/DownloadVersionManager-Watcher-0.2.1-x64.msi) · [0.2.1 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [설치 파일이 바뀌지 않았는지 확인할 자료](https://github.com/prozac0401/Workspace/releases/download/download-version-manager-v0.2.1/SHA256SUMS.txt)
 
-**0.2.1 정식 배포입니다.** 설치 파일은 `DownloadVersionManager-Watcher-0.2.1-x64.msi` 하나입니다. **제작자를 확인하는 전자 서명이 없습니다.**
+설치 파일은 `DownloadVersionManager-Watcher-0.2.1-x64.msi` 하나입니다. **제작자를 확인하는 전자 서명이 없습니다.**
 
 ## 설치와 감시 시작
 
 설치 파일 하나를 열어 지금 로그인한 Windows 계정에 설치합니다. 설치와 제거 중 Windows가 관리자 승인을 요청할 수 있으며 사용자가 직접 승인합니다. 설치 뒤 프로그램은 일반 사용자 권한으로 실행합니다. 실행에 필요한 프로그램을 따로 설치하지 않아도 됩니다.
 
-회사에서 업무용으로 사용해도 된다는 승인은 프로그램의 정식 배포와 별도입니다. 회사 PC에서는 회사의 설치 기준을 따릅니다.
+회사 PC에서는 회사의 설치 기준을 따릅니다.
 
 1. 설치 화면의 현재 Windows 다운로드 폴더를 확인합니다. 기본 설정은 Windows에서 다운로드 위치를 바꾸면 그 위치를 따릅니다.
 2. 다른 폴더를 쓰려면 **찾아보기**로 폴더를 고릅니다. 직접 선택하면 Windows의 다운로드 위치가 바뀌어도 선택한 폴더를 계속 사용합니다.
@@ -18,12 +18,6 @@ DownloadVersionManager 0.2.1은 선택한 폴더의 새 파일을 감지해 원�
 4. 설치를 마치고 프로그램을 실행합니다. 처음 사용하는 폴더에 기존 번호 파일이 있으면 아래 확인 화면이 먼저 열립니다.
 
 프로그램에서 **감시 시작**·**감시 중지**를 사용할 수 있습니다. 시작 메뉴의 **DownloadVersionManager Watcher**로 실행합니다. 창을 닫으면 알림 영역에 남으며, 프로그램을 끝내려면 아래의 **종료**를 사용합니다. 로그인 자동 실행을 선택했다면 다음 로그인에서 다시 시작합니다.
-
-## 확인한 설치·복구 범위
-
-0.2.1에서는 설치 실패 뒤 설치됐다는 정보가 남는 문제를 수정했습니다. 2026-10-06 Windows 11 64비트 PC 한 대에서 설치 시작 전 취소, 설치 도중 취소, 설치 후반의 실패 뒤 자동 원상복귀를 확인했습니다. 자동 복구 뒤 정상 설치, 일반 권한 실행, 종료와 제거도 성공했습니다.
-
-실패 시험에는 정상 0.2.1과 같은 프로그램·설정을 넣고 실패만 유발하는 별도 시험 설치 파일을 사용했습니다. 배포 파일에는 이 실패 기능이 없습니다. 다른 PC나 모든 실패 상황까지 확인한 결과는 아닙니다.
 
 ## 창을 닫고 다시 열기
 
@@ -78,12 +72,8 @@ DownloadVersionManager 0.2.1은 선택한 폴더의 새 파일을 감지해 원�
 
 브라우저 다운로드 목록에는 이름을 바꾸기 전 위치가 남을 수 있습니다. 최종 파일은 감시 폴더에서 확인하세요.
 
-다음 로그인에서 자동으로 실행되는지와, 프로그램을 켜 둔 채 Windows의 다운로드 위치를 바꿨을 때의 동작은 아직 직접 확인하지 못했습니다.
-
 감시하는 동안 이 프로그램 한 개가 켜져 있습니다. Windows가 뒤에서 관리하는 별도 프로그램을 설치하지 않습니다. 자동으로 새 버전을 설치하거나 파일을 온라인 저장소로 보내지 않습니다. 회사 PC에서는 회사의 설치 기준을 따르세요.
 
-## 이전 버전의 기록
+## 이전 버전에서 바뀐 점
 
-[0.2.0 시험판의 배포 기록](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0)은 보존합니다. 초기 0.2.0 후보에서 설치 실패 뒤 설치 정보가 남는 문제가 관찰됐지만 시험 파일은 최종 공개 MSI와 구성이 달랐습니다. 공개 0.2.0의 후반 실패 자동 복구는 확인하지 못했습니다. 이 버전은 창을 닫으면 프로그램을 끝내며 보관 파일 이름에는 보관 작업 시각을 사용합니다.
-
-0.1.0은 개발·확인이 끝나지 않은 시험판입니다. 이전 버전의 실패·미실행 기록은 0.2.1의 성공으로 소급 변경하지 않습니다.
+[0.2.0 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0)에서 이전 버전의 파일을 찾을 수 있습니다. 0.2.0은 창을 닫으면 프로그램을 끝내며 보관 파일 이름에는 보관 작업 시각을 사용합니다. 0.2.1은 알림 영역의 **종료**로 끝내며, 보관 파일 이름에는 파일의 마지막 수정 시각을 사용합니다. 설치 실패 뒤 설치됐다는 정보가 남는 문제의 수정도 포함합니다.

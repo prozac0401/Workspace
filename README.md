@@ -20,9 +20,9 @@
 | 복사한 그림을 파일로 저장하기 | [그림 복사·저장 0.2.1](docs/tools/image-copy-save/guide.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) |
 | 보던 문서나 웹페이지 다시 열기 | [업무 책갈피 0.2.8](docs/tools/bookmark/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) |
 | 다시 받은 파일에 원래 이름 주기 | [다운로드 이름 유지 0.2.0 시험용](docs/tools/download-version-manager/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0) |
-| Excel 파일 합치기·나누기와 양식 문서 만들기 | [오피스 자동화 도구 0.3.1 시험용](docs/tools/office-automation/index.md) | [단일 EXE](https://github.com/prozac0401/Workspace/releases/download/office-automation-tools-v0.3.1/OfficeAutomationTools.exe) · [ZIP·배포 안내](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1) |
+| Excel 파일 합치기·나누기와 양식 문서 만들기 | [오피스 자동화 도구 0.3.1](docs/tools/office-automation/index.md) | [단일 EXE](https://github.com/prozac0401/Workspace/releases/download/office-automation-tools-v0.3.1/OfficeAutomationTools.exe) · [ZIP·배포 안내](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1) |
 
-오피스 자동화 도구(Office Automation Tools)는 비공개 ProbPacker 저장소에서 개발합니다. 같은 EXE·ZIP을 Workspace의 공개 릴리스에서 받도록 연결합니다. Python 설치 없이 EXE를 바로 실행하지만 Excel과 템플릿용 Word·PowerPoint는 필요합니다. 이번 EXE의 전체 화면·생성·종료 재검증과 임시 폴더 삭제 경고의 해결 확인은 남아 있습니다. [받기·사용 안내](docs/tools/office-automation/index.md)에서 원본 행 확인, 분석, 실행, 결과 확인과 세 기능의 상세 방법을 설명합니다.
+오피스 자동화 도구(Office Automation Tools)는 MS Office Excel·PowerPoint(PPT)·Word용 도구입니다. 비공개 ProbPacker 저장소에서 개발하며 같은 EXE·ZIP을 Workspace의 공개 릴리스에서 받도록 연결합니다. Python 설치 없이 EXE를 바로 실행할 수 있습니다. [받기·사용 안내](docs/tools/office-automation/index.md)에서 원본 행 확인, 분석, 실행, 결과 확인과 세 기능의 상세 방법을 설명합니다.
 
 보이는 칸 붙여넣기의 확인한 최신 배포 파일은 0.1.2입니다. 설치 안내는 기존 요청에 따라 배포 목록에서 파일을 고르는 방식으로 제공합니다.
 
