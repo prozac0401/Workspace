@@ -49,4 +49,8 @@ ProbPacker를 공개로 바꾸지 않고 같은 네 파일만 Workspace의 `offi
 
 **03:31:39 UTC**에 인증 없는 요청으로 네 공개 파일을 모두 내려받았습니다. 모두 HTTP 200이며 파일 크기와 SHA-256이 로컬·비공개 ProbPacker 배포본과 일치했습니다. 이 확인은 로그인 가능한 계정의 접근을 공개 다운로드 성공으로 대체하지 않습니다. 로컬 자료는 `artifacts/probpacker-031-publication-20261006/package-verification.json`과 `public-download-verification.json`에 보관하며 Pages에 복사하지 않습니다.
 
-Documentation 실행과 실제 공개 페이지의 확인 결과는 완료 후 추가합니다. 이 절의 현재 확인 범위는 공개 Release와 다운로드까지입니다.
+안내와 다운로드 확인 기록 커밋 `9cb134e2017b38decacec1d1fa085263ce834b7c`의 [Documentation 실행 37409449151](https://github.com/prozac0401/Workspace/actions/runs/37409449151)이 빌드·배포에 성공했습니다. strict 빌드와 공개 범위 검사가 통과했고 **03:32:54 UTC**에 deploy가 완료됐습니다.
+
+**03:33:10 UTC**의 비인증 요청에서 [공개 사용 안내](https://prozac0401.github.io/Workspace/tools/office-automation/)·홈페이지·검색 파일·사이트맵이 모두 HTTP 200을 반환했습니다. 새 페이지의 0.3.1·세 기능·네 고정 다운로드 링크·시험용·자체 서명 설명과 홈페이지 메뉴를 확인했습니다. 새 주소가 검색·사이트맵에 포함되고 이 배포 기록과 ADR은 포함되지 않음을 확인했습니다. 두 개발 기록의 예상 공개 주소는 HTTP 404였습니다.
+
+실제 공개 확인은 `public-site-verification.json`에 보관합니다. 게시 후 결과만 추가한 이 최종 기록과 배포 색인의 확인 날짜 교정은 Pages에서 제외되는 문서이므로 공개 문구·메뉴·허용 범위·사이트 출력에 영향이 없습니다. 검증한 공개 안내를 다시 변경하지 않고 결과 기록 커밋의 CI는 생략합니다.
