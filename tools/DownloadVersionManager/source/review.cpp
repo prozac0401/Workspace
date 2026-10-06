@@ -1,6 +1,7 @@
 #include "review.h"
 #include "engine.h"
 #include "watcher.h"
+#include "ui.h"
 #include <commctrl.h>
 #include <algorithm>
 #include <map>
@@ -94,7 +95,10 @@ struct Review {
     const Group& group;
     size_t ordinal, count;
     HWND window = nullptr, list = nullptr, plan = nullptr, process = nullptr;
-    HFONT font = nullptr;
+    HWND kicker = nullptr, heading = nullptr, description = nullptr, folderLabel = nullptr, folderPath = nullptr;
+    HWND filesTitle = nullptr, filesHint = nullptr, planTitle = nullptr, skip = nullptr, skipRemaining = nullptr;
+    HFONT font = nullptr, titleFont = nullptr, sectionFont = nullptr, smallFont = nullptr, listFont = nullptr;
+    RECT contextCard{}, filesCard{}, planCard{}, progressBadge{};
     UINT dpi = 96;
     int selected = -1;
     Choice choice = Choice::Cancel;
@@ -122,10 +126,11 @@ std::vector<size_t> order(const Group& group, size_t selected) {
 }
 void updatePlan(Review& review) {
     review.selected = ListView_GetNextItem(review.list, -1, LVNI_SELECTED);
+    SetWindowTextW(review.planTitle, review.selected == 0 ? L"2. 보존 내용 확인" : L"2. 정리 순서 확인");
     if (review.selected < 0) {
         EnableWindow(review.process, FALSE);
         SetWindowTextW(review.process, L"선택대로 정리");
-        SetWindowTextW(review.plan, L"최신으로 유지할 파일을 직접 선택하세요. 번호와 수정 시각으로 최신 파일을 추측하지 않습니다.");
+        SetWindowTextW(review.plan, L"최신으로 유지할 파일을 선택해 주세요.\r\n선택하면 정리 순서를 확인할 수 있습니다. 수정 시각과 번호는 참고 정보입니다.");
         return;
     }
     if (review.selected == 0) {
@@ -160,12 +165,97 @@ HWND control(Review& review, const wchar_t* kind, const wchar_t* text, DWORD sty
     SendMessageW(item, WM_SETFONT, reinterpret_cast<WPARAM>(review.font), TRUE);
     return item;
 }
+void fonts(Review& review) {
+    const HFONT previous[] = {review.font, review.titleFont, review.sectionFont, review.smallFont, review.listFont};
+    review.font = ui::makeFont(16, review.dpi);
+    review.titleFont = ui::makeFont(26, review.dpi, FW_SEMIBOLD);
+    review.sectionFont = ui::makeFont(18, review.dpi, FW_SEMIBOLD);
+    review.smallFont = ui::makeFont(13, review.dpi);
+    review.listFont = ui::makeFont(14, review.dpi);
+    const HWND body[] = {review.description, review.folderPath, review.process, review.skip, review.skipRemaining};
+    for (const auto item : body) if (item) SendMessageW(item, WM_SETFONT, reinterpret_cast<WPARAM>(review.font), TRUE);
+    if (review.heading) SendMessageW(review.heading, WM_SETFONT, reinterpret_cast<WPARAM>(review.titleFont), TRUE);
+    for (const auto item : {review.filesTitle, review.planTitle}) if (item)
+        SendMessageW(item, WM_SETFONT, reinterpret_cast<WPARAM>(review.sectionFont), TRUE);
+    for (const auto item : {review.kicker, review.folderLabel, review.filesHint}) if (item)
+        SendMessageW(item, WM_SETFONT, reinterpret_cast<WPARAM>(review.smallFont), TRUE);
+    if (review.plan) SendMessageW(review.plan, WM_SETFONT, reinterpret_cast<WPARAM>(review.listFont), TRUE);
+    if (review.list) {
+        SendMessageW(review.list, WM_SETFONT, reinterpret_cast<WPARAM>(review.listFont), TRUE);
+        SendMessageW(ListView_GetHeader(review.list), WM_SETFONT, reinterpret_cast<WPARAM>(review.listFont), TRUE);
+    }
+    for (const auto previousFont : previous) if (previousFont) DeleteObject(previousFont);
+}
+RECT rectangle(const Review& review, int x, int y, int width, int height) {
+    return {review.px(x), review.px(y), review.px(x + width), review.px(y + height)};
+}
+void place(Review& review, HWND item, int x, int y, int width, int height) {
+    if (item) SetWindowPos(item, nullptr, review.px(x), review.px(y), review.px((std::max)(1, width)),
+        review.px((std::max)(1, height)), SWP_NOZORDER | SWP_NOACTIVATE);
+}
+void layout(Review& review) {
+    RECT client{}; GetClientRect(review.window, &client);
+    const int width = MulDiv(client.right, 96, static_cast<int>(review.dpi));
+    const int height = MulDiv(client.bottom, 96, static_cast<int>(review.dpi));
+    const int margin = 24, contentWidth = width - margin * 2, inside = margin + 20;
+    const int contextHeight = 146, filesTop = margin + contextHeight + 16;
+    const int footerTop = height - 68, contentBottom = footerTop - 20;
+    const int planHeight = height >= 760 ? 210 : height >= 700 ? 185 : 150;
+    const int filesHeight = (std::max)(120, contentBottom - filesTop - planHeight - 16);
+    const int planTop = filesTop + filesHeight + 16;
+    review.contextCard = rectangle(review, margin, margin, contentWidth, contextHeight);
+    review.filesCard = rectangle(review, margin, filesTop, contentWidth, filesHeight);
+    review.planCard = rectangle(review, margin, planTop, contentWidth, (std::max)(110, contentBottom - planTop));
+    review.progressBadge = rectangle(review, width - margin - 125, margin + 18, 105, 28);
+    place(review, review.kicker, inside, margin + 17, contentWidth - 185, 20);
+    place(review, review.heading, inside, margin + 39, contentWidth - 145, 38);
+    place(review, review.description, inside, margin + 81, contentWidth - 40, 24);
+    place(review, review.folderLabel, inside, margin + 115, 40, 20);
+    place(review, review.folderPath, inside + 43, margin + 113, contentWidth - 83, 24);
+    place(review, review.filesTitle, inside, filesTop + 16, contentWidth - 40, 25);
+    place(review, review.filesHint, inside, filesTop + 45, contentWidth - 40, 20);
+    place(review, review.list, margin + 16, filesTop + 76, contentWidth - 32, filesHeight - 92);
+    place(review, review.planTitle, inside, planTop + 16, contentWidth - 40, 25);
+    place(review, review.plan, inside, planTop + 52, contentWidth - 40, contentBottom - planTop - 68);
+    place(review, review.skipRemaining, margin, footerTop, 190, 44);
+    place(review, review.skip, width - margin - 350, footerTop, 160, 44);
+    place(review, review.process, width - margin - 176, footerTop, 176, 44);
+    RECT listClient{}; GetClientRect(review.list, &listClient);
+    const int role = review.px(160), date = review.px(175), size = review.px(105);
+    ListView_SetColumnWidth(review.list, 0, (std::max)(review.px(240), static_cast<int>(listClient.right) - role - date - size - review.px(6)));
+    ListView_SetColumnWidth(review.list, 1, role);
+    ListView_SetColumnWidth(review.list, 2, date);
+    ListView_SetColumnWidth(review.list, 3, size);
+    InvalidateRect(review.window, nullptr, TRUE);
+}
+void paintReview(Review& review, HDC dc) {
+    RECT client{}; GetClientRect(review.window, &client);
+    ui::fill(dc, client, ui::Background);
+    ui::card(dc, review.contextCard, review.dpi);
+    ui::card(dc, review.filesCard, review.dpi);
+    ui::card(dc, review.planCard, review.dpi);
+    ui::fill(dc, review.progressBadge, ui::AccentSoft);
+    ui::text(dc, std::to_wstring(review.ordinal) + L" / " + std::to_wstring(review.count) + L" 그룹",
+        review.progressBadge, review.smallFont, ui::Accent, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+}
+LRESULT listColors(NMLVCUSTOMDRAW& draw) {
+    if (draw.nmcd.dwDrawStage == CDDS_PREPAINT) return CDRF_NOTIFYITEMDRAW;
+    if (draw.nmcd.dwDrawStage == CDDS_ITEMPREPAINT) return CDRF_NOTIFYSUBITEMDRAW;
+    if (draw.nmcd.dwDrawStage == (CDDS_ITEMPREPAINT | CDDS_SUBITEM)) {
+        if (!(draw.nmcd.uItemState & CDIS_SELECTED)) {
+            draw.clrText = ui::color(draw.iSubItem == 0 ? ui::Text : ui::Muted);
+            draw.clrTextBk = ui::color(draw.nmcd.dwItemSpec % 2 ? ui::Background : ui::Surface);
+        }
+        return CDRF_DODEFAULT;
+    }
+    return CDRF_DODEFAULT;
+}
 void addRow(Review& review, const File& file, bool root) {
     const int row = ListView_GetItemCount(review.list);
     LVITEMW item{}; item.mask = LVIF_TEXT; item.iItem = row;
     item.pszText = const_cast<wchar_t*>(file.name.c_str());
     ListView_InsertItem(review.list, &item);
-    std::wstring role = root ? L"원래 이름 (선택하면 보존)" : L"번호 파일";
+    std::wstring role = root ? L"원래 이름 · 보존" : L"번호 파일";
     ListView_SetItemText(review.list, row, 1, const_cast<wchar_t*>(role.c_str()));
     std::wstring time = modified(file);
     ListView_SetItemText(review.list, row, 2, const_cast<wchar_t*>(time.c_str()));
@@ -187,38 +277,90 @@ LRESULT CALLBACK reviewProc(HWND window, UINT message, WPARAM wparam, LPARAM lpa
     if (!review) return DefWindowProcW(window, message, wparam, lparam);
     switch (message) {
     case WM_CREATE: {
-        review->font = CreateFontW(-review->px(15), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-            DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-            DEFAULT_PITCH, L"Malgun Gothic");
-        const std::wstring heading = L"기존 번호 파일 확인 · " + std::to_wstring(review->ordinal) +
-            L" / " + std::to_wstring(review->count) + L" 그룹\n같은 이름 규칙의 파일입니다. 최신 파일을 직접 선택한 후 정리 여부를 결정하세요.";
-        control(*review, L"STATIC", heading.c_str(), 0, 20, 16, 740, 52);
-        control(*review, L"EDIT", review->folder.c_str(), ES_READONLY | ES_AUTOHSCROLL,
-            20, 75, 740, 28, 0, WS_EX_CLIENTEDGE);
-        control(*review, L"STATIC", L"수정 시각은 참고 정보입니다. 선택한 파일을 최신으로 유지하며 원래 이름으로 이동합니다.", 0, 20, 112, 740, 25);
+        fonts(*review);
+        review->kicker = control(*review, L"STATIC", L"감시를 시작하기 전에", 0, 0, 0, 1, 1);
+        review->heading = control(*review, L"STATIC", L"기존 파일을 확인해 주세요", 0, 0, 0, 1, 1);
+        review->description = control(*review, L"STATIC", L"최신으로 유지할 파일을 직접 선택해 주세요. 정리 순서를 확인한 후 실행합니다.", 0, 0, 0, 1, 1);
+        review->folderLabel = control(*review, L"STATIC", L"폴더", 0, 0, 0, 1, 1);
+        review->folderPath = control(*review, L"EDIT", review->folder.c_str(), ES_READONLY | ES_AUTOHSCROLL,
+            0, 0, 1, 1);
+        review->filesTitle = control(*review, L"STATIC", L"1. 최신 파일 선택", 0, 0, 0, 1, 1);
+        review->filesHint = control(*review, L"STATIC", L"수정 시각과 번호는 참고 정보입니다. 원래 이름의 파일을 선택하면 이 그룹을 보존합니다.", 0, 0, 0, 1, 1);
         review->list = control(*review, WC_LISTVIEWW, L"", WS_TABSTOP | WS_VSCROLL | WS_HSCROLL |
-            LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS, 20, 142, 740, 200, FilesControl, WS_EX_CLIENTEDGE);
-        ListView_SetExtendedListViewStyle(review->list, LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
-        const wchar_t* titles[] = {L"파일 이름", L"구분", L"수정 시각 (로컬)", L"크기 (byte)"};
-        const int widths[] = {280, 180, 165, 105};
+            LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS, 0, 0, 1, 1, FilesControl);
+        ui::theme(review->list);
+        ListView_SetExtendedListViewStyle(review->list, LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+        ListView_SetBkColor(review->list, ui::color(ui::Surface));
+        ListView_SetTextBkColor(review->list, ui::color(ui::Surface));
+        ListView_SetTextColor(review->list, ui::color(ui::Text));
+        const wchar_t* titles[] = {L"파일 이름", L"구분", L"마지막 수정 시각", L"크기 (byte)"};
         for (int at = 0; at < 4; ++at) {
-            LVCOLUMNW column{}; column.mask = LVCF_TEXT | LVCF_WIDTH;
-            column.pszText = const_cast<wchar_t*>(titles[at]); column.cx = review->px(widths[at]);
+            LVCOLUMNW column{}; column.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
+            column.pszText = const_cast<wchar_t*>(titles[at]); column.cx = review->px(100);
+            column.fmt = at == 3 ? LVCFMT_RIGHT : LVCFMT_LEFT;
             ListView_InsertColumn(review->list, at, &column);
         }
         addRow(*review, review->group.root, true);
         for (const auto& file : review->group.copies) addRow(*review, file, false);
+        review->planTitle = control(*review, L"STATIC", L"2. 정리 순서 확인", 0, 0, 0, 1, 1);
         review->plan = control(*review, L"EDIT", L"", ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL |
-            WS_VSCROLL, 20, 355, 740, 151, 0, WS_EX_CLIENTEDGE);
-        review->process = control(*review, L"BUTTON", L"선택대로 정리", WS_TABSTOP | BS_PUSHBUTTON,
-            20, 521, 170, 34, ProcessControl);
-        control(*review, L"BUTTON", L"이 그룹 보존", WS_TABSTOP | BS_PUSHBUTTON, 202, 521, 155, 34, SkipControl);
-        control(*review, L"BUTTON", L"남은 그룹 모두 보존", WS_TABSTOP | BS_PUSHBUTTON, 520, 521, 240, 34, SkipRemainingControl);
+            WS_VSCROLL, 0, 0, 1, 1);
+        review->process = control(*review, L"BUTTON", L"선택대로 정리", WS_TABSTOP | BS_OWNERDRAW,
+            0, 0, 1, 1, ProcessControl);
+        review->skip = control(*review, L"BUTTON", L"이 그룹 보존", WS_TABSTOP | BS_OWNERDRAW, 0, 0, 1, 1, SkipControl);
+        review->skipRemaining = control(*review, L"BUTTON", L"남은 그룹 모두 보존", WS_TABSTOP | BS_OWNERDRAW, 0, 0, 1, 1, SkipRemainingControl);
+        fonts(*review);
+        layout(*review);
         updatePlan(*review);
         return 0;
     }
+    case WM_SIZE:
+        if (review->list) layout(*review);
+        return 0;
+    case WM_GETMINMAXINFO: {
+        RECT minimum{0, 0, review->px(820), review->px(720)};
+        AdjustWindowRectExForDpi(&minimum, static_cast<DWORD>(GetWindowLongPtrW(window, GWL_STYLE)), FALSE, 0, review->dpi);
+        auto limits = reinterpret_cast<MINMAXINFO*>(lparam);
+        limits->ptMinTrackSize = {minimum.right - minimum.left, minimum.bottom - minimum.top};
+        MONITORINFO monitor{sizeof(monitor)};
+        if (GetMonitorInfoW(MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST), &monitor)) {
+            limits->ptMinTrackSize.x = (std::min)(limits->ptMinTrackSize.x, monitor.rcWork.right - monitor.rcWork.left);
+            limits->ptMinTrackSize.y = (std::min)(limits->ptMinTrackSize.y, monitor.rcWork.bottom - monitor.rcWork.top);
+        }
+        return 0;
+    }
+    case WM_DPICHANGED: {
+        review->dpi = HIWORD(wparam); fonts(*review);
+        const auto suggested = reinterpret_cast<RECT*>(lparam);
+        SetWindowPos(window, nullptr, suggested->left, suggested->top, suggested->right - suggested->left,
+            suggested->bottom - suggested->top, SWP_NOZORDER | SWP_NOACTIVATE);
+        layout(*review); return 0;
+    }
+    case WM_ERASEBKGND: return 1;
+    case WM_PAINT: {
+        PAINTSTRUCT paint{}; const auto dc = BeginPaint(window, &paint);
+        paintReview(*review, dc); EndPaint(window, &paint); return 0;
+    }
+    case WM_PRINTCLIENT: paintReview(*review, reinterpret_cast<HDC>(wparam)); return 0;
+    case WM_CTLCOLORSTATIC:
+    case WM_CTLCOLOREDIT: {
+        const auto dc = reinterpret_cast<HDC>(wparam);
+        const auto item = reinterpret_cast<HWND>(lparam);
+        const bool subdued = item == review->description || item == review->filesHint || item == review->folderLabel;
+        SetTextColor(dc, ui::color(item == review->kicker ? ui::Accent : subdued ? ui::Muted : ui::Text));
+        SetBkColor(dc, ui::color(ui::Surface)); return reinterpret_cast<LRESULT>(ui::surfaceBrush());
+    }
+    case WM_DRAWITEM: {
+        const auto draw = reinterpret_cast<DRAWITEMSTRUCT*>(lparam);
+        if (draw->CtlType == ODT_BUTTON) {
+            ui::button(*draw, review->font, review->dpi, draw->CtlID == ProcessControl); return TRUE;
+        }
+        break;
+    }
     case WM_NOTIFY: {
         const auto notification = reinterpret_cast<NMHDR*>(lparam);
+        if (notification->idFrom == FilesControl && notification->code == NM_CUSTOMDRAW)
+            return listColors(*reinterpret_cast<NMLVCUSTOMDRAW*>(lparam));
         if (notification->idFrom == FilesControl && notification->code == LVN_ITEMCHANGED && review->plan)
             updatePlan(*review);
         return 0;
@@ -236,7 +378,9 @@ LRESULT CALLBACK reviewProc(HWND window, UINT message, WPARAM wparam, LPARAM lpa
         break;
     case WM_CLOSE: finish(*review, Choice::Cancel); return 0;
     case WM_DESTROY:
-        if (review->font) { DeleteObject(review->font); review->font = nullptr; }
+        for (const auto font : {review->font, review->titleFont, review->sectionFont, review->smallFont, review->listFont})
+            if (font) DeleteObject(font);
+        review->font = review->titleFont = review->sectionFont = review->smallFont = review->listFont = nullptr;
         return 0;
     }
     return DefWindowProcW(window, message, wparam, lparam);
@@ -246,17 +390,25 @@ Choice ask(HWND parent, Review& review) {
     InitCommonControlsEx(&common);
     WNDCLASSW cls{}; cls.lpfnWndProc = reviewProc; cls.hInstance = GetModuleHandleW(nullptr);
     cls.lpszClassName = L"Workspace.DvmExistingReview"; cls.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-    cls.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+    cls.hbrBackground = ui::backgroundBrush();
     if (!RegisterClassW(&cls) && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) return Choice::Cancel;
     review.dpi = parent ? GetDpiForWindow(parent) : GetDpiForSystem();
-    const DWORD style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU;
-    RECT bounds{0, 0, review.px(780), review.px(574)};
+    const DWORD style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MAXIMIZEBOX | WS_CLIPCHILDREN;
+    RECT bounds{0, 0, review.px(960), review.px(800)};
     AdjustWindowRectExForDpi(&bounds, style, FALSE, 0, review.dpi);
+    MONITORINFO monitor{sizeof(monitor)};
+    RECT work{};
+    if (GetMonitorInfoW(MonitorFromWindow(parent ? parent : GetForegroundWindow(), MONITOR_DEFAULTTONEAREST), &monitor))
+        work = monitor.rcWork;
+    else SystemParametersInfoW(SPI_GETWORKAREA, 0, &work, 0);
+    const int width = (std::min)(bounds.right - bounds.left, work.right - work.left - review.px(24));
+    const int height = (std::min)(bounds.bottom - bounds.top, work.bottom - work.top - review.px(24));
+    const int left = work.left + (work.right - work.left - width) / 2;
+    const int top = work.top + (work.bottom - work.top - height) / 2;
     const bool wasEnabled = parent && IsWindowEnabled(parent);
     if (wasEnabled) EnableWindow(parent, FALSE);
-    const HWND window = CreateWindowExW(0, cls.lpszClassName, L"기존 파일 정리 확인",
-        style, CW_USEDEFAULT, CW_USEDEFAULT, bounds.right - bounds.left,
-        bounds.bottom - bounds.top, parent, nullptr, cls.hInstance, &review);
+    const HWND window = CreateWindowExW(0, cls.lpszClassName, L"기존 파일 확인 · DownloadVersionManager",
+        style, left, top, width, height, parent, nullptr, cls.hInstance, &review);
     if (window) {
         ShowWindow(window, SW_SHOW); SetForegroundWindow(window); SetFocus(review.list);
         MSG message{};
@@ -290,7 +442,8 @@ bool processGroup(const std::wstring& folder, Group& group, size_t selected,
         request.requireTargetSnapshot = true; request.expectedTarget = group.root.snapshot;
         const Result result = process(request);
         if (!result.ok || result.error || result.rollbackError) {
-            std::wstring text = group.root.name + L": " + result.status + L" · 나머지 파일 처리를 중단했습니다.";
+            std::wstring text = (result.status == L"permission_denied" || result.status == L"file_info_failed"
+                ? resultMessage(source.name, result) : group.root.name + L": " + result.status) + L" · 나머지 파일 처리를 중단했습니다.";
             if (!result.oldPath.empty()) text += L" 이전 파일 위치: " + result.oldPath;
             report(text); return false;
         }

@@ -46,15 +46,21 @@ bool same(const BY_HANDLE_FILE_INFORMATION& a, const BY_HANDLE_FILE_INFORMATION&
         CompareFileTime(&a.ftLastWriteTime, &b.ftLastWriteTime) == 0 && CompareFileTime(&a.ftCreationTime, &b.ftCreationTime) == 0;
 }
 struct Candidate { std::wstring name, logical; BY_HANDLE_FILE_INFORMATION information{}; ULONGLONG since = 0; bool observed = false; };
+}
 std::wstring resultMessage(const std::wstring& name, const Result& result) {
     if (result.status == L"cleanup_required") return name + L" → 최신 파일로 변경했습니다. 이전 파일은 지우지 못해 보존했습니다. 위치: " + result.oldPath;
     if (result.status == L"metadata_warning") return name + L" → 최신 파일로 변경했습니다. 파일 시간을 설정하지 못했습니다. 탐색기에서 시간을 확인해 주세요.";
     if (result.ok) return name + (result.status == L"same_content_replaced" ? L" → 최신 파일로 변경했습니다. 내용은 같습니다." : L" → 최신 파일로 변경하고 이전 내용을 _history에 보관했습니다.");
     if (result.status == L"target_locked" || result.status == L"new_file_locked") return name + L" → 파일이 사용 중이라 두 파일을 보존했습니다. 파일을 닫은 뒤 최신본을 직접 확인해 주세요.";
-    std::wstring text = name + L" → 파일을 보존했습니다. (" + result.status + L")";
+    std::wstring text;
+    if (result.status == L"permission_denied") {
+        const std::wstring reason = result.readOnlyProtected ? L"읽기 전용 보호: 파일 보존" : L"접근 실패: 파일 보존";
+        text = reason + L" (permission_denied, 오류 " + std::to_wstring(result.error) + L") · " + name;
+    } else if (result.status == L"file_info_failed") {
+        text = L"파일 정보 확인 실패: 파일 보존 (file_info_failed, 오류 " + std::to_wstring(result.error) + L") · " + name;
+    } else text = name + L" → 파일을 보존했습니다. (" + result.status + L")";
     if (!result.oldPath.empty() && result.rollbackError) text += L" 이전 파일 위치: " + result.oldPath;
     return text;
-}
 }
 
 Watcher::~Watcher() { stop(); }

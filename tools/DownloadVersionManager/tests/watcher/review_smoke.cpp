@@ -1,4 +1,5 @@
 #include "review.h"
+#include "ui_capture.h"
 #include <commctrl.h>
 #include <filesystem>
 #include <iostream>
@@ -63,7 +64,62 @@ BOOL CALLBACK planText(HWND child, LPARAM value) {
     GetWindowTextW(child, buffer.data(), static_cast<int>(buffer.size()));
     *text = buffer.data(); return FALSE;
 }
-enum class Flow { CloseWithoutConsent, Skip, SelectLatest, ChangedRoot };
+struct LayoutCheck { HWND window; bool okay = true; };
+BOOL CALLBACK containedControl(HWND child, LPARAM value) {
+    auto& check = *reinterpret_cast<LayoutCheck*>(value);
+    if (GetParent(child) != check.window || !IsWindowVisible(child)) return TRUE;
+    RECT client{}, bounds{}; GetClientRect(check.window, &client); GetWindowRect(child, &bounds);
+    MapWindowPoints(nullptr, check.window, reinterpret_cast<POINT*>(&bounds), 2);
+    check.okay = check.okay && bounds.left >= 0 && bounds.top >= 0 &&
+        bounds.right <= client.right && bounds.bottom <= client.bottom &&
+        bounds.right > bounds.left && bounds.bottom > bounds.top;
+    return TRUE;
+}
+RECT childBounds(HWND window, HWND child) {
+    RECT bounds{}; GetWindowRect(child, &bounds);
+    MapWindowPoints(nullptr, window, reinterpret_cast<POINT*>(&bounds), 2); return bounds;
+}
+BOOL CALLBACK findPlan(HWND child, LPARAM value) {
+    wchar_t type[32]{}; GetClassNameW(child, type, 32);
+    if (std::wstring(type) == L"Edit" && (GetWindowLongPtrW(child, GWL_STYLE) & ES_MULTILINE)) {
+        *reinterpret_cast<HWND*>(value) = child; return FALSE;
+    }
+    return TRUE;
+}
+bool layoutOkay(HWND window, UINT dpi) {
+    LayoutCheck check{window}; EnumChildWindows(window, containedControl, reinterpret_cast<LPARAM>(&check));
+    const HWND list = GetDlgItem(window, 201), process = GetDlgItem(window, 202);
+    HWND plan = nullptr; EnumChildWindows(window, findPlan, reinterpret_cast<LPARAM>(&plan));
+    if (!list || !plan || !process || !check.okay) return false;
+    const auto files = childBounds(window, list), preview = childBounds(window, plan), action = childBounds(window, process);
+    LOGFONTW font{}; const auto listFont = reinterpret_cast<HFONT>(SendMessageW(list, WM_GETFONT, 0, 0));
+    return files.bottom < preview.top && preview.bottom < action.top &&
+        ListView_GetItemCount(list) == 3 && ListView_GetColumnWidth(list, 0) >= MulDiv(240, static_cast<int>(dpi), 96) &&
+        GetObjectW(listFont, sizeof(font), &font) == static_cast<int>(sizeof(font)) && font.lfHeight == -MulDiv(14, static_cast<int>(dpi), 96) &&
+        (GetWindowLongPtrW(window, GWL_STYLE) & WS_THICKFRAME) != 0;
+}
+bool reviewLayouts(HWND window, const std::wstring& folder) {
+    RECT original{}; GetWindowRect(window, &original); const UINT dpi = GetDpiForWindow(window);
+    bool okay = layoutOkay(window, dpi) && captureNative(window, joined(folder, L"review-native-normal.bmp"));
+    std::cout << (okay ? "PASS " : "FAIL ") << "review-layout-normal\n";
+    RECT minimum{0, 0, MulDiv(820, static_cast<int>(dpi), 96), MulDiv(720, static_cast<int>(dpi), 96)};
+    AdjustWindowRectExForDpi(&minimum, static_cast<DWORD>(GetWindowLongPtrW(window, GWL_STYLE)), FALSE, 0, dpi);
+    SetWindowPos(window, nullptr, 0, 0, minimum.right - minimum.left, minimum.bottom - minimum.top,
+        SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+    const bool compact = layoutOkay(window, dpi) && captureNative(window, joined(folder, L"review-native-minimum.bmp"));
+    std::cout << (compact ? "PASS " : "FAIL ") << "review-layout-minimum-820x720\n"; okay = compact && okay;
+    constexpr UINT scaled = 144;
+    RECT adjusted{0, 0, MulDiv(820, static_cast<int>(scaled), 96), MulDiv(720, static_cast<int>(scaled), 96)};
+    AdjustWindowRectExForDpi(&adjusted, static_cast<DWORD>(GetWindowLongPtrW(window, GWL_STYLE)), FALSE, 0, scaled);
+    RECT simulated{original.left, original.top, original.left + adjusted.right - adjusted.left,
+        original.top + adjusted.bottom - adjusted.top};
+    SendMessageW(window, WM_DPICHANGED, MAKELONG(scaled, scaled), reinterpret_cast<LPARAM>(&simulated));
+    const bool scaledOkay = layoutOkay(window, scaled) && captureNative(window, joined(folder, L"review-native-144dpi.bmp"));
+    std::cout << (scaledOkay ? "PASS " : "FAIL ") << "review-layout-simulated-144dpi\n"; okay = scaledOkay && okay;
+    SendMessageW(window, WM_DPICHANGED, MAKELONG(dpi, dpi), reinterpret_cast<LPARAM>(&original));
+    return layoutOkay(window, dpi) && okay;
+}
+enum class Flow { CloseWithoutConsent, Skip, SelectLatest, ChangedRoot, ReadOnlyRoot };
 std::string utf8(const std::wstring& text) {
     const auto count = WideCharToMultiByte(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), nullptr, 0, nullptr, nullptr);
     std::string result(static_cast<size_t>(count), '\0');
@@ -75,13 +131,14 @@ bool run(const std::wstring& base, const wchar_t* name, Flow flow) {
     if (!CreateDirectoryW(folder.c_str(), nullptr)) return false;
     const auto root = joined(folder, L"report.txt"), first = joined(folder, L"report (1).txt"), second = joined(folder, L"report (2).txt");
     if (!write(root, "old") || !write(first, "chosen latest") || !write(second, "other previous")) return false;
+    if (flow == Flow::ReadOnlyRoot && !SetFileAttributesW(root.c_str(), FILE_ATTRIBUTE_READONLY)) return false;
     const auto original = information(root), chosen = information(first), other = information(second);
     bool uiOkay = false;
     std::thread input([&] {
         HWND window = nullptr;
         for (int attempt = 0; attempt < 500; ++attempt) {
             window = reviewWindow();
-            if (window && GetDlgItem(window, 202)) break;
+            if (window && IsWindowVisible(window) && GetDlgItem(window, 202)) break;
             Sleep(10);
         }
         if (!window) return;
@@ -89,6 +146,7 @@ bool run(const std::wstring& base, const wchar_t* name, Flow flow) {
         uiOkay = list && process && !IsWindowEnabled(process) &&
             SendMessageW(list, LVM_GETNEXTITEM, static_cast<WPARAM>(-1), LVNI_SELECTED) == -1 &&
             read(root) == "old" && read(first) == "chosen latest" && read(second) == "other previous";
+        if (flow == Flow::CloseWithoutConsent && uiOkay) uiOkay = reviewLayouts(window, folder);
         if (flow == Flow::CloseWithoutConsent || !uiOkay) { SendMessageW(window, WM_CLOSE, 0, 0); return; }
         if (flow == Flow::Skip) { SendMessageW(window, WM_COMMAND, 203, 0); return; }
         select(list, 1);
@@ -96,6 +154,7 @@ bool run(const std::wstring& base, const wchar_t* name, Flow flow) {
         uiOkay = uiOkay && IsWindowEnabled(process) &&
             plan.find(L"1. report (2).txt") != std::wstring::npos &&
             plan.find(L"2. report (1).txt") != std::wstring::npos;
+        if (flow == Flow::SelectLatest && uiOkay) uiOkay = captureNative(window, joined(folder, L"review-native-selected.bmp"));
         if (flow == Flow::ChangedRoot) uiOkay = uiOkay && write(root, "externally changed root");
         SendMessageW(window, WM_COMMAND, uiOkay ? 202 : 203, 0);
     });
@@ -120,6 +179,14 @@ bool run(const std::wstring& base, const wchar_t* name, Flow flow) {
             snapshot(information(first), chosen) && snapshot(information(second), other) &&
             GetFileAttributesW(joined(folder, L"_history").c_str()) == INVALID_FILE_ATTRIBUTES;
         if (changed) okay = okay && !messages.empty() && messages.back().find(L"변경") != std::wstring::npos;
+        if (flow == Flow::ReadOnlyRoot) {
+            okay = okay && !messages.empty() && messages.back().rfind(L"읽기 전용 보호: 파일 보존", 0) == 0 &&
+                messages.back().find(L"permission_denied, 오류 5") != std::wstring::npos &&
+                messages.back().find(L"report (2).txt") != std::wstring::npos &&
+                messages.back().find(L"나머지 파일 처리를 중단했습니다.") != std::wstring::npos &&
+                (GetFileAttributesW(root.c_str()) & FILE_ATTRIBUTE_READONLY) != 0;
+            okay = SetFileAttributesW(root.c_str(), FILE_ATTRIBUTE_NORMAL) && okay;
+        }
     }
     std::cout << (okay ? "PASS " : "FAIL ") << utf8(name) << "\n";
     for (const auto& message : messages) std::cout << "  " << utf8(message) << "\n";
@@ -134,5 +201,6 @@ int wmain(int argc, wchar_t** argv) {
     okay = run(base, L"skip", Flow::Skip) && okay;
     okay = run(base, L"chosen-latest", Flow::SelectLatest) && okay;
     okay = run(base, L"changed-after-display", Flow::ChangedRoot) && okay;
+    okay = run(base, L"readonly-preserved-with-reason", Flow::ReadOnlyRoot) && okay;
     return okay ? 0 : 1;
 }

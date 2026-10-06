@@ -56,7 +56,7 @@
         <Control Id="Browse" Type="PushButton" X="364" Y="162" Width="72" Height="24" Text="찾아보기"><Publish Event="SpawnDialog" Value="WatchFolderBrowse" /></Control>
         <Control Id="StartAtLogin" Type="CheckBox" X="24" Y="202" Width="412" Height="20" Property="DVMSTARTATLOGIN" CheckBoxValue="1" Text="Windows 로그인 시 자동 실행" />
         <Control Id="Note" Type="Text" X="24" Y="229" Width="412" Height="31" Text="처음 폴더를 사용할 때 기존 파일 목록을 확인합니다. 프로그램을 종료하면 감시를 마칩니다." />
-        <Control Id="Install" Type="PushButton" X="260" Y="278" Width="78" Height="25" Default="yes" Text="설치"><Publish Event="EndDialog" Value="Return" Condition="DVMWATCHFOLDER" /></Control>
+        <Control Id="Install" Type="PushButton" X="260" Y="278" Width="78" Height="25" Default="yes" ElevationShield="yes" Text="설치"><Publish Event="EndDialog" Value="Return" Condition="DVMWATCHFOLDER" /></Control>
         <Control Id="Cancel" Type="PushButton" X="348" Y="278" Width="88" Height="25" Cancel="yes" Text="취소"><Publish Event="EndDialog" Value="Exit" /></Control>
       </Dialog>
       <Dialog Id="WatchFolderBrowse" Width="390" Height="265" Title="감시할 폴더 선택">

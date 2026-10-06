@@ -1,5 +1,11 @@
 # 설계 결정 목록
 
+- [ADR-0033 · DVM 설치기의 관리자 승인과 일반 권한 앱 실행](0033-download-version-manager-installer-consent.md) — 현재 사용자 설치 유지, 사용자 UAC, 같은 PC 후반 실패 자동 복구와 일반 권한 실행 확인
+
+- [ADR-0032 · 감시 창 닫기와 트레이 수명 분리](0032-download-version-manager-tray-lifetime.md) — 같은 창과 감시 상태 보존, 트레이 명시적 종료, 로컬 ADR 번호 이관
+
+- [ADR-0031 · 보관 대상의 수정 시각과 확인된 보존 이유 안내](0031-download-history-mtime-guidance.md) — History 날짜 기준·파일 보존 이유, 로컬 ADR 번호 이관
+
 - [ADR-0030 · 교육 업무의 설명용 예시 화면](0030-education-example-screens.md) — 가상 화면 촬영 PNG 7개만 공개, 실제 제품 시험과 구분, 문서·메뉴 유지
 
 - [ADR-0029 · 교육 업무 예시와 쉬운 공개 안내](0029-education-public-guide.md) — 가짜 자료 7장면, 최신 버전 요약, 일상말 기준과 공개 범위 검사

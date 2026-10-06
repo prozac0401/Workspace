@@ -6,6 +6,8 @@
 #include <thread>
 
 namespace dvm {
+struct Result;
+std::wstring resultMessage(const std::wstring& name, const Result& result);
 bool duplicateName(const std::wstring& name, std::wstring& logical);
 bool validateFolder(const std::wstring& folder, std::wstring& error);
 class Watcher {

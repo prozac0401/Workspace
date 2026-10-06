@@ -1,5 +1,21 @@
 # DownloadVersionManager · 실제 시험 기록
 
+## 게시 CI의 합성 배율 검사 · 2026-10-06
+
+PR 자동 검사 37404594810은 엔진·watcher·review·guidance·log를 통과했지만 합성 144-DPI 화면 검사에서 실패했습니다. 시험이 요청한 900×800 DIP client를 실제 확보했는지 확인하지 않았고 Windows의 기본 최대 tracking 크기는 가상 화면에 의존합니다. 시험 전용 WindowProc가 제품 handler를 그대로 호출한 뒤, 실제 크기 제한이 관찰된 경우에만 이 시험 창의 최대 canvas를 확장합니다. 합성 DPI는 실제 HWND frame DPI를 바꾸지 않으므로 client는 시험 DPI로, non-client는 실제 GetDpiForWindow와 style/exstyle로 계산합니다. 요청/실제 client·nativeDPI·최대 tracking과 DPI/geometry/render 판정을 분리해 기록하며 세 크기 사례에 실제 client 일치 검사를 추가합니다. 제품 app·installer source와 정상 MSI는 변경하지 않습니다. 재검사 결과는 PR 본문에 확인 후 기록합니다. 최초 CI FAIL은 보존합니다.
+
+## 0.2.1 정식 배포 기준 · 2026-10-06
+
+사용자가 검증된 정상 0.2.1의 정식 Release와 Pages 게시를 승인했습니다. 배포 파일은 `DownloadVersionManager-Watcher-0.2.1-x64.msi`와 `SHA256SUMS.txt` 두 개이며 이미 시험한 정상 MSI를 그대로 재사용합니다. MSI SHA-256은 `0feea2fc119bad780da9dcb57d2a0303ef0e2e0c6f6a20a746fd3ab3f86a0ef5`입니다. 실패 기능은 없으며 시험 MSI·개인 진단·백업은 배포하지 않습니다.
+
+[정식 Release](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [설치·사용 안내](https://prozac0401.github.io/Workspace/tools/download-version-manager/) · [이번 게시 기록](../../docs/delivery/download-version-manager-guide-update-20261006.md)
+
+설치기의 필요한 관리자 승인은 사용자가 직접 허용하며 현재 사용자 설치와 일반 권한 앱 실행을 유지합니다. 현재 Windows 11 x64 한 PC에서 취소·대표 후반 실패 뒤 자동 복구·정상 재설치·실행·종료·제거를 확인했습니다. 코드 서명과 조직 도입 승인은 별도입니다. 소스·자동 검사·실제 Release 자산·Pages 게시 확인은 이번 PR 본문에 기록합니다.
+
+아래의 준비 완료·게시 미실행·과거 FAIL/NOT RUN 문구는 각 기록 시점의 결과로 보존합니다. 이번 배포의 자산과 다른 버전·미래 CI 재빌드 파일을 혼동하지 않습니다.
+
+**최신 0.2.1 실제 PC 결과(2026-10-06 KST): 최종 정상 MSI의 두 취소·동등 payload 후반 실패 자동 복구·정상 재설치·일반 권한 앱 실행과 종료·정상 제거·원래 설정 복원이 PASS입니다.** 정식 릴리즈용 정상 MSI 준비와 공개 게시는 구분하며 게시는 실행하지 않았습니다. 아래 과거 FAIL/NOTRUN은 당시 기록으로 보존합니다. [최신 범위와 결과](../../docs/delivery/download-version-manager-first-install-scope-20261005.md)를 따릅니다.
+
 ## 0.2.0 폴더 감시 · 2026-10-04 KST
 
 사용자가 확인한 최초 그룹 미리보기·처리 동의, 신규 suffix 연결, 3초 안정·잠금 조건, 동시 후보 보존, 기본 다운로드 위치 추종과 로그인 자동 실행을 구현했다. 기존 0.1.0의 FAIL/NOT RUN과 산출물을 보존한다.
@@ -189,3 +205,99 @@ Extension 시험은 첫/중복/완료·중단/취소/실패·동시 완료, 원�
 스토어/조직 정책·코드 서명·Windows 10·ARM64·네트워크/클라우드 경로·사용자 Save As 직접 덮어쓰기·모든 다운로드 방식은 검증되지 않았습니다. PowerShell wrapper는 이 환경에서 실행이 거절되어 NOT RUN이며 동일 Python 상위 제작 경로를 실제 실행했습니다. GitHub Actions 원격 실행과 공개 Release/Pages HTTP 검증은 게시하지 않아 NOT RUN입니다. 문서 strict/로컬 링크 결과는 [배포 기록](../../docs/delivery/download-version-manager-evaluation-20260930.md)을 따릅니다.
 
 다음 인수 단계는 공식 평가 profile에서 MSI의 확장을 활성화하고 제공한 loopback fixture로 **Chrome·Edge 계약 + first/same/changed/locked + 실제 handshake**를 기록하는 것입니다. 이후 동시 완료 순서·스토어 단일 배포·추가 installer 실패 지점을 해결하고 모든 stable gate를 다시 판정합니다.
+
+## 2026-10-04 후속 rollback 읽기 진단과 시험 도구 보완 (미게시)
+
+기준 소스는 main `94b3e3360e12c75479e6a901f4fe2271672001a1`이다. PR #16은 2026-10-04 22:32:18 KST 병합됐으며, release source `6d4bb38eeb52b0755de3ed9108c42c037b121d30` 이후 이 기준까지의 9개 변경 파일은 문서다. 제품 엔진/watcher/최초 그룹 소스는 바꾸지 않았으므로 기존 8+15+4=27 PASS를 해당 기능 범위로 재사용한다. MSI 복구 PASS로 확대하지 않는다.
+
+- 공개 MSI를 별도 비공개 출력에 다시 다운로드했다. 실제 바이트 SHA-256은 `c7be2ea44b09b2afd9d3a82956150aafba5390a8013ceccfeacd6583965a30e7`, PackageCode는 `{10F735AB-37BA-490E-993D-EFE207C83687}`이다. 기존 최종 EXE 지문 `3694c92dbe2f15971afa834a6a148cd59f0302530c28f3e105c6a5257e848acf`도 확인했다. 제품 설치를 실행한 검사는 아니다.
+- 기존 실패 주입 파일을 찾았다. SHA-256 `7af30c33e42ebdfb16a36b65393cfdfdf2d2248d2bc16ca55f303398bc64ebd8`, PackageCode `{C790528B-C0E5-4B0F-8821-41948E176E64}`는 원시 late-rollback 로그와 일치한다. 직접 CAB 추출한 단일 PE payload는 266,752 bytes, SHA-256 `171586ee599c0cc74f504fa7c87805c52bf533b0905a2cde018c4856a6be8da6`다. 당시 로그에는 MSI의 PackageCode가 있으며 MSI의 SHA-256 자체는 없으므로 당시 실행 바이트의 지문을 사후에 직접 기록한 것으로 바꾸지 않는다.
+- **두 MSI는 동등한 최종 소스의 production/test 쌍이 아니다.** 과거 주입 MSI에는 현재 삭제된 `BrowseWatchFolder`가 있고 `File`, 내장 CAB와 config DLL 지문도 다르다. 초기 0.2.0 후보의 실제 FAIL은 유지하지만 최종 공개 MSI 자체에서 같은 late-failure를 재현한 결과로 확대하지 않는다.
+- 로그에서 `InstallExecute` 6500 뒤 `FailAfterExecution` 6501 실행, `InstallFinalize` 6600 진입 전 rollback script의 `ScriptType=2`를 확인했다. 제품/SourceList/UpgradeCode 등록에 MSI 1401/1402/1403/1404의 시스템 오류 5가 있다. Run 키의 `RegCreateKey`에서는 MSI 메시지 **1401의 시스템 오류 1307**이 있으며 보안 descriptor 복원 인접 문맥을 확인했다. [Win32 1307](https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--1300-1699-)은 ERROR_INVALID_OWNER이다. 디스크 부족을 뜻하는 MSI 메시지 번호 1307과 구분한다. 거절된 owner SID/DACL 원문은 확보하지 못했다.
+- 당시 정확한 Windows edition/build, token/integrity/elevation, before/after owner/DACL, 완전한 rollback 직후 파일/설정 상태는 UNKNOWN이다. MSI의 호환성 속성 `VersionNT=603/WindowsBuild=9600`을 실제 Windows build로 쓰지 않는다. 0.1.0 후속 token/build 및 reinstall 1638을 0.2.0으로 승계하지 않는다. 공식 제거 exit 0은 자동 원상복귀 성공이 아니다.
+
+확인한 시험 도구 결함만 국소 수정했다: 합성 폴더만으로 현재 계정에서 설치를 실행하던 경로에 승인된 전용 스냅샷 환경/account gate를 추가한다. 1603은 EXPECTED_FAILURE로 기록하고 상태 비교 전에 PASS로 기록하지 않는다. production/test 지문·identity·MSI 테이블·내장 스트림을 대조한다. rollback 직후 제품/SourceList/UpgradeCode, registry 데이터·종류·존재, owner/DACL, 합성 설치/감시/History 파일과 바로가기의 snapshot을 먼저 저장한다. 차이·UNKNOWN·timeout·로그/child 결과 누락 시 재시도/자동 제거 없이 증거를 보존하고 중단한다. 기존 harness는 **신규 설치 시험용**이며 합성 기존 설치의 repair/upgrade 실패 복구를 인증하지 않는다.
+
+| 이번 확인 | 판정 | 충분한 근거/경계 |
+|---|---|---|
+| evidence 판정 회귀검사 | 8 PASS | 1603만 있는 경우/미도달/잔류/typed registry 차이/보안 정보 UNKNOWN/파일·ACL 변경/timeout/전용 환경 불일치 |
+| 실제 두 MSI 읽기 대조 | PASS | 과거 비동등 주입 파일을 현행 시험 파일로 거절, CAB/config DLL 직접 지문; MSI 설치 없음 |
+| Python 문법·diff 검사 | PASS | 수정한 시험 도구와 보조 코드만 |
+| 현행 MSI의 신규 설치 late-failure/취소 | BLOCKED / NOT RUN | 승인된 snapshot-restorable 전용 Windows 시험 환경 미확보 |
+| 합성 기존 0.2.x repair/지원 upgrade 실패 | NOT RUN | 기존 신규 설치 harness로 인증하지 않음 |
+| 수정 production/test MSI 제작·설치·repair·제거 | NOT RUN | 제품 결함 원인 미확정, 제품 소스/작성 변경 없음 |
+
+추측으로 ACL/owner를 바꾸거나 실패 주입을 제품 게시 전으로 옮기지 않았다. 제품 runtime, Watcher.wxs와 공개 MSI에는 복구 수정이 아직 없다. 읽기 진단과 trial 코드 준비는 설치 복구 해결 판정이 아니다. 원시 자료와 패치 manifest는 이번 작업 공간 `artifacts/download-version-manager-watcher/rollback-diagnosis-20261004/`에 비공개로 보관한다. 게시·commit·push·PR·tag·Release 변경은 수행하지 않았다.
+
+## 2026-10-05 감시 창 닫기·트레이 후속 작업의 근거 구분 (로컬 미게시)
+
+요구는 감시 창의 X·Alt+F4를 기존 HWND 숨김으로 바꾸고, 트레이의 열기·더블클릭으로 같은 창을 복원하며 명시적 종료에서 감시·프로세스를 안전하게 끝내는 것이다. 감시 중·중지 상태, 최소화·로그인 자동 실행·시작 정책과 파일 처리 계약을 유지한다. 최초 트레이 등록 실패와 Explorer 재등록 실패는 창 접근과 기존 로그를 보장하며 Windows 세션 종료는 일반 창 닫기와 구분한다. 완료 근거는 이 변경 경로의 집중 시험, 최종 EXE·MSI 지문과 직접 읽은 payload 일치다. 새 실행 결과·모의 시험·실제 UI 미실행은 [트레이 작업 기록](../../docs/delivery/download-version-manager-tray-20261005.md)에 기록한다.
+
+- **USER_CONFIRMED, 2026-10-05:** 사용자가 새 카드 UI와 현재 동작을 확인했다. 앞선 날짜 이름·읽기 전용 보존 이유·긴 로그 수평 스크롤 3종 USER_CONFIRMED도 유지한다. 이번 트레이 수정 전의 사용자 확인이며 트레이 시험·모든 환경·설치·복구·업그레이드의 PASS로 확대하지 않는다.
+- **이전 결과:** [UX·로컬 MSI 기록](../../docs/delivery/download-version-manager-ux-package-20261005.md)의 집중 런타임 17 PASS / 0 FAIL, unchanged core 57 PASS와 설치 진단 판정 8 PASS 재사용은 당시 결과다. 이번 변경 영향과 원본 근거를 확인한 재사용 범위를 새 기록에 구분하며 이 숫자를 트레이의 새 PASS로 복사하거나 합산하지 않는다.
+- **BLOCKED / NOTRUN:** 설치 실패 복구는 승인된 snapshot 복원 가능 전용 Windows 환경이 없어 계속 BLOCKED이며 실제 복구 PASS 0이다. 실사용 PC의 실패 주입·강제 종료·권한 변경·설치 복구 시험은 수행하지 않는다. 실제 Explorer 재시작·Windows 로그오프·종료를 모의 메시지나 코드 검토의 PASS로 바꾸지 않는다.
+
+이 절은 요구와 증거의 구분만 추가한다. 위 기존 내용 전체를 원문 prefix 그대로 보존했으며 새 빌드 성공·시험 수·EXE/MSI 해시·설치본 반영을 미리 선언하지 않는다. 현재 설치본 교체·제거와 commit/push/PR/merge/tag/release/배포는 이번 작업 범위에 없다.
+
+## 2026-10-05 · 0.2.1 최초 설치 경로 우선 분리
+
+일반 배포 대상은 0.2.1 최초 설치 → 정상 실행 → 명시적 종료 → 제거를 우선 검증한다. 최초 설치 실패·취소 복구는 별도 안전 항목이며 기존 실패·원인 미확정과 **실제 복구 PASS 0**을 유지한다. 사용자 PC의 0.2.0 업그레이드는 선택 검증이며 일반 대상의 필수 선행 경로가 아니다.
+
+읽기 전용 Windows Installer 확인에서 현재 계정에 0.2.0 제품과 기존 실행 설정이 존재했고 최초 설치 preflight는 BLOCKED였다. 전용 snapshot 환경 기록도 확보하지 못해 새 후보의 실제 설치·실행·제거는 **NOTRUN**이다. 설치/제거/repair/upgrade/실패 주입/취소·세션·사용자 앱 조작은 수행하지 않았다.
+
+시험 도구의 WM_CLOSE 종료 대기를 기존 트레이 Exit 명령 WM_COMMAND 106으로 수정했다. 설치 EXE 지문·시작 PID·Workspace.DvmWatcher class를 확인하며 종료 직전 소유자를 재검사한다. 강제 종료나 실패 후 자동 제거를 추가하지 않았다. test_installer_app_exit.py는 **4 PASS / 0 FAIL**, 기존 test_installer_evidence.py 재실행은 **8 PASS / 0 FAIL**이며 실제 설치나 복구 PASS가 아니다. command --help는 PASS다. [상세 범위와 준비 명령](../../docs/delivery/download-version-manager-first-install-scope-20261005.md)과 비공개 first-install-scope-20261005 근거를 따른다. 이전 본문의 모든 PASS/FAIL/NOTRUN은 당시 결과로 보존한다.
+
+## 2026-10-05 전용 아이콘 최종 후보
+
+[아이콘 작업 기록](../../docs/delivery/download-version-manager-icon-20261005.md): 최종 app.cpp·동일 ICO resource의 icon 5 + tray 21 + UX 8 + log 1 = 고유 native 집중 **35 PASS / 0 FAIL**. 7개 크기·100회 handle 재사용·실제 창 및 모의 tray DPI 갱신·light/dark 렌더 확인. 최종 production EXE RT_ICON과 ICO frame7개 원문 일치, exact production manifest UX PASS, MSI 추출 payload SHA-256 동일. 빌드·resource·payload 검사를 실제 설치/production wWinMain 성공으로 합산하지 않음. 초기에 C++ macro 충돌과 Python diagnostic syntax 오류가 있었고 로그 보존 후 교정·최종 재검증.
+
+새 EXE 372,224 bytes / SHA-256 3cddb6e185c7f1741cce6bb9b5b91f9afb3898a7a983598cfdc976e1be592abd, 무서명 MSI 380,928 bytes / ff3d0b2746d5733b75621ece88a2aa94e93e25e0e97fdf78beb20a42507c2796. 경로는 artifacts/download-version-manager-watcher/icon-20261005/production 및 package. 이전 core57·review8은 source/test 동일 지문 결과 재사용. installer helper4·기존 판정8은 별도 이번 mock/판정 회귀이며 설치 복구 PASS가 아님. USER_CONFIRMED는 이전 날짜·읽기 전용·가로 스크롤·카드 UI 범위로 유지. 실제 최초 설치·실행·제거 NOTRUN, 최초 설치 실패·취소 복구 BLOCKED / 실제 PASS0, 개인0.2.0 upgrade 별도. 현재 설치본·공개 배포 미반영.
+
+## 2026-10-05 실제 PC의 0.2.1 취소·실패 복구 결과
+
+사용자의 명시 승인으로 기존 0.2.1 정상 제거·백업한 실행 설정 네 값 분리 뒤 동일 PC에서 신규 설치 기준을 만들었다. Windows 11 x64 비상승 일반 사용자이며 전체 OS snapshot은 없다. 합성 설치·감시 fixture만 사용했고 실제 업무파일은 시험하지 않았다. production/test payload와 허용 MSI 차이, 실행 전 기준 및 자세한 범위는 [최초 설치 기록](../../docs/delivery/download-version-manager-first-install-scope-20261005.md)의 최신 절에 고정한다.
+
+| 실제 실행 | 결과 |
+|---|---|
+| 정상 MSI의 설치 실행 전 위자드 취소 | **PASS**: exit 1602, InstallInitialize 미진입, 상태 차이 0·UNKNOWN 0. 취소 조작은 USER_CONFIRMED |
+| 정상 MSI의 transaction 진행 중 취소 | **PASS**: 실제 payload 복사 후 WriteRegistryValues 단계의 IDCANCEL, exit 1602·rollback ScriptType=2, callback 오류 없음, 상태 차이 0·UNKNOWN 0 |
+| 동등 payload 시험 MSI의 InstallExecute 후 실패 | **FAIL**: 실패 지점 도달·exit 1603·rollback ScriptType=2에도 제품·UpgradeCode·Installer userdata·제거 등록 잔류. access denied(5)·owner 복원 오류 1307, 즉시 비교 UNKNOWN 0 |
+| 자동 복구 PASS 후 정상 재시도 | **NOTRUN**: 후반 실패 복구 FAIL 뒤 이 시나리오의 재시도는 중단 |
+| 조건부 공식 제거와 원래 정상 0.2.1 복원 | **PASS**: 실패 증거 저장 후 정확한 시험 제품 공식 제거 exit 0·설치 전 상태 동일, 원래 MSI 재설치 exit 0·원래 설정/기본값/로그인 시작 항목 동일·실행 프로세스 0 |
+
+초기 위자드 명령 오류 1639는 NOTRUN이고 transaction 취소의 callback 계측 오류 두 실행은 FAIL로 보존했다. 영향받은 시험 도구만 보완한 최종 실행의 PASS를 이전 FAIL에 소급 적용하지 않는다. 도구 집중 회귀 19 PASS는 실제 MSI 복구 PASS로 합산하지 않는다. 실제 명령·원시 로그·개별 판정·보안 상태·백업은 비공개 실행 근거에 보존한다.
+
+앞선 실제 PC 정상 lifecycle과 EXE/창 아이콘·X/Alt+F4 중 감시·같은 창 복원은 직접 확인 근거를 재사용한다. 트레이 아이콘 모양과 재실행 대기 화면은 USER_CONFIRMED다. 이전 native 집중 35 PASS와 unchanged core 57·review 8 PASS도 출처가 다른 재사용 근거이며 이번에 재실행·합산하지 않았다. 최종 23:01 KST에 실제 감시 폴더 12개·History 3개의 직하 메타데이터와 CompletionOrder 불변, 원래 production EXE/MSI 지문 및 정상 PackageCode를 확인했다. 업무파일 내용·하위 폴더 전체 바이트 검사와 완전 클린 OS·타 PC 설치는 NOTRUN이다.
+
+**정식 릴리즈 보류:** 준비만 막혔던 후반 실패 복구 항목은 이번 직접 실행에서 실제 FAIL로 바뀌었다. 공식 정리·정상 설치 복원은 자동 원상복귀 성공이 아니며, 근본 원인 분리와 제품 복구 수정·재검증이 남았다. 기존 0.1.0·초기 0.2.0 FAIL/NOTRUN과 공개 자산은 변경하지 않았다.
+
+## 2026-10-06 후반 실패의 원인 분리 대조
+
+- **normalFinalize FAIL:** 강제 InstallExecute 없는 deferred Type 1058/6501 시험에서 실제 cmd exit 1·MSI exit 1603·rollback ScriptType=2를 확인했다. 등록 상태 차이 18개·UNKNOWN 0이며 access denied(5)·owner 복원 오류 1307이 남았다.
+- **표준 msiexec /qn FAIL:** 같은 MSI에서도 실패 지점에 도달하고 같은 등록 상태 차이 18개·UNKNOWN 0이 남았다. 추가 InstallExecute나 Python API 호출만으로 실패를 설명하는 가설은 배제한다. 권한 문제의 근본 원인과 Windows 자체 결함 여부는 확정하지 않았다.
+- **권한 요청 후보 정적 대조 PASS / 후반 실패 대조 NOTRUN:** 기존 deferred 시험본과 table/schema·payload·CA·sequence는 동일하고 Summary PackageCode와 WordCount 10→2만 다르다. msiexec /passive의 실제 상승 권한 요청 뒤 credential request 0x800704C7·MSI exit 1602로 종료해 의도한 후반 실패에 도달하지 않았다. 원시 시험 판정의 FAIL(expectedFailureReached=false)을 보존하며 상태 차이 0·UNKNOWN 0을 복구 PASS로 바꾸지 않는다.
+- **원래 상태 복원 PASS:** 조건부 공식 제거 뒤 설치 전 상태와 같음을 확인했다. 원래 production 재설치 exit 0·실행 설정 네 값·설치 기본값·Run·경로·PackageCode·MSI/EXE 지문을 복원하고 앱 종료를 확인했다. 2026-10-06 00:00 KST 최종 감시 폴더 12개·History 3개의 직하 메타데이터와 CompletionOrder도 같다.
+
+각 시험본의 정확한 지문은 [최초 설치 기록](../../docs/delivery/download-version-manager-first-install-scope-20261005.md)의 최신 절에 고정한다. 원래 production은 불변이며 사용자 UAC 승인이 완료된 권한 대조와 해결 검증이 남았다. 기존 FAIL은 유지하고 정식 릴리즈를 보류한다. 원시 진단·사용자 경로·SID는 비공개 실행 근거에만 보존한다.
+
+## 2026-10-06 최종 production 수정과 실제 검증 완료
+
+같은 PC의 정확한 deferred 실패 MSI에서 Summary WordCount 10→2와 인간의 UAC 승인으로 등록 rollback이 차이 0·UNKNOWN 0으로 바뀌는 대조를 확인했다. 현재 사용자 설치를 유지하면서 Installer 상승 권한을 허용하는 Summary metadata를 정상 제작 과정에 반영하고 설치 버튼에 방패를 표시했다. 앱 EXE는 변경하지 않았다. 이 PC의 권한 경계 근거이며 Windows 자체 결함을 확정하지 않는다.
+
+최종 정상 MSI SHA-256은 `0feea2fc119bad780da9dcb57d2a0303ef0e2e0c6f6a20a746fd3ab3f86a0ef5`, PackageCode는 `{0EA40200-9B82-4D18-9DBE-5045742A195D}`다. 최종 시험 MSI `4c617ecfc94c091c5831181cc93a12ecdd6caabed3e3c83c12173aa798047c48`는 정상 MSI의 CAB·설정 DLL·기존 table/schema와 같고 deferred 실패 action·6501 sequence·별도 PackageCode만 추가했다. production EXE는 `3cddb6e185c7f1741cce6bb9b5b91f9afb3898a7a983598cfdc976e1be592abd`로 유지하며 원래 compile manifest를 보존했다.
+
+| 최종 실제 확인 | 판정 |
+|---|---|
+| 위자드 취소·권한 방패 | **PASS**: USER_CONFIRMED·1602·설치 실행 전 취소·상태 차이 0·UNKNOWN 0 |
+| transaction 중 취소 | **PASS**: UAC 사용자 승인, payload 복사 후 WriteRegistryValues 실행 단계·IDCANCEL·1602·rollback ScriptType=2·callback 오류 없음·상태 차이 0·UNKNOWN 0 |
+| 동등 payload 후반 실패 자동 복구 | **PASS**: 파일·등록·제품 게시 뒤 실제 cmd exit 1·1722/1603·rollback ScriptType=2, 제품 미등록·상태 차이 0·UNKNOWN 0. 즉시 판정 전에 제거·수동 정리 없음 |
+| 복구 후 정상 재설치 | **PASS**: 완료 0·제품 상태 5·0.2.1·per-user·정상 PackageCode·정확 EXE·기본값/Run, 실행 설정 네 값 미생성·앱 프로세스 0 |
+| 설치 앱 실행·트레이 종료 | **PASS**: 추가 인자 없는 등록 앱 실행, 0.2.1 대기 화면, 원래 사용자 medium 8192·elevated=false·Limited token. 종료 USER_CONFIRMED·전체 DVM 프로세스 0·실행 설정 불변 |
+| 정상 제거 | **PASS**: exit 0·제품 5→-1·전체 측정 상태가 설치 전 기준과 동일·UNKNOWN 0 |
+| 원래 설치 위치·사용자 설정 복원 | **PASS**: 정상 MSI 설치 0·runtime 네 값 guard 복원 0·22개 최종 확인 통과, 원래 설정/기본값/Run·정확 패키지·앱 종료·구 0.2.0 미등록 |
+
+초기 고정 DWORD 토큰 조회 전의 읽기 전용 진단 오류와 수정 전 소스는 보존했다. 클래스 18/20의 성공한 4-byte 조회로 최종 앱 token을 확인했으며 진단 오류를 앱 실행 실패로 세지 않는다. 시험 도구 --allow-uac의 기본 NONE/선택 NONE|UACONLY·CLI 전달 회귀 **7 PASS**와 기존 판정 회귀 **19 PASS**는 mock/순수 판정 결과이며 실제 MSI 시험으로 합산하지 않는다.
+
+최종 05:29 KST에 사용자 실행 설정·설치 기본값·Run을 원래 값으로 복원하고 앱 종료를 확인했다. 감시 폴더 12개·History 3개의 직하 메타데이터, CompletionOrder·기존 portable·compile manifest는 불변이다. 업무파일 내용·재귀 전체 바이트·클린 OS·다른 PC는 검사하지 않았다. 앞선 no-elevation FAIL·승인 미완료 1602의 후반 실패 NOTRUN·계측 오류는 그대로 보존하며 이번 PASS를 소급 적용하지 않는다.
+
+CI의 0.2.1 정상 MSI 경로/조건 세 곳과 YAML·자산 경로 검사는 PASS, 실제 CI 실행·공개 게시는 **NOTRUN**이다. 이번 실제 시험 파일과 미래 CI 재빌드 지문을 혼용하지 않는다. 현재 Windows 11 x64 한 PC의 확인 범위에서 관련 설치·실패 복구 요건을 충족했고 정식 릴리즈용 정상 MSI를 준비했다. 코드 서명은 없고 조직의 도입·상용 승인은 미결정이다. 원시 진단과 사용자 경로·SID는 비공개 실행 근거에만 보존한다.

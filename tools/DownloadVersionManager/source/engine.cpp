@@ -11,8 +11,8 @@
 
 namespace dvm {
 namespace {
-struct Error { std::wstring status; DWORD code; };
-[[noreturn]] void fail(const wchar_t* status, DWORD code = GetLastError()) { throw Error{status,code}; }
+struct Error { std::wstring status; DWORD code; bool readOnlyProtected; };
+[[noreturn]] void fail(const wchar_t* status, DWORD code = GetLastError(), bool readOnlyProtected = false) { throw Error{status,code,readOnlyProtected}; }
 struct Handle {
     HANDLE v = INVALID_HANDLE_VALUE;
     Handle() = default; explicit Handle(HANDLE h) : v(h) {}
@@ -82,7 +82,7 @@ bool sameSnapshot(const BY_HANDLE_FILE_INFORMATION& a,const BY_HANDLE_FILE_INFOR
 }
 void ordinary(const BY_HANDLE_FILE_INFORMATION& i, bool dir) {
     if (!!(i.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)!=dir || (i.dwFileAttributes&(FILE_ATTRIBUTE_REPARSE_POINT|FILE_ATTRIBUTE_OFFLINE|FILE_ATTRIBUTE_ENCRYPTED)) || (!dir && i.nNumberOfLinks!=1)) fail(L"unsupported_file",ERROR_NOT_SUPPORTED);
-    if (!dir && (i.dwFileAttributes&FILE_ATTRIBUTE_READONLY)) fail(L"permission_denied",ERROR_ACCESS_DENIED);
+    if (!dir && (i.dwFileAttributes&FILE_ATTRIBUTE_READONLY)) fail(L"permission_denied",ERROR_ACCESS_DENIED,true);
 }
 struct Parents {
     std::vector<Handle> leases; std::wstring path;
@@ -228,9 +228,38 @@ DWORD rename(HANDLE h,const std::wstring& destination) {
     memcpy(r->FileName,p.data(),bytes);
     return SetFileInformationByHandle(h,FileRenameInfo,r,static_cast<DWORD>(length)) ? ERROR_SUCCESS : GetLastError();
 }
-std::wstring timestamp() {
-    SYSTEMTIME t{}; GetLocalTime(&t); wchar_t s[32]{};
-    swprintf_s(s,L"%04u%02u%02u_%02u%02u%02u",t.wYear,t.wMonth,t.wDay,t.wHour,t.wMinute,t.wSecond); return s;
+std::wstring timestamp(HANDLE archived
+#ifdef DVM_TESTING
+    , const TestHooks& hooks
+#endif
+) {
+    // Read the object we will move, while its existing lease prevents replacement.
+    FILETIME writeTime{};
+#ifdef DVM_TESTING
+    if (hooks.fault==L"history_time_read") fail(L"file_info_failed",ERROR_READ_FAULT);
+#endif
+    if (!GetFileTime(archived,nullptr,nullptr,&writeTime)) fail(L"file_info_failed");
+#ifdef DVM_TESTING
+    if (hooks.fault==L"history_time_invalid") writeTime={0,0x80000000};
+#endif
+    SYSTEMTIME utc{},local{};
+    if (!FileTimeToSystemTime(&writeTime,&utc)) fail(L"file_info_failed");
+    DYNAMIC_TIME_ZONE_INFORMATION zone{};
+#ifdef DVM_TESTING
+    if (hooks.fault==L"history_timezone") fail(L"file_info_failed",ERROR_INVALID_DATA);
+    if (hooks.timeZone) zone=*hooks.timeZone; else
+#endif
+    if (GetDynamicTimeZoneInformation(&zone)==TIME_ZONE_ID_INVALID) fail(L"file_info_failed");
+#ifdef DVM_TESTING
+    if (hooks.fault==L"history_time_convert") fail(L"file_info_failed",ERROR_INVALID_PARAMETER);
+#endif
+    if (!SystemTimeToTzSpecificLocalTimeEx(&zone,&utc,&local)) fail(L"file_info_failed");
+    wchar_t text[32]{};
+    swprintf_s(text,L"%04u%02u%02u_%02u%02u%02u",local.wYear,local.wMonth,local.wDay,local.wHour,local.wMinute,local.wSecond);
+#ifdef DVM_TESTING
+    if (!hooks.timestamp.empty()) return hooks.timestamp;
+#endif
+    return text;
 }
 std::wstring randomName() {
     std::array<unsigned char,16> b{};
@@ -248,10 +277,17 @@ Result process(const Request& request
     try {
         component(request.logicalName); const auto input=canonical(request.newPath);
         r.oldPath.reserve(32768); r.newPath.reserve(32768); r.targetPath.reserve(32768);
-        const auto parent=input.substr(0,(std::max)(size_t(3),input.rfind(L'\\'))); Parents parents(parent);
+        const auto parent=input.substr(0,(std::max)(size_t(3),input.rfind(L'\\')));
+#ifdef DVM_TESTING
+        if (hooks.fault==L"parent_open") fail(L"permission_denied",ERROR_ACCESS_DENIED);
+#endif
+        Parents parents(parent);
         const auto newer=join(parents.path,input.substr(input.rfind(L'\\')+1));
         const auto target=join(parents.path,request.logicalName); r.newPath=newer; r.targetPath=target;
         Mutex lock(L"Global\\Workspace.DownloadVersionManager.v1."+targetKey(target));
+#ifdef DVM_TESTING
+        if (hooks.fault==L"file_open") fail(L"permission_denied",ERROR_ACCESS_DENIED);
+#endif
         auto n=file(newer,true);
         if (!equal(finalPath(n.v),newer)) fail(L"path_changed",ERROR_INVALID_NAME);
         const auto ni=info(n.v);
@@ -294,6 +330,12 @@ Result process(const Request& request
             if (!SetFileInformationByHandle(n.v,FileDispositionInfo,&disp,sizeof(disp))) fail(L"permission_denied");
             r.ok=true; r.changed=true; r.status=L"superseded_same_content"; r.newPath=target; return r;
         }
+        std::wstring archiveTimestamp;
+        if (old && !same) archiveTimestamp=timestamp(stale ? n.v : old->v
+#ifdef DVM_TESTING
+            , hooks
+#endif
+        ); // Validate the time before preparing state, creating History, or moving names.
         if (!stale && order) {
 #ifdef DVM_TESTING
             if (hooks.fault==L"order_write") fail(L"order_state_unavailable",ERROR_ACCESS_DENIED);
@@ -309,15 +351,14 @@ Result process(const Request& request
             if (same) dest=join(parents.path,randomName());
             else {
                 const auto hp=join(parents.path,L"_history");
+#ifdef DVM_TESTING
+                if (hooks.fault==L"history_create") fail(L"permission_denied",ERROR_ACCESS_DENIED);
+#endif
                 if (!CreateDirectoryW(native(hp).c_str(),nullptr) && GetLastError()!=ERROR_ALREADY_EXISTS) fail(L"permission_denied");
                 historyLease=std::make_unique<Parents>(hp);
                 const auto dot=request.logicalName.rfind(L'.');
                 const auto split=dot==std::wstring::npos || dot==0 ? request.logicalName.size() : dot;
-                auto ts=timestamp();
-#ifdef DVM_TESTING
-                if (!hooks.timestamp.empty()) ts=hooks.timestamp;
-#endif
-                const auto stem=request.logicalName.substr(0,split)+L"_"+ts;
+                const auto stem=request.logicalName.substr(0,split)+L"_"+archiveTimestamp;
                 const auto ext=request.logicalName.substr(split);
                 for (unsigned i=0;i<10000;++i) {
                     wchar_t suffix[16]{}; if (i) swprintf_s(suffix,L"_%03u",i);
@@ -378,7 +419,7 @@ Result process(const Request& request
             else r.oldPath.clear();
         }
         return r;
-    } catch (const Error& e) { r.status=e.status; r.error=e.code; }
+    } catch (const Error& e) { r.status=e.status; r.error=e.code; r.readOnlyProtected=e.readOnlyProtected; }
       catch (...) { r.status=L"internal_error"; r.error=ERROR_GEN_FAILURE; }
     return r;
 }
