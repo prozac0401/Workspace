@@ -8,7 +8,7 @@
 
 ## 프로그램 고르기
 
-기존 도구의 공개 배포 목록은 **2026년 10월 5일**에 확인했습니다. 오피스 자동화 도구 안내는 **2026년 10월 6일의 0.3.1**을 기준으로 추가했습니다. 기존 도구의 설치 파일에는 제작자의 전자 서명이 없습니다. 오피스 자동화 도구는 자체 서명을 사용합니다. 설치 전에 사용할 PC와 알려진 제한을 확인하세요.
+기존 도구의 공개 배포 목록은 **2026년 10월 5일**에 확인했습니다. 다운로드 이름 유지는 **2026년 10월 10일**에 확인한 **0.2.1 정식판**으로 안내를 갱신했습니다. 오피스 자동화 도구 안내는 **2026년 10월 6일의 0.3.1**을 기준으로 추가했습니다. 기존 도구의 설치 파일에는 제작자의 전자 서명이 없습니다. 오피스 자동화 도구는 자체 서명을 사용합니다. 설치 전에 사용할 PC와 알려진 제한을 확인하세요.
 
 | 하고 싶은 일 | 최신 안내 | 공개 파일 |
 |---|---|---|
@@ -19,14 +19,14 @@
 | 숨긴 행을 건너뛰어 한 열에 값 넣기 | [보이는 칸 붙여넣기](docs/tools/visible-cells-paste/index.md) | [배포 목록에서 도구 이름으로 찾기](https://github.com/prozac0401/Workspace/releases) |
 | 복사한 그림을 파일로 저장하기 | [그림 복사·저장 0.2.1](docs/tools/image-copy-save/guide.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) |
 | 보던 문서나 웹페이지 다시 열기 | [업무 책갈피 0.2.8](docs/tools/bookmark/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/BookMark/releases/tag/v0.2.8) |
-| 다시 받은 파일에 원래 이름 주기 | [다운로드 이름 유지 0.2.0 시험용](docs/tools/download-version-manager/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0) |
+| 다시 받은 파일에 원래 이름 주기 | [다운로드 이름 유지 0.2.1 정식판](docs/tools/download-version-manager/index.md) | [설치 파일과 배포 안내](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) |
 | Excel 파일 합치기·나누기와 양식 문서 만들기 | [오피스 자동화 도구 0.3.1](docs/tools/office-automation/index.md) | [단일 EXE](https://github.com/prozac0401/Workspace/releases/download/office-automation-tools-v0.3.1/OfficeAutomationTools.exe) · [ZIP·배포 안내](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1) |
 
 오피스 자동화 도구(Office Automation Tools)는 MS Office Excel·PowerPoint(PPT)·Word용 도구입니다. Python 설치 없이 EXE를 바로 실행할 수 있습니다. [받기·사용 안내](docs/tools/office-automation/index.md)에서 원본 행 확인, 분석, 실행, 결과 확인과 세 기능의 상세 방법을 설명합니다.
 
 보이는 칸 붙여넣기의 확인한 최신 배포 파일은 0.1.2입니다. 설치 안내는 기존 요청에 따라 배포 목록에서 파일을 고르는 방식으로 제공합니다.
 
-시험용 두 도구는 정식 배포 전 단계입니다. 선택범위 내보내기는 32비트 Excel 등 확인하지 못한 환경이 남아 있습니다. 다운로드 이름 유지는 설치 실패 뒤 설치 기록이 남아 다시 설치하지 못할 수 있어 일상 업무 사용을 아직 권하지 않습니다.
+선택범위 내보내기는 정식 배포 전 단계인 시험용 도구이며, 32비트 Excel 등 확인하지 못한 환경이 남아 있습니다.
 
 FolderState 0.1.3과 업무 책갈피 0.2.8은 이전에 배포한 같은 파일을 정식 배포로 표시한 것입니다. 이 표시 변경 때문에 다시 설치할 필요는 없습니다. 회사 사용 승인과 모든 PC에서의 동작 확인은 별개입니다.
 
