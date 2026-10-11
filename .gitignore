@@ -19,3 +19,6 @@ __pycache__/
 *.pfx
 *.p12
 .env
+
+# Calendar data comes from the pinned calendar-data branch, never source main.
+/docs/assets/calendar/data/calendar.json

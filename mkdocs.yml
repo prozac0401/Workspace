@@ -4,6 +4,18 @@ site_url: https://prozac0401.github.io/Workspace/
 exclude_docs: |
   **
   !/index.md
+  !/calendar/index.md
+  !/assets/calendar/boot.js
+  !/assets/calendar/app.mjs
+  !/assets/calendar/calendar.css
+  !/assets/calendar/date-core.mjs
+  !/assets/calendar/calendar-model.mjs
+  !/assets/calendar/holiday-client.mjs
+  !/assets/calendar/contract.mjs
+  !/assets/calendar/preview-renderer.mjs
+  !/assets/calendar/xlsx-exporter.mjs
+  !/assets/calendar/zip.mjs
+  !/assets/calendar/data/calendar.json
   !/principles.md
   !/getting-started.md
   !/quick-reference.md
@@ -306,6 +318,7 @@ plugins:
       separator: '[\s\-·/]+'
 hooks:
   - docs/hooks/folderstate_redirects.py
+  - docs/hooks/calendar_data.py
 markdown_extensions:
   - admonition
   - attr_list
@@ -319,32 +332,37 @@ markdown_extensions:
       custom_checkbox: true
 extra_css:
   - assets/extra.css
+  - assets/calendar/calendar.css
+extra_javascript:
+  - assets/calendar/boot.js
 nav:
-  - 시작:
-      - 안내 첫 화면: index.md
-      - 지금 할 일 찾기: quick-reference.md
-      - 자료 정리의 10가지 습관: principles.md
-      - 업무 하나로 시작하기: getting-started.md
-      - 교육 업무에 도구 써 보기: education-operations.md
-      - 회사에서 정할 항목: policies/decisions.md
-  - 자료와 업무 정리:
-      - 자료를 둘 곳 정하기: policies/workspace.md
-      - 반복 업무 시작과 일정 관리: policies/kits.md
-      - 파일 이름과 메일 정리: policies/files-email.md
-      - 끝난 업무 보관과 자료 보호: policies/archive-security.md
-  - 프로그램 받기:
-      - FolderState 설치·사용: tools/folderstate/index.md
-      - Excel 명단 비교 설치·사용: tools/excel-list-compare/index.md
-      - 업무 책갈피 설치·사용: tools/bookmark/index.md
-      - 선택범위 내보내기 설치·사용: tools/excel-selection-export/index.md
-      - 탐색기 파일 목록을 Excel로: tools/file-list-to-excel/index.md
-      - 보이는 칸 붙여넣기 설치·사용: tools/visible-cells-paste/index.md
-      - 그림 복사·저장 설치·사용: tools/image-copy-save/guide.md
-      - 다운로드 이름 유지 설치·사용: tools/download-version-manager/index.md
-      - 오피스 자동화 도구 받기·사용: tools/office-automation/index.md
-  - 불편할 때 더 살펴보기:
-      - 반복되는 불편 줄이기: policies/work-efficiency.md
-      - 일을 이어서 하고 다른 사람에게 넘기기: policies/folder-workflow.md
+  - Workspace:
+      - 시작:
+          - 안내 첫 화면: index.md
+          - 지금 할 일 찾기: quick-reference.md
+          - 자료 정리의 10가지 습관: principles.md
+          - 업무 하나로 시작하기: getting-started.md
+          - 교육 업무에 도구 써 보기: education-operations.md
+          - 회사에서 정할 항목: policies/decisions.md
+      - 자료와 업무 정리:
+          - 자료를 둘 곳 정하기: policies/workspace.md
+          - 반복 업무 시작과 일정 관리: policies/kits.md
+          - 파일 이름과 메일 정리: policies/files-email.md
+          - 끝난 업무 보관과 자료 보호: policies/archive-security.md
+      - 프로그램 받기:
+          - FolderState 설치·사용: tools/folderstate/index.md
+          - Excel 명단 비교 설치·사용: tools/excel-list-compare/index.md
+          - 업무 책갈피 설치·사용: tools/bookmark/index.md
+          - 선택범위 내보내기 설치·사용: tools/excel-selection-export/index.md
+          - 탐색기 파일 목록을 Excel로: tools/file-list-to-excel/index.md
+          - 보이는 칸 붙여넣기 설치·사용: tools/visible-cells-paste/index.md
+          - 그림 복사·저장 설치·사용: tools/image-copy-save/guide.md
+          - 다운로드 이름 유지 설치·사용: tools/download-version-manager/index.md
+          - 오피스 자동화 도구 받기·사용: tools/office-automation/index.md
+      - 불편할 때 더 살펴보기:
+          - 반복되는 불편 줄이기: policies/work-efficiency.md
+          - 일을 이어서 하고 다른 사람에게 넘기기: policies/folder-workflow.md
+  - 달력: calendar/index.md
 validation:
   nav:
     omitted_files: info

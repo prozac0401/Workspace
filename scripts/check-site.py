@@ -3,12 +3,16 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 import json
+import argparse
+import subprocess
+import yaml
 import re
 import sys
 import xml.etree.ElementTree as ET
 
 # Keep this explicit: a new page requires a publication-scope review.
 public_routes = {
+    'calendar/',
     '', 'getting-started/', 'quick-reference/', 'principles/', 'education-operations/',
     'policies/workspace/', 'policies/kits/', 'policies/files-email/',
     'policies/archive-security/', 'policies/decisions/', 'policies/folder-workflow/',
@@ -27,6 +31,12 @@ public_redirects = {
     'tools/folderstate/troubleshooting/': '../#troubleshooting',
 }
 public_assets = {
+    'assets/calendar/boot.js', 'assets/calendar/app.mjs',
+    'assets/calendar/calendar.css', 'assets/calendar/date-core.mjs',
+    'assets/calendar/calendar-model.mjs', 'assets/calendar/holiday-client.mjs',
+    'assets/calendar/contract.mjs', 'assets/calendar/preview-renderer.mjs',
+    'assets/calendar/xlsx-exporter.mjs', 'assets/calendar/zip.mjs',
+    'assets/calendar/data/calendar.json',
     'assets/extra.css', 'assets/folderstate.png',
     'assets/tool-guides/bookmark-guide-apps-mobile.svg',
     'assets/tool-guides/bookmark-guide-apps.svg',
@@ -274,8 +284,16 @@ public_assets = {
     'assets/education-examples/state.png',
 }
 
-site = Path(sys.argv[1] if len(sys.argv) > 1 else 'site').resolve()
+arguments = argparse.ArgumentParser()
+arguments.add_argument('site', nargs='?', default='site')
+arguments.add_argument('--site-url')
+arguments.add_argument('--production', action='store_true')
+options = arguments.parse_args()
+site = Path(options.site).resolve()
 docs = Path(__file__).resolve().parent.parent / 'docs'
+config = yaml.safe_load((docs.parent / 'mkdocs.yml').read_text(encoding='utf-8'))
+site_url = urlsplit(options.site_url or config['site_url'])
+base_path = site_url.path.rstrip('/') + '/'
 class Links(HTMLParser):
     def __init__(self):
         super().__init__(); self.links = []; self.ids = set()
@@ -332,9 +350,9 @@ for route, destination in public_redirects.items():
 
 def route_from_url(url):
     parsed = urlsplit(url)
-    if parsed.netloc and parsed.netloc != 'prozac0401.github.io': return None
+    if parsed.netloc and parsed.netloc != site_url.netloc: return None
     route = unquote(parsed.path)
-    if route.startswith('/Workspace/'): route = route[len('/Workspace/'):]
+    if route.startswith(base_path): route = route[len(base_path):]
     elif route.startswith('/'): return None
     if route.endswith('index.html'): route = route[:-len('index.html')]
     return route
@@ -373,11 +391,18 @@ for page in pages:
         parsed = urlsplit(link)
         if parsed.scheme or parsed.netloc or not parsed.path: continue
         urlpath = unquote(parsed.path)
-        if urlpath.startswith('/Workspace/'): target = site / urlpath[len('/Workspace/'):]
+        if urlpath.startswith(base_path): target = site / urlpath[len(base_path):]
         elif urlpath.startswith('/'): target = site / urlpath.lstrip('/')
         else: target = page.parent / urlpath
         if target.is_dir(): target = target / 'index.html'
         if not target.exists(): errors.append(f'{page.relative_to(site)} -> {link}')
+calendar_json = site / 'assets/calendar/data/calendar.json'
+if calendar_json.is_file():
+    result = subprocess.run(['node', str(docs.parent / 'tools/calendar/validate-file.mjs'),
+                             str(calendar_json), *(['--production'] if options.production else [])],
+                            capture_output=True, text=True)
+    if result.returncode:
+        errors.append('Calendar JSON does not satisfy the reviewed public contract')
 if errors: raise SystemExit('\n'.join(errors))
 print(f'PASS {len(public_routes)} public pages + {len(public_redirects)} legacy redirects + 404; '
       'search and sitemap contain only public routes; '
