@@ -21,7 +21,15 @@ export function renderPreview(container, model) {
         const td = document.createElement('td'); td.className = day.styleToken;
         td.dataset.cell = `${String.fromCharCode(64 + day.excelColumn)}${day.excelRow + band}`;
         if (band === 0 && day.date) {
-          td.textContent = day.displayText; td.dataset.date = day.date; td.dataset.style = day.styleToken;
+          if (day.lunar) {
+            for (const run of day.displayRuns) {
+              const span = document.createElement('span');
+              span.className = `calendar-${run.kind}`; span.dataset.kind = run.kind;
+              span.textContent = run.text; span.style.fontSize = `${run.fontSize}pt`; span.style.color = run.color;
+              td.append(span);
+            }
+          } else td.textContent = day.displayText;
+          td.dataset.date = day.date; td.dataset.style = day.styleToken;
           if (day.lunar) td.title = `양력 ${day.date} · 음력 ${day.lunar.year}년 ${day.lunar.isLeapMonth ? '윤' : ''}${day.lunar.month}월 ${day.lunar.day}일`;
         }
         tr.append(td);

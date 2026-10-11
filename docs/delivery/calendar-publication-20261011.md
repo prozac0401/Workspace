@@ -94,3 +94,17 @@ schemaVersion2의 지원/조회 대상은117개 연도다. 올해·다음 해를
 실제 Edge 최종4그룹은 음력defaultoff/on/off, 1983/2050 허용·2051해제/차단·2099양력 유지, 제목/요일높이·사용자서식·테마다크/라이트색상 보존을 확인했다. `artifacts/calendar/lunar/local-2026-10-11T04-03-32-650Z/results.json`에 PASS/pageErrors0이며 실제공식2027+음력+사용자서식 XLSX의 독립파서도 **미리보기1,764셀/365날짜/1,095빈작성셀 전수 PASS**다. 최신`browser-xlsx-inspection.json`으로 앞선 custom전셀미실행 제한을 해소했다. 처음 예상한2027설날2/6은실제기준2/7과달라하네스기대값을수정했고 2/6=12.30,2/7=01.01둘다검증했다. 첫 실패는별도결과폴더에보존했다.
 
 음력on fixture에도 `powershell -NoProfile -File tools/calendar/tests/excel-check.ps1 -OutputDirectory artifacts/calendar/lunar/fixture`를 실행해 Excel16.0/build20430 열기·A5인쇄·편집저장재열기·PDF출력 PASS다. PDF12페이지가각월제목으로시작하고1월1일의`1 (11.24)` 표시·빈작성3행을텍스트/좌표검사와PNG육안으로확인했다. 실제종이출력과LibreOffice는NOT RUN이다. 개인원본파일·원래checkout사용자수정·Secret은변경하지않았다.
+
+## 음력 부분서식 후속 요청
+
+앞선 작업은 PR #27·main `426ab0297bc2758fae453a593fdc71bd85511d36`·배포 38110670958에서 완료됐으며 소스·데이터·실제 배포 검사는 `artifacts/calendar/customization-publication-result.json`에 보존했다. 사용자는 이후 음력을 양력보다 작은 회색으로 표시하고 크기·색상을 독립 설정하며 미리보기와 엑셀을 일치시키도록 요청했다.
+
+이번 범위는 기본 7pt/#777777, 음력 전용 크기 6~16pt와 색상 필드, 공통 불변 `displayRuns`와 OOXML 부분 서식이다. 양력·휴일 색, 전체 문자열·입력 안전·작성 빈 3행·음력 해제·정적 자료·인쇄 좌표는 유지한다. 작업은 깨끗한 관리 worktree에서 main 426ab029 기반 `codex/calendar-lunar-style`로 격리하며 원래 D:/Github_REPOS/Workspace의 사용자 수정은 변경하지 않는다.
+
+완료 근거는 관련 모델·부분 서식·경계 단위시험, 실제 브라우저의 기본·custom·off·reset·다크 모드 일치와 다운로드, 독립 ZIP/XML 파서의 모든 date run 크기·색상 및 빈 작성셀, 실제 Excel Characters 부분 서식과 저장·재열기다. 기존 날짜 변환·공휴일 수집·전체 인쇄 PDF·설치시험은 재사용하고 반복하지 않는다. strict 사이트 빌드·공개 링크와 커밋 CI·배포 후 같은 범위의 검사를 수행한다. 실제 결과·미실행과 source/data SHA는 PR 및 `artifacts/calendar/lunar-style/`에 기록한다.
+
+로컬 검증 기준은 위 main HEAD와 이번 변경이다. `node --test tools/calendar/tests/core.test.mjs`는 **19/19 PASS**다. `CALENDAR_DATA_FILE=artifacts/calendar/first-official-dataset.json`, `CALENDAR_PRODUCTION=1`로 `python -m mkdocs build --strict`와 `python scripts/check-site.py site --production`을 실행해 **PASS**다. 실제 공개 JSON의 기존 수집 시각과 SHA256 `eadb9a96020bebe8b55ef36f7b389f7a356bb09869e090041e326fe48e22c146`을 사용했다.
+
+`CALENDAR_LUNAR_STYLE_READY=1 CALENDAR_LUNAR_STYLE_TARGET=local node artifacts/calendar/lunar-style/style-check.mjs`의 실제 Edge 155 결과는 **3그룹 PASS**, pageErrors 0이다. 기본 음력 7pt/#777777, 사용자 음력 12pt/#2A6F7B, 해제·기본값 복원·다운로드 무효화·다크 모드 보존을 확인했다. 각 variant에 `python tools/calendar/tests/inspect-browser-export.py --base <variant-directory> --years`를 실행한 독립 검사도 **1,764셀·365일·1,095개 빈 작성셀 PASS**다. ON은 365개 부분 서식 날짜 셀, OFF는 0개이며 양력·휴일 서식을 보존한다. 결과와 실제 공식 자료 다운로드는 `artifacts/calendar/lunar-style/local-2026-10-11T04-29-27-084Z/`에 있다. 첫 파서 실행은 CSS fallback 목록 전체를 단일 XLSX 글꼴명과 비교한 검사기 오류로 실패했다. 첫 글꼴명을 비교하도록 고친 뒤 동일 캡처로 재검사했으며 첫 실패를 `first-parser-failure.json`에 보존했다.
+
+fixture 기본 10/7pt와 큰 음력 8/16pt 파일은 `python tools/calendar/tests/inspect-xlsx.py <sample.xlsx>`로 모든 rich text·빈 작성셀 검사를 통과했다. `powershell -NoProfile -ExecutionPolicy Bypass -File artifacts/calendar/lunar-style/excel-runs-check.ps1`은 실제 Excel 16.0/build 20430에서 두 fixture의 각 365일·739개 텍스트 조각의 글꼴·크기·색상을 전수 확인했다. 작성칸 편집·저장·재열기 후 같은 전수 검사도 **PASS**다. 결과는 `artifacts/calendar/lunar-style/excel-runs-results.json`이다. 이 fixture는 운영 자료로 배포하지 않는다. 이번 변경의 전체 PDF·실물 인쇄·LibreOffice는 **NOT RUN**이며 기존 인쇄 검증을 재사용했다. 인쇄 설정은 바꾸지 않았다.

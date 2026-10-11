@@ -59,6 +59,38 @@ def check_fill(cell, key):
     assert cell.fill.fgColor.type == 'rgb' and cell.fill.fgColor.rgb == argb(formatting[key]), (cell.coordinate, cell.fill.fgColor)
 
 
+
+def check_display_runs(element, day):
+    """Check the model's segments and their actual OOXML character styles."""
+    runs = day['displayRuns']
+    expected = [{'kind': 'solar', 'text': str(day['dayNumber']),
+                 'fontSize': formatting['fontSize'], 'color': '#' + colors[day['styleToken']][2:]}]
+    if model['config'].get('showLunar', False):
+        expected.append({'kind': 'lunar', 'text': ' (' + day['lunar']['text'] + ')',
+                         'fontSize': formatting['lunarFontSize'], 'color': formatting['lunarColor']})
+    if '\n' in day['displayText']:
+        expected.append({'kind': 'holidays', 'text': '\n' + day['displayText'].split('\n', 1)[1],
+                         'fontSize': formatting['fontSize'], 'color': '#' + colors[day['styleToken']][2:]})
+    assert runs == expected, (day['date'], runs, expected)
+    assert ''.join(run['text'] for run in runs) == day['displayText']
+    actual = element.findall('s:is/s:r', ns)
+    if not model['config'].get('showLunar', False):
+        assert actual == [], (day['date'], 'Lunar-off cell must remain a plain string')
+        assert element.find('s:is/s:t', ns) is not None
+        return
+    assert element.find('s:is/s:t', ns) is None
+    assert len(actual) == len(runs), (day['date'], len(actual), len(runs))
+    for node, expected in zip(actual, runs):
+        text = node.find('s:t', ns)
+        assert text is not None and text.attrib.get('{http://www.w3.org/XML/1998/namespace}space') == 'preserve'
+        decoded = re.sub(r'_x([0-9a-fA-F]{4})_', lambda match: chr(int(match[1], 16)), text.text or '')
+        assert decoded == expected['text'], (day['date'], expected['kind'], decoded, expected['text'])
+        properties = node.find('s:rPr', ns)
+        assert properties is not None
+        assert properties.find('s:rFont', ns).attrib['val'] == formatting['fontFamily']
+        assert float(properties.find('s:sz', ns).attrib['val']) == expected['fontSize']
+        assert properties.find('s:color', ns).attrib == {'rgb': argb(expected['color'])}
+
 dates = {}
 for month in model['months']:
     for day in month['slots']:
@@ -138,6 +170,7 @@ with zipfile.ZipFile(path) as z:
                 else:
                     assert day.get('lunar') is None
                     assert day['displayText'].split('\n')[0] == str(number)
+                check_display_runs(cells[cell.coordinate], day)
                 assert cell.data_type == 's', (iso, cell.data_type)
                 check_font(cell, colors[day['styleToken']])
                 assert cell.alignment.wrapText and cell.alignment.vertical == 'top'
@@ -181,6 +214,6 @@ with zipfile.ZipFile(path) as z:
 report = {'status': 'PASS', 'engine': 'openpyxl 3.1.5 + independent Python calendar + ZIP/XML (not Excel)',
           'year': year, 'dates': date_count, 'independentBlankCells': blanks, 'sheets': 1, 'months': 12,
           'columns': 7, 'titleMerges': 12, 'hiddenEmptyLeadingRows': 4, 'metadataLocation': 'docProps/core.xml',
-          'showLunar': model['config'].get('showLunar', False), 'formatting': formatting, 'manualPageBreaks': 11, 'formulas': 0, 'datasetKind': 'fixture'}
+          'showLunar': model['config'].get('showLunar', False), 'richTextDateCells': date_count if model['config'].get('showLunar', False) else 0, 'formatting': formatting, 'manualPageBreaks': 11, 'formulas': 0, 'datasetKind': 'fixture'}
 path.with_name(f'inspection_{year}.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 print(json.dumps(report, ensure_ascii=False))

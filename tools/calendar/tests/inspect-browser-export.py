@@ -30,6 +30,47 @@ ns = {'s': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
       'rels': 'http://schemas.openxmlformats.org/package/2006/relationships',
       'ct': 'http://schemas.openxmlformats.org/package/2006/content-types'}
 
+
+def check_display_runs(element, item, number, formatting, show_lunar, date_color):
+    """Compare displayed segments and independent OOXML rich-text formatting."""
+    actual = element.findall('s:is/s:r', ns)
+    if not show_lunar:
+        assert actual == [], (item['cell'], 'Lunar-off cell must remain a plain string')
+        assert element.find('s:is/s:t', ns) is not None
+    captured = item.get('runs')
+    if captured is None and not show_lunar:
+        return  # Earlier solar-only captures did not record individual spans.
+    assert formatting and captured is not None, 'Lunar rich-text inspection requires matching formatting and browser runs'
+    first_line, separator, holidays = item['text'].partition('\n')
+    expected = [{'kind': 'solar', 'text': str(number), 'fontSize': formatting['fontSize'], 'color': date_color}]
+    if show_lunar:
+        expected.append({'kind': 'lunar', 'text': first_line[len(str(number)):],
+                         'fontSize': formatting['lunarFontSize'], 'color': 'FF' + formatting['lunarColor'].removeprefix('#').upper()})
+    if separator:
+        expected.append({'kind': 'holidays', 'text': '\n' + holidays, 'fontSize': formatting['fontSize'], 'color': date_color})
+    assert len(captured) == len(expected), (item['cell'], captured, expected)
+    for shown, wanted in zip(captured, expected):
+        assert shown['kind'] == wanted['kind'] and shown['text'] == wanted['text'], (item['cell'], shown, wanted)
+        assert abs(float(shown['fontSize']) - wanted['fontSize']) < 0.01, (item['cell'], shown)
+        assert 'FF' + shown['color'].removeprefix('#').upper() == wanted['color'], (item['cell'], shown)
+        primary_family = shown['fontFamily'].split(',', 1)[0].strip().strip("\"'")
+        assert primary_family == formatting['fontFamily'], (item['cell'], shown)
+    assert ''.join(run['text'] for run in captured) == item['text']
+    if not show_lunar:
+        return
+    assert element.find('s:is/s:t', ns) is None
+    assert len(actual) == len(expected), (item['cell'], len(actual), len(expected))
+    for node, wanted in zip(actual, expected):
+        text = node.find('s:t', ns)
+        assert text is not None and text.attrib.get('{http://www.w3.org/XML/1998/namespace}space') == 'preserve'
+        decoded = re.sub(r'_x([0-9a-fA-F]{4})_', lambda match: chr(int(match[1], 16)), text.text or '')
+        assert decoded == wanted['text'], (item['cell'], decoded, wanted)
+        properties = node.find('s:rPr', ns)
+        assert properties is not None
+        assert properties.find('s:rFont', ns).attrib['val'] == formatting['fontFamily']
+        assert float(properties.find('s:sz', ns).attrib['val']) == wanted['fontSize']
+        assert properties.find('s:color', ns).attrib == {'rgb': wanted['color']}
+
 targets = [(year, '') for year in args.years]
 custom_path = base / 'custom-formatting.json'
 custom_preview_path = base / 'preview-cells-2027-custom.json'
@@ -53,8 +94,9 @@ for year, variant in targets:
     custom = json.loads(custom_path.read_text(encoding='utf-8')) if variant else None
     formatting = custom['formatting'] if custom else None
     if formatting:
-        for key in ('fontSize', 'titleSize', 'writingRowHeight'):
-            formatting[key] = int(formatting[key])
+        for key in ('fontSize', 'titleSize', 'writingRowHeight', 'lunarFontSize'):
+            if key in formatting:
+                formatting[key] = int(formatting[key])
         argb = lambda color: 'FF' + color.removeprefix('#').upper()
         colors = {token: argb(formatting[key]) for token, key in {
             'black': 'textColor', 'red': 'holidayColor', 'blue': 'saturdayColor',
@@ -159,6 +201,7 @@ for year, variant in targets:
                         # Decode SpreadsheetML's escaped literal sequences once, independently of the writer.
                         actual_text = re.sub(r'_x([0-9a-fA-F]{4})_', lambda match: chr(int(match[1], 16)), actual.value)
                         assert actual_text == item['text'], (year, ref, actual_text, item['text'])
+                        check_display_runs(indexed[ref], item, number, formatting, show_lunar, colors[item['style']] if formatting else None)
                         first_line = item['text'].split('\n')[0]
                         if show_lunar:
                             assert re.fullmatch(str(number) + r' \((0[1-9]|1[0-2])\.(0[1-9]|[12]\d|30)\)', first_line), (year, ref, first_line)
@@ -166,6 +209,7 @@ for year, variant in targets:
                             assert first_line == str(number)
                     else:
                         assert actual.value is None and item['text'] == '', (year, ref)
+                        assert not item.get('runs'), (year, ref, 'Blank preview cell contains text runs')
                         assert ref not in ws.merged_cells
                         assert len(indexed[ref]) == 0 and 't' not in indexed[ref].attrib, (year, ref, 'blank contains XML value/formula/string')
                         if band and real_date:
@@ -184,7 +228,7 @@ for year, variant in targets:
     reports.append({'year': year, 'variant': variant or 'default', 'filename': path.name, 'result': 'PASS', 'sheet': ws.title, 'previewCells': len(cells),
                     'uniqueDates': len(seen_dates), 'emptyWritingCells': blank_count, 'mode': mode,
                     'titleMerges': 12, 'hiddenEmptyLeadingRows': 4, 'metadataLocation': 'docProps/core.xml',
-                    'showLunar': show_lunar, 'formatting': formatting, 'fixtureContext': run.get('fixture'), 'engine': 'openpyxl + Python calendar + ZIP/XML; not native Excel'})
+                    'showLunar': show_lunar, 'richTextDateCells': len(seen_dates) if show_lunar else 0, 'formatting': formatting, 'fixtureContext': run.get('fixture'), 'engine': 'openpyxl + Python calendar + ZIP/XML; not native Excel'})
 
 if custom_path.exists() and not custom_preview_path.exists():
     reports.append({'year': 2027, 'variant': 'custom', 'result': 'NOT RUN',
