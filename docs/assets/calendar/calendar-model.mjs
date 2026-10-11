@@ -1,5 +1,5 @@
 import { yearLayout, validDate, yearNumber } from './date-core.mjs';
-import { TTL, MAX_STALE } from './contract.mjs';
+import { TTL, MAX_STALE, FRESH_DAYS, MAX_DAYS } from './contract.mjs';
 export const LIMITATION = '공식 공휴일은 추가·변경될 수 있습니다. 내려받은 파일은 자동 갱신되지 않습니다.';
 export const LEGEND = '빨강: 일요일·공식 휴일 / 파랑: 토요일 / 보라: 수동 휴일';
 export function normalizeName(value) {
@@ -43,8 +43,8 @@ export function buildCalendar({ year: inputYear, snapshot = null, manual = [], m
   if (mode !== 'manual' && (!snapshot || snapshot.year !== year || !snapshot.complete || !['ready', 'stale'].includes(snapshot.status) || snapshot.status !== mode || !Array.isArray(snapshot.monthResults) || snapshot.monthResults.length !== 12 || new Set(snapshot.monthResults.map(x => x.month)).size !== 12 || snapshot.monthResults.some(x => x.status !== 'success' || x.month < 1 || x.month > 12))) throw new Error('완전한 연간 공휴일 자료가 필요합니다.');
   if (mode !== 'manual') {
     const age = Number(now) - Date.parse(snapshot.lastSuccessfulFetchAt ?? snapshot.fetchedAt);
-    if (!Number.isFinite(age) || age < -5 * 60 * 1000 || age > MAX_STALE) throw new Error('공식 자료의 수집 시각이 잘못되었거나 사용 상한 30일을 지났습니다.');
-    if (age >= TTL && mode !== 'stale') throw new Error('24시간이 지난 자료입니다. 이전 자료 사용을 확인하세요.');
+    if (!Number.isFinite(age) || age < -5 * 60 * 1000 || age > MAX_STALE) throw new Error(`공식 자료의 수집 시각이 잘못되었거나 사용 상한 ${MAX_DAYS}일을 지났습니다.`);
+    if (age >= TTL && mode !== 'stale') throw new Error(`${FRESH_DAYS}일이 지난 자료입니다. 이전 자료 사용을 확인하세요.`);
   }
   if (mode === 'stale' && !staleApproved) throw new Error('이전 자료 사용을 확인하세요.');
   const cleanedManual = [];

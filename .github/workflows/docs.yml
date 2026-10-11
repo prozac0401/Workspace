@@ -6,7 +6,7 @@ on:
   pull_request:
     paths: ['docs/**', 'tools/calendar/**', 'mkdocs.yml', 'requirements-docs.txt', 'scripts/check-site.py', 'scripts/check-calendar-workflow.py', '.github/workflows/docs.yml']
   schedule:
-    - cron: '17 3 * * *'
+    - cron: '17 3 1 * *'
   workflow_dispatch:
     inputs:
       action:

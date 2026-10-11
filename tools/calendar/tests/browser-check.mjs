@@ -9,7 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { fixture, NOW } from './fixtures/helpers.mjs';
 import { emptyYear, TTL, MAX_STALE } from '../../../docs/assets/calendar/contract.mjs';
 const root = fileURLToPath(new URL('../../../', import.meta.url));
-const output = resolve(root, 'artifacts/calendar/browser');
+const output = resolve(root, process.env.CALENDAR_BROWSER_OUTPUT || 'artifacts/calendar/browser');
 const execute = promisify(execFile);
 const sourceHead = (await execute('git', ['rev-parse', 'HEAD'], { cwd: root, windowsHide: true })).stdout.trim();
 const sourceDirty = (await execute('git', ['status', '--porcelain'], { cwd: root, windowsHide: true })).stdout.trim().length > 0;
@@ -51,8 +51,15 @@ try {
   page.on('request', request => requests.push({ url: request.url(), method: request.method() }));
   let acceptDialogs = true;
   page.on('dialog', dialog => acceptDialogs ? dialog.accept() : dialog.dismiss());
-  let data = fixture(), mode = 'ready';
+  let data = fixture(), mode = 'ready', delayNext = false, releaseDelayed = null, delayedFinished = null;
   await page.route('**/assets/calendar/data/calendar.json', async route => {
+    if (delayNext) {
+      delayNext = false; const body = JSON.stringify(data);
+      let finish; delayedFinished = new Promise(resolve => { finish = resolve; });
+      await new Promise(resolve => { releaseDelayed = resolve; });
+      try { await route.fulfill({ contentType: 'application/json', body }); } catch { /* The previous year request was intentionally aborted. */ }
+      finish(); return;
+    }
     if (mode === 'missing') return route.fulfill({ status: 404, body: 'missing' });
     if (mode === 'malformed') return route.fulfill({ contentType: 'application/json', body: '{bad' });
     return route.fulfill({ contentType: 'application/json', body: JSON.stringify(data) });
@@ -62,8 +69,12 @@ try {
     await page.waitForFunction(() => document.querySelector('#status')?.dataset.state !== 'loading' && document.querySelector('#year')?.value === '2027');
   };
   const state = async expected => { await page.waitForFunction(value => document.querySelector('#status')?.dataset.state === value, expected); };
-  const reloadData = async () => { await page.locator('#load').click(); await state('ready'); };
+  const selectYear = async (year, expected = 'ready', key = 'Tab') => {
+    await page.locator('#year').fill(String(year)); await page.locator('#year').press(key); await state(expected);
+  };
   await load(); await state('ready');
+  assert.equal(await page.locator('#load').count(), 0);
+  assert.equal(await page.getByRole('button', { name: '공휴일 자료 다시 읽기', exact: true }).count(), 0);
   assert.deepEqual((await page.locator('.md-tabs__list > .md-tabs__item').allTextContents()).map(x => x.trim()), ['Workspace', '달력']);
   assert.equal(await page.locator('#mockBanner').isVisible(), true);
   assert.equal(await page.locator('#download').isDisabled(), true);
@@ -71,11 +82,21 @@ try {
   await page.locator('#holidayName').fill('=SUM(A1:A2)');
   await page.locator('#saveHoliday').click();
   assert.equal(await page.locator('#manualList li').count(), 1);
+  await page.locator('#holidayDate').fill('2027-02-01'); await page.locator('#holidayName').fill('입력 중 보존');
+  await page.locator('#category').selectOption('personal');
+  const sourceBeforeCancel = await page.locator('#sourceDetails').textContent();
+  const jsonReadsBeforeCancel = requests.filter(request => request.url.endsWith('/data/calendar.json')).length;
   acceptDialogs = false;
-  await page.locator('#year').fill('2028'); await page.locator('#year').press('Tab');
+  await page.locator('#year').fill('2028'); await page.locator('#year').press('Tab'); await state('ready');
   assert.equal(await page.locator('#year').inputValue(), '2027');
   assert.equal(await page.locator('#manualList li').count(), 1);
-  acceptDialogs = true; await reloadData();
+  assert.equal(await page.locator('#holidayDate').inputValue(), '2027-02-01');
+  assert.equal(await page.locator('#holidayName').inputValue(), '입력 중 보존');
+  assert.equal(await page.locator('#category').inputValue(), 'personal');
+  assert.equal(await page.locator('#sourceDetails').textContent(), sourceBeforeCancel);
+  assert.equal(requests.filter(request => request.url.endsWith('/data/calendar.json')).length, jsonReadsBeforeCancel);
+  assert.equal(await page.locator('#previewButton').isEnabled(), true);
+  acceptDialogs = true; await page.locator('#cancelEdit').click();
   await page.locator('#previewButton').click();
   assert.equal(await page.locator('#preview .month').count(), 12);
   assert.equal(await page.locator('#preview [data-date]').count(), 365);
@@ -103,7 +124,15 @@ try {
   });
   await page.locator('#preview .month').first().screenshot({ path: resolve(output, 'desktop-first-month.png'), animations: 'disabled' });
   await page.setViewportSize({ width: 1440, height: 1050 });
-  results.push('PC nav Workspace → 달력; /Workspace/ direct URL; JSON fixture; manual input; 12 months/365 dates; download');
+  results.push('PC nav Workspace → 달력; direct URL automatically loads JSON without refresh button; manual input; 12 months/365 dates; download');
+  await page.locator('#year').fill('20');
+  assert.equal(await page.locator('#download').isDisabled(), true); assert.equal(await page.locator('#previewButton').isDisabled(), true);
+  await page.locator('#year').fill('2027'); await page.locator('#year').press('Enter'); await state('ready');
+  assert.equal(await page.locator('#manualList li').count(), 1);
+  assert.equal(await page.locator('#sourceDetails').textContent(), sourceBeforeCancel);
+  await page.locator('#year').fill('202'); await page.locator('#year').fill('2027'); await page.locator('#year').press('Tab'); await state('ready');
+  assert.equal(await page.locator('#previewButton').isEnabled(), true);
+  results.push('incomplete year input blocks preview/download; Enter and blur restore unchanged selected year');
   await page.locator('#holidayName').fill('미완성 입력'); assert.equal(await page.locator('#download').isDisabled(), true);
   await page.locator('#cancelEdit').click(); await page.locator('#previewButton').click();
   let downloads = 0; page.on('download', () => downloads++);
@@ -119,7 +148,10 @@ try {
   assert.equal(downloads, 0); results.push('pending export cancels after input changes; stale preview cannot download');
   await page.locator('#year').fill('2028'); await page.locator('#year').press('Tab');
   assert.equal(await page.locator('#manualList li').count(), 0);
-  results.push('year change cancel preserves manual entries; explicit discard clears them');
+  await state('ready');
+  assert.equal(await page.locator('#year').inputValue(), '2028');
+  assert.equal(await page.locator('#download').textContent(), '2028년 Excel 다운로드');
+  results.push('cancel restores original source and manual list/editor; accepted year change clears entries and automatically loads selected year');
   await page.reload(); await state('ready'); assert.equal(await page.locator('#manualList li').count(), 0);
   await page.locator('.md-tabs__link').filter({ hasText: /^\s*Workspace\s*$/ }).click();
   await page.locator('.md-tabs__link').filter({ hasText: /^\s*달력\s*$/ }).click(); await state('ready');
@@ -131,18 +163,20 @@ try {
   await page.locator('#holidayDate').fill('2027-01-03'); await page.locator('#holidayName').fill('한 번만 추가'); await page.locator('#saveHoliday').click();
   assert.equal(await page.locator('#manualList li').count(), 1);
   results.push('reload/internal re-entry; repeated boot mounting does not duplicate event handlers');
-  await page.evaluate(() => { window.calendarTestNow += 24 * 60 * 60 * 1000; });
+  await page.evaluate(ttl => { window.calendarTestNow += ttl; }, TTL);
   await page.locator('#previewButton').click(); await state('stale'); assert.equal(await page.locator('#download').isDisabled(), true);
+  assert.match(await page.locator('#status').textContent(), /32일/);
   await page.locator('#approveStale').click(); await page.locator('#previewButton').click(); assert.equal(await page.locator('#download').isEnabled(), true);
   await page.evaluate(({ now, age }) => { window.calendarTestNow = now + age + 1; }, { now: NOW, age: MAX_STALE });
   await page.locator('#download').click(); await state('error'); assert.equal(await page.locator('#preview .month').count(), 0);
-  results.push('open-page 24h stale transition requires consent; 30-day expiry blocks export');
+  assert.match(await page.locator('#status').textContent(), /35일/);
+  results.push('open-page 32-day stale transition requires consent; over-35-day expiry blocks export');
   await page.evaluate(now => { window.calendarTestNow = now; }, NOW);
 
   mode = 'ready'; data = fixture();
   for (const selectedYear of [1983, 2026]) {
     await load(); await state('ready');
-    await page.locator('#year').fill(String(selectedYear)); await page.locator('#year').press('Tab'); await reloadData();
+    await selectYear(selectedYear, 'ready', selectedYear === 1983 ? 'Enter' : 'Tab');
     assert.equal(await page.locator('#download').textContent(), selectedYear + '년 Excel 다운로드');
     await page.locator('#previewButton').click();
     assert.equal(await page.locator('#preview [data-date]').count(), 365);
@@ -155,8 +189,23 @@ try {
     downloadedYears.push({ year: selectedYear, mode: 'fixture' });
   }
   results.push('1983 and 2026 selection each exports its own 365-day workbook; year shown on download button');
+  mode = 'ready'; data = fixture(); await load(); await state('ready');
+  data.years[2026].holidays[0].name = '이전 연도 지연자료';
+  delayNext = true;
+  const oldRequest = page.waitForRequest(request => request.url().endsWith('/data/calendar.json'));
+  await page.locator('#year').fill('2026'); await page.locator('#year').press('Tab'); await oldRequest;
+  await state('loading');
+  await selectYear(1983, 'ready', 'Enter');
+  await page.locator('#previewButton').click();
+  assert.equal(await page.locator('#preview [data-date]').first().getAttribute('data-date'), '1983-01-01');
+  releaseDelayed(); await delayedFinished;
+  await page.evaluate(() => new Promise(requestAnimationFrame));
+  assert.equal(await page.locator('#year').inputValue(), '1983');
+  assert.equal(await page.locator('#preview [data-date]').first().getAttribute('data-date'), '1983-01-01');
+  assert.equal((await page.locator('#officialList').textContent()).includes('이전 연도 지연자료'), false);
+  results.push('automatic year loads discard delayed previous-year responses and retain latest preview');
   for (const outsideYear of [1982, 2100]) {
-    await page.locator('#year').fill(String(outsideYear)); await page.locator('#load').click(); await state('error');
+    await selectYear(outsideYear, 'error');
     assert.match(await page.locator('#status').textContent(), /1983~2099/);
     assert.equal(await page.locator('#previewButton').isDisabled(), true); assert.equal(await page.locator('#download').isDisabled(), true);
     await page.locator('#manualMode').click(); await state('error');
@@ -172,7 +221,7 @@ try {
   results.push('missing/malformed/unavailable do not become no-holidays ready state');
   mode = 'ready'; data = fixture(); data.years[2099] = emptyYear(2099);
   await load(); await state('ready');
-  await page.locator('#year').fill('2099'); await page.locator('#load').click(); await state('error');
+  await selectYear(2099, 'error');
   assert.equal(await page.locator('#download').isDisabled(), true);
   acceptDialogs = false; await page.locator('#manualMode').click();
   assert.equal(await page.locator('#manualReviewWrap').isVisible(), false); assert.equal(await page.locator('#previewButton').isDisabled(), true);
@@ -189,6 +238,15 @@ try {
   const manualFile = await manualPending; assert.equal(manualFile.suggestedFilename(), 'calendar_2099.xlsx');
   await manualFile.saveAs(resolve(output, 'calendar_2099.xlsx')); downloadedYears.push({ year: 2099, mode: 'manual' });
   results.push('2099 unavailable official data blocks export; manual decline blocks preview; explicit manual and empty-list confirmations allow manual-only download');
+  await page.locator('#holidayDate').fill('2099-02-03'); await page.locator('#holidayName').fill('수동 목록 보존'); await page.locator('#saveHoliday').click();
+  await page.locator('#manualReview').check();
+  const manualSource = await page.locator('#sourceDetails').textContent();
+  acceptDialogs = false; await page.locator('#year').fill('2098'); await page.locator('#year').press('Tab');
+  await state('manual'); assert.equal(await page.locator('#year').inputValue(), '2099');
+  assert.equal(await page.locator('#manualList li').count(), 1); assert.equal(await page.locator('#manualReview').isChecked(), true);
+  assert.equal(await page.locator('#sourceDetails').textContent(), manualSource); assert.equal(await page.locator('#previewButton').isEnabled(), true);
+  acceptDialogs = true;
+  results.push('manual-mode year discard cancellation preserves mode, consent, source and manual entries');
   mode = 'ready'; data = fixture(); await load(''); await state('ready');
   results.push('root-path deployment works without hard-coded /Workspace/ asset URLs');
   await page.locator('label[for="__palette_1"]').click();
@@ -210,7 +268,7 @@ try {
   const size = await page.evaluate(() => ({ view: innerWidth, document: document.documentElement.scrollWidth, scroll: document.querySelector('.preview-scroll').scrollWidth }));
   assert.ok(size.document <= size.view + 1, JSON.stringify(size)); assert.ok(size.scroll > size.view);
   await page.locator('#year').focus(); await page.keyboard.press('Tab');
-  assert.equal(await page.evaluate(() => document.activeElement.id), 'load');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'manualMode');
   await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
   await page.screenshot({ path: resolve(output, 'mobile.png'), animations: 'disabled' });
   results.push('mobile menu Workspace → 달력; contained preview horizontal scroll; keyboard navigation; dark palette');

@@ -4,8 +4,11 @@ export const ENDPOINT = 'https://apis.data.go.kr/B090041/openapi/service/SpcdeIn
 export const MAX_DATA_BYTES = 2 * 1024 * 1024;
 export const MIN_YEAR = 1983;
 export const MAX_YEAR = 2099;
-export const TTL = 24 * 60 * 60 * 1000;
-export const MAX_STALE = 30 * TTL;
+export const DAY_MS = 24 * 60 * 60 * 1000;
+export const FRESH_DAYS = 32;
+export const MAX_DAYS = 35;
+export const TTL = FRESH_DAYS * DAY_MS;
+export const MAX_STALE = MAX_DAYS * DAY_MS;
 export const LIMITATION = '12개월 조회 완료는 향후 임시공휴일 확정을 뜻하지 않습니다. 이미 다운로드한 파일은 자동 갱신되지 않습니다.';
 export class CalendarDataError extends Error {
   constructor(code) { super(code); this.code = code; }

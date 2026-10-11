@@ -6,7 +6,9 @@ root = Path(__file__).resolve().parent.parent
 workflow = yaml.load((root / '.github/workflows/docs.yml').read_text(encoding='utf-8'), Loader=yaml.BaseLoader)
 events, jobs = workflow['on'], workflow['jobs']
 assert set(events) == {'push', 'pull_request', 'schedule', 'workflow_dispatch'}
-assert events['schedule'] == [{'cron': '17 3 * * *'}]
+assert events['schedule'] == [{'cron': '17 3 1 * *'}]
+assert events['workflow_dispatch']['inputs']['action']['options'] == ['collect', 'reuse']
+assert events['workflow_dispatch']['inputs']['action']['default'] == 'collect'
 assert events['workflow_dispatch']['inputs']['initialize_data']['default'] == 'false'
 assert workflow['permissions'] == {'contents': 'read'}
 assert workflow['concurrency']['cancel-in-progress'] == 'false'

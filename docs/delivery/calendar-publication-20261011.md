@@ -42,3 +42,15 @@ schemaVersion2의 지원/조회 대상은117개 연도다. 올해·다음 해를
 작업 브랜치 push→PR→해당 HEAD의 검사→main 반영 순서로 진행한다. 기존 문서의 main 자동 배포는 활성화 변수와 검증된 데이터가 없으면 건너뛴다. 승인 범위에서 `CALENDAR_ENABLED=true`를 등록하고 `main`의 dispatch를 `collect`, `initialize_data=true`로 실행한다. 첫 데이터 브랜치는 실제 검증 자료만으로 생성하고, 같은 workflow의 고정 SHA 빌드·Pages 배포로 이어진다. 첫 수집이 실패하면 최초 배포를 하지 않는다.
 
 실제 PR URL, 검사/배포 source SHA·data SHA·run URL, 연도별 준비 상태, 공개 JSON·메뉴·다운로드 확인 결과는 완료 시 해당 PR 설명과 로컬 `artifacts/calendar/publication-result.json`에 기록한다. 실행 전 계획을 실제 성공으로 취급하지 않는다. 이 문서의 최초 작성 시점은 운영 실행 전이며 최종 결과는 이 실행 증거를 따른다.
+
+## 최초 배포 결과와 월간 운영 변경
+
+[PR #24](https://github.com/prozac0401/Workspace/pull/24)를 main `7358f5262fd42dc327dce0a30081456ee953ad97`로 병합하고 [최초 실제 수집·배포](https://github.com/prozac0401/Workspace/actions/runs/38106812300)를 완료했다. 데이터 SHA는 `0256ebe3e3c97bfd82351401372957d14909590f`이며 2004~2028년25개 연도 ready, 1983~2003년·2029~2099년92개 연도 unavailable, 실제 수집 오류0이다. 실제 Edge9그룹과 다운로드4개 독립 검사가 통과했다. 처음 기록한 일일 수집·24시간/30일 정책의 실행 근거는 위의 기록으로 보존한다.
+
+이후 사용자가 월 1회 Actions 수집과 GitHub를 통한 수동 수집, 프런트의 ‘공휴일 자료 다시 읽기’ 제거를 요청했다. 최신성 질문에 **32일 후 경고·35일 초과 차단**을 명시적으로 선택했다. 변경은 매월1일KST12:17 cron, 버튼 제거와 연도 선택 자동 반영, 관련 상태 문구·경계 시험·운영 안내에 한정한다. XLSX 작성기와 데이터 수집·검증·영속 저장 방식은 유지한다.
+
+완료 근거는 월간 cron/수동 입력 검사, 최신성 경계 단위시험, 연도 입력/변경/취소/미준비/늦은 응답의 실제 브라우저 확인, MkDocs strict와 공개 링크 검사다. 배포는 기존 공식 데이터 SHA를 재사용하며 이 UI·정책 변경 때문에 KASI를 다시 수집하지 않는다. 최초 운영 자료와 성공 시각이 그대로 게시되는지 확인한다. 실제 명령·결과·새 소스 SHA·원격 CI·배포 결과는 이 후속 PR과 로컬 `artifacts/calendar/monthly-publication-result.json`에 남긴다. 변경 없는 XLSX의 네이티브 Excel·인쇄·전체 도구 설치 검사는 반복하지 않는다.
+
+로컬 실행: `npm ci --prefix tools/calendar --ignore-scripts`, `npm test --prefix tools/calendar`는 **55/55 PASS, 실패·skip0**이다. `python scripts/check-calendar-workflow.py`, `CALENDAR_PRODUCTION=1` 및 기존 공식 JSON을 지정한 `python -m mkdocs build --strict`, `python scripts/check-site.py site --production`, `git diff --check`도 PASS다. 실제 Edge155.0.4283.45에서 `node tools/calendar/tests/browser-check.mjs`는 **14그룹 PASS, pageErrors0**이며 `artifacts/calendar/browser-monthly-refresh/results.json`에 기록했다. 이 로컬 검증 기준은 main7358f526과 이 후속 작업 변경이며 원격 CI는 커밋 후 해당 HEAD로 별도 확인한다.
+
+브라우저 첫 실행에서는 한 입력 안에서2027→20→2027로 되돌린 뒤 Enter를 누르면 native change가 생략되어 준비 상태로 돌아오지 않는 결함을 재현했다. 조건부 blur 확정 처리로 수정하고 Enter/Tab, 정상 전환과 수동 목록 폐기 취소를 다시 검증했다. 최초 실패는 `same-year-return-first-failure.json`에 보존하고 최종 PASS와 구분한다. 기존 일일 예약이 전환 중 실행되지 않도록 CALENDAR_ENABLED를 잠시 false로 두었으며, 월간 workflow가 main에 반영되면 true로 복원하고 기존 데이터 reuse로 배포한다.

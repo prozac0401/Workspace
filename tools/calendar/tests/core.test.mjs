@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { yearLayout, yearNumber, weekday, validDate, nextSeoulYear, isLeap } from '../../../docs/assets/calendar/date-core.mjs';
 import { buildCalendar, validateManual, normalizeName } from '../../../docs/assets/calendar/calendar-model.mjs';
 import { workbookParts, exportXlsx } from '../../../docs/assets/calendar/xlsx-exporter.mjs';
-import { TTL, MAX_STALE } from '../../../docs/assets/calendar/contract.mjs';
+import { DAY_MS, TTL, MAX_STALE } from '../../../docs/assets/calendar/contract.mjs';
 const NOW = Date.parse('2026-10-10T00:00:00Z');
 const manualModel = (year = 2027, manual = []) => buildCalendar({ year, manual, mode: 'manual', manualApproved: true, generatedAt: '2026-10-10T00:00:00Z' });
 test('AT01-03: every date and coordinate, 1900 through 2100, independently checked with UTC Date', () => {
@@ -51,7 +51,7 @@ test('AT10: manual names, dates, duplicates, maximum and edit identity', () => {
   const hundred = Array.from({ length: 100 }, (_, i) => ({ ...item, name: `휴일${i}`, sourceId: String(i) }));
   assert.throws(() => validateManual(base, 2027, hundred));
 });
-const snapshot = holidays => ({ year: 2027, snapshotId: 'test', status: 'ready', complete: true, fetchedAt: '2026-10-10T00:00:00Z', expiresAt: '2026-10-11T00:00:00Z', holidays,
+const snapshot = holidays => ({ year: 2027, snapshotId: 'test', status: 'ready', complete: true, fetchedAt: '2026-10-10T00:00:00Z', expiresAt: new Date(NOW + TTL).toISOString(), holidays,
   monthResults: Array.from({ length: 12 }, (_, i) => ({ month: i + 1, status: 'success' })), warnings: [] });
 test('AT05/09: stable ordering, same-name dedup with source preservation, holiday color priorities and frozen model', () => {
   const records = [ { date: '2027-01-02', name: '겹침', source: 'official', category: 'public', sourceId: 'a' }, { date: '2027-01-02', name: '가나다', source: 'official', category: 'public', sourceId: 'b' } ];
@@ -115,13 +115,17 @@ test('normalized manual snapshot preserves identities, category provenance, and 
 
 test('freshness is evaluated from real collection time, not a ready label or claimed expiry', () => {
   const s = snapshot([{ date: '2027-01-01', name: '모의 신정', source: 'official' }]);
+  for (const days of [28, 29, 30, 31]) assert.equal(buildCalendar({ year: 2027, mode: 'ready', snapshot: s, now: NOW + days * DAY_MS }).mode, 'ready');
   assert.equal(buildCalendar({ year: 2027, mode: 'ready', snapshot: s, now: NOW + TTL - 1 }).mode, 'ready');
-  assert.throws(() => buildCalendar({ year: 2027, mode: 'ready', snapshot: s, now: NOW + TTL }), /24시간/);
+  assert.throws(() => buildCalendar({ year: 2027, mode: 'ready', snapshot: s, now: NOW + TTL }), /32일/);
   s.expiresAt = '2099-01-01T00:00:00Z';
-  assert.throws(() => buildCalendar({ year: 2027, mode: 'ready', snapshot: s, now: NOW + TTL + 1 }), /24시간/);
+  assert.throws(() => buildCalendar({ year: 2027, mode: 'ready', snapshot: s, now: NOW + TTL + 1 }), /32일/);
   s.status = 'stale';
+  assert.throws(() => buildCalendar({ year: 2027, mode: 'stale', snapshot: s, now: NOW + TTL }), /이전 자료 사용/);
+  assert.equal(buildCalendar({ year: 2027, mode: 'stale', snapshot: s, staleApproved: true, now: NOW + TTL }).mode, 'stale');
+  assert.equal(buildCalendar({ year: 2027, mode: 'stale', snapshot: s, staleApproved: true, now: NOW + MAX_STALE - 1 }).mode, 'stale');
   assert.equal(buildCalendar({ year: 2027, mode: 'stale', snapshot: s, staleApproved: true, now: NOW + MAX_STALE }).mode, 'stale');
-  assert.throws(() => buildCalendar({ year: 2027, mode: 'stale', snapshot: s, staleApproved: true, now: NOW + MAX_STALE + 1 }), /30일/);
+  assert.throws(() => buildCalendar({ year: 2027, mode: 'stale', snapshot: s, staleApproved: true, now: NOW + MAX_STALE + 1 }), /35일/);
   assert.throws(() => buildCalendar({ year: 2027, mode: 'stale', snapshot: s, staleApproved: true, now: NOW - 5 * 60 * 1000 - 1 }), /수집 시각/);
   s.fetchedAt = 'not-a-date';
   assert.throws(() => buildCalendar({ year: 2027, mode: 'stale', snapshot: s, staleApproved: true, now: NOW }), /수집 시각/);
