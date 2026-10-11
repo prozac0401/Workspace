@@ -80,7 +80,7 @@ try {
   assert.equal(await page.locator('#mockBanner').isVisible(), true);
   assert.equal(await page.locator('#sourceDetails, #availabilityList, #progress, #officialList, #holidaySummary').count(), 0);
   assert.equal(await page.getByRole('heading', { name: '자료를 사용할 때', exact: true }).count(), 0);
-  assert.equal(await page.locator('#yearHelp').textContent(), '1983~2099년');
+  assert.equal(await page.locator('#yearHelp').textContent(), '(범위 : 1983~2099)');
   assert.equal(await page.locator('#status').isVisible(), false);
   assert.equal(await page.locator('#manualMode').isVisible(), false);
   const scheduleRow = await page.locator('#holidayForm').evaluate(form => {
@@ -316,8 +316,15 @@ try {
   await page.locator('label.md-overlay[for="__drawer"]').click({ position: { x: 370, y: 400 }, force: true });
   await page.locator('#previewButton').click();
   assert.equal(await page.locator('#preview .month').count(), 12);
-  const size = await page.evaluate(() => ({ view: innerWidth, document: document.documentElement.scrollWidth, scroll: document.querySelector('.preview-scroll').scrollWidth }));
-  assert.ok(size.document <= size.view + 1, JSON.stringify(size)); assert.ok(size.scroll > size.view);
+  const size = await page.evaluate(() => {
+    const scroller = document.querySelector('.preview-scroll'), bounds = scroller.getBoundingClientRect();
+    return { view: innerWidth, document: document.documentElement.scrollWidth, scroll: scroller.scrollWidth, client: scroller.clientWidth,
+      allMonthsFit: [...document.querySelectorAll('#preview .month')].every(month => {
+        const box = month.getBoundingClientRect(); return box.left >= bounds.left - 1 && box.right <= bounds.right + 1;
+      }) };
+  });
+  assert.ok(size.document <= size.view + 1, JSON.stringify(size));
+  assert.ok(size.scroll <= size.client + 1 && size.allMonthsFit, JSON.stringify(size));
   const mobileSchedule = await page.locator('#holidayForm').evaluate(form => {
     const boxes = ['holidayDate', 'holidayName', 'category', 'saveHoliday'].map(id => { const r = form.querySelector('#' + id).getBoundingClientRect(); return { x: r.x, y: r.y, right: r.right, bottom: r.bottom }; });
     let scroller = form.querySelector('.schedule-scroll') || form;
@@ -330,7 +337,7 @@ try {
   assert.equal(await page.evaluate(() => document.activeElement.id !== 'year' && document.querySelector('#workspace-calendar').contains(document.activeElement) && !document.activeElement.disabled), true);
   await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
   await page.screenshot({ path: resolve(output, 'mobile.png'), animations: 'disabled' });
-  results.push('mobile menu Workspace → 달력; schedule inputs remain one horizontally scrolling row; contained preview scroll; keyboard navigation; dark palette');
+  results.push('mobile menu Workspace → 달력; schedule inputs remain one horizontally scrolling row; all preview month borders fit initially; keyboard navigation; dark palette');
   assert.deepEqual(errors, []);
   assert.ok(requests.every(request => request.url.startsWith(base) && request.method === 'GET'));
   await writeFile(resolve(output, 'results.json'), JSON.stringify({ result: 'PASS', browser: await browser.version(), sourceHead, sourceDirty, fixture: true, downloadedYears, customFormattingExport, checks: results, pageErrors: errors, requests }, null, 2));

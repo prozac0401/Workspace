@@ -8,7 +8,7 @@
 
 `server.mjs`의 API proxy와 메모리 캐시는 운영에서 제거했다. 조회 구현은 원래 별도 `lib/holiday-provider.mjs`에 있었으며 배치로 재사용했다. 브라우저는 `data/calendar.json`만 상대 경로로 읽는다. 개인·회사 입력은 브라우저 메모리에만 있고 새로고침·페이지 이탈 때 사라진다. ZIP/XLSX는 이 입력을 서버로 보내지 않고 같은 불변 CalendarModel에서 생성한다.
 
-패키지 버전은 `1.4.1`, Node는 24.x, `package-lock.json`을 사용한다. 런타임 npm 의존성은 없다. SAX만 서버용 vendored 코드이고 버전·해시·라이선스는 `vendor/manifest.json`과 `vendor/sax-LICENSE.md`에 고정한다. 테스트용 Python 라이브러리는 `requirements-test.txt`에 고정한다. 브라우저 재현 도구는 Playwright 1.62.1과 설치된 Edge를 사용했다. 초안 자체 작성 코드에는 별도 LICENSE가 없으므로 제3자 XLSX 라이브러리 라이선스가 있다고 꾸미지 않는다.
+패키지 버전은 `1.4.2`, Node는 24.x, `package-lock.json`을 사용한다. 런타임 npm 의존성은 없다. SAX만 서버용 vendored 코드이고 버전·해시·라이선스는 `vendor/manifest.json`과 `vendor/sax-LICENSE.md`에 고정한다. 테스트용 Python 라이브러리는 `requirements-test.txt`에 고정한다. 브라우저 재현 도구는 Playwright 1.62.1과 설치된 Edge를 사용했다. 초안 자체 작성 코드에는 별도 LICENSE가 없으므로 제3자 XLSX 라이브러리 라이선스가 있다고 꾸미지 않는다.
 
 공식 휴일 표시명은 공통 모델에서 ‘기독탄신일’을 ‘크리스마스’로 바꾼다. 대체공휴일 이름에도 적용하며 미리보기·XLSX가 같은 규칙을 사용한다. 검증 JSON과 snapshot/sources의 원문·식별자·수집 시각은 보존하고 개인/회사 수동 이름은 바꾸지 않는다.
 

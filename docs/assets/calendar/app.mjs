@@ -186,7 +186,15 @@ export function initCalendar(root) {
     finally { exporting = false; buttons(); }
   });
   listen(document, 'visibilitychange', () => { if (!document.hidden) checkFreshness(); });
+  // Fit the complete paper, including its borders, without changing workbook formatting.
+  const preview = $('preview'), previewViewport = preview.parentElement;
+  const fitPreview = () => {
+    const width = previewViewport.clientWidth;
+    if (width > 0) preview.style.zoom = Math.min(1, width / parseFloat(getComputedStyle(preview).minWidth));
+  };
+  const previewObserver = new ResizeObserver(fitPreview);
+  previewObserver.observe(previewViewport); fitPreview();
   const freshnessTimer = setInterval(checkFreshness, 60000);
   resetFormatting(); dateBounds(); renderLists(); buttons(); loadOfficial();
-  return { destroy() { destroyed = true; client.invalidate(); events.abort(); clearInterval(freshnessTimer); } };
+  return { destroy() { destroyed = true; client.invalidate(); events.abort(); clearInterval(freshnessTimer); previewObserver.disconnect(); } };
 }

@@ -108,3 +108,15 @@ schemaVersion2의 지원/조회 대상은117개 연도다. 올해·다음 해를
 `CALENDAR_LUNAR_STYLE_READY=1 CALENDAR_LUNAR_STYLE_TARGET=local node artifacts/calendar/lunar-style/style-check.mjs`의 실제 Edge 155 결과는 **3그룹 PASS**, pageErrors 0이다. 기본 음력 7pt/#777777, 사용자 음력 12pt/#2A6F7B, 해제·기본값 복원·다운로드 무효화·다크 모드 보존을 확인했다. 각 variant에 `python tools/calendar/tests/inspect-browser-export.py --base <variant-directory> --years`를 실행한 독립 검사도 **1,764셀·365일·1,095개 빈 작성셀 PASS**다. ON은 365개 부분 서식 날짜 셀, OFF는 0개이며 양력·휴일 서식을 보존한다. 결과와 실제 공식 자료 다운로드는 `artifacts/calendar/lunar-style/local-2026-10-11T04-29-27-084Z/`에 있다. 첫 파서 실행은 CSS fallback 목록 전체를 단일 XLSX 글꼴명과 비교한 검사기 오류로 실패했다. 첫 글꼴명을 비교하도록 고친 뒤 동일 캡처로 재검사했으며 첫 실패를 `first-parser-failure.json`에 보존했다.
 
 fixture 기본 10/7pt와 큰 음력 8/16pt 파일은 `python tools/calendar/tests/inspect-xlsx.py <sample.xlsx>`로 모든 rich text·빈 작성셀 검사를 통과했다. `powershell -NoProfile -ExecutionPolicy Bypass -File artifacts/calendar/lunar-style/excel-runs-check.ps1`은 실제 Excel 16.0/build 20430에서 두 fixture의 각 365일·739개 텍스트 조각의 글꼴·크기·색상을 전수 확인했다. 작성칸 편집·저장·재열기 후 같은 전수 검사도 **PASS**다. 결과는 `artifacts/calendar/lunar-style/excel-runs-results.json`이다. 이 fixture는 운영 자료로 배포하지 않는다. 이번 변경의 전체 PDF·실물 인쇄·LibreOffice는 **NOT RUN**이며 기존 인쇄 검증을 재사용했다. 인쇄 설정은 바꾸지 않았다.
+
+## 입력 정렬과 미리보기 너비 후속 요청
+
+PR #28은 main `8ef6fc5b22a58fede886e8967a900d2aa9e093f2`, 배포 38111990105에서 완료했고 실제 검증은 `artifacts/calendar/lunar-style/publication-result.json`에 보존했다. 이번 요청은 컨트롤 텍스트 중앙 정렬, 범위 문구 `(범위 : 1983~2099)`, 일정 입력행 높이 통일, 미리보기 오른쪽 테두리까지 초기 화면에 표시하는 것이다. 같은 관리 worktree의 깨끗한 main에서 `codex/calendar-control-layout`로 작업하며 원래 checkout의 사용자 수정은 보존한다.
+
+원인은 달력의 최소 너비 780px와 입력 요소별 기본 줄 높이·padding 차이다. 기존 배포를 Edge에서 측정했을 때 일정 date/name/select/button 높이는 각각 53.75/51.75/48/53.75px였고, 모바일 미리보기는 358px 영역에 780px 달력을 표시했다. 수정은 scoped CSS 중앙 정렬과 일정 입력 높이 2.7rem, 기존 780px 달력 종이를 영역 너비에 맞춰 비례 축소하는 ResizeObserver다. 이탈 시 observer를 해제하며 XLSX 서식·공휴일 수집·데이터 계약은 변경하지 않는다.
+
+완료 판단은 실제 브라우저의 PC·사용자 화면에 해당하는 772px 내용 폭·모바일 390px·창 크기 변경, 입력 높이/정렬과 달력 12개월 테두리 포함 여부, 일정 추가와 내부 재진입 확인이다. strict build와 공개 링크 검사 및 현재 HEAD CI도 수행한다. 전체 모델·수집기·Excel·인쇄 시험은 변경 대상이 아니므로 기존 결과를 재사용한다. 증거는 `artifacts/calendar/control-layout/` 및 PR에 남긴다.
+
+위 main HEAD와 로컬 변경에서 `node --check docs/assets/calendar/app.mjs`, `git diff --check`, 실제 검증 JSON을 사용한 `python -m mkdocs build --strict`와 `python scripts/check-site.py site --production`이 **PASS**다. `CALENDAR_CONTROL_LAYOUT_READY=1`, `CALENDAR_CONTROL_LAYOUT_TARGET=local`로 `node artifacts/calendar/control-layout/layout-check.mjs`를 실행한 Edge 155 검사도 **2그룹 PASS**, pageErrors 0이다. 일정 입력 4개는 각각 높이 54px와 같은 상·하단 좌표이고, 1440px 창·772px 내용 영역·390px 모바일·재확대에서 12개월의 오른쪽 테두리가 처음부터 영역 안에 있다. 원래 텍스트·글자 서식, 내부 페이지 재진입, 일정 1회 추가 및 다운로드 활성화도 확인했다. 결과와 육안 확인한 화면은 `artifacts/calendar/control-layout/local-2026-10-11T04-44-58-453Z/`에 있다.
+
+첫 두 하네스 실행은 축소 후 전체 높이를 역산한 차이를 2px 미만으로 요구하여 실패했다. 실제 차이는 2.416px(0.27%)의 브라우저 반올림이었고 경계 넘침·텍스트 변경·잘림은 없었다. 이 과도한 기대를 제거하고 테두리의 실제 화면 좌표·모든 날짜 텍스트와 글자 서식 보존으로 검사했다. 첫 실패 결과도 같은 산출물 폴더 아래 보존한다. 이번에는 Excel·전체 인쇄·무관한 전체 브라우저 suite를 **NOT RUN**으로 남기며 앞선 증거를 재사용한다. 원격 CI와 배포 결과는 최종 PR 및 별도 publication-result.json에 정확한 HEAD로 기록한다.
