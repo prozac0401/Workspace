@@ -1,5 +1,7 @@
 # 설계 결정 목록
 
+- [ADR-0036 · 검증된 정적 JSON으로 달력 통합](0036-static-calendar.md) — 기존 생성기 재사용, 일일 수집·영속 데이터 SHA·운영 활성화 분리, 로컬 구현·미배포
+
 - [ADR-0035 · 공개 도구 안내를 기능과 사용 방법 중심으로 정리](0035-public-tool-wording.md) — Pages의 배포 단계·미확인 시험 경고 제외, 실제 버전·사용 제한과 제외 문서의 검증 근거 보존
 
 - [ADR-0034 · ProbPacker 오피스 자동화 도구의 공개 안내와 배포 연결](0034-office-automation-public-guide.md) — 비공개 제품 원본 보존, Workspace에 0.3.1 EXE·ZIP 공개, 기능·사용 안내 한 페이지와 검증 범위 표시

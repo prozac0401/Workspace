@@ -1,0 +1,32 @@
+{
+  "name": "sax",
+  "version": "1.6.1",
+  "license": "BlueOak-1.0.0",
+  "licenseUrl": "https://blueoakcouncil.org/license/1.0.0",
+  "registryMetadata": "https://registry.npmjs.org/sax/1.6.1",
+  "tarball": "https://registry.npmjs.org/sax/-/sax-1.6.1.tgz",
+  "tarballIntegrity": "sha512-42tBVwLWnaQvW5zc4HbZrTuWccECCZfBi92FDuwtqxasH+JbPB3/FOKb1m222K42R4WxuxzzMsTswfzgtSu64Q==",
+  "repository": "https://github.com/isaacs/sax-js",
+  "tag": "v1.6.1",
+  "npmGitHead": "961ceeefcc5186005466f2085aeb36f31b161e37",
+  "verifiedOn": "2026-10-11",
+  "verification": "Vendored bytes matched both the integrity-verified npm tarball and the upstream GitHub v1.6.1 tag. No package code was installed or executed for verification.",
+  "files": [
+    {
+      "path": "sax.cjs",
+      "upstreamPath": "package/lib/sax.js",
+      "source": "https://raw.githubusercontent.com/isaacs/sax-js/v1.6.1/lib/sax.js",
+      "bytes": 50818,
+      "sha256": "1cdc1270d987cb0f6ee66dd8efb01c50511aa14d17b6163bbbffb21df8cf1c06",
+      "modifications": "Filename changed from sax.js to sax.cjs; contents unchanged."
+    },
+    {
+      "path": "sax-LICENSE.md",
+      "upstreamPath": "package/LICENSE.md",
+      "source": "https://raw.githubusercontent.com/isaacs/sax-js/v1.6.1/LICENSE.md",
+      "bytes": 1552,
+      "sha256": "8a1af140fdfbf5afd3df27f7e662f989c5b963a300020dfafce42033cae9e004",
+      "modifications": "Filename changed from LICENSE.md to sax-LICENSE.md; contents unchanged."
+    }
+  ]
+}

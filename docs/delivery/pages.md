@@ -4,7 +4,7 @@
 
 ## 원본과 게시
 
-docs/의 Markdown과 mkdocs.yml을 편집합니다. main 반영 후 Documentation 워크플로가 문서 빌드와 공개 범위·링크 검사를 통과하면 GitHub Pages에 게시합니다. 생성한 HTML을 직접 편집하지 않습니다.
+docs/의 Markdown과 mkdocs.yml을 편집합니다. 생성한 HTML을 직접 편집하지 않습니다. 이번 로컬 변경의 Documentation workflow는 문서 검사 뒤 승인된 calendar-data SHA를 읽고 사이트 검사·빌드를 거쳐 Pages artifact와 배포를 연결합니다. 운영 활성화 변수 `CALENDAR_ENABLED=true`와 기본 브랜치/허용 이벤트 조건을 만족해야 운영 job을 실행합니다. 초기 데이터가 없거나 검증에 실패하면 기존 Pages를 유지하며 배포하지 않습니다. [달력 운영 안내](../../tools/calendar/README.md)의 Secret 등록·설정 검토·병합·초기화/배포는 각각 별도 승인 단계입니다. 이번 구현은 미배포입니다.
 
 워크플로 성공과 공개 URL의 HTTP 응답 및 새 문장·메뉴·검색·사이트맵을 함께 확인합니다. Pages의 Source는 GitHub Actions를 사용합니다.
 
@@ -16,7 +16,7 @@ docs/의 Markdown과 mkdocs.yml을 편집합니다. main 반영 후 Documentatio
 
 mkdocs.yml의 exclude_docs에서 전체 문서를 제외하고 검토한 문서와 자산만 허용합니다. 공개 목록을 scripts/check-site.py와 함께 유지합니다. PPTX·DOCX 원본과 설치 파일은 사이트에 복사하지 않습니다.
 
-현재 공개 안내는 21개입니다. FolderState의 이전 설치·문제 해결 주소 2개에는 통합 안내로 이동하는 문서를 생성합니다. 이 두 주소를 메뉴·검색·사이트맵의 별도 안내로 싣지 않습니다. 기존 공개 자산은 CSS와 FolderState 화면, WebP 이미지 6개와 교육 예시 화면 7개로 모두 15개입니다. 2026-10-06 챕터별 삽화 게시로 가로·모바일 SVG 230개를 더해 공개 안내용 자산은 총 245개입니다. 테마 자산은 별도로 관리합니다.
+기존 게시본의 공개 안내는 21개입니다. FolderState의 이전 설치·문제 해결 주소 2개에는 통합 안내로 이동하는 문서를 생성합니다. 이 두 주소를 메뉴·검색·사이트맵의 별도 안내로 싣지 않습니다. 기존 공개 자산은 CSS와 FolderState 화면, WebP 이미지 6개와 교육 예시 화면 7개로 모두 15개입니다. 2026-10-06 챕터별 삽화 게시로 가로·모바일 SVG 230개를 더해 공개 안내용 자산은 총 245개입니다. 테마 자산은 별도로 관리합니다. 이번 로컬 구현은 달력 한 페이지와 필요한 로컬 자산·JSON을 추가하므로 검사 대상은 공개 안내 22개·이동 문서 2개입니다. 수집기·fixture·검증 결과는 게시하지 않습니다.
 
 ProbPacker의 Office Automation Tools 0.3.1은 [ADR-0034](../design/0034-office-automation-public-guide.md)에 따라 `tools/office-automation/` 한 페이지와 Workspace 공개 릴리스의 고정 태그 EXE·ZIP 링크로 안내합니다. 원본 ProbPacker는 비공개이므로 배포물만 Workspace에 동일 해시로 게시합니다. 공개 소개는 MS Office Excel·PowerPoint(PPT)·Word용 도구이며 Python 없이 실행하는 방법으로 설명합니다. 사용자 요청에 따라 공개 페이지와 검색에는 ProbPacker 저장소의 이름·존재·비공개 설명을 넣지 않습니다. 서명과 남은 검증 범위는 제외한 배포 기록에 보존합니다. 바이너리·QA 자료·인증서·원시 진단은 Pages로 복사하지 않습니다.
 
@@ -39,7 +39,7 @@ python -m mkdocs build --strict
 python scripts/check-site.py site
 ```
 
-검사기는 공개 안내 21개·이전 주소 이동 문서 2개·404 외의 HTML, 제외한 자산의 복사, 비공개 문서의 검색·사이트맵 노출, 깨진 로컬 링크를 실패로 처리합니다. 교육 안내 주소는 education-operations/이며 오피스 자동화 도구 주소는 tools/office-automation/입니다.
+검사기는 공개 안내 22개·이전 주소 이동 문서 2개·404 외의 HTML, 제외한 자산의 복사, 비공개 문서의 검색·사이트맵 노출, 깨진 로컬 링크와 달력 JSON 계약 위반을 실패로 처리합니다. 운영 빌드는 `python scripts/check-site.py site --production`으로 실제 검증 데이터만 허용합니다. 교육 안내 주소는 education-operations/이며 오피스 자동화 도구 주소는 tools/office-automation/입니다.
 
 수정한 공개 문장과 메뉴 이름을눈으로 검토하고,작은 화면에서도 표·단계 안내를 읽을 수 있는지 확인합니다. 실제 비전공자의 이해도나 업무 효과를 측정하지 않았다면 미확인으로 남깁니다.
 

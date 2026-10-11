@@ -1,0 +1,11 @@
+{
+  "name": "workspace-static-calendar",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "sample": "node tests/make-sample.mjs"
+  }
+}

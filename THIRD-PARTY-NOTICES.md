@@ -1,5 +1,7 @@
 # Third-party notices
 
+The static calendar batch collector vendors `sax` 1.6.1 under the Blue Oak Model License 1.0.0. The complete license is in [tools/calendar/vendor/sax-LICENSE.md](tools/calendar/vendor/sax-LICENSE.md); upstream identity and integrity hashes are pinned in [manifest.json](tools/calendar/vendor/manifest.json). This parser runs in the collector and is not shipped in the browser assets. The calendar ZIP/OOXML writer is reused from the user-provided draft, which has no separate license file; public repository visibility is not a grant of a new license.
+
 FolderState's self-contained Windows distribution includes the Microsoft .NET runtime and Windows Desktop runtime. Their licenses and notices are available in the upstream repositories:
 
 - .NET runtime: https://github.com/dotnet/runtime/blob/main/LICENSE.TXT
