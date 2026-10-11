@@ -1,6 +1,6 @@
 # 정적 달력 · 제품 명세
 
-도구 ID: Calendar · 버전: 1.2.0 · 상태: 연도 범위 확장 구현, 운영 활성화·배포 승인됨
+도구 ID: Calendar · 버전: 1.3.0 · 상태: 월간 수집·자동 연도 선택으로 운영 방식 변경
 제품 책임: 저장소 관리 담당(운영 담당자 미결정)
 적용: [개발 기준](../../policies/tools.md), [문서 규칙](../../policies/documentation.md), [ADR-0036](../../design/0036-static-calendar.md)
 
@@ -14,7 +14,7 @@
 |---|---|---|
 | CAL-01 | Workspace 다음 달력 최상위 메뉴, 모바일·다크·키보드, base path | mkdocs nav, scoped CSS, boot, browser-check |
 | CAL-02 | 1983~2099년 선택·조회 대상과 실제 가용 연도 구분, 기본은 KST다음해 | schemaVersion2 contract targetYears/years, client/browser 경계 tests |
-| CAL-03 | 수집 오류·미제공 차단, 24시간 stale 동의·30일 초과 차단 | contract/client/model과 경계 시험 |
+| CAL-03 | 수집 오류·미제공 차단, 32일 이상 stale 동의·35일 초과 차단 | contract/client/model과 월간 간격·경계 시험 |
 | CAL-04 | 수동 실제 ISO날짜, 이름trim/NFC1~50자·줄바꿈/제어문자 거부,100개, 날짜/이름/개인·회사 중복 거부 | core tests; 공식 항목 수정/삭제 UI 없음 |
 | CAL-05 | 설정·preview·export 동일 불변 model, 오래된 응답/내보내기 배제 | core/client/browser race tests |
 | CAL-06 | calendar_YYYY.xlsx, 1시트 YYYY년 달력, A:G 일~토, 주당 날짜1+실제 빈3행 | 독립 calendar/openpyxl/ZIP 검사, Excel 사본 검사 |
@@ -24,6 +24,7 @@
 | CAL-10 | 제한timeout/retry/Retry-After/크기/페이지, 전체실제HTTP2,000회상한,비밀키출력금지,DTD차단 | provider tests, 고정 endpoint·환경변수만 소비 |
 | CAL-11 | 원자쓰기·연도별 보존·영속 JSON branch·SHA고정·배포skip | collector/persistence tests, docs.yml |
 | CAL-12 | PR 무Secret·무배포,운영 활성화/기본브랜치/이벤트 제한·최소권한 | workflow checker, 독립 코드 리뷰 |
+| CAL-13 | 매월 1일 KST12:17 수집, 수동 수집은 GitHub Actions, 프런트 자료 다시 읽기 버튼 제거·연도 선택 자동 반영 | docs.yml, app/browser, 운영 README |
 
 ## 좌표·출처·입력 계약
 
@@ -32,6 +33,8 @@ A1:G1 연간 제목, A2:G2 출처·수집/생성 시각·모드, A3:G3 범례·�
 공식/일요일 빨강,토요일 파랑,평일 수동 보라. 같은 이름은 표시만 정리하고 model.sources에는 각 출처를 유지한다. 날짜행 이름은 자르지 않으며409pt 초과 시 명시적 오류다. 수식 모양 이름도 inline string이다. 시트 보호·매크로·수식·외부링크·데이터연결은 없다.
 
 ## 경계·실패·운영
+
+2026-10-11 배포 후 요청으로 정기 수집은 일일에서 월 1회로 변경한다. 수동 수집은 GitHub Actions의 collect 실행으로 진행하며 프런트엔드는 공개 JSON을 자동으로 읽고 선택 연도를 반영한다. 사용자가 32일 이상 경고·35일 초과 차단을 선택했다. 가장 긴 월간 간격 31일과 하루의 지연 여유를 포함하며, 수집 실패로 보존한 자료는 경과 시간과 관계없이 명시적 동의를 요구한다. 새로고침 또는 연도 선택은 KASI 수집을 실행하지 않는다.
 
 2026-10-11 후속 요청에서 사용자가 1983~2099년 선택과 완료 후 원격 반영·최초 실수집·배포를 승인했다. 이 범위가 최초의 올해/다음 해 공식 조회 범위를 대체한다. 117개 연도의 자료 제공을 보장하지 않으며 미제공 연도는 명시적 수동 모드만 허용한다. 정상 0건의 선택 연도가 있더라도 현재 해 수집 성공과 실제 오류 없음이 확인되면 준비/미준비 상태를 함께 게시한다. 기존 완전 자료가 0건으로 바뀌거나 현재 해 0건, HTTP·업무·검증 오류가 있으면 이 예외에 포함하지 않고 배포를 건너뛴다. 기존 XLSX 형식과 수동 입력·날짜 계산 규칙은 유지한다.
 

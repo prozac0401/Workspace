@@ -1,5 +1,5 @@
 import { nextSeoulYear, yearNumber } from './date-core.mjs';
-import { MIN_YEAR, MAX_YEAR } from './contract.mjs';
+import { MIN_YEAR, MAX_YEAR, FRESH_DAYS } from './contract.mjs';
 import { buildCalendar, validateManual, seoulTime } from './calendar-model.mjs';
 import { HolidayClient } from './holiday-client.mjs';
 import { renderPreview } from './preview-renderer.mjs';
@@ -13,10 +13,11 @@ export function initCalendar(root) {
   const listen = (element, event, handler) => element.addEventListener(event, handler, { signal: events.signal });
   let year = Math.max(MIN_YEAR, Math.min(MAX_YEAR, nextSeoulYear())), manual = [], snapshot = null, model = null;
   let mode = 'idle', staleApproved = false, manualApproved = false, editId = null, exporting = false, destroyed = false;
+  let yearEditing = false, yearStatusText = '';
   $('year').min = MIN_YEAR; $('year').max = MAX_YEAR; $('year').value = year;
   const setStatus = (text, state = mode) => { $('status').textContent = text; $('status').dataset.state = state; };
   function available() {
-    return ['ready', 'stale', 'manual'].includes(mode)
+    return !yearEditing && ['ready', 'stale', 'manual'].includes(mode)
       && (mode !== 'stale' || staleApproved)
       && (mode !== 'manual' || manualApproved && $('manualReview').checked)
       && String(year) === $('year').value;
@@ -25,12 +26,11 @@ export function initCalendar(root) {
     $('previewButton').disabled = !available() || exporting;
     $('download').disabled = !model || exporting || !available();
     $('download').textContent = year + '년 Excel 다운로드';
-    $('load').disabled = mode === 'loading' || exporting;
     $('manualMode').disabled = exporting;
-    $('progress').hidden = mode !== 'loading';
+    $('progress').hidden = mode !== 'loading' || yearEditing;
     $('approveStale').hidden = mode !== 'stale' || staleApproved;
     $('manualReviewWrap').hidden = mode !== 'manual';
-    const count = mode === 'manual' ? '미확인 (수동 모드)' : snapshot ? snapshot.holidays.length + '건' : '미확인';
+    const count = yearEditing ? '미확인 (연도 입력 중)' : mode === 'manual' ? '미확인 (수동 모드)' : snapshot ? snapshot.holidays.length + '건' : '미확인';
     $('holidaySummary').textContent = '휴일 목록 확인 · ' + (snapshot?.mock ? '가상 공식 ' : '공식 ') + count + ' / 수동 ' + manual.length + '건';
   }
   function invalidate() {
@@ -87,6 +87,11 @@ export function initCalendar(root) {
     }
     buttons();
   }
+  function restoreYear() {
+    yearEditing = false;
+    if (mode === 'loading') { loadOfficial(); return; }
+    setStatus(yearStatusText, mode); showSource(); renderLists(); checkFreshness(); buttons();
+  }
   function commitYear() {
     let target;
     try {
@@ -95,10 +100,11 @@ export function initCalendar(root) {
     } catch { setStatus('연도는 ' + MIN_YEAR + '~' + MAX_YEAR + '년 정수로 입력하세요.', 'error'); return false; }
     if (target !== year && (manual.length || $('holidayName').value || $('holidayDate').value)
       && !confirm('연도를 바꾸면 현재 수동 휴일 목록과 입력 중인 내용을 버립니다. 계속할까요?')) {
-      $('year').value = year; setStatus('연도 변경을 취소했습니다. 공휴일 자료를 다시 읽어 주세요.'); return false;
+      $('year').value = year; restoreYear(); return false;
     }
-    if (target !== year) { manual = []; resetEditor(); }
-    year = target; dateBounds(); $('manualReview').checked = false; renderLists(); return true;
+    if (target === year) { if (yearEditing) restoreYear(); return true; }
+    manual = []; resetEditor(); year = target; yearEditing = false;
+    dateBounds(); $('manualReview').checked = false; loadOfficial(); return true;
   }
   function applySelection(result) {
     if (result.error) {
@@ -107,33 +113,36 @@ export function initCalendar(root) {
     } else {
       snapshot = result.snapshot; mode = snapshot.status;
       setStatus(mode === 'stale'
-        ? '이전 완전 자료입니다. 24시간이 지났거나 최근 수집이 실패하여 변경된 공휴일이 누락될 수 있습니다. 기준 시각과 경고를 확인하고 사용 여부를 선택하세요.'
+        ? '이전 완전 자료입니다. ' + FRESH_DAYS + '일이 지났거나 최근 수집이 실패하여 변경된 공휴일이 누락될 수 있습니다. 기준 시각과 경고를 확인하고 사용 여부를 선택하세요.'
         : '12개월 수집·검증 자료 준비 · ' + snapshot.holidays.length + '건. 이후 지정될 임시공휴일까지 확정된 것은 아닙니다.' + (snapshot.mock ? '\n검증용 가상 자료이며 실제 공휴일은 확인하지 않았습니다.' : ''));
     }
     showSource(); renderLists(); buttons();
   }
   // Re-evaluate age and Seoul year at each action; a long-open page cannot keep a ready preview indefinitely.
   function checkFreshness() {
-    if (!['ready', 'stale'].includes(mode)) return;
+    if (yearEditing || !['ready', 'stale'].includes(mode)) return;
     const result = client.current(year);
     if (result.error || result.snapshot.status !== mode || result.snapshot.snapshotId !== snapshot?.snapshotId) {
       staleApproved = false; invalidate(); applySelection(result); invalidate();
     }
   }
   async function loadOfficial() {
-    if (!commitYear()) return;
+    const requestedYear = year;
     mode = 'loading'; snapshot = null; manualApproved = false; staleApproved = false;
     invalidate(); renderLists(); setStatus('사이트에 공개된 공휴일 자료를 읽고 있습니다.');
-    const result = await client.load(year);
-    if (destroyed || result.obsolete) return;
+    const result = await client.load(requestedYear);
+    if (destroyed || result.obsolete || yearEditing || year !== requestedYear) return;
     applySelection(result);
   }
   listen($('year'), 'input', () => {
-    client.invalidate(); snapshot = null; mode = 'idle'; manualApproved = false; staleApproved = false;
-    $('sourceDetails').textContent = ''; invalidate(); renderLists(); setStatus('연도 변경 중입니다. 변경 후 공휴일 자료를 다시 읽어 주세요.');
+    if (!yearEditing) yearStatusText = $('status').textContent;
+    yearEditing = true; client.invalidate();
+    $('sourceDetails').textContent = ''; invalidate();
+    setStatus('연도를 입력한 뒤 Enter를 누르거나 다른 항목으로 이동하면 공개 자료를 자동으로 확인합니다.', 'idle');
   });
   listen($('year'), 'change', commitYear);
-  listen($('load'), 'click', loadOfficial);
+  listen($('year'), 'blur', () => { if (yearEditing) commitYear(); });
+  listen($('year'), 'keydown', event => { if (event.key === 'Enter') { event.preventDefault(); $('year').blur(); } });
   listen($('approveStale'), 'click', () => {
     checkFreshness();
     if (mode !== 'stale' || !snapshot) return;
@@ -150,7 +159,7 @@ export function initCalendar(root) {
   listen($('holidayForm'), 'submit', event => {
     event.preventDefault();
     try {
-      if (String(year) !== $('year').value) throw new Error('먼저 연도 변경을 완료하세요.');
+      if (yearEditing || String(year) !== $('year').value) throw new Error('먼저 연도 변경을 완료하세요.');
       const record = validateManual({ date: $('holidayDate').value, name: $('holidayName').value, category: $('category').value }, year, manual, editId);
       manual = [...manual.filter(x => x.sourceId !== editId), record]; resetEditor(); $('manualReview').checked = false; invalidate(); renderLists();
     } catch (error) { $('formError').textContent = error.message; }

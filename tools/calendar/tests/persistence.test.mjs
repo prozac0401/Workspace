@@ -9,7 +9,7 @@ import { gitStore } from '../data-store.mjs';
 import { prepareSite, assertDeployable } from '../prepare-site.mjs';
 import { prepareWorkflow, deploymentDecision } from '../workflow-data.mjs';
 import { fixture, NOW } from './fixtures/helpers.mjs';
-import { MAX_STALE, MAX_DATA_BYTES, validateDataset } from '../../../docs/assets/calendar/contract.mjs';
+import { DAY_MS, TTL, MAX_STALE, MAX_DATA_BYTES, validateDataset } from '../../../docs/assets/calendar/contract.mjs';
 const execute = promisify(execFile);
 const artifacts = fileURLToPath(new URL('../../../artifacts/calendar-tests/', import.meta.url));
 const official = () => ({ ...fixture(), datasetKind: 'official' });
@@ -61,6 +61,9 @@ test('local build uses explicit unavailable JSON; production refuses fixture, mi
   await assert.rejects(prepareSite({ output, production: true, now: NOW }), /INITIALIZATION_REQUIRED/);
   assert.equal(await readFile(output, 'utf8'), bytes);
   assert.throws(() => assertDeployable(fixture(), NOW));
+  for (const age of [28 * DAY_MS, 30 * DAY_MS, 31 * DAY_MS, TTL, MAX_STALE]) {
+    assert.equal(assertDeployable(official(), NOW + age).years[2026].lastSuccessfulFetchAt, '2026-10-11T00:00:00.000Z');
+  }
   assert.throws(() => assertDeployable(official(), NOW + MAX_STALE + 1), /EXPIRED/);
   assert.throws(() => assertDeployable(official(), Date.parse('2026-12-31T15:00:00Z')), /EXPIRED/);
   assert.equal(assertDeployable(official(), NOW).years[2026].lastSuccessfulFetchAt, '2026-10-11T00:00:00.000Z');

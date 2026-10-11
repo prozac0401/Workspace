@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { HolidayClient } from '../../../docs/assets/calendar/holiday-client.mjs';
-import { emptyDataset, TTL, MAX_STALE } from '../../../docs/assets/calendar/contract.mjs';
+import { emptyDataset, DAY_MS, TTL, MAX_STALE } from '../../../docs/assets/calendar/contract.mjs';
 
 const NOW = Date.parse('2026-10-11T03:00:00.000Z');
 function fixture(at = NOW) {
@@ -53,16 +53,18 @@ test('network failure and oversized JSON return safe errors without upstream det
   assert.ok((await new HolidayClient().load(2027, async () => large, NOW)).error);
 });
 
-test('current re-evaluates 24-hour freshness and 30-day upper bound after page remains open', async () => {
+test('current re-evaluates 32-day freshness and 35-day upper bound after page remains open', async () => {
   const client = new HolidayClient();
   await client.load(2027, async () => reply(fixture()), NOW);
+  for (const days of [28, 29, 30, 31]) assert.equal(client.current(2027, NOW + days * DAY_MS).snapshot.status, 'ready');
   assert.equal(client.current(2027, NOW + TTL - 1).snapshot.status, 'ready');
   assert.equal(client.current(2027, NOW + TTL).snapshot.status, 'stale');
+  assert.equal(client.current(2027, NOW + MAX_STALE - 1).snapshot.status, 'stale');
   assert.equal(client.current(2027, NOW + MAX_STALE).snapshot.status, 'stale');
   assert.equal(client.current(2027, NOW + MAX_STALE + 1).error.code, 'CALENDAR_DATA_EXPIRED');
 });
 
-test('preserved snapshots require stale consent even before 24 hours', async () => {
+test('preserved snapshots require stale consent immediately despite the 32-day fresh period', async () => {
   const data = fixture(); data.years[2027].status = 'preserved';
   const result = await new HolidayClient().load(2027, async () => reply(data), NOW);
   assert.equal(result.snapshot.status, 'stale');
@@ -86,7 +88,7 @@ test('a late previous-year response cannot replace the latest dataset', async ()
   const client = new HolidayClient(); let release;
   const old = client.load(2026, () => new Promise(resolve => { release = resolve; }), NOW);
   const current = await client.load(2027, async () => reply(fixture()), NOW);
-  release(reply(fixture(NOW - TTL * 2)));
+  release(reply(fixture(NOW - TTL - 1)));
   assert.deepEqual(await old, { obsolete: true });
   assert.equal(client.current(2027, NOW).snapshot.snapshotId, current.snapshot.snapshotId);
   assert.equal(client.current(2027, NOW).snapshot.status, 'ready');
