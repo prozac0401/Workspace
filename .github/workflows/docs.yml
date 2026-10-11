@@ -54,6 +54,7 @@ jobs:
       # This local/PR site has unavailable data and is never uploaded to Pages.
   prepare-data:
     needs: verify
+    timeout-minutes: 45
     if: >-
       vars.CALENDAR_ENABLED == 'true' &&
       github.repository == 'prozac0401/Workspace' &&

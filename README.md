@@ -72,7 +72,7 @@ python -m mkdocs serve
 
 ## 개발 파일의 위치
 
-정적 달력의 로컬 실행·테스트와 승인 후 수집/배포 절차는 [달력 운영 안내](tools/calendar/README.md)를 따릅니다. [구현·검증 기록](docs/delivery/calendar-20261011.md)과 [PR 설명 초안](docs/delivery/calendar-pr-draft.md)은 공개 사이트에서 제외합니다. 현재 변경은 로컬 검토용이며 원격 운영은 활성화하지 않았습니다.
+정적 달력의 로컬 실행·테스트와 수집/배포 절차는 [달력 운영 안내](tools/calendar/README.md)를 따릅니다. [최초 구현·검증](docs/delivery/calendar-20261011.md), [1983~2099년 확장·운영 활성화](docs/delivery/calendar-publication-20261011.md), [PR 설명](docs/delivery/calendar-pr-draft.md)은 공개 사이트에서 제외합니다. 최초 로컬 검증과 이후 승인된 운영 실행 결과를 구분합니다.
 
 ```text
 src/          폴더 상태 엔진, WPF 관리 화면, CLI

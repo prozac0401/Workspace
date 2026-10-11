@@ -4,7 +4,7 @@
 
 ## 원본과 게시
 
-docs/의 Markdown과 mkdocs.yml을 편집합니다. 생성한 HTML을 직접 편집하지 않습니다. 이번 로컬 변경의 Documentation workflow는 문서 검사 뒤 승인된 calendar-data SHA를 읽고 사이트 검사·빌드를 거쳐 Pages artifact와 배포를 연결합니다. 운영 활성화 변수 `CALENDAR_ENABLED=true`와 기본 브랜치/허용 이벤트 조건을 만족해야 운영 job을 실행합니다. 초기 데이터가 없거나 검증에 실패하면 기존 Pages를 유지하며 배포하지 않습니다. [달력 운영 안내](../../tools/calendar/README.md)의 Secret 등록·설정 검토·병합·초기화/배포는 각각 별도 승인 단계입니다. 이번 구현은 미배포입니다.
+docs/의 Markdown과 mkdocs.yml을 편집합니다. 생성한 HTML을 직접 편집하지 않습니다. Documentation workflow는 문서 검사 뒤 승인된 calendar-data SHA를 읽고 사이트 검사·빌드를 거쳐 Pages artifact와 배포를 연결합니다. 운영 활성화 변수 `CALENDAR_ENABLED=true`와 기본 브랜치/허용 이벤트 조건을 만족해야 운영 job을 실행합니다. 초기 데이터가 없거나 검증에 실패하면 기존 Pages를 유지하며 배포하지 않습니다. [달력 운영 안내](../../tools/calendar/README.md)의 Secret 등록·설정 검토·병합·초기화/배포는 승인 범위에 따라 진행합니다. 2026-10-11 후속 요청에서 1983~2099년 확장과 첫 수집·배포가 승인되었으며 실제 결과는 [운영 기록](calendar-publication-20261011.md)을 따릅니다.
 
 워크플로 성공과 공개 URL의 HTTP 응답 및 새 문장·메뉴·검색·사이트맵을 함께 확인합니다. Pages의 Source는 GitHub Actions를 사용합니다.
 

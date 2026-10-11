@@ -1,4 +1,5 @@
 import { nextSeoulYear, yearNumber } from './date-core.mjs';
+import { MIN_YEAR, MAX_YEAR } from './contract.mjs';
 import { buildCalendar, validateManual, seoulTime } from './calendar-model.mjs';
 import { HolidayClient } from './holiday-client.mjs';
 import { renderPreview } from './preview-renderer.mjs';
@@ -10,9 +11,9 @@ export function initCalendar(root) {
   const client = new HolidayClient();
   const events = new AbortController();
   const listen = (element, event, handler) => element.addEventListener(event, handler, { signal: events.signal });
-  let year = Math.min(2100, nextSeoulYear()), manual = [], snapshot = null, model = null;
+  let year = Math.max(MIN_YEAR, Math.min(MAX_YEAR, nextSeoulYear())), manual = [], snapshot = null, model = null;
   let mode = 'idle', staleApproved = false, manualApproved = false, editId = null, exporting = false, destroyed = false;
-  $('year').value = year;
+  $('year').min = MIN_YEAR; $('year').max = MAX_YEAR; $('year').value = year;
   const setStatus = (text, state = mode) => { $('status').textContent = text; $('status').dataset.state = state; };
   function available() {
     return ['ready', 'stale', 'manual'].includes(mode)
@@ -23,6 +24,7 @@ export function initCalendar(root) {
   function buttons() {
     $('previewButton').disabled = !available() || exporting;
     $('download').disabled = !model || exporting || !available();
+    $('download').textContent = year + '년 Excel 다운로드';
     $('load').disabled = mode === 'loading' || exporting;
     $('manualMode').disabled = exporting;
     $('progress').hidden = mode !== 'loading';
@@ -87,7 +89,10 @@ export function initCalendar(root) {
   }
   function commitYear() {
     let target;
-    try { target = yearNumber($('year').value); } catch (error) { setStatus(error.message, 'error'); return false; }
+    try {
+      target = yearNumber($('year').value);
+      if (target < MIN_YEAR || target > MAX_YEAR) throw new Error();
+    } catch { setStatus('연도는 ' + MIN_YEAR + '~' + MAX_YEAR + '년 정수로 입력하세요.', 'error'); return false; }
     if (target !== year && (manual.length || $('holidayName').value || $('holidayDate').value)
       && !confirm('연도를 바꾸면 현재 수동 휴일 목록과 입력 중인 내용을 버립니다. 계속할까요?')) {
       $('year').value = year; setStatus('연도 변경을 취소했습니다. 공휴일 자료를 다시 읽어 주세요.'); return false;

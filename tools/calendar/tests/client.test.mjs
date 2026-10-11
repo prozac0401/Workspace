@@ -69,11 +69,12 @@ test('preserved snapshots require stale consent even before 24 hours', async () 
   assert.equal(result.snapshot.fetchedAt, data.years[2027].lastSuccessfulFetchAt);
 });
 
-test('unsupported year and Seoul year boundary are re-evaluated', async () => {
+test('range endpoints can load; only years outside 1983..2099 are unsupported after Seoul year rollover', async () => {
   const client = new HolidayClient();
-  await client.load(2027, async () => reply(fixture()), NOW);
-  assert.equal(client.current(1900, NOW).error.code, 'CALENDAR_YEAR_UNSUPPORTED');
-  assert.equal(client.current(2026, Date.parse('2026-12-31T15:00:00.000Z')).error.code, 'CALENDAR_YEAR_UNSUPPORTED');
+  const before = Date.parse('2026-12-31T14:59:59.999Z'), after = before + 1;
+  await client.load(2027, async () => reply(fixture(before)), before);
+  for (const year of [1983, 2026, 2099]) assert.equal(client.current(year, after).snapshot.status, 'ready');
+  for (const year of [1982, 2100]) assert.equal(client.current(year, after).error.code, 'CALENDAR_YEAR_UNSUPPORTED');
 });
 
 test('future success timestamps are rejected', async () => {

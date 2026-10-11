@@ -2,14 +2,15 @@ import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
-import { validateDataset, emptyDataset, selectYear, targetYears } from '../../docs/assets/calendar/contract.mjs';
+import { validateDataset, emptyDataset, selectYear, targetYears, currentSeoulYear } from '../../docs/assets/calendar/contract.mjs';
 
 export function assertDeployable(data, now = Date.now()) {
   validateDataset(data, { production: true });
   const years = targetYears(now);
   if (JSON.stringify(data.targetYears) !== JSON.stringify(years)) throw new Error('CALENDAR_REFRESH_REQUIRED');
-  // A missing next year is visible as unavailable. The current year must be usable.
-  selectYear(data, years[0], now);
+  // Optional years remain visibly unavailable. A real current-year snapshot is
+  // required for the first deployment and every later rebuild.
+  selectYear(data, currentSeoulYear(now), now);
   return data;
 }
 

@@ -4,7 +4,7 @@ title: 달력
 
 # 편집 가능한 한 해 달력
 
-연도와 휴일을 확인한 뒤 12개월 미리보기를 만들고 Excel 파일로 내려받으세요. 한 시트에 1~12월을 세로로 배치하며, 날짜 아래에는 매주 **빈 작성칸 3행**이 있습니다.
+1983~2099년 중 원하는 연도와 휴일을 확인한 뒤 12개월 미리보기를 만들고 Excel 파일로 내려받으세요. 연도를 바꿔 한 해씩 내려받을 수 있습니다. 한 시트에 1~12월을 세로로 배치하며, 날짜 아래에는 매주 **빈 작성칸 3행**이 있습니다.
 
 <div id="workspace-calendar" class="workspace-calendar" data-workspace-calendar>
   <noscript>달력 미리보기와 파일 만들기를 사용하려면 브라우저의 JavaScript를 켜 주세요.</noscript>
@@ -14,8 +14,8 @@ title: 달력
       <section class="card" aria-labelledby="calendar-data-heading">
         <h2 id="calendar-data-heading">1. 연도와 자료</h2>
         <label for="year">달력 연도</label>
-        <div class="year-control"><input id="year" type="number" min="1900" max="2100" step="1" required inputmode="numeric"><span>년</span></div>
-        <p class="hint">기본값은 한국 시각 기준 다음 해입니다. 공식 자료 지원 대상은 올해와 다음 해이며, 실제 자료가 준비되었는지는 아래에서 확인하세요. 수동 모드는 1900~2100년을 지원합니다.</p>
+        <div class="year-control"><input id="year" type="number" min="1983" max="2099" step="1" required inputmode="numeric"><span>년</span></div>
+        <p class="hint">공식 자료와 수동 모드 모두 1983~2099년을 선택할 수 있습니다. 기본값은 한국 시각 기준 다음 해이며 선택 범위 안으로 맞춥니다. 연도를 바꾼 뒤 공휴일 자료를 다시 읽어 주세요. 실제 자료가 준비되었는지는 아래에서 확인하세요.</p>
         <button id="load" class="primary" type="button">공휴일 자료 다시 읽기</button>
         <div id="status" class="status" role="status" aria-live="polite">공개 공휴일 자료를 확인하고 있습니다.</div>
         <progress id="progress" hidden aria-label="공개 공휴일 자료 읽는 중"></progress>
@@ -54,7 +54,7 @@ title: 달력
 
 ## 자료를 사용할 때
 
-- 공식 출처는 [한국천문연구원 특일 정보](https://www.data.go.kr/data/15012690/openapi.do)의 공휴일 자료입니다. 사이트에 게시된 검증 자료를 읽으며, 버튼을 눌러도 제공기관에 새로 조회하지 않습니다.
+- 공식 출처는 [한국천문연구원 특일 정보](https://www.data.go.kr/data/15012690/openapi.do)의 공휴일 자료입니다. 사이트에 게시된 검증 자료를 읽으며, 버튼을 눌러도 제공기관에 새로 조회하지 않습니다. 1983~2099년 중 아직 공식 자료가 제공되지 않거나 검증되지 않은 연도는 수동 모드를 별도로 선택해야 합니다.
 - 마지막 성공 수집 후 **24시간**이 지나면 이전 자료 경고를 확인하고 사용 여부를 선택해야 합니다. **30일 초과 자료**는 공식 달력에 사용할 수 없습니다. 준비되지 않은 연도·자료 오류는 공휴일이 없는 상태와 다릅니다.
 - 12개월 조회 완료는 조회 당시의 자료가 완전하다는 뜻입니다. 향후 임시공휴일까지 확정되었다는 뜻은 아닙니다. 정기 수집은 지연되거나 실행되지 않을 수 있으며, 임시공휴일의 즉시 반영을 보장하지 않습니다.
 - 미리보기와 다운로드는 같은 자료를 사용합니다. 설정을 바꾸면 미리보기를 다시 만들어 주세요. **이미 내려받은 파일은 자동 갱신되지 않습니다.** 자료·생성 시각은 한국 표준시(KST)로 표시합니다.

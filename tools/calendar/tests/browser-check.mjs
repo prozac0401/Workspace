@@ -1,6 +1,8 @@
 // Real browser integration against built MkDocs output. All holiday data are fixtures.
 import assert from 'node:assert/strict';
 import http from 'node:http';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve, extname, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -8,6 +10,9 @@ import { fixture, NOW } from './fixtures/helpers.mjs';
 import { emptyYear, TTL, MAX_STALE } from '../../../docs/assets/calendar/contract.mjs';
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 const output = resolve(root, 'artifacts/calendar/browser');
+const execute = promisify(execFile);
+const sourceHead = (await execute('git', ['rev-parse', 'HEAD'], { cwd: root, windowsHide: true })).stdout.trim();
+const sourceDirty = (await execute('git', ['status', '--porcelain'], { cwd: root, windowsHide: true })).stdout.trim().length > 0;
 await mkdir(output, { recursive: true });
 const packagePath = process.env.PLAYWRIGHT_MODULE;
 const { chromium } = await import(packagePath ? pathToFileURL(packagePath).href : 'playwright');
@@ -27,7 +32,7 @@ const server = http.createServer(async (request, response) => {
 await new Promise(done => server.listen(0, '127.0.0.1', done));
 const base = `http://127.0.0.1:${server.address().port}`;
 let browser;
-const results = [], errors = [], requests = [];
+const results = [], errors = [], requests = [], downloadedYears = [];
 try {
   browser = await chromium.launch({
     ...(process.env.CALENDAR_BROWSER_EXECUTABLE ? { executablePath: process.env.CALENDAR_BROWSER_EXECUTABLE } : { channel: process.env.CALENDAR_BROWSER || 'msedge' }),
@@ -79,6 +84,8 @@ try {
   const downloadPromise = page.waitForEvent('download'); await page.locator('#download').click();
   const download = await downloadPromise; assert.equal(download.suggestedFilename(), 'calendar_2027.xlsx');
   await download.saveAs(resolve(output, 'calendar_2027.xlsx'));
+  downloadedYears.push({ year: 2027, mode: 'fixture' });
+  assert.equal(await page.locator('#download').textContent(), '2027년 Excel 다운로드');
   await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
   await page.screenshot({ path: resolve(output, 'desktop.png'), fullPage: false, animations: 'disabled' });
   await page.evaluate(() => {
@@ -131,18 +138,57 @@ try {
   await page.locator('#download').click(); await state('error'); assert.equal(await page.locator('#preview .month').count(), 0);
   results.push('open-page 24h stale transition requires consent; 30-day expiry blocks export');
   await page.evaluate(now => { window.calendarTestNow = now; }, NOW);
-  for (const scenario of ['missing', 'malformed', 'unavailable', 'unsupported']) {
+
+  mode = 'ready'; data = fixture();
+  for (const selectedYear of [1983, 2026]) {
+    await load(); await state('ready');
+    await page.locator('#year').fill(String(selectedYear)); await page.locator('#year').press('Tab'); await reloadData();
+    assert.equal(await page.locator('#download').textContent(), selectedYear + '년 Excel 다운로드');
+    await page.locator('#previewButton').click();
+    assert.equal(await page.locator('#preview [data-date]').count(), 365);
+    assert.equal(await page.locator('#preview [data-date]').first().getAttribute('data-date'), selectedYear + '-01-01');
+    const selectedCells = await page.locator('#preview [data-cell]').evaluateAll(cells => cells.map(cell => ({ cell: cell.dataset.cell, text: cell.textContent, date: cell.dataset.date || null })));
+    await writeFile(resolve(output, 'preview-cells-' + selectedYear + '.json'), JSON.stringify(selectedCells, null, 2));
+    const pending = page.waitForEvent('download'); await page.locator('#download').click();
+    const selectedFile = await pending; assert.equal(selectedFile.suggestedFilename(), 'calendar_' + selectedYear + '.xlsx');
+    await selectedFile.saveAs(resolve(output, 'calendar_' + selectedYear + '.xlsx'));
+    downloadedYears.push({ year: selectedYear, mode: 'fixture' });
+  }
+  results.push('1983 and 2026 selection each exports its own 365-day workbook; year shown on download button');
+  for (const outsideYear of [1982, 2100]) {
+    await page.locator('#year').fill(String(outsideYear)); await page.locator('#load').click(); await state('error');
+    assert.match(await page.locator('#status').textContent(), /1983~2099/);
+    assert.equal(await page.locator('#previewButton').isDisabled(), true); assert.equal(await page.locator('#download').isDisabled(), true);
+    await page.locator('#manualMode').click(); await state('error');
+    assert.equal(await page.locator('#manualReviewWrap').isVisible(), false);
+  }
+  results.push('1982 and 2100 are rejected for both official and manual modes');
+  for (const scenario of ['missing', 'malformed', 'unavailable']) {
     mode = scenario; data = fixture();
     if (scenario === 'unavailable') data.years[2027] = emptyYear(2027);
     await load();
-    if (scenario === 'unsupported') { await state('ready'); await page.locator('#year').fill('2000'); await page.locator('#load').click(); }
     await state('error'); assert.equal(await page.locator('#previewButton').isDisabled(), true); assert.equal(await page.locator('#download').isDisabled(), true);
   }
-  results.push('missing/malformed/unavailable/unsupported do not become no-holidays ready state');
+  results.push('missing/malformed/unavailable do not become no-holidays ready state');
+  mode = 'ready'; data = fixture(); data.years[2099] = emptyYear(2099);
+  await load(); await state('ready');
+  await page.locator('#year').fill('2099'); await page.locator('#load').click(); await state('error');
+  assert.equal(await page.locator('#download').isDisabled(), true);
+  acceptDialogs = false; await page.locator('#manualMode').click();
+  assert.equal(await page.locator('#manualReviewWrap').isVisible(), false); assert.equal(await page.locator('#previewButton').isDisabled(), true);
+  acceptDialogs = true;
   let confirmations = 0; page.on('dialog', () => confirmations++);
   await page.locator('#manualMode').click(); await page.locator('#manualReview').check(); await page.locator('#previewButton').click();
-  assert.equal(confirmations, 2); assert.equal(await page.locator('#preview [data-date]').count(), 366);
-  results.push('explicit manual mode and empty-manual second confirmation; unsupported official year still allows manual leap calendar');
+  assert.equal(confirmations, 2); assert.equal(await page.locator('#preview [data-date]').count(), 365);
+  assert.match(await page.locator('#preview .preview-metadata').textContent(), /수동 자료만 사용/);
+  assert.equal(await page.locator('#mockBanner').isVisible(), false);
+  assert.equal(await page.locator('#download').textContent(), '2099년 Excel 다운로드');
+  const manualCells = await page.locator('#preview [data-cell]').evaluateAll(cells => cells.map(cell => ({ cell: cell.dataset.cell, text: cell.textContent, date: cell.dataset.date || null })));
+  await writeFile(resolve(output, 'preview-cells-2099.json'), JSON.stringify(manualCells, null, 2));
+  const manualPending = page.waitForEvent('download'); await page.locator('#download').click();
+  const manualFile = await manualPending; assert.equal(manualFile.suggestedFilename(), 'calendar_2099.xlsx');
+  await manualFile.saveAs(resolve(output, 'calendar_2099.xlsx')); downloadedYears.push({ year: 2099, mode: 'manual' });
+  results.push('2099 unavailable official data blocks export; manual decline blocks preview; explicit manual and empty-list confirmations allow manual-only download');
   mode = 'ready'; data = fixture(); await load(''); await state('ready');
   results.push('root-path deployment works without hard-coded /Workspace/ asset URLs');
   await page.locator('label[for="__palette_1"]').click();
@@ -170,8 +216,8 @@ try {
   results.push('mobile menu Workspace → 달력; contained preview horizontal scroll; keyboard navigation; dark palette');
   assert.deepEqual(errors, []);
   assert.ok(requests.every(request => request.url.startsWith(base) && request.method === 'GET'));
-  await writeFile(resolve(output, 'results.json'), JSON.stringify({ result: 'PASS', browser: await browser.version(), baseHead: '28cce1cb0540b4457d6c5ef8b91cf4c18fe5ee2f', fixture: true, checks: results, pageErrors: errors, requests }, null, 2));
-  console.log(JSON.stringify({ result: 'PASS', checks: results, pageErrors: errors, output }, null, 2));
+  await writeFile(resolve(output, 'results.json'), JSON.stringify({ result: 'PASS', browser: await browser.version(), sourceHead, sourceDirty, fixture: true, downloadedYears, checks: results, pageErrors: errors, requests }, null, 2));
+  console.log(JSON.stringify({ result: 'PASS', sourceHead, sourceDirty, downloadedYears, checks: results, pageErrors: errors, output }, null, 2));
 } catch (error) {
   await writeFile(resolve(output, 'results.json'), JSON.stringify({ result: 'FAIL', checks: results, error: error.message, pageErrors: errors }, null, 2));
   throw error;

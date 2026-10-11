@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { parseHolidayXml, createHolidayService, HolidayError, buildUpstreamUrl, ENDPOINT, MAX_PAGES_PER_MONTH } from '../lib/holiday-provider.mjs';
+import { parseHolidayXml, createHolidayService, HolidayError, buildUpstreamUrl, ENDPOINT, MAX_PAGES_PER_MONTH, MAX_REQUESTS_PER_RUN } from '../lib/holiday-provider.mjs';
 import { item, xml, response, mockFetch, NOW } from './fixtures/helpers.mjs';
 const service = options => createHolidayService({ key: 'FAKE-TEST-ONLY', now: () => NOW, delay: async () => {}, random: () => 0, ...options });
 
@@ -94,6 +94,16 @@ test('provider call budget capped at 20 pages per month and names reject newline
     return response(xml(item('20270101', `name${page}`, 'Y', page), 21, page, 1));
   } }).getYear(2027));
   assert.equal(count, MAX_PAGES_PER_MONTH);
+});
+test('run budget covers concurrent years and every retry, with no requests after exhaustion', async () => {
+  assert.equal(MAX_REQUESTS_PER_RUN, 2000);
+  let calls = 0;
+  const s = service({ maxRequests: 5, fetchImpl: async () => { calls++; return new Response('busy', { status: 429 }); } });
+  const results = await Promise.allSettled([s.getYear(2026), s.getYear(2027)]);
+  assert.ok(results.every(result => result.status === 'rejected' && result.reason.code === 'REQUEST_BUDGET_EXCEEDED'));
+  assert.equal(calls, 5);
+  await assert.rejects(s.getYear(1983), e => e.code === 'REQUEST_BUDGET_EXCEEDED'); assert.equal(calls, 5);
+  assert.throws(() => createHolidayService({ maxRequests: 2001 }), e => e.code === 'CONFIGURATION_ERROR');
 });
 test('oversized Content-Length cancels the unread body; malformed UTF-8 never becomes a holiday name', async () => {
   let cancelled = 0, calls = 0;

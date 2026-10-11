@@ -1,7 +1,9 @@
-// Public data contract v1. Keep schema and the stricter semantic checks in sync.
+// Public data contract v2. Keep schema and the stricter semantic checks in sync.
 import { validDate } from './date-core.mjs';
 export const ENDPOINT = 'https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo';
 export const MAX_DATA_BYTES = 2 * 1024 * 1024;
+export const MIN_YEAR = 1983;
+export const MAX_YEAR = 2099;
 export const TTL = 24 * 60 * 60 * 1000;
 export const MAX_STALE = 30 * TTL;
 export const LIMITATION = '12개월 조회 완료는 향후 임시공휴일 확정을 뜻하지 않습니다. 이미 다운로드한 파일은 자동 갱신되지 않습니다.';
@@ -15,9 +17,11 @@ const keys = (value, expected) => {
 const integer = (n, low, high) => Number.isInteger(n) && n >= low && n <= high;
 const safeText = (text, max) => typeof text === 'string' && text === text.trim() && text.length > 0 && [...text].length <= max && !/[\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069\ufffe\uffff\uD800-\uDFFF]/u.test(text);
 const timestamp = text => typeof text === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(text) && Number.isFinite(Date.parse(text)) && new Date(text).toISOString() === text;
-export function targetYears(now = Date.now()) {
-  const year = Number(new Intl.DateTimeFormat('en', { timeZone: 'Asia/Seoul', year: 'numeric' }).format(new Date(now)));
-  return [year, year + 1];
+export function currentSeoulYear(now = Date.now()) {
+  return Number(new Intl.DateTimeFormat('en', { timeZone: 'Asia/Seoul', year: 'numeric' }).format(new Date(now)));
+}
+export function targetYears() {
+  return Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, index) => MIN_YEAR + index);
 }
 export function emptyYear(year, status = 'unavailable', warning = '공식 자료를 아직 수집하지 않았습니다.') {
   return { year, status, complete: false, lastSuccessfulFetchAt: null, snapshotId: null,
@@ -26,16 +30,17 @@ export function emptyYear(year, status = 'unavailable', warning = '공식 자료
 }
 export function emptyDataset(now = Date.now()) {
   const years = targetYears(now);
-  return { schemaVersion: 1, source: { provider: 'KASI', operation: 'getRestDeInfo', url: ENDPOINT },
+  return { schemaVersion: 2, source: { provider: 'KASI', operation: 'getRestDeInfo', url: ENDPOINT },
     datasetKind: 'uninitialized', supportedYears: years, targetYears: [...years],
     years: Object.fromEntries(years.map(year => [year, emptyYear(year)])) };
 }
 export function validateDataset(data, { production = false } = {}) {
   keys(data, ['schemaVersion', 'source', 'datasetKind', 'supportedYears', 'targetYears', 'years']);
-  if (data.schemaVersion !== 1 || !['official', 'fixture', 'uninitialized'].includes(data.datasetKind) || production && data.datasetKind !== 'official') fail();
+  if (data.schemaVersion !== 2 || !['official', 'fixture', 'uninitialized'].includes(data.datasetKind) || production && data.datasetKind !== 'official') fail();
   keys(data.source, ['provider', 'operation', 'url']);
   if (data.source.provider !== 'KASI' || data.source.operation !== 'getRestDeInfo' || data.source.url !== ENDPOINT) fail();
-  if (!Array.isArray(data.targetYears) || data.targetYears.length !== 2 || !data.targetYears.every(y => integer(y, 1900, 2100)) || data.targetYears[1] !== data.targetYears[0] + 1 || !Array.isArray(data.supportedYears) || JSON.stringify(data.supportedYears) !== JSON.stringify(data.targetYears)) fail();
+  const expectedYears = targetYears();
+  if (!Array.isArray(data.targetYears) || JSON.stringify(data.targetYears) !== JSON.stringify(expectedYears) || !Array.isArray(data.supportedYears) || JSON.stringify(data.supportedYears) !== JSON.stringify(expectedYears)) fail();
   keys(data.years, data.targetYears.map(String));
   for (const year of data.targetYears) {
     const snapshot = data.years[year];
@@ -76,7 +81,7 @@ export function validateDataset(data, { production = false } = {}) {
 const freeze = value => { if (value && typeof value === 'object') { Object.values(value).forEach(freeze); Object.freeze(value); } return value; };
 export function selectYear(data, year, now = Date.now()) {
   validateDataset(data);
-  if (!Number.isInteger(year) || !targetYears(now).includes(year)) fail('CALENDAR_YEAR_UNSUPPORTED');
+  if (!Number.isInteger(year) || year < MIN_YEAR || year > MAX_YEAR) fail('CALENDAR_YEAR_UNSUPPORTED');
   const snapshot = data.years[year];
   if (!snapshot?.complete || data.datasetKind === 'uninitialized') fail('CALENDAR_DATA_UNAVAILABLE');
   const age = Number(new Date(now)) - Date.parse(snapshot.lastSuccessfulFetchAt);

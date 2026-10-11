@@ -6,7 +6,8 @@ import { runCollector } from './collect.mjs';
 import { assertDeployable } from './prepare-site.mjs';
 
 export function deploymentDecision(report) {
-  return { persist: report.successfulYears.length > 0, deploy: report.outcome === 'success' && report.deployEligible === true };
+  return { persist: report.successfulYears.length > 0,
+    deploy: report.successfulYears.length > 0 && report.deployEligible === true && report.failedYears.length === 0 };
 }
 
 export async function prepareWorkflow({ action, initialize = false, directory, store = gitStore(), collect = runCollector, now = Date.now() }) {
@@ -22,6 +23,8 @@ export async function prepareWorkflow({ action, initialize = false, directory, s
   const candidatePath = join(directory, 'candidate.json');
   const { report } = await collect({ previousPath: previous.data ? previousPath : undefined,
     outputPath: candidatePath, reportPath: join(directory, 'report.json'), now });
+  // Only validated year/status summaries: never URLs, raw responses or errors.
+  console.log(JSON.stringify({ calendarCollection: report }));
   const decision = deploymentDecision(report);
   if (decision.deploy) assertDeployable(JSON.parse(await readFile(candidatePath, 'utf8')), now);
   return { ...decision, data_sha: previous.sha || '' };

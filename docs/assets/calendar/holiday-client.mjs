@@ -1,4 +1,4 @@
-import { validateDataset, selectYear, MAX_DATA_BYTES } from './contract.mjs';
+import { validateDataset, selectYear, MAX_DATA_BYTES, MIN_YEAR, MAX_YEAR } from './contract.mjs';
 
 const DATA_URL = new URL('./data/calendar.json', import.meta.url);
 const unavailable = (code, message) => ({ error: { code, message } });
@@ -15,7 +15,7 @@ export class HolidayClient {
     try { return { snapshot: selectYear(this.#dataset, year, now), dataset: this.#dataset }; }
     catch (error) {
       const messages = {
-        CALENDAR_YEAR_UNSUPPORTED: '공식 자료 지원 대상은 한국 시각 기준 올해와 다음 해입니다. 이 연도는 수동 모드를 선택하세요.',
+        CALENDAR_YEAR_UNSUPPORTED: '선택할 수 있는 연도는 ' + MIN_YEAR + '~' + MAX_YEAR + '년입니다. 범위 안의 연도를 입력하세요.',
         CALENDAR_DATA_UNAVAILABLE: '이 연도의 완전한 공식 자료가 아직 준비되지 않았습니다. 다시 읽거나 수동 모드를 선택하세요.',
         CALENDAR_DATA_EXPIRED: '마지막 성공 수집 후 30일을 넘었습니다. 공식 자료로 만들 수 없습니다. 새 자료를 기다리거나 수동 모드를 선택하세요.',
       };

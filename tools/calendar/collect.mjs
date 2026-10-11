@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { createHolidayService, HolidayError } from './lib/holiday-provider.mjs';
-import { emptyDataset, emptyYear, validateDataset, targetYears, MAX_DATA_BYTES } from '../../docs/assets/calendar/contract.mjs';
+import { emptyDataset, emptyYear, validateDataset, targetYears, currentSeoulYear, MAX_DATA_BYTES } from '../../docs/assets/calendar/contract.mjs';
 
 const error = code => Object.assign(new Error(code), { code });
 const safeCodes = new Set(['CONFIGURATION_ERROR', 'COLLECTION_FAILED', 'PREVIOUS_DATA_INVALID', 'OUTPUT_BUSY', 'PERSISTENCE_ERROR', 'ARGUMENT_ERROR']);
@@ -31,8 +31,10 @@ export async function collectDataset({ previous = null, service, now = Date.now(
   if (previous) validateDataset(previous, { production: true });
   const data = emptyDataset(now);
   data.datasetKind = 'official';
-  const report = { outcome: 'success', successfulYears: [], preservedYears: [], failedYears: [], deployEligible: false };
-  for (const year of targetYears(now)) {
+  const report = { outcome: 'success', successfulYears: [], preservedYears: [], unavailableYears: [], failedYears: [], deployEligible: false };
+  const currentYear = currentSeoulYear(now), targets = targetYears();
+  const orderedYears = [...new Set([currentYear, currentYear + 1, ...targets])].filter(year => targets.includes(year));
+  for (const year of orderedYears) {
     try {
       const snapshot = await service.getYear(year);
       data.years[year] = snapshot;
@@ -41,7 +43,10 @@ export async function collectDataset({ previous = null, service, now = Date.now(
       if (!snapshot.complete || snapshot.status !== 'ready') throw error('COLLECTION_FAILED');
       report.successfulYears.push(year);
     } catch (failure) {
-      report.failedYears.push(year);
+      const unavailable = failure instanceof HolidayError && failure.code === 'YEAR_UNAVAILABLE';
+      const optionalUnavailable = unavailable && year !== currentYear && !previous?.years[year]?.complete;
+      if (optionalUnavailable) report.unavailableYears.push(year);
+      else report.failedYears.push(year);
       if (previous?.years[year]?.complete) {
         const warning = '최근 수집 실패: 이전 검증 자료를 보존했습니다. 사용 전 최신성을 확인하세요.';
         data.years[year] = { ...structuredClone(previous.years[year]), status: 'preserved',
@@ -50,13 +55,12 @@ export async function collectDataset({ previous = null, service, now = Date.now(
             ? [...previous.years[year].warnings] : [...previous.years[year].warnings, warning] };
         report.preservedYears.push(year);
       } else {
-        const unavailable = failure instanceof HolidayError && failure.code === 'YEAR_UNAVAILABLE';
         data.years[year] = emptyYear(year, unavailable ? 'unavailable' : 'error', unavailable ? '연간 공식 공휴일이 0건입니다. 자료 공개 여부를 확인하세요.' : '공식 자료 수집에 실패했습니다. 다음 수집 또는 명시적 수동 모드를 사용하세요.');
       }
     }
   }
-  report.outcome = report.failedYears.length === 0 ? 'success' : report.successfulYears.length ? 'partial' : 'failed';
-  report.deployEligible = report.outcome === 'success';
+  report.outcome = report.failedYears.length === 0 && report.unavailableYears.length === 0 ? 'success' : report.successfulYears.length ? 'partial' : 'failed';
+  report.deployEligible = report.failedYears.length === 0 && report.successfulYears.includes(currentYear);
   validateDataset(data);
   return { data, report };
 }

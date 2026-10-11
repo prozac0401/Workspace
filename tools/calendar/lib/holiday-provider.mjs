@@ -11,6 +11,7 @@ export class HolidayError extends Error {
 }
 const bad = () => { throw new HolidayError(); };
 export const MAX_PAGES_PER_MONTH = 20;
+export const MAX_REQUESTS_PER_RUN = 2000;
 export function parseHolidayXml(xml) {
   if (typeof xml !== 'string' || Buffer.byteLength(xml) > 1048576 || /<!\s*(DOCTYPE|ENTITY)/i.test(xml)) bad();
   let root = null, count = 0; const stack = [];
@@ -85,16 +86,20 @@ async function readLimited(response) {
   catch { bad(); }
 }
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-export function createHolidayService({ key = '', fetchImpl = fetch, now = Date.now, delay = sleep, random = Math.random, timeoutMs = 8000, annualTimeoutMs = 60000 } = {}) {
+export function createHolidayService({ key = '', fetchImpl = fetch, now = Date.now, delay = sleep, random = Math.random, timeoutMs = 8000, annualTimeoutMs = 60000, maxRequests = MAX_REQUESTS_PER_RUN } = {}) {
+  if (!Number.isInteger(maxRequests) || maxRequests < 1 || maxRequests > MAX_REQUESTS_PER_RUN) throw new HolidayError('CONFIGURATION_ERROR');
   const run = semaphore(3);
+  let requestCount = 0;
   async function getPage(year, month, page, signal, deadline) {
     for (let attempt = 0; attempt < 3; attempt++) {
       let retryAfter = null;
       try {
         return await run(async () => {
           if (signal.aborted || now() >= deadline) throw new HolidayError('UPSTREAM_TIMEOUT', true);
+          if (requestCount >= maxRequests) throw new HolidayError('REQUEST_BUDGET_EXCEEDED');
           const requestSignal = AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]);
           let response;
+          requestCount++;
           try { response = await fetchImpl(buildUpstreamUrl(year, month, page, key), { signal: requestSignal, redirect: 'error', headers: { Accept: 'application/xml' } }); }
           catch { throw new HolidayError(requestSignal.aborted ? 'UPSTREAM_TIMEOUT' : 'UPSTREAM_ERROR', true); }
           if (!response.ok) {
@@ -158,7 +163,7 @@ export function createHolidayService({ key = '', fetchImpl = fetch, now = Date.n
     const failedMonths = outcomes.flatMap((v, i) => v.status === 'rejected' ? [i + 1] : []);
     if (failedMonths.length) {
       const errors = outcomes.filter(x => x.status === 'rejected').map(x => x.reason);
-      throw new HolidayError(errors.some(x => x.code === 'UPSTREAM_TIMEOUT') ? 'UPSTREAM_TIMEOUT' : 'UPSTREAM_ERROR', errors.some(x => x.retryable), failedMonths);
+      throw new HolidayError(errors.some(x => x.code === 'REQUEST_BUDGET_EXCEEDED') ? 'REQUEST_BUDGET_EXCEEDED' : errors.some(x => x.code === 'UPSTREAM_TIMEOUT') ? 'UPSTREAM_TIMEOUT' : 'UPSTREAM_ERROR', errors.some(x => x.retryable), failedMonths);
     }
     const unique = new Map();
     for (const result of outcomes) for (const record of result.value.holidays) {
@@ -176,6 +181,7 @@ export function createHolidayService({ key = '', fetchImpl = fetch, now = Date.n
   async function getYear(input) {
     let year; try { year = yearNumber(input); } catch { throw new HolidayError('INVALID_YEAR'); }
     if (!key) throw new HolidayError('CONFIGURATION_ERROR');
+    if (requestCount >= maxRequests) throw new HolidayError('REQUEST_BUDGET_EXCEEDED');
     // Durability and stale decisions belong to the validated dataset, never runner memory.
     return collect(year);
   }

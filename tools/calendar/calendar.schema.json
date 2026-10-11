@@ -1,81 +1,414 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:workspace:calendar:1",
-  "title": "Workspace public calendar dataset v1",
+  "$id": "urn:workspace:calendar:2",
+  "title": "Workspace public calendar dataset v2",
   "description": "Run contract.mjs as well: it validates real dates, year/key matching, ordering, completeness, raw counts, production fixture restrictions and the 2 MiB canonical UTF-8 JSON size limit.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "source", "datasetKind", "supportedYears", "targetYears", "years"],
+  "required": [
+    "schemaVersion",
+    "source",
+    "datasetKind",
+    "supportedYears",
+    "targetYears",
+    "years"
+  ],
   "properties": {
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": {
+      "const": 2
+    },
     "source": {
-      "type": "object", "additionalProperties": false,
-      "required": ["provider", "operation", "url"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "operation",
+        "url"
+      ],
       "properties": {
-        "provider": { "const": "KASI" },
-        "operation": { "const": "getRestDeInfo" },
-        "url": { "const": "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo" }
+        "provider": {
+          "const": "KASI"
+        },
+        "operation": {
+          "const": "getRestDeInfo"
+        },
+        "url": {
+          "const": "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
+        }
       }
     },
-    "datasetKind": { "enum": ["official", "fixture", "uninitialized"] },
-    "supportedYears": { "$ref": "#/$defs/yearPair" },
-    "targetYears": { "$ref": "#/$defs/yearPair" },
+    "datasetKind": {
+      "enum": [
+        "official",
+        "fixture",
+        "uninitialized"
+      ]
+    },
+    "supportedYears": {
+      "$ref": "#/$defs/yearRange"
+    },
+    "targetYears": {
+      "$ref": "#/$defs/yearRange"
+    },
     "years": {
-      "type": "object", "minProperties": 2, "maxProperties": 2, "additionalProperties": false,
-      "patternProperties": { "^(19[0-9]{2}|20[0-9]{2}|2100)$": { "$ref": "#/$defs/year" } }
+      "type": "object",
+      "minProperties": 117,
+      "maxProperties": 117,
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(198[3-9]|199[0-9]|20[0-9]{2})$": {
+          "$ref": "#/$defs/year"
+        }
+      }
     }
   },
   "$defs": {
-    "yearPair": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "type": "integer", "minimum": 1900, "maximum": 2100 } },
-    "text": { "type": "string", "minLength": 1, "maxLength": 250, "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$" },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
     "month": {
-      "type": "object", "additionalProperties": false,
-      "required": ["month", "rawCount", "pages", "status"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "month",
+        "rawCount",
+        "pages",
+        "status"
+      ],
       "properties": {
-        "month": { "type": "integer", "minimum": 1, "maximum": 12 },
-        "rawCount": { "type": "integer", "minimum": 0, "maximum": 1000 },
-        "pages": { "type": "integer", "minimum": 0, "maximum": 1000 },
-        "status": { "enum": ["success", "unavailable", "error"] }
+        "month": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "rawCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "pages": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "status": {
+          "enum": [
+            "success",
+            "unavailable",
+            "error"
+          ]
+        }
       }
     },
     "holiday": {
-      "type": "object", "additionalProperties": false,
-      "required": ["date", "name", "source", "category", "sourceId"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "date",
+        "name",
+        "source",
+        "category",
+        "sourceId"
+      ],
       "properties": {
-        "date": { "type": "string", "format": "date", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
-        "name": { "type": "string", "minLength": 1, "maxLength": 50, "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$" },
-        "source": { "const": "official" },
-        "category": { "const": "public" },
-        "sourceId": { "type": "string", "pattern": "^kasi:[0-9]{8}:[0-9]{1,6}$", "maxLength": 20 }
+        "date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+        },
+        "source": {
+          "const": "official"
+        },
+        "category": {
+          "const": "public"
+        },
+        "sourceId": {
+          "type": "string",
+          "pattern": "^kasi:[0-9]{8}:[0-9]{1,6}$",
+          "maxLength": 20
+        }
       }
     },
     "year": {
-      "type": "object", "additionalProperties": false,
-      "required": ["year", "status", "complete", "lastSuccessfulFetchAt", "snapshotId", "monthResults", "holidays", "warnings"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "year",
+        "status",
+        "complete",
+        "lastSuccessfulFetchAt",
+        "snapshotId",
+        "monthResults",
+        "holidays",
+        "warnings"
+      ],
       "properties": {
-        "year": { "type": "integer", "minimum": 1900, "maximum": 2100 },
-        "status": { "enum": ["ready", "preserved", "unavailable", "error"] },
-        "complete": { "type": "boolean" },
-        "lastSuccessfulFetchAt": { "type": ["string", "null"], "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
-        "snapshotId": { "type": ["string", "null"], "pattern": "^[a-zA-Z0-9_-]+$", "maxLength": 100 },
-        "monthResults": { "type": "array", "minItems": 12, "maxItems": 12, "items": { "$ref": "#/$defs/month" } },
-        "holidays": { "type": "array", "maxItems": 12000, "items": { "$ref": "#/$defs/holiday" } },
-        "warnings": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/text" } }
+        "year": {
+          "type": "integer",
+          "minimum": 1983,
+          "maximum": 2099
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "preserved",
+            "unavailable",
+            "error"
+          ]
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "lastSuccessfulFetchAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+        },
+        "snapshotId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "maxLength": 100
+        },
+        "monthResults": {
+          "type": "array",
+          "minItems": 12,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/month"
+          }
+        },
+        "holidays": {
+          "type": "array",
+          "maxItems": 12000,
+          "items": {
+            "$ref": "#/$defs/holiday"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        }
       },
-      "allOf": [{
-        "if": { "properties": { "complete": { "const": true } } },
-        "then": { "properties": {
-          "status": { "enum": ["ready", "preserved"] },
-          "lastSuccessfulFetchAt": { "type": "string" }, "snapshotId": { "type": "string", "minLength": 1 },
-          "holidays": { "minItems": 1 },
-          "monthResults": { "items": { "properties": { "status": { "const": "success" }, "pages": { "minimum": 1 } } } }
-        } },
-        "else": { "properties": {
-          "status": { "enum": ["unavailable", "error"] },
-          "lastSuccessfulFetchAt": { "const": null }, "snapshotId": { "const": null }, "holidays": { "maxItems": 0 },
-          "monthResults": { "items": { "properties": { "status": { "enum": ["unavailable", "error"] }, "pages": { "const": 0 }, "rawCount": { "const": 0 } } } }
-        } }
-      }]
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "complete": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "ready",
+                  "preserved"
+                ]
+              },
+              "lastSuccessfulFetchAt": {
+                "type": "string"
+              },
+              "snapshotId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "holidays": {
+                "minItems": 1
+              },
+              "monthResults": {
+                "items": {
+                  "properties": {
+                    "status": {
+                      "const": "success"
+                    },
+                    "pages": {
+                      "minimum": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "unavailable",
+                  "error"
+                ]
+              },
+              "lastSuccessfulFetchAt": {
+                "const": null
+              },
+              "snapshotId": {
+                "const": null
+              },
+              "holidays": {
+                "maxItems": 0
+              },
+              "monthResults": {
+                "items": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "unavailable",
+                        "error"
+                      ]
+                    },
+                    "pages": {
+                      "const": 0
+                    },
+                    "rawCount": {
+                      "const": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "yearRange": {
+      "type": "array",
+      "const": [
+        1983,
+        1984,
+        1985,
+        1986,
+        1987,
+        1988,
+        1989,
+        1990,
+        1991,
+        1992,
+        1993,
+        1994,
+        1995,
+        1996,
+        1997,
+        1998,
+        1999,
+        2000,
+        2001,
+        2002,
+        2003,
+        2004,
+        2005,
+        2006,
+        2007,
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026,
+        2027,
+        2028,
+        2029,
+        2030,
+        2031,
+        2032,
+        2033,
+        2034,
+        2035,
+        2036,
+        2037,
+        2038,
+        2039,
+        2040,
+        2041,
+        2042,
+        2043,
+        2044,
+        2045,
+        2046,
+        2047,
+        2048,
+        2049,
+        2050,
+        2051,
+        2052,
+        2053,
+        2054,
+        2055,
+        2056,
+        2057,
+        2058,
+        2059,
+        2060,
+        2061,
+        2062,
+        2063,
+        2064,
+        2065,
+        2066,
+        2067,
+        2068,
+        2069,
+        2070,
+        2071,
+        2072,
+        2073,
+        2074,
+        2075,
+        2076,
+        2077,
+        2078,
+        2079,
+        2080,
+        2081,
+        2082,
+        2083,
+        2084,
+        2085,
+        2086,
+        2087,
+        2088,
+        2089,
+        2090,
+        2091,
+        2092,
+        2093,
+        2094,
+        2095,
+        2096,
+        2097,
+        2098,
+        2099
+      ]
     }
   }
 }

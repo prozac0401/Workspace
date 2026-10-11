@@ -44,10 +44,12 @@ test('durable Git storage: init is explicit, only JSON persists, pinned reads su
   assert.equal(await store.current(), second);
 });
 
-test('deployment defaults skip partial/failed, while partial successful years remain eligible for persistence', () => {
-  assert.deepEqual(deploymentDecision({ outcome: 'partial', successfulYears: [2026], deployEligible: false }), { persist: true, deploy: false });
-  assert.deepEqual(deploymentDecision({ outcome: 'failed', successfulYears: [], deployEligible: false }), { persist: false, deploy: false });
-  assert.deepEqual(deploymentDecision({ outcome: 'success', successfulYears: [2026, 2027], deployEligible: true }), { persist: true, deploy: true });
+test('deployment skips collection errors but allows explicitly unavailable optional years after current-year success', () => {
+  assert.deepEqual(deploymentDecision({ outcome: 'partial', successfulYears: [2026], failedYears: [2027], deployEligible: false }), { persist: true, deploy: false });
+  assert.deepEqual(deploymentDecision({ outcome: 'failed', successfulYears: [], failedYears: [2026], deployEligible: false }), { persist: false, deploy: false });
+  assert.deepEqual(deploymentDecision({ outcome: 'success', successfulYears: [2026, 2027], failedYears: [], deployEligible: true }), { persist: true, deploy: true });
+  assert.deepEqual(deploymentDecision({ outcome: 'partial', successfulYears: [2026, 2027], failedYears: [], unavailableYears: [2099], deployEligible: true }), { persist: true, deploy: true });
+  assert.deepEqual(deploymentDecision({ outcome: 'partial', successfulYears: [2026], failedYears: [2027], deployEligible: true }), { persist: true, deploy: false });
 });
 
 test('local build uses explicit unavailable JSON; production refuses fixture, missing, expired and year rollover data', async () => {
@@ -60,7 +62,7 @@ test('local build uses explicit unavailable JSON; production refuses fixture, mi
   assert.equal(await readFile(output, 'utf8'), bytes);
   assert.throws(() => assertDeployable(fixture(), NOW));
   assert.throws(() => assertDeployable(official(), NOW + MAX_STALE + 1), /EXPIRED/);
-  assert.throws(() => assertDeployable(official(), Date.parse('2026-12-31T15:00:00Z')), /REFRESH_REQUIRED/);
+  assert.throws(() => assertDeployable(official(), Date.parse('2026-12-31T15:00:00Z')), /EXPIRED/);
   assert.equal(assertDeployable(official(), NOW).years[2026].lastSuccessfulFetchAt, '2026-10-11T00:00:00.000Z');
 });
 
@@ -90,7 +92,7 @@ test('otherwise-valid oversized snapshots cannot replace durable data or public 
   await prepareSite({ source: file, production: true, output, now: NOW });
   const before = await readFile(output, 'utf8');
   const oversized = official();
-  for (const year of oversized.targetYears) {
+  for (const year of [2026, 2027]) {
     oversized.years[year].holidays = [];
     for (let month = 1; month <= 12; month++) {
       const mm = String(month).padStart(2, '0');
