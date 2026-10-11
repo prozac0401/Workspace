@@ -25,6 +25,10 @@ assert jobs['build']['needs'] == ['verify', 'prepare-data', 'store-data']
 assert "needs.prepare-data.outputs.deploy == 'true'" in jobs['build']['if']
 assert "needs.store-data.outputs.data_sha != ''" in jobs['build']['if']
 assert jobs['deploy']['needs'] == 'build'
+# reuse intentionally skips store-data. An explicit status function prevents
+# an implicit success() from propagating that ancestor's skip through build.
+assert "!cancelled()" in jobs['deploy']['if']
+assert "needs.build.result == 'success'" in jobs['deploy']['if']
 assert jobs['deploy']['environment']['name'] == 'github-pages'
 for name, job in jobs.items():
     permissions = job.get('permissions', workflow['permissions'])
