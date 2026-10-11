@@ -164,9 +164,10 @@ jobs:
   deploy:
     needs: build
     if: >-
+      ${{ !cancelled() && needs.build.result == 'success' &&
       vars.CALENDAR_ENABLED == 'true' && github.repository == 'prozac0401/Workspace' &&
       github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
-      contains(fromJSON('["push","schedule","workflow_dispatch"]'), github.event_name)
+      contains(fromJSON('["push","schedule","workflow_dispatch"]'), github.event_name) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
