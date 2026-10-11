@@ -14,7 +14,7 @@ title: 달력
       <section class="card year-card" aria-labelledby="calendar-data-heading">
         <h2 id="calendar-data-heading">달력 연도</h2>
         <label class="visually-hidden" for="year">달력 연도</label>
-        <div class="year-control"><input id="year" type="number" min="1983" max="2099" step="1" required inputmode="numeric" aria-describedby="yearHelp"><span>년</span><span id="yearHelp" class="hint">1983~2099년</span></div>
+        <div class="year-control"><input id="year" type="number" min="1983" max="2099" step="1" required inputmode="numeric" aria-describedby="yearHelp"><span>년</span><span id="yearHelp" class="hint">(범위 : 1983~2099)</span></div>
         <label class="lunar-option" for="showLunar"><input id="showLunar" type="checkbox" aria-describedby="lunarRangeHelp"><span>음력 날짜 표시 (MM.DD)</span></label>
         <p id="lunarRangeHelp" class="hint" hidden>음력은 1983~2050년까지 표시할 수 있습니다.</p>
         <div id="status" class="status" role="status" aria-live="polite" hidden></div>
@@ -73,7 +73,7 @@ title: 달력
         <p id="exportStatus" role="status" aria-live="polite" class="hint"></p>
       </section>
       <div id="empty" class="empty"><p>미리보기에서 달력을 확인하세요.</p></div>
-      <div class="preview-scroll" tabindex="0" role="region" aria-label="연간 달력 미리보기, 작은 화면에서는 가로로 스크롤"><div id="preview"></div></div>
+      <div class="preview-scroll" tabindex="0" role="region" aria-label="연간 달력 미리보기"><div id="preview"></div></div>
     </div>
   </div>
 </div>

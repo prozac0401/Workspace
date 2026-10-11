@@ -10,7 +10,9 @@
 .workspace-calendar .card h2{font-size:1rem;margin:0 0 .8rem;font-weight:600}
 .workspace-calendar label:not(.check){display:block;font-weight:600;margin:.7rem 0 .3rem}
 .workspace-calendar .visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.workspace-calendar input,.workspace-calendar select,.workspace-calendar button{font:inherit}
+.workspace-calendar input,.workspace-calendar select,.workspace-calendar button{font:inherit;text-align:center}
+.workspace-calendar select{text-align-last:center}
+.workspace-calendar input[type="date"]::-webkit-datetime-edit{padding:0;text-align:center}
 .workspace-calendar input:not([type="checkbox"]),.workspace-calendar select{width:100%;border:1px solid var(--calendar-muted);border-radius:.3rem;background:var(--md-code-bg-color);padding:.55rem;color:var(--md-default-fg-color)}
 .workspace-calendar :is(input,select,button,summary,a,.preview-scroll,.schedule-scroll):focus-visible{outline:3px solid var(--md-accent-fg-color);outline-offset:3px}
 .workspace-calendar .year-control{display:flex;align-items:center;gap:.5rem}
@@ -27,7 +29,7 @@
 .workspace-calendar .schedule-scroll{overflow-x:auto;padding:0 .15rem .3rem}
 .workspace-calendar .schedule-row{display:grid;grid-template-columns:11rem minmax(10rem,1fr) 5rem auto;gap:.65rem;align-items:end;min-width:32rem}
 .workspace-calendar .schedule-row label{margin-top:0}
-.workspace-calendar .schedule-row :is(input,select,button){min-height:2.4rem}
+.workspace-calendar .schedule-row :is(input,select,button){height:2.7rem;min-height:0;padding-block:0;line-height:1.2}
 .workspace-calendar .schedule-row button{margin:0}
 .workspace-calendar .format-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}
 .workspace-calendar .color-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem 1.2rem;margin:1rem 0}
@@ -55,7 +57,7 @@
 .workspace-calendar .check input{flex:0 0 auto;margin-top:.2rem}
 .workspace-calendar .empty{text-align:center;border:1px dashed var(--calendar-muted);border-radius:.5rem;padding:2rem 1rem;color:var(--calendar-muted);font-size:.7rem;line-height:1.8}
 .workspace-calendar .preview-scroll{overflow-x:auto;overscroll-behavior-x:contain}
-.workspace-calendar #preview{font-family:var(--sheet-font-family),sans-serif;color:var(--sheet-text-color);color-scheme:light}
+.workspace-calendar #preview{min-width:780px;font-family:var(--sheet-font-family),sans-serif;color:var(--sheet-text-color);color-scheme:light}
 .workspace-calendar #preview .month{background:var(--sheet-background);border:1px solid var(--sheet-border-color);margin-bottom:1rem;overflow:hidden;min-width:780px}
 .workspace-calendar #preview .month h3{background:var(--sheet-title-background);color:var(--sheet-title-color);padding:3pt 6pt;margin:0;font-size:var(--sheet-title-size);font-family:inherit;font-weight:700;line-height:1.2;letter-spacing:normal}
 .workspace-calendar #preview .month table{border-collapse:collapse;table-layout:fixed;width:100%;font-family:inherit;font-size:var(--sheet-font-size);line-height:1.2;background:var(--sheet-background);border:0;display:table;margin:0;color:var(--sheet-text-color)}
