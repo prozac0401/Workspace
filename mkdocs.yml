@@ -10,6 +10,9 @@ exclude_docs: |
   !/assets/calendar/calendar.css
   !/assets/calendar/date-core.mjs
   !/assets/calendar/calendar-model.mjs
+  !/assets/calendar/formatting.mjs
+  !/assets/calendar/lunar-calendar.mjs
+  !/assets/calendar/lunar-data.mjs
   !/assets/calendar/holiday-client.mjs
   !/assets/calendar/contract.mjs
   !/assets/calendar/preview-renderer.mjs

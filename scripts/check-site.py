@@ -34,6 +34,8 @@ public_assets = {
     'assets/calendar/boot.js', 'assets/calendar/app.mjs',
     'assets/calendar/calendar.css', 'assets/calendar/date-core.mjs',
     'assets/calendar/calendar-model.mjs', 'assets/calendar/holiday-client.mjs',
+    'assets/calendar/formatting.mjs',
+    'assets/calendar/lunar-calendar.mjs', 'assets/calendar/lunar-data.mjs',
     'assets/calendar/contract.mjs', 'assets/calendar/preview-renderer.mjs',
     'assets/calendar/xlsx-exporter.mjs', 'assets/calendar/zip.mjs',
     'assets/calendar/data/calendar.json',

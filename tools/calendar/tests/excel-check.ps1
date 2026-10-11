@@ -25,12 +25,23 @@ try {
     $book = $excelApp.Workbooks.Open($inputPath, 0, $false)
     $sheet = $book.Worksheets.Item(1)
     if ($book.Worksheets.Count -ne 1) { throw 'Expected exactly one worksheet' }
-    if ($sheet.Range('F7').Value2 -notlike "1`n*") { throw 'F7 date text mismatch' }
+    if ($sheet.Range('F7').Value2 -notmatch '^1(?: \(\d{2}\.\d{2}\))?\r?\n') { throw 'F7 date text mismatch' }
     if ($null -ne $sheet.Range('F8').Value2) { throw 'F8 must be empty' }
     if ($sheet.Range('F8').MergeCells) { throw 'Writing cell must be independent' }
     if ($sheet.ProtectContents) { throw 'Worksheet must be unprotected' }
     $report.open = 'PASS'
     $report.printArea = $sheet.PageSetup.PrintArea
+    if ($report.printArea -notmatch '^\$A\$5:\$G\$\d+$') { throw 'Print area must start at the January heading in A5' }
+    $januaryHeading = '2027' + [char]0xB144 + ' 1' + [char]0xC6D4
+    if ($sheet.Range('A5').Value2 -ne $januaryHeading) { throw 'First printed heading must be January' }
+    for ($leadingRow = 1; $leadingRow -le 4; $leadingRow++) {
+        if (-not $sheet.Rows.Item($leadingRow).Hidden) { throw 'Unused leading rows must be hidden' }
+        if ($null -ne $sheet.Cells.Item($leadingRow, 1).Value2) { throw 'Unnecessary annual header or metadata remains in the worksheet' }
+    }
+    foreach ($header in @($sheet.PageSetup.LeftHeader, $sheet.PageSetup.CenterHeader, $sheet.PageSetup.RightHeader)) {
+        if ($header) { throw 'Unexpected printed header' }
+    }
+    $report.januaryStartsAtMonthHeading = 'PASS'
     $report.fitToWidth = $sheet.PageSetup.FitToPagesWide
     $report.fitToHeight = $sheet.PageSetup.FitToPagesTall
     $report.horizontalBreaks = $sheet.HPageBreaks.Count

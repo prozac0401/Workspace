@@ -58,3 +58,39 @@ schemaVersion2의 지원/조회 대상은117개 연도다. 올해·다음 해를
 [월간 변경 PR #25](https://github.com/prozac0401/Workspace/pull/25)의 HEAD `dc4b159bf001078a8f9fe9cf6d341973931ae7db`는 문서·Windows CI가 통과했고 main `609d572d1e36c1cb911d22c5744f556967346cb3`로 병합됐다. CALENDAR_ENABLED를 true로 복원한 뒤 [reuse 실행38108077377](https://github.com/prozac0401/Workspace/actions/runs/38108077377)은 verify/prepare-data/build 성공과 store-data 생략을 확인했지만 deploy도 생략됐다. workflow 전체의 success만으로 배포 성공이라고 기록하지 않는다. 기존 문서 재빌드 경로의 암묵적 success 조건이 생략된 선행 job의 영향을 받아 발생한 결함이다.
 
 배포 조건에 명시적 `!cancelled()`와 `needs.build.result == 'success'`를 추가해 성공한 운영 빌드만 이어받고 취소·실패는 계속 차단한다. 기존 저장소/활성화/기본브랜치/이벤트 조건, 권한과 최신 source SHA 확인은 유지한다. workflow 검사기에 이 두 조건을 회귀 검사로 추가하고 실제 main push의 reuse 배포로 완료를 확인한다. 기존 수집·XLSX·UI 코드는 이 복구에서 수정하지 않는다.
+
+월간 변경과 재사용 배포 복구는 [PR #26](https://github.com/prozac0401/Workspace/pull/26), main `cc3f9e3f3975f9534fc28fded51b6ebc6a6d0506`, [실제 배포38108452661](https://github.com/prozac0401/Workspace/actions/runs/38108452661)에서 완료했다. store-data 생략·build/deploy 성공, 실제 브라우저의 버튼 제거·자동 연도 전환·다운로드와 기존 데이터 hash/시각 보존을 확인했다. 기록은 `artifacts/calendar/monthly-publication-result.json`이다.
+
+## 공식 휴일 표시명 변경
+
+사용자가 ‘기독탄신일’을 ‘크리스마스’로 표시하는 로직을 요청했다. 공식 항목의 해당 문자열만 공통 모델에서 변환하며 대체공휴일의 괄호 안 이름도 포함한다. 공식 목록과 preview/XLSX에 같은 표시를 적용하고 원본 JSON·snapshot·sources·수집 시각, 수동 입력은 보존한다. 날짜 행의 표시 중복은 변환 후 정리하고 모든 출처를 유지한다. 완료 근거는 관련 모델/OOXML 단위시험, 기존 공식 데이터로 strict 빌드·공개 링크 검사, 실제 2027년 공식 목록/미리보기/XLSX의 두 날짜 표시 확인이다. 변경 없는 날짜 계산·네이티브 Excel/인쇄·설치 검사는 반복하지 않는다. 명령·결과·source/data SHA와 배포 후 확인은 후속 PR 및 `artifacts/calendar/christmas-publication-result.json`에 남긴다.
+
+위 표시명 변경의 로컬 모델13개·실제JSON strict/check-site와 실제Edge·독립OOXML 두셀 검증은 통과했다. `artifacts/calendar/christmas-label/local-2026-10-11T03-43-01-975Z`에 결과를 남겼으며, 원격 반영 전 사용자의 다음 화면·인쇄 요청이 도착하여 같은 작업 범위를 확장한다. 이 중간 성공을 확장 변경 전체의 성공으로 사용하지 않는다.
+
+## 화면·인쇄·서식 후속 요구
+
+사용자는1월 상단의 불필요한 인쇄 헤더와 사용자에게 필요 없는 세부 설명을 제거하고, 연도 안내는1983~2099년으로만 줄이며 자료 읽기·연도별 현황·상시 주의사항을 없애도록 요청했다. ‘내 휴일 추가’는 ‘내 일정 추가’로 바꾸고 날짜·이름·구분·추가를 한 가로 행으로 제공한다. 미리보기의 사이트 테마 색상과 XLSX색 차이를 없애고 각 요소의 서식·색상을 사용자 설정으로 제공한다.
+
+구현은 정상 상태의 운영 상세 제거, 상황별 오류/동의만 유지, 반응형 가로 입력, 공통 불변 서식, 테마와 독립인 달력 미리보기, A5부터 인쇄와 운영 metadata의 문서 속성 이동에 한정한다. 기존 달력 날짜좌표·빈 작성3행·공식원문·월간수집·32일/35일·데이터 branch는 보존한다. 사용자 최신 요구가 기존 상단metadata/항상출처 표시와 초안작성기 무수정 선택을 대체한다. 새공개자산은 formatting.mjs만 허용목록과 검사기에 함께 추가한다.
+
+충분한 완료 근거는 관련 모델/서식/OOXML 시험과 독립파서, 실제브라우저의 가로배치·간소화·서식무효화·테마다크/라이트색상일치·설정다운로드, 실제Excel 사본의 PDF1월상단·기본12개월인쇄, strict빌드·공개링크·현재HEAD CI와배포확인이다. 출력이 바뀌었으므로 이번에는 Excel PDF검사를 다시 수행한다. 실제종이인쇄·LibreOffice·다른도구설치검사는 NOT RUN 범위다. 실제 결과는 아래에 기록하고 작업산출물은 `artifacts/calendar/customization/`, 최종 원격 증거는 `customization-publication-result.json`에 둔다. 운영JSON은 동일SHA를 재사용하며 KASI추가수집은 하지 않는다.
+
+중간 로컬 결과: `node --test tools/calendar/tests/core.test.mjs`15/15 PASS. `tools/calendar/tests/inspect-xlsx.py`는 `artifacts/calendar/formatting/{default,custom}`의 각365날짜·1,095빈셀·A5인쇄·12제목병합·문서속성·서식 PASS다. `node tools/calendar/tests/browser-check.mjs`15그룹과 실제공식JSON 별도4그룹은 Edge155에서 PASS/pageErrors0이다. `artifacts/calendar/browser-compact-formatting/results.json`, `compact-formatting/local-2026-10-11T03-54-23-064Z/results.json` 및 독립서식 XLSX결과에 기록했다. 공개 JSON hash는 그대로다. 이후 음력 요청과 renderer 높이 보정을 최종 작은 범위에서 추가 확인한다.
+
+`powershell -NoProfile -File tools/calendar/tests/excel-check.ps1 -OutputDirectory artifacts/calendar/formatting/default`는 Excel16.0/build20430에서 열기·A5인쇄·숨김빈1~4행·편집/저장/재열기·PDF출력 PASS다. PDF독립검사는12페이지 모두 월 제목부터 시작하며 불필요한 metadata가 없는 것을 확인했고1월/12월을PNG로 렌더링하여 육안 확인했다. 파일은 `formatting/default/excel-results.json`, `pdf-inspection.json`, `excel-print.pdf`다. 실제종이출력은 하지 않았다.
+
+검증 도구 초기 실패도 구분한다. Windows PowerShell5.1의 UTF-8 한글 리터럴 읽기 오류는 테스트에서 Unicode 문자코드로 비교하도록 고쳤다. PDF text 추출의 내부 쓰기 순서를 시각 순서로 오인한 assertion은 pdfplumber의 페이지 좌표순서로 검증하도록 고쳤다. 브라우저에서는 폭0인 보이지 않는 테두리의 상속색을 비교한 기대값을 실제 표시되는 테두리만 비교하도록 수정했다. 각각 수정 후 위 검사가 통과했으며 제품 실패를 성공으로 바꿔 기록하지 않는다.
+
+## 음력 표시 선택 추가
+
+사용자는 날짜 오른쪽 `(MM.DD)` 음력 표시를 선택적으로 추가하도록 요청했다. 한국음력표와 계산결과를 조사한 뒤, 확인 가능한 표가2050년까지이며 이후 계산에는하루차이가있다는 선택지를 안내했고 사용자는 **음력은1983~2050년만 제공**을 확정했다. 달력1983~2099 범위는 유지한다. 기본off,범위밖비활성화,불변모델의동일값을미리보기와XLSX에표시하고작성칸은계속비운다. 수집 API나Secret 사용범위를늘리지않는다. 표/조회모듈두개만추가공개하고generation·license·전수검사를저장소에보존한다.
+
+추가완료근거는 정적표재현·1983~2050 전체일자비교·윤월/연도경계·옵션무효화, 실제브라우저의defaultoff/on/off·2050허용·2051/2099비활성·날짜텍스트와독립XLSX일치이다. 기본off의Excel인쇄결과는앞단검사를재사용한다. 음력on은별도샘플에서날짜행에만추가되는지확인하고필요한실제출력검증만추가한다. 최종PR/소스SHA·배포·미실행은최종증거에명시한다.
+
+최종 로컬 실행: `npm ci --prefix tools/calendar --ignore-scripts`와 `npm test --prefix tools/calendar` **64/64 PASS(실패/skip0)**, 음력 생성물 재현·24,837일 참조표 비교·윤월/2033/시간대 검사 포함이다. 실제 기존KASI 설날·추석50개 기준 날짜도 일치했다(`lunar-research/official-festival-anchors.json`). 참조 패키지와의 전수 일치를 KASI API전수검증이라고 해석하지 않는다. 기본·사용자 서식과 음력 fixture독립검사도 PASS다.
+
+최종 productionJSON 빌드: `CALENDAR_DATA_FILE=artifacts/calendar/first-official-dataset.json`, `CALENDAR_PRODUCTION=1`에서 `python -m mkdocs build --strict` 및 `python scripts/check-site.py site --production` PASS(22공개페이지+2redirect+404). workflow검사와diff검사 PASS. 로컬 기준은 main`cc3f9e3f3975f9534fc28fded51b6ebc6a6d0506`에서 시작한 이번작업이며 최종커밋과원격CI는후속PR에서고정한다.
+
+실제 Edge 최종4그룹은 음력defaultoff/on/off, 1983/2050 허용·2051해제/차단·2099양력 유지, 제목/요일높이·사용자서식·테마다크/라이트색상 보존을 확인했다. `artifacts/calendar/lunar/local-2026-10-11T04-03-32-650Z/results.json`에 PASS/pageErrors0이며 실제공식2027+음력+사용자서식 XLSX의 독립파서도 **미리보기1,764셀/365날짜/1,095빈작성셀 전수 PASS**다. 최신`browser-xlsx-inspection.json`으로 앞선 custom전셀미실행 제한을 해소했다. 처음 예상한2027설날2/6은실제기준2/7과달라하네스기대값을수정했고 2/6=12.30,2/7=01.01둘다검증했다. 첫 실패는별도결과폴더에보존했다.
+
+음력on fixture에도 `powershell -NoProfile -File tools/calendar/tests/excel-check.ps1 -OutputDirectory artifacts/calendar/lunar/fixture`를 실행해 Excel16.0/build20430 열기·A5인쇄·편집저장재열기·PDF출력 PASS다. PDF12페이지가각월제목으로시작하고1월1일의`1 (11.24)` 표시·빈작성3행을텍스트/좌표검사와PNG육안으로확인했다. 실제종이출력과LibreOffice는NOT RUN이다. 개인원본파일·원래checkout사용자수정·Secret은변경하지않았다.

@@ -28,14 +28,37 @@ assert ws.sheet_properties.pageSetUpPr.fitToPage is True
 assert ws.print_title_rows is None
 assert ws.column_dimensions['A'].min == 1 and ws.column_dimensions['A'].max == 7
 assert ws.column_dimensions['A'].width == 18
-assert ws['A1'].value == f'{year}년 달력'
-assert ws['A2'].value == model['metadataText']
-assert ws['A3'].value == model['legendText']
-assert '모의 테스트' in ws['A2'].value
-assert '자동 갱신되지 않습니다' in ws['A3'].value
+for row in range(1, 5):
+    assert ws.row_dimensions[row].hidden, f'Leading row {row} must be hidden'
+    assert all(ws.cell(row, col).value is None for col in range(1, 8)), 'Leading rows must be empty'
+description = model['metadataText'] + '\n' + model['legendText']
+assert wb.properties.description == description
+assert wb.properties.title in (None, model['title'])
+assert '모의 테스트' in description
+assert '자동 갱신되지 않습니다' in description
 
-ns = {'s': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
-colors = {'black': 'FF17202A', 'red': 'FF9C2436', 'blue': 'FF2158A6', 'purple': 'FF70308C'}
+ns = {'s': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
+      'dc': 'http://purl.org/dc/elements/1.1/', 'dcterms': 'http://purl.org/dc/terms/',
+      'rels': 'http://schemas.openxmlformats.org/package/2006/relationships',
+      'ct': 'http://schemas.openxmlformats.org/package/2006/content-types'}
+formatting = model['formatting']
+argb = lambda value: 'FF' + value.removeprefix('#').upper()
+colors = {token: argb(formatting[key]) for token, key in {
+    'black': 'textColor', 'red': 'holidayColor', 'blue': 'saturdayColor',
+    'purple': 'manualColor', 'outside': 'textColor'}.items()}
+
+
+def check_font(cell, color, title=False):
+    assert cell.font.name == formatting['fontFamily'], (cell.coordinate, cell.font.name)
+    assert cell.font.sz == formatting['titleSize' if title else 'fontSize'], (cell.coordinate, cell.font.sz)
+    assert cell.font.color.type == 'rgb' and cell.font.color.rgb == color, (cell.coordinate, cell.font.color)
+
+
+def check_fill(cell, key):
+    assert cell.fill.patternType == 'solid', (cell.coordinate, cell.fill.patternType)
+    assert cell.fill.fgColor.type == 'rgb' and cell.fill.fgColor.rgb == argb(formatting[key]), (cell.coordinate, cell.fill.fgColor)
+
+
 dates = {}
 for month in model['months']:
     for day in month['slots']:
@@ -46,7 +69,9 @@ for month in model['months']:
 with zipfile.ZipFile(path) as z:
     assert z.testzip() is None, 'ZIP CRC failure'
     names = z.namelist()
-    assert len(names) == len(set(names)) == 6
+    assert len(names) == len(set(names)) == 7
+    assert set(names) == {'[Content_Types].xml', '_rels/.rels', 'docProps/core.xml', 'xl/workbook.xml',
+                          'xl/_rels/workbook.xml.rels', 'xl/worksheets/sheet1.xml', 'xl/styles.xml'}
     assert names.count('xl/worksheets/sheet1.xml') == 1
     assert not any(term in name.lower() for name in names for term in ['vba', 'externallink', 'connection'])
     for name in names:
@@ -55,7 +80,24 @@ with zipfile.ZipFile(path) as z:
         assert not any(node.attrib.get('TargetMode') == 'External' for node in xml.iter())
     sheet = ET.fromstring(z.read('xl/worksheets/sheet1.xml'))
     cells = {c.attrib['r']: c for c in sheet.findall('.//s:c', ns)}
-    merges = ['A1:G1', 'A2:G2', 'A3:G3']
+    for row in sheet.findall('s:sheetData/s:row', ns):
+        if int(row.attrib['r']) <= 4:
+            assert row.attrib.get('hidden') == '1'
+            assert all(len(cell) == 0 and 't' not in cell.attrib for cell in row), 'Leading rows contain XML content'
+    core = ET.fromstring(z.read('docProps/core.xml'))
+    assert core.findtext('dc:description', namespaces=ns) == description
+    created = core.findtext('dcterms:created', namespaces=ns)
+    assert created and created.endswith('Z'), 'Generation time must be UTC ISO 8601'
+    assert dt.datetime.fromisoformat(created.replace('Z', '+00:00')) == dt.datetime.fromisoformat(model['generatedAt'].replace('Z', '+00:00'))
+    relationships = ET.fromstring(z.read('_rels/.rels'))
+    assert any(item.attrib.get('Target') == 'docProps/core.xml' and item.attrib.get('Type') ==
+               'http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties'
+               for item in relationships.findall('rels:Relationship', ns))
+    content_types = ET.fromstring(z.read('[Content_Types].xml'))
+    assert any(item.attrib.get('PartName') == '/docProps/core.xml' and item.attrib.get('ContentType') ==
+               'application/vnd.openxmlformats-package.core-properties+xml'
+               for item in content_types.findall('ct:Override', ns))
+    merges = []
     start = 5
     blanks = 0
     date_count = 0
@@ -68,6 +110,11 @@ with zipfile.ZipFile(path) as z:
         assert model['months'][month - 1]['startRow'] == start
         assert ws.cell(start, 1).value == f'{year}년 {month}월'
         assert [ws.cell(start + 1, c).value for c in range(1, 8)] == list('일월화수목금토')
+        check_font(ws.cell(start, 1), argb(formatting['titleColor']), title=True)
+        check_fill(ws.cell(start, 1), 'titleBackground')
+        for c in range(1, 8):
+            check_font(ws.cell(start + 1, c), colors['red' if c == 1 else 'blue' if c == 7 else 'black'])
+            check_fill(ws.cell(start + 1, c), 'weekdayBackground')
         merges.append(f'A{start}:G{start}')
         if month > 1:
             expected_breaks.append(start - 1)
@@ -82,19 +129,34 @@ with zipfile.ZipFile(path) as z:
                 # openpyxl preserves the escaped underscore used by Excel's _xNNNN_ syntax.
                 expected = re.sub(r'(_x[0-9a-fA-F]{4}_)', lambda m: '_x005F_' + m[0][1:], day['displayText'])
                 assert cell.value == expected, (iso, cell.coordinate, cell.value, expected)
+                if model['config'].get('showLunar', False):
+                    lunar = day['lunar']
+                    assert 1983 <= year <= 2050 and type(lunar['isLeapMonth']) is bool
+                    assert 1 <= lunar['month'] <= 12 and 1 <= lunar['day'] <= 30
+                    assert lunar['text'] == f"{lunar['month']:02}.{lunar['day']:02}"
+                    assert day['displayText'].split('\n')[0] == f"{number} ({lunar['text']})"
+                else:
+                    assert day.get('lunar') is None
+                    assert day['displayText'].split('\n')[0] == str(number)
                 assert cell.data_type == 's', (iso, cell.data_type)
-                assert cell.font.color.rgb == colors[day['styleToken']]
+                check_font(cell, colors[day['styleToken']])
                 assert cell.alignment.wrapText and cell.alignment.vertical == 'top'
                 assert 34 <= ws.row_dimensions[row].height <= 409
                 date_count += 1
             else:
                 assert cell.value is None, 'Adjacent-month date must stay empty'
                 assert len(cells[cell.coordinate]) == 0
+                check_font(cell, colors['outside'])
+            check_fill(cell, 'background' if 1 <= number <= days else 'outsideBackground')
             for delta in range(1, 4):
                 blank = ws.cell(row + delta, col)
                 assert blank.value is None and blank.data_type != 'f'
                 assert blank.coordinate not in ws.merged_cells
-                assert ws.row_dimensions[blank.row].height == 22
+                assert ws.row_dimensions[blank.row].height == formatting['writingRowHeight']
+                check_font(blank, colors['black'])
+                check_fill(blank, 'background' if 1 <= number <= days else 'outsideBackground')
+                for side in (blank.border.left, blank.border.right, blank.border.top, blank.border.bottom):
+                    assert side.color.type == 'rgb' and side.color.rgb == argb(formatting['borderColor'])
                 element = cells[blank.coordinate]
                 assert len(element) == 0 and 't' not in element.attrib, 'Writing cell contains value/formula/string/space'
                 assert element.attrib.get('s') is not None, 'Styled editable blank expected'
@@ -103,10 +165,11 @@ with zipfile.ZipFile(path) as z:
         end = start + 1 + 4 * weeks
         start += 3 + 4 * weeks
     assert sorted(str(x) for x in ws.merged_cells.ranges) == sorted(merges)
+    assert len(merges) == 12
     assert [b.id for b in ws.row_breaks.brk] == expected_breaks
     assert len(expected_breaks) == 11
     assert ws.max_row == end
-    assert f'$A$1:$G${end}' in str(ws.print_area)
+    assert str(ws.print_area) == f"'{year}년 달력'!$A$5:$G${end}"
     assert date_count == len(dates) == (366 if calendar.isleap(year) else 365)
     assert blanks == date_count * 3
     for row in ws:
@@ -117,6 +180,7 @@ with zipfile.ZipFile(path) as z:
 
 report = {'status': 'PASS', 'engine': 'openpyxl 3.1.5 + independent Python calendar + ZIP/XML (not Excel)',
           'year': year, 'dates': date_count, 'independentBlankCells': blanks, 'sheets': 1, 'months': 12,
-          'columns': 7, 'titleMerges': 15, 'manualPageBreaks': 11, 'formulas': 0, 'datasetKind': 'fixture'}
+          'columns': 7, 'titleMerges': 12, 'hiddenEmptyLeadingRows': 4, 'metadataLocation': 'docProps/core.xml',
+          'showLunar': model['config'].get('showLunar', False), 'formatting': formatting, 'manualPageBreaks': 11, 'formulas': 0, 'datasetKind': 'fixture'}
 path.with_name(f'inspection_{year}.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 print(json.dumps(report, ensure_ascii=False))

@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { yearLayout, yearNumber, weekday, validDate, nextSeoulYear, isLeap } from '../../../docs/assets/calendar/date-core.mjs';
-import { buildCalendar, validateManual, normalizeName } from '../../../docs/assets/calendar/calendar-model.mjs';
+import { buildCalendar, validateManual, normalizeName, holidayDisplayName } from '../../../docs/assets/calendar/calendar-model.mjs';
 import { workbookParts, exportXlsx } from '../../../docs/assets/calendar/xlsx-exporter.mjs';
 import { DAY_MS, TTL, MAX_STALE } from '../../../docs/assets/calendar/contract.mjs';
+import { DEFAULT_FORMATTING, normalizeFormatting } from '../../../docs/assets/calendar/formatting.mjs';
 const NOW = Date.parse('2026-10-10T00:00:00Z');
 const manualModel = (year = 2027, manual = []) => buildCalendar({ year, manual, mode: 'manual', manualApproved: true, generatedAt: '2026-10-10T00:00:00Z' });
 test('AT01-03: every date and coordinate, 1900 through 2100, independently checked with UTC Date', () => {
@@ -66,6 +67,45 @@ test('AT05/09: stable ordering, same-name dedup with source preservation, holida
   assert.ok(Object.isFrozen(model.months[0].slots[0])); assert.throws(() => { model.mode = 'manual'; });
   records[0].name = 'changed'; assert.equal(second.labels[1], '겹침');
 });
+test('official Christmas display aliases reach preview and OOXML while original sources and manual names stay intact', () => {
+  const records = [
+    { date: '2027-12-25', name: '기독탄신일', source: 'official', category: 'public', sourceId: 'fixture:christmas' },
+    { date: '2027-12-25', name: '하늘휴일', source: 'official', category: 'public', sourceId: 'fixture:unchanged-last' },
+    { date: '2027-12-25', name: '나눔휴일', source: 'official', category: 'public', sourceId: 'fixture:unchanged-first' },
+    { date: '2027-12-27', name: '대체공휴일(기독탄신일)', source: 'official', category: 'public', sourceId: 'fixture:substitute' },
+  ];
+  const manual = [
+    validateManual({ date: '2027-12-25', name: '크리스마스', category: 'company', sourceId: 'manual:same-display' }, 2027),
+    validateManual({ date: '2027-12-25', name: '가가 수동', category: 'personal', sourceId: 'manual:sort-after-official' }, 2027),
+    validateManual({ date: '2027-12-26', name: '기독탄신일', category: 'personal', sourceId: 'manual:original-name' }, 2027),
+  ];
+  const s = { ...snapshot(records), datasetKind: 'fixture', lastSuccessfulFetchAt: '2026-10-10T00:00:00.000Z' };
+  const original = structuredClone(s);
+  const model = buildCalendar({ year: 2027, snapshot: s, manual, mode: 'ready', now: NOW });
+  const days = model.months[11].slots;
+  const christmas = days.find(day => day.date === '2027-12-25');
+  const personal = days.find(day => day.date === '2027-12-26');
+  const substitute = days.find(day => day.date === '2027-12-27');
+  assert.deepEqual(christmas.labels, ['나눔휴일', '크리스마스', '하늘휴일', '[개인] 가가 수동']);
+  assert.equal(christmas.sources.length, 5); // Same display label retains both official and manual provenance.
+  assert.deepEqual(personal.labels, ['[개인] 기독탄신일']);
+  assert.deepEqual(substitute.labels, ['대체공휴일(크리스마스)']);
+  assert.equal(holidayDisplayName(records[0]), '크리스마스');
+  assert.equal(holidayDisplayName(records[3]), '대체공휴일(크리스마스)');
+  assert.equal(holidayDisplayName(records[1]), '하늘휴일');
+  assert.equal(holidayDisplayName(manual[2]), '기독탄신일');
+  assert.deepEqual(s, original); assert.deepEqual(model.snapshot, original); assert.deepEqual(model.manual, manual);
+  const actualSources = new Map(days.flatMap(day => day.sources).map(item => [item.sourceId, item]));
+  assert.deepEqual(actualSources, new Map([...records, ...manual].map(item => [item.sourceId, item])));
+  const sheet = workbookParts(model)['xl/worksheets/sheet1.xml'];
+  for (const day of [christmas, personal, substitute]) {
+    const ref = String.fromCharCode(64 + day.excelColumn) + day.excelRow;
+    const xml = sheet.match(new RegExp(`<c r="${ref}"[^>]*>[\\s\\S]*?</c>`))[0];
+    assert.ok(xml.includes(day.displayText), ref);
+    if (day !== personal) assert.doesNotMatch(xml, /기독탄신일/);
+  }
+});
+
 test('AT05: long names grow a week uniformly; excessive names explicitly block export', () => {
   const long = validateManual({ date: '2027-01-01', name: '가'.repeat(50), category: 'company' }, 2027);
   const model = manualModel(2027, [long]); assert.ok(model.months[0].weekHeights[0] > 100);
@@ -80,11 +120,16 @@ test('AT08: explicit manual/stale consent and complete snapshots are enforced', 
   s.complete = false; assert.throws(() => buildCalendar({ year: 2027, mode: 'stale', snapshot: s, staleApproved: true, now: NOW }));
   assert.throws(() => buildCalendar({ year: 2027, mode: 'ready', snapshot: snapshot([]), now: NOW }));
 });
-test('AT04/11/12: OOXML has 1 sheet, exact blank cells, inline text, 15 title merges and 11 breaks', () => {
+test('AT04/11/12: OOXML has 1 sheet, exact blank cells, hidden empty leading rows, 12 month merges and 11 breaks', () => {
   const manual = ['=SUM(A1:A2)', '+1', '-1', '@test', '<img src=x>', '_x0041_'].map((name, i) => validateManual({ date: `2027-01-0${i + 1}`, name, category: 'company' }, 2027));
   const model = manualModel(2027, manual), parts = workbookParts(model), sheet = parts['xl/worksheets/sheet1.xml'];
   assert.equal((parts['xl/workbook.xml'].match(/<sheet /g) || []).length, 1);
-  assert.equal((sheet.match(/<mergeCell /g) || []).length, 15);
+  assert.equal((sheet.match(/<mergeCell /g) || []).length, 12);
+  for (let row = 1; row <= 4; row++) {
+    assert.match(sheet, new RegExp(`<row r="${row}" hidden="1" ht="0" customHeight="1"/>`));
+    assert.doesNotMatch(sheet, new RegExp(`<c r="[A-G]${row}"`));
+  }
+  assert.ok(parts['xl/workbook.xml'].includes("'2027년 달력'!$A$5:$G$291"));
   assert.equal((sheet.match(/<brk /g) || []).length, 11);
   assert.match(sheet, /<brk id="31"/); assert.match(sheet, /orientation="portrait" fitToWidth="1" fitToHeight="0"/);
   for (const month of model.months) for (const day of month.slots) {
@@ -138,7 +183,52 @@ test('fixture provenance and canonical success time appear in workbook metadata'
   assert.equal(model.isMock, true);
   assert.match(model.metadataText, /모의 테스트 자료/);
   assert.match(model.metadataText, /KST/);
-  assert.match(workbookParts(model)['xl/worksheets/sheet1.xml'], /모의 테스트 자료/);
+  const parts = workbookParts(model);
+  assert.match(parts['docProps/core.xml'], /모의 테스트 자료/);
+  assert.ok(parts['docProps/core.xml'].includes(model.metadataText));
+  assert.ok(parts['docProps/core.xml'].includes(model.legendText));
+  assert.match(parts['docProps/core.xml'], /2026-10-10T01:00:00Z/);
+  assert.doesNotMatch(parts['xl/worksheets/sheet1.xml'], /모의 테스트 자료|자료:|생성:|자동 갱신/);
+});
+
+test('format settings reject unknown or unsafe inputs and enforce numeric and font limits', () => {
+  assert.deepEqual(normalizeFormatting(), DEFAULT_FORMATTING);
+  assert.ok(Object.isFrozen(DEFAULT_FORMATTING));
+  for (const bad of [null, [], 'red', { unknown: true }, { fontFamily: 'url(https://example.test)' },
+    { fontSize: '10' }, { fontSize: 7 }, { fontSize: 17 }, { fontSize: 10.5 },
+    { titleSize: 13 }, { titleSize: 25 }, { writingRowHeight: 15 }, { writingRowHeight: 33 },
+    { textColor: '#fff' }, { background: 'red' }, { titleColor: '#FFFFFF; color:red' }, { borderColor: null }]) {
+    assert.throws(() => normalizeFormatting(bad));
+    assert.throws(() => buildCalendar({ year: 2027, mode: 'manual', manualApproved: true, formatting: bad }));
+  }
+  for (const fontFamily of ['맑은 고딕', 'Arial', '바탕']) {
+    assert.equal(normalizeFormatting({ fontFamily, fontSize: 8, titleSize: 14, writingRowHeight: 16 }).fontFamily, fontFamily);
+  }
+});
+
+test('one immutable custom format drives OOXML font, colors, row height and conservative name wrapping', () => {
+  const format = { fontFamily: 'Arial', fontSize: 16, titleSize: 24, writingRowHeight: 32,
+    textColor: '#112233', holidayColor: '#224466', saturdayColor: '#335577', manualColor: '#446688',
+    titleColor: '#aabbcc', titleBackground: '#556677', weekdayBackground: '#667788',
+    background: '#778899', outsideBackground: '#8899aa', borderColor: '#99aabb' };
+  const manual = [validateManual({ date: '2027-01-01', name: '가'.repeat(30), category: 'company' }, 2027)];
+  const model = buildCalendar({ year: 2027, mode: 'manual', manualApproved: true, manual, formatting: format });
+  const normal = manualModel(2027, manual);
+  assert.deepEqual(normal.formatting, DEFAULT_FORMATTING);
+  assert.deepEqual(model.formatting, normalizeFormatting(format));
+  assert.ok(Object.isFrozen(model.formatting));
+  assert.throws(() => { model.formatting.fontSize = 8; });
+  assert.match(model.legendText, /일요일·공식 휴일 #224466 \/ 토요일 #335577 \/ 수동 일정 #446688/);
+  assert.ok(model.months[0].weekHeights[0] > normal.months[0].weekHeights[0]);
+  const parts = workbookParts(model), style = parts['xl/styles.xml'];
+  assert.match(style, /<sz val="16"/); assert.match(style, /<sz val="24"/);
+  assert.match(style, /<name val="Arial"/); assert.doesNotMatch(style, /맑은 고딕/);
+  for (const value of Object.values(format).filter(value => typeof value === 'string' && value.startsWith('#'))) {
+    assert.ok(style.includes('FF' + value.slice(1).toUpperCase()), value);
+  }
+  assert.match(parts['xl/worksheets/sheet1.xml'], /<row r="8" ht="32"/);
+  format.fontSize = 8; format.textColor = '#FFFFFF';
+  assert.equal(model.formatting.fontSize, 16); assert.equal(model.formatting.textColor, '#112233');
 });
 
 test('calendar date coordinates do not move between process timezones', () => {
@@ -152,4 +242,49 @@ test('calendar date coordinates do not move between process timezones', () => {
   } finally {
     if (previous === undefined) delete process.env.TZ; else process.env.TZ = previous;
   }
+});
+
+test('lunar display is optional, strictly boolean and limited without narrowing the Gregorian calendar', () => {
+  const options = { year: 2027, mode: 'manual', manualApproved: true, generatedAt: '2026-10-10T00:00:00Z' };
+  const implicit = buildCalendar(options), explicit = buildCalendar({ ...options, showLunar: false });
+  assert.deepEqual(implicit, explicit);
+  assert.equal(implicit.config.showLunar, false);
+  assert.ok(implicit.months.flatMap(month => month.slots).every(day => day.lunar === null));
+  assert.doesNotMatch(implicit.metadataText, /음력:/);
+  for (const showLunar of [null, 0, 1, 'true', 'false', {}, []]) assert.throws(() => buildCalendar({ ...options, showLunar }), /음력 표시 여부/);
+  for (const year of [1983, 2050]) assert.equal(buildCalendar({ ...options, year, showLunar: true }).config.showLunar, true);
+  for (const year of [1982, 2051, 2099]) assert.throws(() => buildCalendar({ ...options, year, showLunar: true }), /1983~2050/);
+  assert.equal(buildCalendar({ ...options, year: 2099 }).config.year, 2099);
+});
+
+test('lunar first lines share the immutable preview/export model, preserve names and leave all writing cells blank', () => {
+  const manual = [validateManual({ date: '2027-01-04', name: '개인 일정', category: 'personal' }, 2027)];
+  const options = { year: 2027, mode: 'manual', manualApproved: true, manual, generatedAt: '2026-10-10T00:00:00Z' };
+  const normal = buildCalendar(options), model = buildCalendar({ ...options, showLunar: true, formatting: { fontSize: 16 } });
+  const parts = workbookParts(model), sheet = parts['xl/worksheets/sheet1.xml'];
+  assert.ok(Object.isFrozen(model.config));
+  assert.match(parts['docProps/core.xml'], /음력: 한국 음력 변환표/);
+  assert.doesNotMatch(sheet, /한국 음력 변환표/);
+  let count = 0;
+  for (let month = 0; month < 12; month++) for (let slot = 0; slot < model.months[month].slots.length; slot++) {
+    const day = model.months[month].slots[slot], original = normal.months[month].slots[slot];
+    assert.deepEqual(day.labels, original.labels); assert.deepEqual(day.sources, original.sources);
+    assert.equal(day.excelRow, original.excelRow); assert.equal(day.excelColumn, original.excelColumn);
+    if (day.date) {
+      count++;
+      assert.ok(Object.isFrozen(day.lunar));
+      assert.match(day.lunar.text, /^\d{2}\.\d{2}$/);
+      assert.equal(day.displayText.split('\n')[0], `${day.dayNumber} (${day.lunar.text})`);
+      assert.equal(day.displayText.split('\n').slice(1).join('\n'), original.displayText.split('\n').slice(1).join('\n'));
+      assert.ok(sheet.includes(day.displayText));
+      assert.ok(day.height >= original.height);
+    } else {
+      assert.equal(day.lunar, null); assert.equal(day.displayText, '');
+    }
+    for (let band = 1; band <= 3; band++) {
+      const ref = String.fromCharCode(64 + day.excelColumn) + (day.excelRow + band);
+      assert.match(sheet, new RegExp(`<c r="${ref}" s="\\d+"/>`));
+    }
+  }
+  assert.equal(count, 365);
 });
