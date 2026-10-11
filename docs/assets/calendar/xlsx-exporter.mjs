@@ -33,7 +33,12 @@ export function workbookParts(model) {
     return styleMap.get(key);
   }
   styleId();
-  const cell = (r, c, value, style) => `<c r="${String.fromCharCode(64 + c)}${r}" s="${style}"${value === null ? '/>' : ` t="inlineStr"><is><t xml:space="preserve">${excelText(value)}</t></is></c>`}`;
+  const cell = (r, c, value, style, runs = null) => {
+    const attributes = `r="${String.fromCharCode(64 + c)}${r}" s="${style}"`;
+    if (value === null) return `<c ${attributes}/>`;
+    const content = runs ? runs.map(run => `<r><rPr><rFont val="${esc(format.fontFamily)}"/><sz val="${run.fontSize}"/><color rgb="${argb(run.color)}"/></rPr><t xml:space="preserve">${excelText(run.text)}</t></r>`).join('') : `<t xml:space="preserve">${excelText(value)}</t>`;
+    return `<c ${attributes} t="inlineStr"><is>${content}</is></c>`;
+  };
   const rows = [], merges = [];
   const row = (r, height, cells = '') => rows.push(`<row r="${r}" ht="${height}" customHeight="1">${cells}</row>`);
   for (let r = 1; r <= 4; r++) rows.push(`<row r="${r}" hidden="1" ht="0" customHeight="1"/>`);
@@ -47,7 +52,7 @@ export function workbookParts(model) {
         const r = s + 2 + q * 4 + band;
         const cells = month.slots.slice(q * 7, q * 7 + 7).map((day, i) => {
           const border = borderId(i === 0 ? 'medium' : 'thin', i === 6 ? 'medium' : 'thin', band === 0 ? 'medium' : 'thin', band === 3 ? 'medium' : 'thin');
-          return cell(r, i + 1, band === 0 && day.date ? day.displayText : null, styleId({ color: band === 0 ? day.styleToken : 'black', fill: day.date ? 5 : 2, border }));
+          return cell(r, i + 1, band === 0 && day.date ? day.displayText : null, styleId({ color: band === 0 ? day.styleToken : 'black', fill: day.date ? 5 : 2, border }), band === 0 && day.lunar ? day.displayRuns : null);
         }).join('');
         row(r, band === 0 ? month.weekHeights[q] : format.writingRowHeight, cells);
       }

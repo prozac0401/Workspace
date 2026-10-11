@@ -7,6 +7,13 @@ import { DAY_MS, TTL, MAX_STALE } from '../../../docs/assets/calendar/contract.m
 import { DEFAULT_FORMATTING, normalizeFormatting } from '../../../docs/assets/calendar/formatting.mjs';
 const NOW = Date.parse('2026-10-10T00:00:00Z');
 const manualModel = (year = 2027, manual = []) => buildCalendar({ year, manual, mode: 'manual', manualApproved: true, generatedAt: '2026-10-10T00:00:00Z' });
+const cellXml = (sheet, day) => {
+  const ref = String.fromCharCode(64 + day.excelColumn) + day.excelRow;
+  return sheet.match(new RegExp(`<c r="${ref}"[^>]*>[\\s\\S]*?</c>`))[0];
+};
+const inlineText = xml => [...xml.matchAll(/<t(?: [^>]*)?>([\s\S]*?)<\/t>/g)].map(([, text]) => text
+  .replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&apos;', "'").replaceAll('&amp;', '&')
+  .replace(/_x([0-9a-f]{4})_/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))).join('');
 test('AT01-03: every date and coordinate, 1900 through 2100, independently checked with UTC Date', () => {
   for (let y = 1900; y <= 2100; y++) {
     const months = yearLayout(y); assert.equal(months.length, 12); let count = 0; const seen = new Set();
@@ -196,8 +203,10 @@ test('format settings reject unknown or unsafe inputs and enforce numeric and fo
   assert.ok(Object.isFrozen(DEFAULT_FORMATTING));
   for (const bad of [null, [], 'red', { unknown: true }, { fontFamily: 'url(https://example.test)' },
     { fontSize: '10' }, { fontSize: 7 }, { fontSize: 17 }, { fontSize: 10.5 },
+    { lunarFontSize: '7' }, { lunarFontSize: 5 }, { lunarFontSize: 17 }, { lunarFontSize: 7.5 },
     { titleSize: 13 }, { titleSize: 25 }, { writingRowHeight: 15 }, { writingRowHeight: 33 },
-    { textColor: '#fff' }, { background: 'red' }, { titleColor: '#FFFFFF; color:red' }, { borderColor: null }]) {
+    { textColor: '#fff' }, { lunarColor: '#777' }, { lunarColor: 'gray' }, { lunarColor: null },
+    { background: 'red' }, { titleColor: '#FFFFFF; color:red' }, { borderColor: null }]) {
     assert.throws(() => normalizeFormatting(bad));
     assert.throws(() => buildCalendar({ year: 2027, mode: 'manual', manualApproved: true, formatting: bad }));
   }
@@ -276,7 +285,7 @@ test('lunar first lines share the immutable preview/export model, preserve names
       assert.match(day.lunar.text, /^\d{2}\.\d{2}$/);
       assert.equal(day.displayText.split('\n')[0], `${day.dayNumber} (${day.lunar.text})`);
       assert.equal(day.displayText.split('\n').slice(1).join('\n'), original.displayText.split('\n').slice(1).join('\n'));
-      assert.ok(sheet.includes(day.displayText));
+      assert.equal(inlineText(cellXml(sheet, day)), day.displayText);
       assert.ok(day.height >= original.height);
     } else {
       assert.equal(day.lunar, null); assert.equal(day.displayText, '');
@@ -287,4 +296,69 @@ test('lunar first lines share the immutable preview/export model, preserve names
     }
   }
   assert.equal(count, 365);
+});
+
+test('lunar run font and color stay independent of official, Sunday, Saturday, manual and ordinary date colors', () => {
+  const records = [{ date: '2027-01-01', name: '모의 공식 휴일', source: 'official', category: 'public', sourceId: 'fixture:new-year' }];
+  const manual = [validateManual({ date: '2027-01-04', name: '개인 일정', category: 'personal' }, 2027)];
+  const model = buildCalendar({ year: 2027, mode: 'ready', snapshot: snapshot(records), manual, now: NOW, showLunar: true });
+  const sheet = workbookParts(model)['xl/worksheets/sheet1.xml'];
+  assert.equal(model.formatting.lunarFontSize, 7); assert.equal(model.formatting.lunarColor, '#777777');
+  const expectedColors = new Map([[1, '#9C2436'], [2, '#2158A6'], [3, '#9C2436'], [4, '#70308C'], [5, '#17202A']]);
+  for (const [number, color] of expectedColors) {
+    const day = model.months[0].slots.find(item => item.dayNumber === number);
+    assert.deepEqual(day.displayRuns[0], { kind: 'solar', text: String(number), fontSize: 10, color });
+    assert.deepEqual(day.displayRuns[1], { kind: 'lunar', text: ` (${day.lunar.text})`, fontSize: 7, color: '#777777' });
+    if (day.labels.length) assert.deepEqual(day.displayRuns[2], { kind: 'holidays', text: '\n' + day.labels.join('\n'), fontSize: 10, color });
+    const runs = [...cellXml(sheet, day).matchAll(/<r>([\s\S]*?)<\/r>/g)].map(([, run]) => run);
+    assert.equal(runs.length, day.displayRuns.length);
+    runs.forEach((xml, index) => {
+      const run = day.displayRuns[index];
+      assert.equal(inlineText(xml), run.text);
+      assert.match(xml, /<rFont val="맑은 고딕"\/>/);
+      assert.ok(xml.includes(`<sz val="${run.fontSize}"/>`));
+      assert.ok(xml.includes(`<color rgb="FF${run.color.slice(1)}"/>`));
+    });
+  }
+  for (const day of model.months.flatMap(month => month.slots)) {
+    assert.ok(Object.isFrozen(day.displayRuns));
+    assert.ok(day.displayRuns.every(Object.isFrozen));
+    assert.equal(day.displayRuns.map(run => run.text).join(''), day.displayText);
+    if (!day.date) assert.deepEqual(day.displayRuns, []);
+  }
+  assert.equal((sheet.match(/<r>/g) || []).length, 365 * 2 + 2);
+  assert.throws(() => { model.months[0].slots.find(day => day.date).displayRuns[1].color = '#FFFFFF'; });
+});
+
+test('custom lunar runs preserve literal text, scale the first line safely and leave disabled exports unchanged', () => {
+  const manual = [
+    validateManual({ date: '2027-01-04', name: '=SUM(A1:A2)&<_x0041_>', category: 'personal' }, 2027),
+    validateManual({ date: '2027-01-06', name: '가'.repeat(50), category: 'company' }, 2027),
+  ];
+  const options = { year: 2027, mode: 'manual', manualApproved: true, manual, generatedAt: '2026-10-10T00:00:00Z' };
+  const formatting = { fontFamily: 'Arial', fontSize: 8, lunarFontSize: 16, lunarColor: '#a1b2c3' };
+  const model = buildCalendar({ ...options, showLunar: true, formatting });
+  const small = buildCalendar({ ...options, showLunar: true, formatting: { ...formatting, lunarFontSize: 6 } });
+  const off = buildCalendar({ ...options, formatting });
+  const defaultOff = buildCalendar({ ...options, formatting: { fontFamily: 'Arial', fontSize: 8 } });
+  const parts = workbookParts(model), sheet = parts['xl/worksheets/sheet1.xml'];
+  for (const day of model.months.flatMap(month => month.slots).filter(day => day.date)) {
+    const runs = day.displayRuns;
+    assert.equal(runs[0].fontSize, 8); assert.equal(runs[1].fontSize, 16); assert.equal(runs[1].color, '#A1B2C3');
+    if (runs[2]) assert.equal(runs[2].fontSize, 8);
+    assert.equal(inlineText(cellXml(sheet, day)), day.displayText);
+  }
+  const fourth = model.months[0].slots.find(day => day.dayNumber === 4), xml = cellXml(sheet, fourth);
+  assert.match(xml, /<rFont val="Arial"\/>/); assert.match(xml, /&amp;&lt;_x005F_x0041_&gt;/);
+  assert.match(inlineText(xml), /=SUM\(A1:A2\)&<_x0041_>/);
+  assert.equal(Object.values(parts).some(part => /<f[ >]|sheetProtection|externalLink|vbaProject|connections/.test(part)), false);
+  const at = (calendar, number) => calendar.months[0].slots.find(day => day.dayNumber === number);
+  assert.ok(at(model, 5).height > at(small, 5).height, 'larger lunar text must reserve more first-line height');
+  assert.ok(at(model, 6).height >= at(off, 6).height, 'long holiday labels must remain fully visible at the solar font size');
+  assert.equal(at(model, 6).labels[0], '[회사] ' + '가'.repeat(50));
+  assert.deepEqual(off.months.map(month => month.weekHeights), defaultOff.months.map(month => month.weekHeights));
+  const offSheet = workbookParts(off)['xl/worksheets/sheet1.xml'];
+  assert.equal(offSheet, workbookParts(defaultOff)['xl/worksheets/sheet1.xml']);
+  assert.doesNotMatch(offSheet, /<r>|<rPr>/);
+  assert.equal(at(off, 4).displayRuns.some(run => run.kind === 'lunar'), false);
 });

@@ -36,10 +36,18 @@ export function holidayDisplayName(record) {
 export function seoulTime(value) {
   return value ? new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'medium', hour12: false }).format(new Date(value)) + ' KST' : '미확인';
 }
-export function estimateHeight(text, fontSize = 10) {
+export function estimateHeight(text, fontSize = 10, firstLineFontSize = fontSize) {
   // Conservative CJK width estimate: width 18, padding and font safety allowance.
   const capacity = 15 * 10 / fontSize;
-  const lines = text.split('\n').reduce((sum, line) => sum + Math.max(1, Math.ceil([...line].reduce((n, c) => n + (c.codePointAt(0) > 255 ? 2 : 1), 0) / capacity)), 0);
+  const lineWidth = line => [...line].reduce((n, c) => n + (c.codePointAt(0) > 255 ? 2 : 1), 0);
+  const parts = text.split('\n');
+  if (firstLineFontSize > fontSize) {
+    // The date line can mix solar/lunar sizes; using its largest size avoids clipping.
+    const firstLines = Math.max(1, Math.ceil(lineWidth(parts[0]) / (15 * 10 / firstLineFontSize)));
+    const restLines = parts.slice(1).reduce((sum, line) => sum + Math.max(1, Math.ceil(lineWidth(line) / capacity)), 0);
+    return Math.max(34, firstLines * firstLineFontSize * 1.6 + restLines * fontSize * 1.6 + 10);
+  }
+  const lines = parts.reduce((sum, line) => sum + Math.max(1, Math.ceil(lineWidth(line) / capacity)), 0);
   return Math.max(34, lines * fontSize * 1.6 + 10);
 }
 export function buildCalendar({ year: inputYear, snapshot = null, manual = [], mode = 'manual', staleApproved = false, manualApproved = false, generatedAt = new Date().toISOString(), now = Date.now(), formatting: inputFormatting, showLunar = false }) {
@@ -66,6 +74,7 @@ export function buildCalendar({ year: inputYear, snapshot = null, manual = [], m
     if (!validDate(x.date, year) || !['official', 'manual'].includes(x.source)) throw new Error('휴일 데이터가 유효하지 않습니다.');
     return { ...x, name: normalizeName(x.name) };
   }));
+  const dayColors = { black: formatting.textColor, red: formatting.holidayColor, blue: formatting.saturdayColor, purple: formatting.manualColor, outside: formatting.textColor };
   const months = yearLayout(year).map(month => {
     const slots = month.slots.map(slot => {
       const sources = records.filter(x => x.date === slot.date);
@@ -77,10 +86,16 @@ export function buildCalendar({ year: inputYear, snapshot = null, manual = [], m
       const official = sources.some(x => x.source === 'official');
       const styleToken = !slot.date ? 'outside' : official || slot.weekday === 0 ? 'red' : slot.weekday === 6 ? 'blue' : sources.length ? 'purple' : 'black';
       const lunar = showLunar && slot.date ? lunarDate(slot.date) : null;
-      const displayText = slot.date ? [lunar ? `${slot.dayNumber} (${lunar.text})` : String(slot.dayNumber), ...labels].join('\n') : '';
-      const height = estimateHeight(displayText, formatting.fontSize);
+      const displayRuns = [];
+      if (slot.date) {
+        displayRuns.push({ kind: 'solar', text: String(slot.dayNumber), fontSize: formatting.fontSize, color: dayColors[styleToken] });
+        if (lunar) displayRuns.push({ kind: 'lunar', text: ` (${lunar.text})`, fontSize: formatting.lunarFontSize, color: formatting.lunarColor });
+        if (labels.length) displayRuns.push({ kind: 'holidays', text: '\n' + labels.join('\n'), fontSize: formatting.fontSize, color: dayColors[styleToken] });
+      }
+      const displayText = displayRuns.map(run => run.text).join('');
+      const height = estimateHeight(displayText, formatting.fontSize, lunar ? Math.max(formatting.fontSize, formatting.lunarFontSize) : formatting.fontSize);
       if (height > 409) throw new Error(`${slot.date}: 이름이 많아 지원 행 높이(409pt)를 초과합니다. 일정 이름 또는 글자 크기를 줄이세요.`);
-      return { ...slot, lunar, labels, sources, displayText, styleToken, height };
+      return { ...slot, lunar, labels, sources, displayRuns, displayText, styleToken, height };
     });
     const weekHeights = Array.from({ length: month.weeks }, (_, q) => Math.max(...slots.slice(q * 7, q * 7 + 7).map(d => d.height)));
     return { ...month, slots, weekHeights };

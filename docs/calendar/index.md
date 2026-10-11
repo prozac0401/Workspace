@@ -44,12 +44,14 @@ title: 달력
               <div><label for="format-fontFamily">글꼴</label><select id="format-fontFamily" data-formatting="fontFamily"><option>맑은 고딕</option><option>Arial</option><option>바탕</option></select></div>
               <div><label for="format-titleSize">월 제목 크기 (pt)</label><input id="format-titleSize" data-formatting="titleSize" type="number" min="14" max="24" step="1" required></div>
               <div><label for="format-fontSize">날짜·일정 크기 (pt)</label><input id="format-fontSize" data-formatting="fontSize" type="number" min="8" max="16" step="1" required></div>
+              <div><label for="format-lunarFontSize">음력 글자 크기 (pt)</label><input id="format-lunarFontSize" data-formatting="lunarFontSize" type="number" min="6" max="16" step="1" required></div>
               <div><label for="format-writingRowHeight">작성칸 높이 (pt)</label><input id="format-writingRowHeight" data-formatting="writingRowHeight" type="number" min="16" max="32" step="1" required></div>
             </div>
             <div class="color-grid">
               <label for="format-titleColor"><span>월 제목 글자</span><input id="format-titleColor" data-formatting="titleColor" type="color"></label>
               <label for="format-titleBackground"><span>월 제목 배경</span><input id="format-titleBackground" data-formatting="titleBackground" type="color"></label>
               <label for="format-textColor"><span>평일·작성칸 글자</span><input id="format-textColor" data-formatting="textColor" type="color"></label>
+              <label for="format-lunarColor"><span>음력 글자</span><input id="format-lunarColor" data-formatting="lunarColor" type="color"></label>
               <label for="format-holidayColor"><span>일요일·공휴일</span><input id="format-holidayColor" data-formatting="holidayColor" type="color"></label>
               <label for="format-saturdayColor"><span>토요일</span><input id="format-saturdayColor" data-formatting="saturdayColor" type="color"></label>
               <label for="format-manualColor"><span>내 일정</span><input id="format-manualColor" data-formatting="manualColor" type="color"></label>
