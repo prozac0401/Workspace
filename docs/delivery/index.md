@@ -1,12 +1,12 @@
 # 배포·검증 안내
 
-[정적 달력 1983~2099년 확장·운영 활성화](calendar-publication-20261011.md)는 최초 로컬 구현 이후 사용자가 승인한 후속 작업입니다. 실제 실행 결과는 해당 기록의 PR/실행 증거와 구분해 확인합니다.
+[정적 달력 1983~2099년 확장·운영 활성화](calendar-publication-20261011.md)는 최초 로컬 구현 이후 사용자가 승인한 후속 작업입니다. 2026-10-11 [PR #29](https://github.com/prozac0401/Workspace/pull/29)까지 병합됐으며, [GitHub Pages 운영 배포](https://github.com/prozac0401/Workspace/actions/runs/38112713824)의 build·deploy 성공을 2026-10-12에 확인했습니다. 단계별 검증과 미검증 범위는 해당 운영 기록과 PR의 실행 증거를 따릅니다.
 
-[정적 달력 로컬 구현·검증](calendar-20261011.md)과 [PR 설명 초안](calendar-pr-draft.md)은 2026-10-11의 미배포 변경입니다. 아래 기존 도구의 공개 버전과 구분합니다.
+[정적 달력 로컬 구현·검증](calendar-20261011.md)과 [PR 설명 초안](calendar-pr-draft.md)은 2026-10-11 최초 작성 당시의 미배포 구현·검증 기록입니다. 당시 원격 미반영·미실행 항목은 그대로 보존하며, 이후 승인된 실제 운영 배포와 구분합니다. 현재 달력의 배포 상태는 위 후속 기록을 따릅니다.
 
 [2026-10-07 공개 문구 정리](public-wording-20261007.md)에서 경고·면책·그림 표기 제거와 실제 게시 확인 결과를 읽을 수 있습니다.
 
-현재 공개된 설치 파일과 당시 확인 기록을 구분해 안내합니다. 기존 도구는 **2026-10-05에 GitHub의 배포 페이지를 확인한 결과**입니다. 오피스 자동화 도구 0.3.1은 **2026-10-06의 공개 릴리스와 다운로드 확인**을 추가했습니다. 업무 책갈피는 **2026-10-06의 0.2.10 공개 릴리스 확인**과 별도로 아래 기록에서 Pages 반영 상태를 구분합니다.
+현재 공개된 설치 파일과 당시 확인 기록을 구분해 안내합니다. 기존 도구는 **2026-10-05에 GitHub의 배포 페이지를 확인한 결과**입니다. 오피스 자동화 도구 0.3.1은 **2026-10-06의 공개 릴리스와 다운로드 확인**을 추가했습니다. 업무 책갈피는 **2026-10-06의 0.2.10 공개 릴리스 확인**과 별도로 아래 기록에서 Pages 반영 상태를 구분합니다. 내려받은 파일 관리는 **2026-10-06에 게시된 0.2.1 정식 릴리스**를 **2026-10-12에 확인**해 반영했습니다.
 
 ## 현재 공개 버전
 
@@ -19,7 +19,7 @@
 | 보이는 칸 붙여넣기 0.1.2 | 일반 배포 | [설치·사용](../tools/visible-cells-paste/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.2) · [0.1.2 확인 기록](visible-cells-paste-012-20261003.md) |
 | 업무 책갈피 0.2.10 | 일반 배포 | [설치·사용](../tools/bookmark/index.md) | [별도 저장소의 배포 페이지](https://github.com/prozac0401/BookMark/releases/tag/v0.2.10) · [0.2.9·0.2.10 안내 반영](bookmark-0210-publication-20261006.md) · [0.2.8 당시 안내 반영](bookmark-028-publication-20260927.md) |
 | 그림 복사·저장 0.2.1 | 일반 배포 | [설치·사용](../tools/image-copy-save/guide.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) · [0.2.1 제작·확인·게시 기록](image-copy-save-021-20261003.md) |
-| 내려받은 파일 관리 0.2.0 | 평가판 | [설치·사용](../tools/download-version-manager/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.0) · [0.2.0 설치·파일 보존·게시 기록](download-version-manager-watcher-release-20261004.md) |
+| 내려받은 파일 관리 0.2.1 | 일반 배포 | [설치·사용](../tools/download-version-manager/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [0.2.1 정식 Release·Pages 게시 기록](download-version-manager-guide-update-20261006.md) · [0.2.0 당시 설치·파일 보존·게시 기록](download-version-manager-watcher-release-20261004.md) |
 | 오피스 자동화 도구 0.3.1 | 평가판 | [받기·사용](../tools/office-automation/index.md) | [Workspace 공개 배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1) · [2026-10-06 배포·문서 게시 기록](probpacker-031-publication-20261006.md) |
 
 기존 도구의 설치 파일에는 전자 서명이 없습니다. 오피스 자동화 도구 0.3.1의 두 EXE는 자체 서명이며 이번 PC에서는 `Valid`로 확인했습니다. 다른 PC의 신뢰를 보장하지 않습니다. **일반 배포**는 GitHub에서 평가판 표시 없이 제공한다는 뜻입니다. 모든 환경에서의 확인이나 회사별 사용 승인을 뜻하지 않습니다. 평가판의 알려진 문제와 아직 확인하지 않은 환경은 내려받기 전에 설치 안내에서 읽으세요.
