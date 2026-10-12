@@ -186,12 +186,17 @@ export function initCalendar(root) {
     finally { exporting = false; buttons(); }
   });
   listen(document, 'visibilitychange', () => { if (!document.hidden) checkFreshness(); });
-  // Fit the complete paper, including its borders, without changing workbook formatting.
+  // Preview-only scale; keep workbook formatting and the current model intact.
   const preview = $('preview'), previewViewport = preview.parentElement;
+  $('originalPreviewSize').checked = false;
   const fitPreview = () => {
     const width = previewViewport.clientWidth;
-    if (width > 0) preview.style.zoom = Math.min(1, width / parseFloat(getComputedStyle(preview).minWidth));
+    if (width > 0) preview.style.zoom = $('originalPreviewSize').checked
+      ? 1 : Math.min(1, width / parseFloat(getComputedStyle(preview).minWidth));
   };
+  listen($('originalPreviewSize'), 'change', () => {
+    fitPreview(); previewViewport.scrollLeft = 0;
+  });
   const previewObserver = new ResizeObserver(fitPreview);
   previewObserver.observe(previewViewport); fitPreview();
   const freshnessTimer = setInterval(checkFreshness, 60000);

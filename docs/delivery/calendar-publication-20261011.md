@@ -120,3 +120,23 @@ PR #28은 main `8ef6fc5b22a58fede886e8967a900d2aa9e093f2`, 배포 38111990105에
 위 main HEAD와 로컬 변경에서 `node --check docs/assets/calendar/app.mjs`, `git diff --check`, 실제 검증 JSON을 사용한 `python -m mkdocs build --strict`와 `python scripts/check-site.py site --production`이 **PASS**다. `CALENDAR_CONTROL_LAYOUT_READY=1`, `CALENDAR_CONTROL_LAYOUT_TARGET=local`로 `node artifacts/calendar/control-layout/layout-check.mjs`를 실행한 Edge 155 검사도 **2그룹 PASS**, pageErrors 0이다. 일정 입력 4개는 각각 높이 54px와 같은 상·하단 좌표이고, 1440px 창·772px 내용 영역·390px 모바일·재확대에서 12개월의 오른쪽 테두리가 처음부터 영역 안에 있다. 원래 텍스트·글자 서식, 내부 페이지 재진입, 일정 1회 추가 및 다운로드 활성화도 확인했다. 결과와 육안 확인한 화면은 `artifacts/calendar/control-layout/local-2026-10-11T04-44-58-453Z/`에 있다.
 
 첫 두 하네스 실행은 축소 후 전체 높이를 역산한 차이를 2px 미만으로 요구하여 실패했다. 실제 차이는 2.416px(0.27%)의 브라우저 반올림이었고 경계 넘침·텍스트 변경·잘림은 없었다. 이 과도한 기대를 제거하고 테두리의 실제 화면 좌표·모든 날짜 텍스트와 글자 서식 보존으로 검사했다. 첫 실패 결과도 같은 산출물 폴더 아래 보존한다. 이번에는 Excel·전체 인쇄·무관한 전체 브라우저 suite를 **NOT RUN**으로 남기며 앞선 증거를 재사용한다. 원격 CI와 배포 결과는 최종 PR 및 별도 publication-result.json에 정확한 HEAD로 기록한다.
+
+
+## 모바일 가독성 전환 후속 요청 (2026-10-13)
+
+요구는 기존 전체 맞춤 보기를 유지하며 사용자가 선택할 때 원래 글자 크기와 달력 영역 안의 가로 스크롤을 제공하는 것이다. main `304710661c4333a82fdf5848847d05ccbf586ead`에서 `codex/calendar-preview-readability`로 별도 작업한다. 일정 백업 PR #30과 독립이며 기존 checkout의 수정 파일은 포함하지 않는다.
+
+기존 CSS의 780px 최소 너비·overflow-x:auto·스크롤 영역 키보드 포커스를 재사용하고 선택란 하나와 간단한 안내를 추가했다. 기본은 기존 비례 축소, 선택 시 preview zoom=1이다. 전환 시 가로 시작점을 초기화한다. 열린 화면의 연도·일정·서식 변경 동안 선택을 유지하고 인스턴스 재진입은 기본 보기로 초기화한다. 보기 전환은 invalidate/buildCalendar/downloadXlsx를 호출하지 않으며 현재 입력과 다운로드 상태를 유지한다. XLSX 작성기·모델·공휴일 수집·공개 자료·CSS는 변경하지 않는다.
+
+완료 근거는 최소 UI 변경의 문법·strict build·공개 링크 검사와 실제 브라우저에서 기본 전체 표시/원래 크기/가로 이동/입력·연도/다운로드 보존을 확인하는 것이다. `tools/calendar/tests/preview-size-browser.mjs`는 320·360·390·804·820px 창, 모든 월의 경계·날짜/일정 텍스트, 원래 크기의 글꼴과 달력 너비, 토요일까지 가로 이동, 전환 전후 XLSX 바이트 일치, 키보드 전환, 회전·PC 확대, 연도 변경 취소/확정·입력 보존·재진입 초기화를 검사한다. 공휴일은 명시적 fixture를 사용하며 운영 자료로 배포하지 않는다.
+
+검증 상태:
+
+- `node --check docs/assets/calendar/app.mjs`, `node --check tools/calendar/tests/preview-size-browser.mjs`: PASS.
+- `python -m mkdocs build --strict`, `python scripts/check-site.py site`: PASS (22 공개 페이지·2 이전 주소·404, 공개 범위·링크·JSON 검증).
+- 변경 대상 `git diff --check`: PASS.
+- 실제 브라우저 시도: **BLOCKED / 검사 NOT RUN**. Playwright 관리 브라우저 다운로드가 손상된 응답으로 실패했고 공식 Chrome 155.0.8059.39 실행 파일을 확보했으나 실행 시 `process_singleton_posix.cc: socket() failed: Operation not permitted`로 종료됐다. 실패는 제품 화면에 도달하기 전 발생했다. 원격 Windows 기기는 오프라인이며 Cloud Browser는 로컬 서버에 연결할 수 없었다. `artifacts/calendar/preview-size/failure.json`에 첫 실행 실패를 보존했다. 브라우저 검증 결과·스크린샷·다운로드 바이트 동일성을 PASS로 주장하지 않는다.
+
+재현: `python -m mkdocs build --strict` 후 Playwright를 사용할 수 있는 환경에서 `node tools/calendar/tests/preview-size-browser.mjs`를 실행한다. 기본은 설치된 Edge이며 `PLAYWRIGHT_MODULE`(모듈 절대 경로), `CALENDAR_BROWSER_EXECUTABLE`(브라우저 실행 파일), `CALENDAR_BROWSER_OUTPUT`(증거 폴더)로 지정할 수 있다. 자료는 하네스가 fixture로 대체하며 운영 수집을 실행하지 않는다.
+
+실제 모바일 기기에서 추가 확인할 것은 손가락으로 좌우 이동해 모든 날짜·일정이 읽히는지, 긴 일정과 사용자가 설정한 글꼴에서의 가독성, 화면 회전 후 보기 선택 유지, Android Chrome/Samsung Internet 및 iOS Safari의 zoom·터치 이동이다. 데스크톱 viewport 검증과 실제 기기 사용성 확인을 구분한다. 현재는 Draft PR 범위이며 병합·운영 배포를 수행하지 않는다.
