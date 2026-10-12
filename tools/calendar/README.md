@@ -29,7 +29,7 @@
 1. [GitHub Actions → Documentation](https://github.com/prozac0401/Workspace/actions/workflows/docs.yml)을 연다.
 2. **Run workflow**, Branch **main**, action **collect**를 선택한다.
 3. 이미 초기화된 운영 저장소이므로 **initialize_data는 false(선택 해제)**로 둔다.
-4. **Run workflow**를 누르고 수집·저장·빌드·배포 결과를 확인한다. 성공 후 사이트를 새로고침하면 갱신된 자료를 읽는다. 새로고침 전에 필요한 수동 입력 달력은 내려받는다.
+4. **Run workflow**를 누르고 수집·저장·빌드·배포 결과를 확인한다. 성공 후 사이트를 새로고침하면 갱신된 자료를 읽는다. 새로고침 전에 필요한 수동 일정은 JSON으로 백업하고 완성된 달력은 XLSX로 내려받는다.
 
 `reuse`는 기존 검증 데이터의 SHA와 성공 시각을 그대로 재사용해 사이트만 빌드하며 KASI에 조회하지 않는다. 수집 오류 시 배포 skip과 이전 데이터 보존은 동일하다. 이미 받은 XLSX는 갱신되지 않는다.
 
@@ -117,3 +117,11 @@ powershell -NoProfile -File tools/calendar/tests/excel-check.ps1
 공공데이터포털 공개 안내는 개발계정 트래픽10,000, 운영계정 증설 신청을 설명하지만 이 계정의 실제 승인량은 미확인이다. 정상1,404회는 안내된10,000회의14.04%, 실행상한2,000회는20%이며 다른 프로그램 호출량도 합산해야 한다. 저장소는 공개로 확인했고 소유자 플랜·현재 Actions 사용량·청구 한도는 미확인이다. 항상 무료라고 보장하지 않으며 유료 자원은 만들지 않는다. 사용자 확인과 읽기 전용 API 조회로 Pages Source=workflow, custom domain 없음, `github-pages` main제한, reviewer/wait 없음, Actions 기본read와GitHubActions허용을 확인했다. 코드·검사기는 설정된 base path를 사용하고 브라우저는 루트 및 `/Workspace/` 경로를 검증한다.
 
 공식 근거(2026-10-11 재확인): [KASI](https://www.data.go.kr/data/15012690/openapi.do), [schedule](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule), [Secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets), [GITHUB_TOKEN](https://docs.github.com/en/actions/concepts/security/github_token), [workflow 연결](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow), [Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+
+## 개인·회사 일정 JSON 백업과 복원
+
+‘일정 백업 (JSON)’은 추가·수정 저장을 완료한 목록을 `calendar_manual_YYYY.json`으로 내려받는다. 입력 중인 내용은 먼저 저장해야 한다. 백업은 서버로 전송되지 않으며 평문 파일이므로 사용자가 파일을 보관·관리한다. 자동 저장·계정·localStorage는 도입하지 않는다. 새로고침·이탈·연도 변경 시 메모리 목록이 사라지는 기존 동작은 유지된다.
+
+같은 연도를 선택하고 ‘일정 가져오기 (JSON)’에서 파일을 고른다. 전체 검증 뒤 기존 목록과 편집 중인 내용을 대체할지 항목 수와 함께 확인한다. 취소·읽기 실패·검증 오류·읽는 동안 입력 또는 연도 변경 시 기존 내용을 유지한다. 성공하면 편집칸과 수동 모드 확인을 초기화하고 이전 미리보기·다운로드를 무효화한다. 필요한 확인 후 새 미리보기를 만들면 복원 목록이 XLSX에 반영된다. 빈 배열도 명시적 확인을 거쳐 기존 목록을 비운다.
+
+형식은 `{ "format": "workspace-calendar-manual", "version": 1, "year": 2027, "entries": [{ "date": "2027-01-04", "name": "회사 일정", "category": "company" }] }`이다. 최상위·항목의 필드를 정확히 검사하고 미래 버전·다른 연도·128 KiB 초과·100개 초과를 거부한다. 날짜·이름·구분·정규화 중복 검사는 기존 `validateManual`을 재사용한다. 내부 sourceId는 가져올 때 새로 만든다. 공휴일 자료·자료 시각·서식·음력 선택·XLSX에 작성한 내용은 백업하지 않는다.
