@@ -120,3 +120,52 @@ PR #28은 main `8ef6fc5b22a58fede886e8967a900d2aa9e093f2`, 배포 38111990105에
 위 main HEAD와 로컬 변경에서 `node --check docs/assets/calendar/app.mjs`, `git diff --check`, 실제 검증 JSON을 사용한 `python -m mkdocs build --strict`와 `python scripts/check-site.py site --production`이 **PASS**다. `CALENDAR_CONTROL_LAYOUT_READY=1`, `CALENDAR_CONTROL_LAYOUT_TARGET=local`로 `node artifacts/calendar/control-layout/layout-check.mjs`를 실행한 Edge 155 검사도 **2그룹 PASS**, pageErrors 0이다. 일정 입력 4개는 각각 높이 54px와 같은 상·하단 좌표이고, 1440px 창·772px 내용 영역·390px 모바일·재확대에서 12개월의 오른쪽 테두리가 처음부터 영역 안에 있다. 원래 텍스트·글자 서식, 내부 페이지 재진입, 일정 1회 추가 및 다운로드 활성화도 확인했다. 결과와 육안 확인한 화면은 `artifacts/calendar/control-layout/local-2026-10-11T04-44-58-453Z/`에 있다.
 
 첫 두 하네스 실행은 축소 후 전체 높이를 역산한 차이를 2px 미만으로 요구하여 실패했다. 실제 차이는 2.416px(0.27%)의 브라우저 반올림이었고 경계 넘침·텍스트 변경·잘림은 없었다. 이 과도한 기대를 제거하고 테두리의 실제 화면 좌표·모든 날짜 텍스트와 글자 서식 보존으로 검사했다. 첫 실패 결과도 같은 산출물 폴더 아래 보존한다. 이번에는 Excel·전체 인쇄·무관한 전체 브라우저 suite를 **NOT RUN**으로 남기며 앞선 증거를 재사용한다. 원격 CI와 배포 결과는 최종 PR 및 별도 publication-result.json에 정확한 HEAD로 기록한다.
+
+
+## 모바일 가독성 전환 후속 요청 (2026-10-13)
+
+요구는 기존 전체 맞춤 보기를 유지하며 사용자가 선택할 때 원래 글자 크기와 달력 영역 안의 가로 스크롤을 제공하는 것이다. main `304710661c4333a82fdf5848847d05ccbf586ead`에서 `codex/calendar-preview-readability`로 별도 작업한다. 일정 백업 PR #30과 독립이며 기존 checkout의 수정 파일은 포함하지 않는다.
+
+기존 CSS의 780px 최소 너비·overflow-x:auto·스크롤 영역 키보드 포커스를 재사용하고 선택란 하나와 간단한 안내를 추가했다. 기본은 기존 비례 축소, 선택 시 preview zoom=1이다. 전환 시 가로 시작점을 초기화한다. 열린 화면의 연도·일정·서식 변경 동안 선택을 유지하고 인스턴스 재진입은 기본 보기로 초기화한다. 보기 전환은 invalidate/buildCalendar/downloadXlsx를 호출하지 않으며 현재 입력과 다운로드 상태를 유지한다. XLSX 작성기·모델·공휴일 수집·공개 자료·CSS는 변경하지 않는다.
+
+완료 근거는 최소 UI 변경의 문법·strict build·공개 링크 검사와 실제 브라우저에서 기본 전체 표시/원래 크기/가로 이동/입력·연도/다운로드 보존을 확인하는 것이다. `tools/calendar/tests/preview-size-browser.mjs`는 320·360·390·804·820px 창, 모든 월의 경계·날짜/일정 텍스트, 원래 크기의 글꼴과 달력 너비, 토요일까지 가로 이동, 전환 전후 XLSX 바이트 일치, 키보드 전환, 회전·PC 확대, 연도 변경 취소/확정·입력 보존·재진입 초기화를 검사한다. 공휴일은 명시적 fixture를 사용하며 운영 자료로 배포하지 않는다.
+
+검증 상태:
+
+- `node --check docs/assets/calendar/app.mjs`, `node --check tools/calendar/tests/preview-size-browser.mjs`: PASS.
+- `python -m mkdocs build --strict`, `python scripts/check-site.py site`: PASS (22 공개 페이지·2 이전 주소·404, 공개 범위·링크·JSON 검증).
+- 변경 대상 `git diff --check`: PASS.
+- 실제 브라우저 시도: **BLOCKED / 검사 NOT RUN**. Playwright 관리 브라우저 다운로드가 손상된 응답으로 실패했고 공식 Chrome 155.0.8059.39 실행 파일을 확보했으나 실행 시 `process_singleton_posix.cc: socket() failed: Operation not permitted`로 종료됐다. 실패는 제품 화면에 도달하기 전 발생했다. 원격 Windows 기기는 오프라인이며 Cloud Browser는 로컬 서버에 연결할 수 없었다. `artifacts/calendar/preview-size/failure.json`에 첫 실행 실패를 보존했다. 브라우저 검증 결과·스크린샷·다운로드 바이트 동일성을 PASS로 주장하지 않는다.
+
+재현: `python -m mkdocs build --strict` 후 Playwright를 사용할 수 있는 환경에서 `node tools/calendar/tests/preview-size-browser.mjs`를 실행한다. 기본은 설치된 Edge이며 `PLAYWRIGHT_MODULE`(모듈 절대 경로), `CALENDAR_BROWSER_EXECUTABLE`(브라우저 실행 파일), `CALENDAR_BROWSER_OUTPUT`(증거 폴더)로 지정할 수 있다. 자료는 하네스가 fixture로 대체하며 운영 수집을 실행하지 않는다.
+
+실제 모바일 기기에서 추가 확인할 것은 손가락으로 좌우 이동해 모든 날짜·일정이 읽히는지, 긴 일정과 사용자가 설정한 글꼴에서의 가독성, 화면 회전 후 보기 선택 유지, Android Chrome/Samsung Internet 및 iOS Safari의 zoom·터치 이동이다. 데스크톱 viewport 검증과 실제 기기 사용성 확인을 구분한다. 현재는 Draft PR 범위이며 병합·운영 배포를 수행하지 않는다.
+
+## PR #30·#31 통합 검토 (2026-10-13)
+
+최신 확인 시 main은 `304710661c4333a82fdf5848847d05ccbf586ead`, PR #30은 `ea566fac59eb2101d5db44f78e29916542a39a8f`, PR #31은 `c9eab9d41ea0adecc0158c358275d2d991e91a1e`였다. 둘 다 open Draft이며 개별 mergeable이었다. 로컬 실제 merge에서 specification.md와 tools/calendar/README.md의 충돌을 재현했다. app.mjs와 docs/calendar/index.md는 서로 다른 위치의 변경으로 자동 통합됐다.
+
+최소 수정: 백업 CAL-20과 기존 CAL-01~19의 의미를 유지하고 보기 전환을 CAL-21로 바꿨다. PR #31의 모바일 명세·README 설명을 별도 기존 절 앞에 배치해 PR #30의 말미 추가와 충돌하지 않게 했다. 두 설명을 모두 보존한다. JSON 파일 읽기와 보기 전환은 각각 입력 데이터와 화면 zoom을 다루므로 제품 코드 추가 수정은 필요하지 않았다.
+
+통합 시 기존 backup.test.mjs의 UI 검사에서 새 originalPreviewSize가 없는 최소 DOM 어댑터로 인해 TypeError가 발생했다. PR #30의 어댑터에 해당 요소만 추가한 `db70ac5`로 수정했다. 제품 실패와 구분하며 최초 실패를 숨기지 않는다. PR #31의 `1c6d2a9`는 통합 전용 `backup-preview-integration.mjs`를 추가한다. 이 파일은 두 PR을 함께 적용한 tree에서만 명시적으로 실행하며 개별 PR의 기본 test glob에는 포함하지 않는다.
+
+수정된 두 head의 양방향 git merge-tree --write-tree 결과는 모두 충돌 없이 동일한 tree `95ec6b8feafda5a1af7d4b27c0ddbf67b3555abd`였다. 그 로컬 통합 상태에서 다음 검증을 수행했다.
+
+- `node --test tools/calendar/tests/backup-preview-integration.mjs`: 1/1 PASS. 실제 앱 핸들러의 개인·회사 일정, 보기 전환 전후 JSON 내용과 XLSX 바이트 동일성, 편집 입력 유지, 잘못된 JSON·취소 시 기존 목록/preview 보존, 성공 시 다운로드 차단/수동 확인 초기화와 보기 선택 유지, 새 preview 후 일정 표시/다운로드 복구, 파일을 읽는 동안 보기만 바꾸는 동작을 확인했다.
+- `node --test --test-name-pattern='app preserves' tools/calendar/tests/backup.test.mjs`: 어댑터 수정 후 1/1 PASS. 이번 통합에서 실제로 실패한 UI 검사만 다시 실행했다. 앞선 개별 Node 24개·정적 검사 증거는 재사용하며 무관한 suite를 반복하지 않았다.
+- 통합 tree의 `python -m mkdocs build --strict`, `python scripts/check-site.py`: PASS (22 공개 페이지·2 이전 주소·404, 공개 범위·로컬 링크·JSON). 변경 대상 diff check PASS.
+
+위 Node 결과는 최소 DOM 어댑터 검사다. 실제 브라우저 layout·touch·파일 선택·다운로드와 실제 Excel을 검증했다고 해석하지 않는다. 이번 환경의 Playwright 패키지는 있으나 예상 Chromium 실행 파일이 없어 실제 브라우저 검사는 NOT RUN이다. PR #31의 앞선 소켓 제한 BLOCKED 기록은 그대로 유지한다. 실행 가능한 환경에서 preview-size-browser.mjs와 실제 JSON 파일 선택/백업을 함께 확인하기 전까지 두 PR은 Draft로 유지하고 병합·운영 배포하지 않는다. 향후 main/head 변경 시 이 tree 증거를 새 변경의 결과로 재사용하지 않는다.
+
+## Draft 병합·배포 검증 (2026-10-13)
+
+사용자가 올라온 Draft를 main에 반영하고 배포하도록 요청했다. 대상은 PR #30 `c6ff42e051b8011358dd2d94bb7d28c2abb1332a`와 PR #31 `c2e55f52f578be677836b88ff0faed1f2dff1e7a`다. 별도 관리 worktree에서 두 PR을 합친 `a4445be3cea3e741574f1191ff195d3b759bd7ef`(tree `9013df8837aee296cf610132a1d23c5d8f73296e`)를 검증했다. 제품 코드 추가 수정 없이 미완료 브라우저 검증을 해소하고, CI·Pages 배포와 실제 공개 응답을 확인하는 것이 이번 단계의 완료 기준이다. 원래 checkout의 미커밋 변경은 포함하지 않았다.
+
+- `node --test tools/calendar/tests/backup.test.mjs tools/calendar/tests/core.test.mjs tools/calendar/tests/backup-preview-integration.mjs`: **25/25 PASS**, 실패·취소·skip 0.
+- `python -m mkdocs build --strict`, `python scripts/check-site.py site`: **PASS**, 공개 22페이지·이전 주소 이동 2개·404와 로컬 링크·공개 범위 검사 통과. 변경 diff 검사도 PASS.
+- `tools/calendar/tests/preview-size-browser.mjs`: 실제 Windows Edge **155.0.4283.45 PASS**, 페이지 오류 0. 320·360·390·804·820px의 전체 맞춤/원래 크기, 영역 안 가로 이동, 날짜·일정 보존, 전환 전후 XLSX 바이트 동일성, 키보드 선택, 화면 크기 변경, 연도 변경 취소/확정과 재진입을 확인했다. 모바일 폭 캡처도 육안 확인했다.
+- 실제 브라우저 JSON 통합 검사: **PASS**, 페이지 오류 0. JSON·XLSX 다운로드, 내려받은 JSON의 새로고침 후 파일 입력·복원, 파일 선택창을 통한 대체, 잘못된 JSON·취소 시 목록·입력·미리보기·다운로드 상태 보존, 성공 후 새 미리보기 요구와 크기 선택 유지, JSON 재출력 일치를 확인했다. 포커스한 미리보기의 ArrowRight 입력으로 가로 위치가 0에서 40px로 이동했다.
+
+로컬 근거는 `artifacts/calendar/draft-deploy/backup-core-integration-tests.log`, `preview-size/results.json`, `backup-import/results.json`과 같은 폴더의 화면·다운로드 파일에 보존한다. fixture는 브라우저 검사에만 사용했다. 이 후속 실행은 위의 실제 브라우저 NOT RUN을 해소하며 과거 실패 기록은 유지한다. 실제 휴대전화 터치·iOS Safari·이번 변경의 Windows Excel 실기는 **NOT RUN**이다. XLSX 작성기와 인쇄 설정은 변경하지 않았다.
+
+운영 배포는 main push의 기존 `reuse` 경로로 검증된 공휴일 자료를 재사용한다. 배포 전 자료 branch SHA는 `0256ebe3e3c97bfd82351401372957d14909590f`, 공개 JSON SHA-256은 `eadb9a96020bebe8b55ef36f7b389f7a356bb09869e090041e326fe48e22c146`이다. 실제 병합·배포 완료는 PR 상태와 해당 main SHA의 Documentation workflow 성공 및 공개 URL 확인으로 판단하고, 최종 결과를 `artifacts/calendar/draft-deploy/publication-result.json`에 기록한다.

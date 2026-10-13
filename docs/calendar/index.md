@@ -78,7 +78,9 @@ title: 달력
         <p id="exportStatus" role="status" aria-live="polite" class="hint"></p>
       </section>
       <div id="empty" class="empty"><p>미리보기에서 달력을 확인하세요.</p></div>
-      <div class="preview-scroll" tabindex="0" role="region" aria-label="연간 달력 미리보기"><div id="preview"></div></div>
+      <label class="lunar-option" for="originalPreviewSize"><input id="originalPreviewSize" type="checkbox" aria-controls="preview" aria-describedby="previewSizeHelp"><span>원래 글자 크기로 보기</span></label>
+      <p id="previewSizeHelp" class="hint">기본은 전체 맞춤 보기입니다. 원래 크기에서는 달력을 가로로 밀어 날짜와 일정을 확인하세요. Excel 파일에는 영향을 주지 않습니다.</p>
+      <div class="preview-scroll" tabindex="0" role="region" aria-label="연간 달력 미리보기" aria-describedby="previewSizeHelp"><div id="preview"></div></div>
     </div>
   </div>
 </div>
