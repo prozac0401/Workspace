@@ -156,3 +156,16 @@ PR #28은 main `8ef6fc5b22a58fede886e8967a900d2aa9e093f2`, 배포 38111990105에
 - 통합 tree의 `python -m mkdocs build --strict`, `python scripts/check-site.py`: PASS (22 공개 페이지·2 이전 주소·404, 공개 범위·로컬 링크·JSON). 변경 대상 diff check PASS.
 
 위 Node 결과는 최소 DOM 어댑터 검사다. 실제 브라우저 layout·touch·파일 선택·다운로드와 실제 Excel을 검증했다고 해석하지 않는다. 이번 환경의 Playwright 패키지는 있으나 예상 Chromium 실행 파일이 없어 실제 브라우저 검사는 NOT RUN이다. PR #31의 앞선 소켓 제한 BLOCKED 기록은 그대로 유지한다. 실행 가능한 환경에서 preview-size-browser.mjs와 실제 JSON 파일 선택/백업을 함께 확인하기 전까지 두 PR은 Draft로 유지하고 병합·운영 배포하지 않는다. 향후 main/head 변경 시 이 tree 증거를 새 변경의 결과로 재사용하지 않는다.
+
+## Draft 병합·배포 검증 (2026-10-13)
+
+사용자가 올라온 Draft를 main에 반영하고 배포하도록 요청했다. 대상은 PR #30 `c6ff42e051b8011358dd2d94bb7d28c2abb1332a`와 PR #31 `c2e55f52f578be677836b88ff0faed1f2dff1e7a`다. 별도 관리 worktree에서 두 PR을 합친 `a4445be3cea3e741574f1191ff195d3b759bd7ef`(tree `9013df8837aee296cf610132a1d23c5d8f73296e`)를 검증했다. 제품 코드 추가 수정 없이 미완료 브라우저 검증을 해소하고, CI·Pages 배포와 실제 공개 응답을 확인하는 것이 이번 단계의 완료 기준이다. 원래 checkout의 미커밋 변경은 포함하지 않았다.
+
+- `node --test tools/calendar/tests/backup.test.mjs tools/calendar/tests/core.test.mjs tools/calendar/tests/backup-preview-integration.mjs`: **25/25 PASS**, 실패·취소·skip 0.
+- `python -m mkdocs build --strict`, `python scripts/check-site.py site`: **PASS**, 공개 22페이지·이전 주소 이동 2개·404와 로컬 링크·공개 범위 검사 통과. 변경 diff 검사도 PASS.
+- `tools/calendar/tests/preview-size-browser.mjs`: 실제 Windows Edge **155.0.4283.45 PASS**, 페이지 오류 0. 320·360·390·804·820px의 전체 맞춤/원래 크기, 영역 안 가로 이동, 날짜·일정 보존, 전환 전후 XLSX 바이트 동일성, 키보드 선택, 화면 크기 변경, 연도 변경 취소/확정과 재진입을 확인했다. 모바일 폭 캡처도 육안 확인했다.
+- 실제 브라우저 JSON 통합 검사: **PASS**, 페이지 오류 0. JSON·XLSX 다운로드, 내려받은 JSON의 새로고침 후 파일 입력·복원, 파일 선택창을 통한 대체, 잘못된 JSON·취소 시 목록·입력·미리보기·다운로드 상태 보존, 성공 후 새 미리보기 요구와 크기 선택 유지, JSON 재출력 일치를 확인했다. 포커스한 미리보기의 ArrowRight 입력으로 가로 위치가 0에서 40px로 이동했다.
+
+로컬 근거는 `artifacts/calendar/draft-deploy/backup-core-integration-tests.log`, `preview-size/results.json`, `backup-import/results.json`과 같은 폴더의 화면·다운로드 파일에 보존한다. fixture는 브라우저 검사에만 사용했다. 이 후속 실행은 위의 실제 브라우저 NOT RUN을 해소하며 과거 실패 기록은 유지한다. 실제 휴대전화 터치·iOS Safari·이번 변경의 Windows Excel 실기는 **NOT RUN**이다. XLSX 작성기와 인쇄 설정은 변경하지 않았다.
+
+운영 배포는 main push의 기존 `reuse` 경로로 검증된 공휴일 자료를 재사용한다. 배포 전 자료 branch SHA는 `0256ebe3e3c97bfd82351401372957d14909590f`, 공개 JSON SHA-256은 `eadb9a96020bebe8b55ef36f7b389f7a356bb09869e090041e326fe48e22c146`이다. 실제 병합·배포 완료는 PR 상태와 해당 main SHA의 Documentation workflow 성공 및 공개 URL 확인으로 판단하고, 최종 결과를 `artifacts/calendar/draft-deploy/publication-result.json`에 기록한다.
