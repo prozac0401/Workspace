@@ -35,6 +35,11 @@ title: 달력
           <button id="cancelEdit" type="button" class="text-button">입력 비우기</button>
         </form>
         <p id="formError" role="alert" class="error"></p><ul id="manualList" class="holiday-list"></ul>
+        <button id="backupManual" class="secondary" type="button">일정 백업 (JSON)</button>
+        <button id="importManual" class="secondary" type="button">일정 가져오기 (JSON)</button>
+        <input id="backupFile" type="file" accept=".json,application/json" hidden>
+        <p class="hint">추가한 일정만 파일로 저장합니다. 새로고침·페이지 이탈 전에 백업하세요. 가져오기는 같은 연도의 기존 일정을 대체합니다.</p>
+        <p id="backupStatus" role="status" aria-live="polite"></p>
       </section>
       <section class="card formatting-card" aria-label="달력 서식">
         <details>

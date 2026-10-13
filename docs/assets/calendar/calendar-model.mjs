@@ -1,5 +1,5 @@
 import { yearLayout, validDate, yearNumber } from './date-core.mjs';
-import { TTL, MAX_STALE, FRESH_DAYS, MAX_DAYS } from './contract.mjs';
+import { TTL, MAX_STALE, FRESH_DAYS, MAX_DAYS, MIN_YEAR, MAX_YEAR } from './contract.mjs';
 import { normalizeFormatting } from './formatting.mjs';
 import { lunarDate, MIN_LUNAR_YEAR, MAX_LUNAR_YEAR } from './lunar-calendar.mjs';
 export const LIMITATION = '공식 공휴일은 추가·변경될 수 있습니다. 내려받은 파일은 자동 갱신되지 않습니다.';
@@ -18,6 +18,34 @@ export function validateManual(input, year, entries = [], excludingId = null) {
   if (others.some(x => x.date === input.date && normalizeName(x.name) === name && x.category === input.category)) throw new Error('같은 날짜·이름·구분의 수동 일정이 이미 있습니다.');
   return { date: input.date, name, source: 'manual', category: input.category,
     sourceId: excludingId || input.sourceId || `manual:${crypto.randomUUID()}` };
+}
+export const MAX_BACKUP_BYTES = 128 * 1024;
+function backupEntries(value, year) {
+  if (!Array.isArray(value) || value.length > 100) throw new Error('백업 일정은 배열이며 최대 100개여야 합니다.');
+  const entries = [];
+  for (const item of value) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)
+      || Object.keys(item).sort().join(',') !== 'category,date,name') throw new Error('백업 일정의 형식이 올바르지 않습니다.');
+    entries.push(validateManual({ date: item.date, name: item.name, category: item.category }, year, entries));
+  }
+  return entries;
+}
+export function parseManualBackup(text, selectedYear) {
+  if (typeof text !== 'string' || new TextEncoder().encode(text).length > MAX_BACKUP_BYTES) throw new Error('백업 파일은 128 KiB 이하여야 합니다.');
+  let data;
+  try { data = JSON.parse(text); } catch { throw new Error('올바른 JSON 백업 파일을 선택하세요.'); }
+  if (!data || typeof data !== 'object' || Array.isArray(data)
+    || Object.keys(data).sort().join(',') !== 'entries,format,version,year'
+    || data.format !== 'workspace-calendar-manual' || data.version !== 1) throw new Error('지원하는 일정 백업 형식·버전이 아닙니다.');
+  if (!Number.isInteger(data.year) || data.year < MIN_YEAR || data.year > MAX_YEAR) throw new Error('백업 연도가 올바르지 않습니다.');
+  if (data.year !== selectedYear) throw new Error(`백업은 ${data.year}년 일정입니다. 달력 연도를 먼저 맞춰 주세요.`);
+  return backupEntries(data.entries, data.year);
+}
+export function serializeManualBackup(year, manual) {
+  const entries = manual.map(({ date, name, category }) => ({ date, name, category }));
+  const text = JSON.stringify({ format: 'workspace-calendar-manual', version: 1, year, entries }, null, 2);
+  parseManualBackup(text, year);
+  return text;
 }
 export function freezeDeep(value) {
   if (value && typeof value === 'object' && !Object.isFrozen(value)) {

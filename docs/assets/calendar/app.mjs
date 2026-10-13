@@ -1,6 +1,6 @@
 import { nextSeoulYear, yearNumber } from './date-core.mjs';
 import { MIN_YEAR, MAX_YEAR } from './contract.mjs';
-import { buildCalendar, validateManual, seoulTime } from './calendar-model.mjs';
+import { buildCalendar, validateManual, seoulTime, MAX_BACKUP_BYTES, parseManualBackup, serializeManualBackup } from './calendar-model.mjs';
 import { DEFAULT_FORMATTING, normalizeFormatting } from './formatting.mjs';
 import { MIN_LUNAR_YEAR, MAX_LUNAR_YEAR } from './lunar-calendar.mjs';
 import { HolidayClient } from './holiday-client.mjs';
@@ -16,6 +16,7 @@ export function initCalendar(root) {
   let year = Math.max(MIN_YEAR, Math.min(MAX_YEAR, nextSeoulYear())), manual = [], snapshot = null, model = null;
   let mode = 'idle', staleApproved = false, manualApproved = false, editId = null, exporting = false, destroyed = false;
   let yearEditing = false, yearStatusText = '';
+  let importing = false;
   $('year').min = MIN_YEAR; $('year').max = MAX_YEAR; $('year').value = year;
   const setStatus = (text, state = mode) => {
     $('status').textContent = text; $('status').dataset.state = state;
@@ -35,6 +36,8 @@ export function initCalendar(root) {
       && String(year) === $('year').value;
   }
   function buttons() {
+    $('backupManual').disabled = yearEditing || exporting || importing || !manual.length;
+    $('importManual').disabled = yearEditing || exporting || importing;
     $('previewButton').disabled = !available() || exporting;
     $('download').disabled = !model || exporting || !available();
     $('download').textContent = year + '년 Excel 다운로드';
@@ -150,6 +153,37 @@ export function initCalendar(root) {
   });
   for (const id of ['holidayDate', 'holidayName', 'category']) listen($(id), 'input', invalidate);
   listen($('cancelEdit'), 'click', () => { resetEditor(); invalidate(); });
+  listen($('backupManual'), 'click', () => {
+    try {
+      if (yearEditing || exporting || importing) return;
+      if ($('holidayName').value || $('holidayDate').value || editId) throw new Error('입력 중인 일정을 먼저 추가하거나 수정 저장해 주세요.');
+      const url = URL.createObjectURL(new Blob([serializeManualBackup(year, manual)], { type: 'application/json;charset=utf-8' }));
+      const link = document.createElement('a'); link.href = url; link.download = `calendar_manual_${year}.json`;
+      document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+      $('backupStatus').textContent = `${year}년 일정 ${manual.length}개 백업 다운로드를 시작했습니다.`;
+    } catch (error) { $('backupStatus').textContent = error.message; }
+  });
+  listen($('importManual'), 'click', () => { if (!yearEditing && !exporting && !importing) $('backupFile').click(); });
+  listen($('backupFile'), 'change', async () => {
+    const file = $('backupFile').files[0]; $('backupFile').value = '';
+    if (!file || importing || exporting || yearEditing) return;
+    importing = true; buttons();
+    const requestedYear = year;
+    // A user can change the year or editor while the local file is being read.
+    const before = JSON.stringify([manual, editId, $('holidayDate').value, $('holidayName').value, $('category').value]);
+    try {
+      if (file.size > MAX_BACKUP_BYTES) throw new Error('백업 파일은 128 KiB 이하여야 합니다.');
+      const restored = parseManualBackup(await file.text(), requestedYear);
+      if (destroyed) return;
+      if (yearEditing || year !== requestedYear || exporting || before !== JSON.stringify([manual, editId, $('holidayDate').value, $('holidayName').value, $('category').value])) throw new Error('파일을 읽는 동안 연도나 입력이 바뀌었습니다. 다시 가져오세요.');
+      if (!confirm(`${year}년 기존 일정 ${manual.length}개와 입력 중인 내용을 백업 일정 ${restored.length}개로 대체할까요? 기존 내용은 지워집니다.`)) {
+        $('backupStatus').textContent = '가져오기를 취소했습니다. 기존 입력을 유지합니다.'; return;
+      }
+      manual = restored; resetEditor(); $('manualReview').checked = false; invalidate(); renderLists();
+      $('backupStatus').textContent = `${year}년 일정 ${manual.length}개를 가져왔습니다. 새 미리보기를 만들어 확인하세요.`;
+    } catch (error) { if (!destroyed) $('backupStatus').textContent = error.message + ' 기존 입력은 유지됩니다.'; }
+    finally { importing = false; if (!destroyed) buttons(); }
+  });
   listen($('manualReview'), 'change', invalidate);
   listen($('showLunar'), 'change', invalidate);
   listen($('formattingForm'), 'submit', event => event.preventDefault());
