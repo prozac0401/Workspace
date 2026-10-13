@@ -38,7 +38,7 @@ class Element {
 }
 let elements;
 function dom() {
-  elements = Object.fromEntries(['year','status','previewButton','download','manualMode','approveStale','manualReviewWrap','mockBanner','preview','empty','exportStatus','holidayDate','showLunar','lunarRangeHelp','holidayForm','saveHoliday','cancelEdit','formError','manualList','holidayName','category','manualReview','formattingForm','resetFormatting','backupManual','importManual','backupFile','backupStatus'].map(id => [id,new Element()]));
+  elements = Object.fromEntries(['year','status','previewButton','download','manualMode','approveStale','manualReviewWrap','mockBanner','preview','empty','exportStatus','holidayDate','showLunar','lunarRangeHelp','holidayForm','saveHoliday','cancelEdit','formError','manualList','holidayName','category','manualReview','formattingForm','resetFormatting','backupManual','importManual','backupFile','backupStatus','originalPreviewSize'].map(id => [id,new Element()]));
   elements.category.value='personal';
   globalThis.document={querySelector(){},hidden:false,addEventListener(){},createElement:()=>new Element(),createDocumentFragment:()=>new Element(),body:new Element()};
   globalThis.ResizeObserver=class { observe(){} disconnect(){} };
