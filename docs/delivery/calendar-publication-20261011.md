@@ -140,3 +140,19 @@ PR #28은 main `8ef6fc5b22a58fede886e8967a900d2aa9e093f2`, 배포 38111990105에
 재현: `python -m mkdocs build --strict` 후 Playwright를 사용할 수 있는 환경에서 `node tools/calendar/tests/preview-size-browser.mjs`를 실행한다. 기본은 설치된 Edge이며 `PLAYWRIGHT_MODULE`(모듈 절대 경로), `CALENDAR_BROWSER_EXECUTABLE`(브라우저 실행 파일), `CALENDAR_BROWSER_OUTPUT`(증거 폴더)로 지정할 수 있다. 자료는 하네스가 fixture로 대체하며 운영 수집을 실행하지 않는다.
 
 실제 모바일 기기에서 추가 확인할 것은 손가락으로 좌우 이동해 모든 날짜·일정이 읽히는지, 긴 일정과 사용자가 설정한 글꼴에서의 가독성, 화면 회전 후 보기 선택 유지, Android Chrome/Samsung Internet 및 iOS Safari의 zoom·터치 이동이다. 데스크톱 viewport 검증과 실제 기기 사용성 확인을 구분한다. 현재는 Draft PR 범위이며 병합·운영 배포를 수행하지 않는다.
+
+## PR #30·#31 통합 검토 (2026-10-13)
+
+최신 확인 시 main은 `304710661c4333a82fdf5848847d05ccbf586ead`, PR #30은 `ea566fac59eb2101d5db44f78e29916542a39a8f`, PR #31은 `c9eab9d41ea0adecc0158c358275d2d991e91a1e`였다. 둘 다 open Draft이며 개별 mergeable이었다. 로컬 실제 merge에서 specification.md와 tools/calendar/README.md의 충돌을 재현했다. app.mjs와 docs/calendar/index.md는 서로 다른 위치의 변경으로 자동 통합됐다.
+
+최소 수정: 백업 CAL-20과 기존 CAL-01~19의 의미를 유지하고 보기 전환을 CAL-21로 바꿨다. PR #31의 모바일 명세·README 설명을 별도 기존 절 앞에 배치해 PR #30의 말미 추가와 충돌하지 않게 했다. 두 설명을 모두 보존한다. JSON 파일 읽기와 보기 전환은 각각 입력 데이터와 화면 zoom을 다루므로 제품 코드 추가 수정은 필요하지 않았다.
+
+통합 시 기존 backup.test.mjs의 UI 검사에서 새 originalPreviewSize가 없는 최소 DOM 어댑터로 인해 TypeError가 발생했다. PR #30의 어댑터에 해당 요소만 추가한 `db70ac5`로 수정했다. 제품 실패와 구분하며 최초 실패를 숨기지 않는다. PR #31의 `1c6d2a9`는 통합 전용 `backup-preview-integration.mjs`를 추가한다. 이 파일은 두 PR을 함께 적용한 tree에서만 명시적으로 실행하며 개별 PR의 기본 test glob에는 포함하지 않는다.
+
+수정된 두 head의 양방향 git merge-tree --write-tree 결과는 모두 충돌 없이 동일한 tree `95ec6b8feafda5a1af7d4b27c0ddbf67b3555abd`였다. 그 로컬 통합 상태에서 다음 검증을 수행했다.
+
+- `node --test tools/calendar/tests/backup-preview-integration.mjs`: 1/1 PASS. 실제 앱 핸들러의 개인·회사 일정, 보기 전환 전후 JSON 내용과 XLSX 바이트 동일성, 편집 입력 유지, 잘못된 JSON·취소 시 기존 목록/preview 보존, 성공 시 다운로드 차단/수동 확인 초기화와 보기 선택 유지, 새 preview 후 일정 표시/다운로드 복구, 파일을 읽는 동안 보기만 바꾸는 동작을 확인했다.
+- `node --test --test-name-pattern='app preserves' tools/calendar/tests/backup.test.mjs`: 어댑터 수정 후 1/1 PASS. 이번 통합에서 실제로 실패한 UI 검사만 다시 실행했다. 앞선 개별 Node 24개·정적 검사 증거는 재사용하며 무관한 suite를 반복하지 않았다.
+- 통합 tree의 `python -m mkdocs build --strict`, `python scripts/check-site.py`: PASS (22 공개 페이지·2 이전 주소·404, 공개 범위·로컬 링크·JSON). 변경 대상 diff check PASS.
+
+위 Node 결과는 최소 DOM 어댑터 검사다. 실제 브라우저 layout·touch·파일 선택·다운로드와 실제 Excel을 검증했다고 해석하지 않는다. 이번 환경의 Playwright 패키지는 있으나 예상 Chromium 실행 파일이 없어 실제 브라우저 검사는 NOT RUN이다. PR #31의 앞선 소켓 제한 BLOCKED 기록은 그대로 유지한다. 실행 가능한 환경에서 preview-size-browser.mjs와 실제 JSON 파일 선택/백업을 함께 확인하기 전까지 두 PR은 Draft로 유지하고 병합·운영 배포하지 않는다. 향후 main/head 변경 시 이 tree 증거를 새 변경의 결과로 재사용하지 않는다.

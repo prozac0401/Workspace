@@ -104,6 +104,10 @@ powershell -NoProfile -File tools/calendar/tests/excel-check.ps1
 
 2026-10-11 후속 요청에서 사용자가 1983~2099 범위와 완료 후 원격 반영·배포, 최초 실제 수집을 승인했다. 해당 실행 결과는 운영 기록을 따른다. 이후 권한 확대·Secret 교체·데이터 강제 복구는 별도 변경 범위다.
 
+## 미리보기 크기 선택
+
+미리보기 글자가 작으면 ‘원래 글자 크기로 보기’를 선택하고 달력을 가로로 밀어 확인한다. 선택을 해제하면 전체 맞춤 보기로 돌아간다. Excel의 글자 크기와 인쇄 설정은 보기 전환으로 바뀌지 않는다.
+
 ## Actions 연결과 운영 한계
 
 기존 `Documentation` 하나에 verify→prepare-data→store-data→build→deploy를 연결한다. PR은 Secret 없는 단위·독립 XLSX·schema·사이트 검사를 수행하고 데이터 쓰기/Pages artifact 업로드/배포를 하지 않는다. `pull_request_target`을 사용하지 않는다. 운영 job은 원본 저장소·기본 브랜치·허용 이벤트·활성화 변수로 제한한다. 하나의 운영 concurrency 그룹을 사용하고 오래된 source SHA는 저장·배포 직전 확인하여 skip한다. 대기 순서가 정확히 보장되는 큐라고 설명하지 않는다.
@@ -117,5 +121,3 @@ powershell -NoProfile -File tools/calendar/tests/excel-check.ps1
 공공데이터포털 공개 안내는 개발계정 트래픽10,000, 운영계정 증설 신청을 설명하지만 이 계정의 실제 승인량은 미확인이다. 정상1,404회는 안내된10,000회의14.04%, 실행상한2,000회는20%이며 다른 프로그램 호출량도 합산해야 한다. 저장소는 공개로 확인했고 소유자 플랜·현재 Actions 사용량·청구 한도는 미확인이다. 항상 무료라고 보장하지 않으며 유료 자원은 만들지 않는다. 사용자 확인과 읽기 전용 API 조회로 Pages Source=workflow, custom domain 없음, `github-pages` main제한, reviewer/wait 없음, Actions 기본read와GitHubActions허용을 확인했다. 코드·검사기는 설정된 base path를 사용하고 브라우저는 루트 및 `/Workspace/` 경로를 검증한다.
 
 공식 근거(2026-10-11 재확인): [KASI](https://www.data.go.kr/data/15012690/openapi.do), [schedule](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule), [Secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets), [GITHUB_TOKEN](https://docs.github.com/en/actions/concepts/security/github_token), [workflow 연결](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow), [Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
-
-미리보기 글자가 작으면 ‘원래 글자 크기로 보기’를 선택하고 달력을 가로로 밀어 확인한다. 선택을 해제하면 전체 맞춤 보기로 돌아간다. Excel의 글자 크기와 인쇄 설정은 보기 전환으로 바뀌지 않는다.
