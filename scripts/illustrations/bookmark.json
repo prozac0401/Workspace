@@ -6,7 +6,7 @@
     "mode": "compare",
     "panels": [
       {"icon": "pc", "title": "PC 환경 확인", "lines": ["Windows 11 x64", "업데이트 전 기록 백업"]},
-      {"icon": "install", "title": "MSI로 설치", "lines": ["0.2.10 설치 파일", "설치 준비"]},
+      {"icon": "install", "title": "MSI로 설치", "lines": ["0.2.13 설치 파일", "설치 준비"]},
       {"icon": "folder", "title": "ZIP으로 실행", "lines": ["폴더 전체 압축 해제", "폴더 안에서 프로그램 실행"]}
     ],
     "caption": "MSI 설치와 ZIP 실행 중 필요한 방식을 선택하세요. 이전 버전의 사용자 지정 설치 경로는 해당 업데이트 순서를 따릅니다."
