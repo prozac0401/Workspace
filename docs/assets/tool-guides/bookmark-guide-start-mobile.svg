@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="432" viewBox="0 0 320 432" role="img" aria-labelledby="title desc">
-<title id="title">설치하고 첫 책갈피 남기기</title><desc id="desc">실제 폴더 하나로 연습하세요. 스티커의 오른쪽 화살표로 저장한 위치를 열고, 목록 모드에서는 항목을 고른 뒤 Enter를 누릅니다.</desc>
+<title id="title">설치하고 첫 책갈피 남기기</title><desc id="desc">실제 폴더 하나로 연습하세요. 스티커의 왼쪽 이동 버튼로 저장한 위치를 열고, 목록 모드에서는 항목을 고른 뒤 Enter를 누릅니다.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="320" height="432" rx="4" fill="#fffdf9"/>
 <text x="27" y="18" font-size="10" fill="#8a622f" font-weight="700" text-anchor="middle">01</text>
@@ -20,5 +20,5 @@
 <g transform="translate(9 307) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M94 51A23 23 0 1 1 65 28M65 28L55 27M65 28L60 39" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="120" y="323" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">저장한 작업 열기</text>
 <text x="120" y="348" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">트레이 → 책갈피 보기</text>
-<text x="120" y="368" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">스티커 오른쪽 화살표</text>
+<text x="120" y="368" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">스티커 왼쪽 이동 버튼</text>
 </g></svg>
