@@ -260,7 +260,7 @@ A반의 세 값만 확정으로 바뀌고 B반의 기존 값은 남습니다.
 
 정답은 같은 저장 파일의 **안내준비 시트·B4**로 돌아오고, 다음 할 일을 적은 메모를 확인할 수 있는 것입니다.
 
-![스티커 제목 더블클릭·F2로 편집하고 왼쪽 이동 버튼으로 저장한 작업 열기](assets/tool-guides/bookmark-guide-stickers.svg)
+[![스티커 제목 더블클릭·F2로 편집하고 왼쪽 이동 버튼으로 저장한 작업 열기](assets/tool-guides/bookmark-guide-stickers.svg)](assets/tool-guides/bookmark-guide-stickers.svg)
 
 안내준비 시트의 B4와 다음 할 일을 적은 책갈피 메모를 확인합니다.
 
