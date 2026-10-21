@@ -72,7 +72,7 @@ namespace VisibleCellsPaste
                 {
                     uint format = RegisterClipboardFormat(name);
                     if (!IsClipboardFormatAvailable(format))
-                        throw new ValidationException("VCP-CLIPBOARD-FORMAT", "필요한 Excel 구조화 복사 형식이 없습니다. Excel에서 한 행 또는 한 열을 다시 복사해 주세요. 변경된 셀은 없습니다.");
+                        throw new ValidationException("VCP-CLIPBOARD-FORMAT", "필요한 Excel 구조화 복사 형식이 없습니다. Excel에서 셀 범위를 다시 복사해 주세요. 변경된 셀은 없습니다.");
                     IntPtr handle = GetClipboardData(format);
                     if (handle == IntPtr.Zero) throw new ValidationException("VCP-CLIPBOARD-DATA", "Excel 복사 데이터를 읽을 수 없습니다. 변경된 셀은 없습니다.");
                     ulong size = GlobalSize(handle).ToUInt64();

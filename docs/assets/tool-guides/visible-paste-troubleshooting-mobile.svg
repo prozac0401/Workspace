@@ -8,9 +8,10 @@
 <text x="120" y="80" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">추가 기능 차단 여부 확인</text>
 <path d="M18 144H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 <g transform="translate(9 163) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="22" y="9" width="100" height="78" rx="4" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M23 28H121M49 10V86M89 10V86M23 47H121M23 66H121" fill="none" stroke="#ded2c4" stroke-width="2"/><rect x="24" y="11" width="96" height="15" rx="2" fill="#ece5d7"/><path d="M49 48H120V65H49Z" fill="#f6e7cd" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="69" y="43" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">A</text><text x="104" y="43" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">3</text><text x="69" y="62" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">B</text><text x="104" y="62" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">1</text><text x="69" y="81" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">C</text><text x="104" y="81" font-size="13" fill="#2c2622" font-weight="400" text-anchor="middle">2</text></g>
-<text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">개수가 다르면</text>
-<text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">빈칸 포함 원본 개수 확인</text>
-<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">보이는 대상 개수와 대조</text>
+<text x="120" y="179" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">모양이 다르면</text>
+<text x="120" y="204" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">빈칸도 한 칸으로 계산</text>
+<text x="120" y="224" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">보이는 행·열 수 각각</text>
+<text x="120" y="244" font-size="14" fill="#6e6258" font-weight="400" text-anchor="start">비교</text>
 <path d="M18 288H302" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 <g transform="translate(9 307) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><circle cx="72" cy="49" r="38" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M94 51A23 23 0 1 1 65 28M65 28L55 27M65 28L60 39" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="120" y="323" font-size="16" fill="#2c2622" font-weight="700" text-anchor="start">되돌리기가 안 되면</text>

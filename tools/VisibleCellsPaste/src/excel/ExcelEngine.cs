@@ -109,16 +109,17 @@ namespace VisibleCellsPaste {
    var retained=new ComScope();
    try{using(var refs=new ComScope()){
     dynamic selected=retained.Own((object)app.Selection);dynamic sheet,book;
-    try{sheet=retained.Own((object)selected.Worksheet);book=retained.Own((object)sheet.Parent);}catch{throw Reject("VCP-SELECTION","워크시트의 한 열 범위를 선택해 주세요.");}
+    try{sheet=retained.Own((object)selected.Worksheet);book=retained.Own((object)sheet.Parent);}catch{throw Reject("VCP-SELECTION","워크시트의 연속된 사각형 범위를 선택해 주세요.");}
     if(Convert.ToBoolean(book.ReadOnly))throw Reject("VCP-READONLY","읽기 전용 파일은 지원하지 않습니다.");
     if(Convert.ToBoolean(sheet.ProtectContents)||Convert.ToBoolean(sheet.ProtectDrawingObjects)||Convert.ToBoolean(sheet.ProtectScenarios))throw Reject("VCP-PROTECTED","보호된 시트는 지원하지 않습니다.");
     dynamic window=refs.Own((object)app.ActiveWindow);dynamic selectedSheets=refs.Own((object)window.SelectedSheets);
     if((int)selectedSheets.Count!=1)throw Reject("VCP-GROUPED","여러 시트를 그룹 선택한 상태는 지원하지 않습니다.");
     dynamic columns=refs.Own((object)selected.Columns),selectedAreas=refs.Own((object)selected.Areas),rows=refs.Own((object)selected.Rows);
     long count=Convert.ToInt64(selected.CountLarge);int cols=(int)columns.Count,areas=(int)selectedAreas.Count;
-    int first=(int)selected.Row,col=(int)selected.Column,last=first+(int)rows.Count-1;
-    if(areas!=1||cols!=1||count>=Limits.ExcelRows||count>Limits.MaxSelectionCells)throw Reject("VCP-SELECTION-SHAPE","연속된 한 열의 최대 200,000칸을 선택해 주세요. 전체 행·열과 직접 만든 다중 선택은 지원하지 않습니다.");
-    dynamic entireColumn=refs.Own((object)selected.EntireColumn);if(Convert.ToBoolean(entireColumn.Hidden))throw Reject("VCP-HIDDEN-COLUMN","선택한 열이 숨겨져 있습니다.");
+    int first=(int)selected.Row,col=(int)selected.Column,rowCount=(int)rows.Count,last=first+rowCount-1,lastCol=col+cols-1;
+    if(areas!=1||rowCount==Limits.ExcelRows||cols==Limits.ExcelColumns||count>Limits.MaxSelectionCells)throw Reject("VCP-SELECTION-SHAPE","연속된 사각형 범위에서 최대 200,000칸을 선택해 주세요. 전체 행·열과 직접 만든 다중 선택은 지원하지 않습니다.");
+    dynamic entireColumn=refs.Own((object)selected.EntireColumn);object allColumnsHidden=entireColumn.Hidden;
+    if(allColumnsHidden is bool&&(bool)allColumnsHidden)throw Reject("VCP-HIDDEN-COLUMN","선택한 열이 모두 숨겨져 있습니다.");
     try{if(Convert.ToBoolean(book.MultiUserEditing))throw Reject("VCP-SHARED","공유 통합문서는 지원하지 않습니다.");}catch(COMException){}
     dynamic visible;try{visible=refs.Own((object)selected.SpecialCells(12));}catch(COMException){throw Reject("VCP-NO-VISIBLE","선택한 범위에 보이는 칸이 없습니다.");}
     dynamic clipped=refs.Own((object)app.Intersect(selected,visible));if(clipped==null)throw Reject("VCP-NO-VISIBLE","선택한 범위에 보이는 칸이 없습니다.");
@@ -129,18 +130,20 @@ namespace VisibleCellsPaste {
      dynamic area=areaRefs.Own((object)visibleAreas[areaIndex]);object areaSheet=areaRefs.Own((object)area.Worksheet);
      if(!Same(areaSheet,(object)sheet))throw Reject("VCP-BOUNDARY","대상 워크시트가 달라졌습니다.");
      if(Convert.ToInt64(area.CountLarge)+targets.Count>Limits.MaxItems)throw Reject("VCP-ITEM-LIMIT","보이는 칸은 최대 50,000개입니다.");
-     dynamic areaRows=areaRefs.Own((object)area.Rows),areaColumns=areaRefs.Own((object)area.Columns),entireRow=areaRefs.Own((object)area.EntireRow);
-     int start=(int)area.Row,end=start+(int)areaRows.Count-1;
-     if((int)area.Column!=col||(int)areaColumns.Count!=1||start<first||end>last)throw Reject("VCP-BOUNDARY","선택 밖의 셀이 감지됐습니다.");
-     object hidden=entireRow.Hidden;if(!(hidden is bool)||Convert.ToBoolean(hidden))throw Reject("VCP-HIDDEN","대상 가시 상태가 달라졌습니다.");
+     dynamic areaRows=areaRefs.Own((object)area.Rows),areaColumns=areaRefs.Own((object)area.Columns),entireRow=areaRefs.Own((object)area.EntireRow),areaEntireColumn=areaRefs.Own((object)area.EntireColumn);
+     int start=(int)area.Row,end=start+(int)areaRows.Count-1,startCol=(int)area.Column,endCol=startCol+(int)areaColumns.Count-1;
+     if(startCol<col||endCol>lastCol||start<first||end>last)throw Reject("VCP-BOUNDARY","선택 밖의 셀이 감지됐습니다.");
+     object hidden=entireRow.Hidden,hiddenColumn=areaEntireColumn.Hidden;
+     if(!(hidden is bool)||(bool)hidden||!(hiddenColumn is bool)||(bool)hiddenColumn)throw Reject("VCP-HIDDEN","대상 가시 상태가 달라졌습니다.");
      object merge=area.MergeCells,array=area.HasArray;
      if(!(merge is bool)||Convert.ToBoolean(merge)||!(array is bool)||Convert.ToBoolean(array))throw Reject("VCP-MERGE-ARRAY","병합 셀과 배열 수식은 지원하지 않습니다.");
      try{object spill=area.HasSpill;if(!(spill is bool)||Convert.ToBoolean(spill))throw Reject("VCP-SPILL","동적 배열 spill 범위는 지원하지 않습니다.");}catch(COMException error){if((uint)error.HResult!=0x80020003)throw;}
-     for(int row=start;row<=end;row++)targets.Add(new TargetCell(sheetKey,row,col,false));
+     for(int row=start;row<=end;row++)for(int column=startCol;column<=endCol;column++)targets.Add(new TargetCell(sheetKey,row,column,false));
     }
     object validation=null;try{validation=refs.Own((object)selected.SpecialCells(-4174));}catch(COMException error){if((uint)error.HResult!=0x800A03EC)throw;}
     if(validation!=null&&Intersects(clipped,validation))throw Reject("VCP-VALIDATION","데이터 유효성 검사 규칙이 있는 칸은 지원하지 않습니다.");
-    GuardTable(sheet,selected);
+    // Inspect only cells we will write, while checking each targeted table column's full body.
+    GuardTable(sheet,clipped);
     var selection=new SelectionSnapshot(sheetKey,first,last,col,cols,count,areas,false,false,targets);var plan=Planner.Build(source,selection);
     var prepared=new PreparedPaste(retained){Book=book,Sheet=sheet,Selection=selected,Address=(string)selected.Address,SheetName=(string)sheet.Name,Plan=plan};
     app.StatusBar="보이는 칸 붙여넣기 · 백업 검사";prepared.Before=CellSnapshotReader.Capture(sheet,plan);
@@ -161,17 +164,17 @@ namespace VisibleCellsPaste {
    }
   }
   static object NativeValue(CellValue v){if(v.Kind==CellValueKind.Error)return new ErrorWrapper(unchecked((int)0x800A0000)|v.ErrorCode);return v.Value;}
-  void WriteRun(PreparedPaste p,int start,int n) {
-   dynamic sheet=p.Sheet;var first=p.Plan.Targets[start];
+  void WriteRun(PreparedPaste p,int start,int n,bool horizontal) {
+   dynamic sheet=p.Sheet;
    using(var refs=new ComScope()){
     dynamic range=refs.Own((object)sheet.Range[p.Before[start].Address,p.Before[start+n-1].Address]);var kind=p.Plan.Source.Items[start].Kind;
     if(kind==CellValueKind.Empty){range.Value2=null;return;}
-    var values=new object[n,1];for(int i=0;i<n;i++)values[i,0]=NativeValue(p.Plan.Source.Items[start+i]);
+    var values=new object[horizontal?1:n,horizontal?n:1];for(int i=0;i<n;i++)values[horizontal?0:i,horizontal?i:0]=NativeValue(p.Plan.Source.Items[start+i]);
     if(kind==CellValueKind.String){
      range.NumberFormat="@";
      try{range.Value2=values;}finally{
       dynamic cells=refs.Own((object)sheet.Cells);
-      for(int i=0;i<n;i++)using(var cellRefs=new ComScope()){dynamic cell=cellRefs.Own((object)cells[first.Row+i,first.Column]);cell.NumberFormat=p.Before[start+i].Format;}
+      for(int i=0;i<n;i++)using(var cellRefs=new ComScope()){var target=p.Plan.Targets[start+i];dynamic cell=cellRefs.Own((object)cells[target.Row,target.Column]);cell.NumberFormat=p.Before[start+i].Format;}
      }
     }else range.Value2=values;
    }
@@ -268,7 +271,7 @@ namespace VisibleCellsPaste {
      int n=1;var kind=p.Plan.Source.Items[start].Kind;
      while(start+n<segment.StartIndex+segment.Count&&p.Plan.Source.Items[start+n].Kind==kind&&n<512)n++;
      if(progress!=null)progress("쓰기 "+start+" / "+p.Before.Length);app.StatusBar="보이는 칸 붙여넣기 · 쓰기 "+start+" / "+p.Before.Length;
-     touched=true;WriteRun(p,start,n);writes++;start+=n;
+     touched=true;WriteRun(p,start,n,segment.Horizontal);writes++;start+=n;
 #if VCP_TESTING
      if(writes==FailAfterWrites)throw new COMException("Synthetic write failure",unchecked((int)0x80004005));
      if(CancelAfterWrite)throw new OperationCanceledException();

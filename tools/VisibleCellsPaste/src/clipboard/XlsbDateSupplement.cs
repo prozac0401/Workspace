@@ -40,7 +40,7 @@ namespace VisibleCellsPaste
         }
         internal static CellValue[] Complete(byte[] package, int rows, int columns, CellValue[] xml, bool[] dates)
         {
-            Require(rows > 0 && columns > 0 && (rows == 1 || columns == 1) && (long)rows * columns <= Limits.MaxItems);
+            Require(rows > 0 && columns > 0 && (long)rows * columns <= Limits.MaxItems);
             Require(xml != null && dates != null && xml.Length == rows * columns && dates.Length == xml.Length);
             var zip = new BoundedZip(package);
             Require(Relationship(zip.Read("_rels/.rels"), null, "officeDocument") == "xl/workbook.bin");
@@ -62,10 +62,10 @@ namespace VisibleCellsPaste
                     case 549: Require(origin == null); origin = ReadRectangle(record); break;
                 }
             }
-            Require(began && ended && origin != null && sheetId != null && (origin.Rows == 1 || origin.Columns == 1));
+            Require(began && ended && origin != null && sheetId != null);
             // BrtOleSize establishes the copy origin. Filtered copies can have a larger original extent;
             // native cell coordinates are compacted at this origin, and every XML position is cross-checked below.
-            Require(origin.Rows >= rows && origin.Columns >= columns && (columns == 1 ? origin.Columns == 1 : origin.Rows == 1));
+            Require(origin.Rows >= rows && origin.Columns >= columns);
             var expected = new Rectangle { FirstRow = origin.FirstRow, LastRow = origin.FirstRow + rows - 1,
                 FirstColumn = origin.FirstColumn, LastColumn = origin.FirstColumn + columns - 1 };
             Require(expected.LastRow < Limits.ExcelRows && expected.LastColumn < Limits.ExcelColumns);
@@ -139,7 +139,7 @@ namespace VisibleCellsPaste
                 for (int span = 0; span < rowHeader.U32(13); span++)
                     if (nextColumn >= rowHeader.I32(17 + span * 8) && nextColumn <= rowHeader.I32(21 + span * 8)) inSpan = true;
                 Require(inSpan); column = nextColumn;
-                int index = expected.Rows == 1 ? column - expected.FirstColumn : row - expected.FirstRow;
+                int index = (row - expected.FirstRow) * expected.Columns + column - expected.FirstColumn;
                 Require(!seen[index]); seen[index] = true; result[index] = ReadCell(record, strings);
             }
             Require(began && ended && finished && dimension != null); return result;

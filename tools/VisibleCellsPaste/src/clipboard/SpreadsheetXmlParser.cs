@@ -56,10 +56,11 @@ namespace VisibleCellsPaste
                 XElement table = tables[0];
                 int rows = RequiredPositive(table, "ExpandedRowCount", Limits.MaxItems);
                 int columns = RequiredPositive(table, "ExpandedColumnCount", Limits.ExcelColumns);
-                if (rows != 1 && columns != 1) throw Fail("SHAPE", "원본은 한 행 또는 한 열이어야 합니다.");
                 if ((long)rows * columns > Limits.MaxItems) throw Fail("LIMIT", "복사 항목은 최대 50,000개입니다.");
                 if (OptionalPositive(table, "TopCell", 1, Limits.ExcelRows) != 1 || OptionalPositive(table, "LeftCell", 1, Limits.ExcelColumns) != 1)
                     throw Fail("OFFSET", "복사 범위의 시작 위치를 확정할 수 없습니다.");
+                var hiddenRows = new bool[rows];
+                var hiddenColumns = new bool[columns];
                 int previousMetadataColumn = 0;
                 foreach (XElement column in table.Elements(Ss + "Column"))
                 {
@@ -70,7 +71,9 @@ namespace VisibleCellsPaste
                         throw Fail("INDEX-LIMIT", "복사 열 서식의 범위를 확인할 수 없습니다.");
                     if (firstColumn <= previousMetadataColumn || (long)firstColumn + span > columns)
                         throw Fail("INDEX-LIMIT", "복사 열 서식이 선언한 범위를 벗어납니다.");
-                    // Column Span repeats formatting only; it never expands or synthesizes source data.
+                    // Column Span repeats metadata, including visibility, without synthesizing source data.
+                    bool hidden = IsHidden(column);
+                    for (int c = firstColumn - 1; c < firstColumn + span; c++) hiddenColumns[c] = hidden;
                     previousMetadataColumn = firstColumn + span;
                 }
                 if (table.Elements().Any(delegate(XElement child) { return child.Name != Ss + "Column" && child.Name != Ss + "Row"; }))
@@ -85,6 +88,7 @@ namespace VisibleCellsPaste
                     int rowIndex = OptionalPositive(row, "Index", previousRow + 1, rows);
                     if (rowIndex <= previousRow || rowIndex > rows) throw Fail("INDEX", "복사 데이터의 행 인덱스가 일치하지 않습니다.");
                     RejectNonzero(row, "Span");
+                    hiddenRows[rowIndex - 1] = IsHidden(row);
                     previousRow = rowIndex;
                     if (row.Elements().Any(delegate(XElement child) { return child.Name != Ss + "Cell"; }))
                         throw Fail("ROW-CONTENT", "복사 행의 구조를 확정할 수 없습니다.");
@@ -95,19 +99,36 @@ namespace VisibleCellsPaste
                         if (columnIndex <= previousColumn || columnIndex > columns) throw Fail("INDEX", "복사 데이터의 열 인덱스가 일치하지 않습니다.");
                         previousColumn = columnIndex;
                         RejectNonzero(cell, "MergeAcross"); RejectNonzero(cell, "MergeDown");
-                        int index = rows == 1 ? columnIndex - 1 : rowIndex - 1;
+                        int index = (rowIndex - 1) * columns + columnIndex - 1;
                         items[index] = ParseCell(cell, biff12 != null, out dates[index]);
                     }
                 }
                 bool hasDates = dates.Any(delegate(bool date) { return date; });
                 if (hasDates) items = XlsbDateSupplement.Complete(biff12, rows, columns, items, dates);
-                return new ClipboardSnapshot(hasDates ? "XML Spreadsheet + Biff12" : "XML Spreadsheet", sequence, rows, columns, true, items,
-                    "SpreadsheetML ExpandedRowCount/ExpandedColumnCount; sparse Index preserves all empty positions. " +
+                int visibleRows = hiddenRows.Count(delegate(bool hidden) { return !hidden; });
+                int visibleColumns = hiddenColumns.Count(delegate(bool hidden) { return !hidden; });
+                if (visibleRows == 0 || visibleColumns == 0) throw Fail("HIDDEN", "복사한 범위에 보이는 셀이 없습니다.");
+                var visibleItems = new List<CellValue>(visibleRows * visibleColumns);
+                for (int r = 0; r < rows; r++)
+                    if (!hiddenRows[r])
+                        for (int c = 0; c < columns; c++)
+                            if (!hiddenColumns[c]) visibleItems.Add(items[r * columns + c]);
+                return new ClipboardSnapshot(hasDates ? "XML Spreadsheet + Biff12" : "XML Spreadsheet", sequence, visibleRows, visibleColumns, true, visibleItems,
+                    "SpreadsheetML ExpandedRowCount/ExpandedColumnCount; row-major sparse Index preserves all empty positions. " +
+                    "Explicit ss:Hidden row/column metadata excluded after native coordinate checks; source worksheet is never reread. " +
                     (hasDates ? "XLSB BrtOleSize/cell coordinates cross-checked against all XML positions; raw numeric dates, no calendar conversion. " : "") + (evidence ?? ""));
             }
             catch (ValidationException) { throw; }
             catch (XmlException ex) { throw new ValidationException("VCP-XML-INVALID", "복사 데이터 XML을 안전하게 해석할 수 없습니다. 변경된 셀은 없습니다.", ex); }
             catch (ArgumentException ex) { throw new ValidationException("VCP-XML-INVALID", "복사 데이터를 안전하게 해석할 수 없습니다. 변경된 셀은 없습니다.", ex); }
+        }
+
+        private static bool IsHidden(XElement element)
+        {
+            XAttribute attribute = element.Attribute(Ss + "Hidden");
+            if (attribute == null || attribute.Value == "0" || attribute.Value == "false") return false;
+            if (attribute.Value == "1" || attribute.Value == "true") return true;
+            throw Fail("VISIBILITY", "복사한 행·열의 숨김 상태를 확인할 수 없습니다.");
         }
 
         private static CellValue ParseCell(XElement cell, bool nativeAvailable, out bool isDate)

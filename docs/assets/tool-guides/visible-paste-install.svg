@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
-<title id="title">설치하기</title><desc id="desc">설치는 한 번만 하면 됩니다. 이후 Excel을 평소처럼 실행해 셀 우클릭 메뉴를 사용합니다.</desc>
+<title id="title">설치하기</title><desc id="desc">파일을 저장하고 Excel을 종료한 뒤 설치합니다. 이전 EXE·ZIP 또는 다른 MSI 버전은 먼저 제거합니다.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="720" height="244" rx="4" fill="#fffdf9"/>
 <text x="120.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">01</text>
@@ -13,8 +13,8 @@
 <text x="360.0" y="18" font-size="11" fill="#8a622f" font-weight="700" text-anchor="middle">02</text>
 <g transform="translate(288 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><path d="M72 34V56M62 48L72 58L82 48" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 62V69H101V62" fill="none" stroke="#8a622f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="360.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">설치 파일 실행</text>
-<text x="360.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">Setup.exe 실행</text>
-<text x="360.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">ZIP은 풀고 Install.cmd</text>
+<text x="360.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">기존 버전 먼저 제거</text>
+<text x="360.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">맞는 MSI 실행</text>
 <rect x="325.0" y="109" width="70" height="23" rx="3" fill="#f2e9dd" stroke="#f2e9dd" stroke-width="2"/>
 <text x="360.0" y="125" font-size="12" fill="#8a622f" font-weight="700" text-anchor="middle">2</text>
 <path d="M467 71H493M486 64L493 71L486 78" fill="none" stroke="#8a622f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

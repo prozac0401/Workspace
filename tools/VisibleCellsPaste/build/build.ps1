@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([ValidatePattern('^[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.]+)?$')][string]$Version = '0.1.2')
+param([ValidatePattern('^[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.]+)?$')][string]$Version = '0.2.0-rc.1')
 $ErrorActionPreference = 'Stop'
 $assemblyVersion = ($Version -split '-', 2)[0] + '.0'
 Set-StrictMode -Version Latest
@@ -127,7 +127,8 @@ foreach ($doc in $docs) {
     $inventory += "docs/$doc"
 }
 $sourceManifest = @($sources + $nativeFixtures + @((Join-Path $productRoot 'installer\Setup.cs'),(Join-Path $productRoot 'installer\Setup.manifest'),(Join-Path $productRoot 'installer\SetupTests.cs'),(Join-Path $productRoot 'tests\unit\CoreTests.cs'),(Join-Path $productRoot 'tests\unit\NativeClipboardTests.cs'),(Join-Path $productRoot 'tests\unit\CellSnapshotReaderTests.cs'),(Join-Path $productRoot 'tests\unit\AddInLifecycleTests.cs'),(Join-Path $productRoot 'tests\unit\ComLifetimeTests.cs'),(Join-Path $productRoot 'tests\unit\GlobalStateRecoveryTests.cs'),(Join-Path $productRoot 'tests\unit\PresentationAndEntryTests.cs'),(Join-Path $productRoot 'tests\fixtures\excel-vertical-5.xml'),(Join-Path $productRoot 'installer\Install.cmd'),(Join-Path $productRoot 'installer\Uninstall.cmd'),(Join-Path $PSScriptRoot 'verify-package.ps1'),(Join-Path $PSScriptRoot 'verify-assembly.ps1'),$PSCommandPath) | ForEach-Object { [ordered]@{ path = $_.Substring($repoRoot.Length + 1); sha256 = (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash.ToLowerInvariant() } })
-$manifest = [ordered]@{ product='VisibleCellsPaste'; version=$Version; assemblyVersion=$assemblyVersion; utc=[DateTime]::UtcNow.ToString('o'); architectures=@('x86','x64'); signed=$false; classification='unsigned release build'; actualExcelValidation='See docs/test-report.md. Successful build does not establish Excel acceptance.'; compiler=(Get-Item -LiteralPath $compiler).VersionInfo.FileVersion; sources=$sourceManifest }
+$buildClassification = if ($Version -match '-') { 'unsigned evaluation build' } else { 'unsigned release build' }
+$manifest = [ordered]@{ product='VisibleCellsPaste'; version=$Version; assemblyVersion=$assemblyVersion; utc=[DateTime]::UtcNow.ToString('o'); architectures=@('x86','x64'); signed=$false; classification=$buildClassification; actualExcelValidation='See docs/test-report.md. Successful build does not establish Excel acceptance.'; compiler=(Get-Item -LiteralPath $compiler).VersionInfo.FileVersion; sources=$sourceManifest }
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $package 'build-manifest.json') -Encoding UTF8
 $inventory += 'build-manifest.json'
 $hashLines = @($inventory | Sort-Object | ForEach-Object { (Get-FileHash -LiteralPath (Join-Path $package $_) -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + $_ })
@@ -146,4 +147,4 @@ try {
 & (Join-Path $PSScriptRoot 'verify-package.ps1') -ZipPath $tempZip
 Move-Item -LiteralPath $tempZip -Destination $zipFile -Force
 [IO.File]::WriteAllText((Join-Path $output 'SHA256SUMS.txt'),(Get-FileHash -LiteralPath $zipFile -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + [IO.Path]::GetFileName($zipFile) + [Environment]::NewLine,[Text.Encoding]::ASCII)
-Write-Output "Unsigned release package: $zipFile"
+Write-Output "$buildClassification package: $zipFile"

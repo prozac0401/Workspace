@@ -20,6 +20,21 @@ jobs:
         # Package metadata inspection uses Windows PowerShell and .NET Framework.
         shell: powershell
         run: ./tools/VisibleCellsPaste/build/build.ps1
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Build and verify both MSI architectures
+        shell: powershell
+        env:
+          DOTNET_ROLL_FORWARD: Major
+        run: |
+          dotnet tool install wix --version 4.0.6 --tool-path .tools/wix
+          if ($LASTEXITCODE -ne 0) { throw 'WiX installation failed.' }
+          $vswhere = "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe"
+          $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (!$vs) { throw 'MSVC x86/x64 tools are required.' }
+          $vc = Get-ChildItem "$vs/VC/Tools/MSVC" -Directory | Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
+          ./tools/VisibleCellsPaste/build/build-msi.ps1 -VCToolsRoot $vc.FullName -WindowsSdkRoot "${env:ProgramFiles(x86)}/Windows Kits/10"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -49,4 +64,8 @@ jobs:
             artifacts/visible-cells-paste/*/presentation-entry-tests.log
             artifacts/visible-cells-paste/*/setup-tests-build.log
             artifacts/visible-cells-paste/*/setup-tests.log
+            artifacts/visible-cells-paste/*/msi/*/*.msi
+            artifacts/visible-cells-paste/*/msi/*/SHA256SUMS.txt
+            artifacts/visible-cells-paste/*/msi/*/*/guard-tests.log
+            artifacts/visible-cells-paste/*/msi/*/*/wix-build.log
           if-no-files-found: warn
