@@ -1,7 +1,7 @@
 # 보이는 칸 붙여넣기 · 0.2.1-rc.1 시작 셀 확장 검증·배포 기록
 
 기록일: 2026-10-21 · 버전: 0.2.1-rc.1 · MSI ProductVersion: 0.2.1<br>
-상태: 시작 셀 확장·MSI 제작·집중 설치 검증 완료 · CI·게시 확인 전<br>
+상태: 시작 셀 확장 검증·MSI 사전 공개·다운로드·Pages 확인 완료<br>
 제품 책임: 도구 개발·검증 담당<br>
 관련 문서: [원본 명세](../tools/visible-cells-paste/original-specification.md), [현재 대응표](../tools/visible-cells-paste/acceptance.md), [ADR-0039](../design/0039-visible-cells-paste-anchor.md), [이전 0.2.0-rc.1 게시·검증](visible-cells-paste-msi-020rc1-20261021.md)
 
@@ -21,7 +21,7 @@
 | x86/x64 MSI 제작·정적 검사·해시 | PASS | ProductVersion0.2.1·AssemblyVersion0.2.1.0, 패키지16파일과 MSI 각각10파일·등록30개 확인. native guard 각각14 PASS·0 FAIL. 두 MSI 모두 서명 없음 |
 | 새 MSI 집중 설치 검증12개 | PASS | 최종 x64 MSI로 일반 Explorer·일반 사용자 설치0, 파일10개 해시·HKCU등록30개·Assembly0.2.1.0, Excel 자동 로드/정상 종료2회, 제거0·제품 상태-1·소유 파일/등록 부재·추가 파일 보존 확인. 이전 MSI25개와 별도 |
 | 문서 strict·생성 링크·그림 | PASS | 최종 문서 동결 후 MkDocs strict 종료0(5.84초), check-site 종료0: 공개22페이지·이전주소2개·404·검색/사이트맵·비공개 제외·로컬 링크·자산 확인. 상대링크·변경 SVG XML·diffcheck는 아래 validation.json에 기록 |
-| CI·MSI 게시·다운로드·Pages | 확인 전 | 이전 0.2.0-rc.1 게시 성공을 새 버전의 성공으로 승계하지 않음 |
+| CI·MSI 게시·다운로드·Pages | PASS | PR35의 도구 Windows·공통 Windows·문서 CI 성공 후 병합. 새 태그의 비초안 사전 공개·자산3개 다운로드 SHA-256 일치·병합 커밋 Pages 배포·공개 시작 셀 안내 확인 |
 | 실제 클립보드·Ctrl+C/우클릭 | 이전 미해결·이번 NOT RUN | 이전 정상 Explorer 조사도 소유권 전제에서 내용 읽기·Paste 호출 전에 FAIL. UI 전체 경로는 NOT RUN |
 | 늦은 설치 실패의 내부 등록 롤백 | 이전 FAIL 유지 | 0.2.0-rc.1에서 일반 Explorer에서도 접근 거부·제품 상태 잔존 재현. 공식 제거 성공과 별도 |
 | Office32 실제 실행·새 PC·전체 공존 | 이전 NOT RUN 유지 | 제작·자동 검사로 실제 환경 검증을 대신하지 않음 |
@@ -42,16 +42,24 @@
 
 ## 산출물과 기록 경계
 
-기존 0.2.0-rc.1은 공개 자산을 그대로 유지한다. 새 MSI는 `artifacts/visible-cells-paste/0.2.1-rc.1/msi/20261021-041957-50c2751a`에 제작했다. 아래는 최종 로컬 파일의 해시이며 아직 원격 게시·다운로드를 확인하지 않았다. x64 MSI는315,392바이트, x86 MSI는282,624바이트이며 코드 서명이 없다.
+기존 0.2.0-rc.1은 공개 자산을 그대로 유지한다. 새 MSI는 `artifacts/visible-cells-paste/0.2.1-rc.1/msi/20261021-041957-50c2751a`에 제작했다. 아래 최종 로컬 파일과 공개 URL에서 새로 내려받은 파일의 해시가 모두 일치한다. x64 MSI는315,392바이트, x86 MSI는282,624바이트이며 코드 서명이 없다.
 
 | 파일 | 로컬 SHA-256 | 원격 다운로드 대조 |
 |---|---|---|
-| VisibleCellsPaste-0.2.1-rc.1-x64.msi | `b0b5866e093f9ccdee474d318e3239bc770eb4069414087f71a4b120b7712e6c` | 확인 전 |
-| VisibleCellsPaste-0.2.1-rc.1-x86.msi | `6c32f5c5779d656d7f2f15337bc3120e352a7ef1d17080167b21bee03f63d7be` | 확인 전 |
-| SHA256SUMS.txt | `f16a90c89c530d398364e63343d0e3a19abfdddbd2e4976c41e90a49a18a8337` | 확인 전 |
+| VisibleCellsPaste-0.2.1-rc.1-x64.msi | `b0b5866e093f9ccdee474d318e3239bc770eb4069414087f71a4b120b7712e6c` | PASS·315,392바이트 |
+| VisibleCellsPaste-0.2.1-rc.1-x86.msi | `6c32f5c5779d656d7f2f15337bc3120e352a7ef1d17080167b21bee03f63d7be` | PASS·282,624바이트 |
+| SHA256SUMS.txt | `f16a90c89c530d398364e63343d0e3a19abfdddbd2e4976c41e90a49a18a8337` | PASS·206바이트 |
 
-제작·정적 검사 근거는 같은 위치의 `build-results.json`과 MSI별 manifest다. CI·태그·게시 시각·다운로드 대조는 실제 결과가 확보된 뒤 기록한다. 로컬 제작·설치 검증 성공을 사전 공개 완료로 표시하지 않는다.
+제작·정적 검사 근거는 같은 위치의 `build-results.json`과 MSI별 manifest다. 게시 메타데이터는 `artifacts/visible-cells-paste/0.2.1-rc.1/published-release.json`, 공개 다운로드 대조는 `published-downloads/verification.json`에 보존했다.
 
 새 동봉 문서는 0.2.1-rc.1 계약을 반영한 제작 전 스냅샷으로 동결했다. 이후 결과는 패키지 밖 이 기록에 남겨 결과 문구만을 위한 재제작·재설치를 피한다. 공개 안내에는 시작 셀과 명시적 영역의 사용법을 설명하고 실제 검증·실패·미실행 수치는 제외 기록과 릴리스 노트에 둔다.
 
 문서 근거는 `artifacts/visible-cells-paste/anchor-docs-20261021/validation.json`이다. 기존 다운로드·사용 그림2개의 JSON과 가로/모바일 SVG4개만 바꿨으며 공개 자산·메뉴를 늘리지 않았다. 최초 명세는 변경하지 않았다.
+
+## 게시 확인
+
+[PR35](https://github.com/prozac0401/Workspace/pull/35)의 head `d33f019b3199e2deb4902bc99751c66356d979d3`에서 [도구 Windows CI](https://github.com/prozac0401/Workspace/actions/runs/39543874514), [공통 Windows CI](https://github.com/prozac0401/Workspace/actions/runs/39543874560), [문서 CI](https://github.com/prozac0401/Workspace/actions/runs/39543874528)가 모두 성공했다. 병합 커밋은 `aa2f2e4e30b7c6bfb245c0016ceae60107fbe2cb`다.
+
+[0.2.1-rc.1 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.2.1-rc.1)는 2026-10-21 04:28:39 UTC(13:28:39 KST)에 게시했다. 태그 `visible-cells-paste-v0.2.1-rc.1`은 위 병합 커밋을 가리키고, `isDraft=false`, `isPrerelease=true`다. 자산은 x64·x86 MSI와 SHA256SUMS.txt 3개뿐이며 내부 로그·검사 JSON·실패 주입 파일은 업로드하지 않았다. 이 사전 공개와 실제 확인 범위는 상업 승인이나 미해결 실패의 해소를 뜻하지 않는다.
+
+병합 커밋의 [문서 배포](https://github.com/prozac0401/Workspace/actions/runs/39544203549)는 성공했다. 2026-10-21 04:29:58 UTC에 [공개 사용 안내](https://prozac0401.github.io/Workspace/tools/visible-cells-paste/)의 HTTP200, 시작 셀 하나 안내와 Releases 목록 연결을 확인했다. 근거는 `artifacts/visible-cells-paste/0.2.1-rc.1/published-guide.json`이다.
