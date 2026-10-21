@@ -146,4 +146,3 @@ foreach ($arch in $architectures) {
 Write-Utf8 (Join-Path $output 'SHA256SUMS.txt') ((@($results|ForEach-Object{$_.sha256+'  '+[IO.Path]::GetFileName($_.msi)})-join "`n")+"`n")
 Write-Utf8 (Join-Path $output 'build-results.json') ($results|ConvertTo-Json -Depth 6)
 Write-Output "MSI output: $output"
-

@@ -35,12 +35,16 @@
 | MSI 정상 수명주기·외부 변경 보호 | PASS | 일반 Explorer에서 시작한 032832-591ce8b1 시험 25/25. 설치 등록30개·자동 로드·누락 파일/표식 복구·변경 파일/LoadBehavior/경로 변조 차단·추가 파일/값 보존·정상 제거·재제거1605 확인. 늦은 실패 주입은 포함하지 않음 |
 | 실제 기존 EXE·다른 MSI 설치와 실행 중 Excel 충돌 | NOT RUN | 이번 25개 실기 시험에는 별도 기존 설치·실행 중 Excel 충돌 사례를 포함하지 않음. native guard 검사·과거 Setup 결과와 구분 |
 | 표준 쓰기 뒤 실패 주입의 전체 롤백 | FAIL · 일반 Explorer에서도 재현 | 초기 030632-4191e75d 및 일반 Explorer의 desktop-rollback-20261021-033144에서 제품 파일·소유 등록은 제거됐지만 내부 Installer 등록 롤백 접근 거부5와 제품 상태5가 남음. 최신 시험 설치는 독립 제품·위치 확인 후 표준 /x 종료0·제품 상태-1·합성 업무 파일 보존으로 정리 |
-| 실제 Ctrl+C 영역 클립보드→메뉴 | 미검증 | 앞선 별도 로컬 조사에서 OpenClipboard 오류5 접근 거부. 합성 COM Range.Copy 시도 후 내용을 읽어 검증하지 못했으며 업무 데이터 수집 없음 |
+| 실제 Excel 복사→설치된 Paste probe | 입력 전제 FAIL · 붙여넣기 미실행 | 초기 OpenClipboard 오류5와 별개로 일반 Explorer에서 합성 Range.Copy 후 복사 상태는 확인했으나 클립보드 소유 HWND/PID가0. 내용 읽기와 설치된 Paste 호출 전에 중단. 아래 조사 기록 참조 |
+| 실제 Ctrl+C·우클릭 UI 전체 경로 | NOT RUN | COM Range.Copy 기반 probe와 구분. 클립보드 파서·메뉴 경로의 실제 성공 증거 없음 |
 | Office 32비트 실제 실행·새 PC·전체 공존 | NOT RUN | x86 제작·COM 자동 검사를 Office 32비트 실제 실행으로 확대하지 않음 |
 | 문서 strict·생성 링크·공개 범위 | PASS | 설치 실패 복구 안내 추가 후 MkDocs strict 종료0(2.70초), 생성 사이트 검사 종료0. 공개22페이지·이전주소2개·404, 검색·사이트맵·비공개 제외·로컬 경로/자산 확인. 변경 Markdown18개 상대링크191개 오류0, VCP SVG16개 XML 검사 통과. 동결한 동봉 문서9개 해시 불일치0 |
+| PR-34 최초 제출 CI | PASS · 해당 커밋 한정 | 258a3cd6dd5ee27e9bc7009f6e96da32ba08d13f에서 Windows 검사2개와 문서 verify 성공. 후속 커밋·Pages 배포·릴리스 게시 결과와 구분 |
 | GitHub 사전 공개 릴리스·다운로드 확인 | 확인 전 | 태그·게시 상태·자산 다운로드 SHA-256 확인 후 기록 |
 
 이번 후보의 원격 대상은 `prozac0401/Workspace`, 태그는 `visible-cells-paste-v0.2.0-rc.1`이다. 이 문자열을 기록한 사실은 실제 게시 완료의 증거가 아니다.
+
+[PR-34](https://github.com/prozac0401/Workspace/pull/34)의 최초 제출 CI 근거는 [Windows 검사](https://github.com/prozac0401/Workspace/actions/runs/39539300611), [도구 Windows 검사](https://github.com/prozac0401/Workspace/actions/runs/39539300607), [문서 verify](https://github.com/prozac0401/Workspace/actions/runs/39539300613)다. 이 실행의 Pages build·deploy는 SKIPPED였다. MSI는 사전 공개로 게시할 후보이며 실제 게시·다운로드 확인은 아직 남아 있다.
 
 ## 산출물·해시
 
@@ -76,6 +80,14 @@ MSI ProductVersion은 0.2.0, AssemblyVersion은 0.2.0.0이다. x64 MSI는 311,29
 내부 등록 롤백의 접근 거부와 제품 상태 잔존은 이 PC의 [이전 DownloadVersionManager 후속 검증](download-version-manager-followup-20260930.md)과 같은 관찰 양상이다. 동일한 원인이라고 확정하지 않으며 이번 기록에서도 미해결로 남긴다. Windows Installer 내부 등록이나 ACL을 수동 수정하지 않았다. 시험에서 만든 제품 표식의 제한된 복원은 일반 사용자 복구 방법으로 안내하지 않는다.
 
 25개 정상 수명주기 시험에는 늦은 실패 주입을 포함하지 않았다. 이후 실행 환경에 따라 사용자 등록 관찰이 달랐다는 새 근거가 생겨 일반 Explorer에서 해당 실패 경로만 한 번 다시 확인했고, 같은 실패가 재현됐다. 추가 반복은 하지 않는다. 정상 경로와 실패 후 공식 제거가 통과해도 이 FAIL을 PASS로 바꾸거나 전체 실패 복구가 확인됐다고 기록하지 않는다. 최신 재확인·정리 요약은 `artifacts/visible-cells-paste/installed-startup/desktop-rollback-result.json`과 `desktop-rollback-recovery-result.json`이다.
+
+## 실제 클립보드 조사
+
+앞선 별도 작업공간 조사에서는 OpenClipboard가 오류5 접근 거부로 끝났다. 이번 후보는 정상 Explorer에서 시작한 Excel의 합성 통합문서에 COM Range.Copy를 실행해 설치된 Paste 콜백까지 확인하려 했으나, 첫 probe는 복사 소유권 전제에서 FAIL로 중단됐다. Ctrl+C 키나 우클릭 UI를 조작한 시험이 아니다.
+
+한 번의 제한된 진단에서는 WinSta0/Default, ExcelVisible=True, CutCopyMode=1을 확인했다. 약2초 동안 클립보드 소유 HWND/PID는 모두0이고 sequence는345로 변하지 않았다. 소유자를 확인할 수 없어 클립보드 내용은 읽지 않았으며 설치된 Paste 콜백도 호출하지 않았다. 실제 클립보드 형식·파서·셀 쓰기·되돌리기의 성공 증거로 계산하지 않는다. 업무 데이터는 수집하지 않았으며 추가 원인 조사는 하지 않는다.
+
+근거는 `artifacts/visible-cells-paste/installed-rectangle-clipboard/actual-clipboard-report.txt`, `diagnostic-clipboard-report.txt`, `diagnostic-console.log`다. `final-result.json`에는 probe 종료1과 당시 아직 종료 중인 Excel 때문에 MSI 제거를 보류한 상태가 남아 있다. 이후 Excel이 종료된 것을 확인하고 표준 /x로 정리했으며 `cleanup-result.json`은 success=true, 제거 종료0, 제품 상태-1, 소유 파일 잔존0을 기록한다. Excel 강제 종료나 내부 Installer 등록 수동 수정은 하지 않았다. 정상 정리 성공이 클립보드 probe의 FAIL을 바꾸지는 않는다.
 
 ## 문서와 공개 안내
 

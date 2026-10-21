@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -11,7 +12,14 @@ using VisibleCellsPaste;
 // changes add-in registration, saves the workbook, nor clicks through confirmation dialogs.
 internal static class InstalledRectangleClipboardProbe
 {
-    [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr window, out uint process);
+    [DllImport("user32.dll", SetLastError = true)] static extern uint GetWindowThreadProcessId(IntPtr window, out uint process);
+    [DllImport("user32.dll", SetLastError = true)] static extern IntPtr GetClipboardOwner();
+    [DllImport("kernel32.dll")] static extern void SetLastError(uint error);
+    [DllImport("kernel32.dll")] static extern uint GetCurrentThreadId();
+    [DllImport("user32.dll", SetLastError = true)] static extern IntPtr GetProcessWindowStation();
+    [DllImport("user32.dll", SetLastError = true)] static extern IntPtr GetThreadDesktop(uint thread);
+    [DllImport("user32.dll", EntryPoint = "GetUserObjectInformationW", CharSet = CharSet.Unicode, SetLastError = true)]
+    static extern bool GetUserObjectInformation(IntPtr handle, int index, StringBuilder data, uint bytes, out uint needed);
     static string report;
     static void Check(bool condition, string message) { if (!condition) throw new Exception(message); }
     static void Log(string message)
@@ -36,6 +44,37 @@ internal static class InstalledRectangleClipboardProbe
         Check((int)books.Count == 1, "Unexpected workbook count; probe refused.");
         Check(String.Equals((string)book.FullName, fixture, StringComparison.OrdinalIgnoreCase), "Workbook identity changed; probe refused.");
         Check(!(bool)book.ReadOnly, "Synthetic workbook is read-only.");
+    }
+    static string UserObjectName(IntPtr handle)
+    {
+        var name = new StringBuilder(256); uint needed;
+        return GetUserObjectInformation(handle, 2, name, (uint)(name.Capacity * 2), out needed)
+            ? name.ToString() : "unavailable(error=" + Marshal.GetLastWin32Error() + ")";
+    }
+    static void RequireOwnedCopy(dynamic app, int expectedPid)
+    {
+        for (int attempt = 0; attempt < 21; attempt++)
+        {
+            int mode = Convert.ToInt32(app.CutCopyMode, CultureInfo.InvariantCulture);
+            SetLastError(0);
+            IntPtr owner = GetClipboardOwner();
+            int ownerError = Marshal.GetLastWin32Error();
+            uint ownerPid = 0; int pidError = 0;
+            if (owner != IntPtr.Zero)
+            {
+                SetLastError(0); GetWindowThreadProcessId(owner, out ownerPid);
+                pidError = Marshal.GetLastWin32Error();
+            }
+            Log("COPY_STATE attempt=" + attempt + "; owner=0x" + owner.ToInt64().ToString("X", CultureInfo.InvariantCulture)
+                + "; ownerPid=" + ownerPid + "; expectedPid=" + expectedPid + "; CutCopyMode=" + mode
+                + "; sequence=" + NativeClipboard.GetClipboardSequenceNumber() + "; ownerLastError=" + ownerError + "; pidLastError=" + pidError);
+            if (ownerPid == (uint)expectedPid && mode == 1) return;
+            // Only an already active copy with no owner yet is a plausible short transition.
+            // Never wait through access denial, a foreign owner, or inactive/cut state; never read their data.
+            if (attempt == 20 || mode != 1 || owner != IntPtr.Zero || ownerError != 0) break;
+            Thread.Sleep(100);
+        }
+        throw new Exception("Real Excel clipboard ownership/copy state mismatch; no clipboard content was read.");
     }
     internal static int RunOwned(int pid, string fixture, string output)
     { return Main(new[] { pid.ToString(CultureInfo.InvariantCulture), fixture, output }); }
@@ -73,6 +112,10 @@ internal static class InstalledRectangleClipboardProbe
                 string initial = callback.GetDiagnostics();
                 Check(initial.Contains("connected=True") && initial.Contains("clicks=0") && initial.Contains("outcome=idle"), "Fresh installed add-in required: " + initial);
                 Log("PASS owned identity; Excel=" + app.Version + "; Build=" + app.Build + "; " + initial);
+                using (var probeProcess = Process.GetCurrentProcess())
+                    Log("CONTEXT probePid=" + probeProcess.Id + "; session=" + probeProcess.SessionId
+                        + "; station=" + UserObjectName(GetProcessWindowStation()) + "; desktop=" + UserObjectName(GetThreadDesktop(GetCurrentThreadId()))
+                        + "; ExcelHwnd=" + app.Hwnd + "; ExcelVisible=" + app.Visible);
 
                 dynamic grid = Range(scope, sheet, "A1:J10");
                 var fixtureValues = new object[10, 10];
@@ -90,10 +133,8 @@ internal static class InstalledRectangleClipboardProbe
                 object[,] before = (object[,])grid.Formula2;
                 sheet.Activate();
                 source.Copy();
-                uint ownerPid;
-                NativeClipboard.GetWindowThreadProcessId(NativeClipboard.GetClipboardOwner(), out ownerPid);
-                Check(ownerPid == (uint)pid && Convert.ToInt32(app.CutCopyMode, CultureInfo.InvariantCulture) == 1, "Real Excel clipboard ownership/copy state mismatch.");
-                Log("PASS real Range.Copy; source=A2:D4; hidden row=3; hidden column=B; clipboard owner PID=" + ownerPid);
+                RequireOwnedCopy(app, pid);
+                Log("PASS real Range.Copy; source=A2:D4; hidden row=3; hidden column=B; clipboard owner PID=" + pid);
                 // Only synthetic clipboard bytes are recorded, including on parser rejection.
                 File.WriteAllBytes(report + ".synthetic.xml.bin", NativeClipboard.ReadFormatBytes("XML Spreadsheet"));
                 ClipboardSnapshot copied = ClipboardReader.ReadSnapshot(1);
