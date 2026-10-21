@@ -17,7 +17,7 @@ namespace VisibleCellsPaste
             {
                 string letters = ColumnLetters(segment.Column);
                 string firstAddress = "$" + letters + "$" + segment.FirstRow;
-                string lastAddress = "$" + letters + "$" + segment.LastRow;
+                string lastAddress = "$" + ColumnLetters(segment.LastColumn) + "$" + segment.LastRow;
                 using (var references = new ComScope())
                 {
                     dynamic range = references.Own((object)sheet.Range[firstAddress + ":" + lastAddress]);
@@ -29,7 +29,7 @@ namespace VisibleCellsPaste
                         continue;
                     }
                     object values = range.Value2;
-                    if (!Fits(values, segment.Count))
+                    if (!Fits(values, segment))
                     {
                         CaptureIndividually(worksheet, plan, segment, result);
                         continue;
@@ -41,7 +41,7 @@ namespace VisibleCellsPaste
                     {
                         try { formulas = range.Formula2; formulaProperty = "Formula2"; }
                         catch (COMException) { formulas = range.Formula; formulaProperty = "Formula"; }
-                        if (!Fits(formulas, segment.Count))
+                        if (!Fits(formulas, segment))
                         {
                             CaptureIndividually(worksheet, plan, segment, result);
                             continue;
@@ -49,13 +49,14 @@ namespace VisibleCellsPaste
                     }
                     for (int offset = 0; offset < segment.Count; offset++)
                     {
-                        int row = segment.FirstRow + offset;
+                        TargetCell target = plan.Targets[segment.StartIndex + offset];
+                        int row = target.Row;
                         result[segment.StartIndex + offset] = new CellState
                         {
-                            Row = row, Column = segment.Column, Address = "$" + letters + "$" + row,
+                            Row = row, Column = target.Column, Address = "$" + ColumnLetters(target.Column) + "$" + row,
                             Formula = formula, FormulaProperty = formulaProperty,
-                            FormulaValue = formula ? Item(formulas, offset) : null,
-                            Format = format, Value = ExcelEngine.ReadValue(Item(values, offset))
+                            FormulaValue = formula ? Item(formulas, offset, segment.Horizontal) : null,
+                            Format = format, Value = ExcelEngine.ReadValue(Item(values, offset, segment.Horizontal))
                         };
                     }
                 }
@@ -63,16 +64,16 @@ namespace VisibleCellsPaste
             return result;
         }
 
-        private static bool Fits(object value, int count)
+        private static bool Fits(object value, PasteSegment segment)
         {
             Array array = value as Array;
-            if (array == null) return count == 1;
-            return array.Rank == 2 && array.GetLength(0) == count && array.GetLength(1) == 1;
+            if (array == null) return segment.Count == 1;
+            return array.Rank == 2 && array.GetLength(0) == (segment.Horizontal ? 1 : segment.Count) && array.GetLength(1) == (segment.Horizontal ? segment.Count : 1);
         }
-        private static object Item(object value, int offset)
+        private static object Item(object value, int offset, bool horizontal)
         {
             Array array = value as Array;
-            return array == null ? value : array.GetValue(array.GetLowerBound(0) + offset, array.GetLowerBound(1));
+            return array == null ? value : array.GetValue(array.GetLowerBound(0) + (horizontal ? 0 : offset), array.GetLowerBound(1) + (horizontal ? offset : 0));
         }
         private static void CaptureIndividually(object sheet, PastePlan plan, PasteSegment segment, CellState[] result)
         {
@@ -90,13 +91,14 @@ namespace VisibleCellsPaste
             {
                 if (segment.StartIndex != next || segment.Count < 1 || segment.Count > plan.Targets.Count - next ||
                     segment.Column < 1 || segment.Column > Limits.ExcelColumns || segment.FirstRow < 1 ||
-                    (long)segment.FirstRow + segment.Count - 1 > Limits.ExcelRows) throw InvalidPlan();
+                    (long)segment.FirstRow + (segment.Horizontal ? 0 : segment.Count - 1) > Limits.ExcelRows ||
+                    (long)segment.Column + (segment.Horizontal ? segment.Count - 1 : 0) > Limits.ExcelColumns) throw InvalidPlan();
                 for (int offset = 0; offset < segment.Count; offset++)
                 {
                     TargetCell cell = plan.Targets[next + offset];
-                    if (cell.Hidden || cell.Row != segment.FirstRow + offset || cell.Column != segment.Column ||
+                    if (cell.Hidden || cell.Row != segment.FirstRow + (segment.Horizontal ? 0 : offset) || cell.Column != segment.Column + (segment.Horizontal ? offset : 0) ||
                         cell.SheetKey != plan.Selection.SheetKey || cell.Row < plan.Selection.FirstRow ||
-                        cell.Row > plan.Selection.LastRow || cell.Column != plan.Selection.FirstColumn) throw InvalidPlan();
+                        cell.Row > plan.Selection.LastRow || cell.Column < plan.Selection.FirstColumn || cell.Column > plan.Selection.LastColumn) throw InvalidPlan();
                 }
                 next += segment.Count;
             }

@@ -1,10 +1,11 @@
 [CmdletBinding()]
-param([ValidateSet('x86','x64')][string]$Architecture='x64')
+param([ValidateSet('x86','x64')][string]$Architecture='x64',[string]$OutputDirectory)
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $productRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $repoRoot=[IO.Path]::GetFullPath((Join-Path $productRoot '..\..'))
-$output=[IO.Path]::GetFullPath((Join-Path $repoRoot "artifacts\visible-cells-paste\excel-e2e\$Architecture"))
+if (-not $OutputDirectory) { $OutputDirectory=Join-Path $repoRoot "artifacts\visible-cells-paste\excel-e2e\$Architecture" }
+$output=[IO.Path]::GetFullPath($OutputDirectory)
 $boundary=[IO.Path]::GetFullPath((Join-Path $repoRoot 'artifacts\visible-cells-paste\excel-e2e')) + [IO.Path]::DirectorySeparatorChar
 if (-not $output.StartsWith($boundary,[StringComparison]::OrdinalIgnoreCase)) { throw 'Excel test output escaped its artifact directory.' }
 New-Item -ItemType Directory -Path $output -Force | Out-Null
@@ -33,7 +34,7 @@ $exe=Join-Path $output 'FunctionalTests.exe'
 $testSources=@((Join-Path $productRoot 'tests\excel_e2e\FunctionalTests.cs'),(Join-Path $productRoot 'tests\excel_e2e\ExcelProbe.cs'))
 Compile (@('/nologo','/target:exe','/main:FunctionalTests',"/platform:$Architecture","/out:$exe","/reference:$dll",'/reference:System.IO.Compression.dll','/reference:System.IO.Compression.FileSystem.dll')+$references+$testSources) (Join-Path $output 'compile-functional-tests.log')
 $built=@($exe)
-foreach ($testName in @('ClipboardIntegrationTests','ExtendedTests','PerformanceTests','OverlapClipboardTests','RemainingSafetyTests','ClipboardAdversarialTests')) {
+foreach ($testName in @('ClipboardIntegrationTests','ExtendedTests','PerformanceTests','OverlapClipboardTests','RemainingSafetyTests','ClipboardAdversarialTests','RectangleTests')) {
     $testSource=Join-Path $productRoot ("tests\excel_e2e\"+$testName+'.cs')
     if (Test-Path -LiteralPath $testSource -PathType Leaf) {
         $testExe=Join-Path $output ($testName+'.exe')

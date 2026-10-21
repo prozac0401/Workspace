@@ -3,8 +3,8 @@
 빌드에는 Windows의 .NET Framework 4.8 C# 컴파일러와 Windows PowerShell 5.1이 필요합니다. 최종 사용자는 개발 SDK, Python, Node.js를 설치하지 않습니다.
 
 ~~~powershell
-powershell -NoProfile -File tools/VisibleCellsPaste/build/build.ps1 -Version 0.1.2
-powershell -NoProfile -File tools/VisibleCellsPaste/build/verify-package.ps1 -ZipPath artifacts/visible-cells-paste/0.1.2/VisibleCellsPaste_0.1.2.zip
+powershell -NoProfile -File tools/VisibleCellsPaste/build/build.ps1 -Version 0.2.0-rc.1
+powershell -NoProfile -File tools/VisibleCellsPaste/build/verify-package.ps1 -ZipPath artifacts/visible-cells-paste/0.2.0-rc.1/VisibleCellsPaste_0.2.0-rc.1.zip
 ~~~
 
 이 스크립트는 레지스트리 또는 Office 보안 설정을 변경하지 않습니다. 소스를 두 아키텍처로 컴파일하고 설치 프로그램, 파일 해시, 한국어 안내 문서를 ZIP으로 만듭니다. 핵심/파서, 네이티브 클립보드 날짜, 대량 스냅샷, 연결 수명 주기, 실제 OLE 객체의 COM 참조 수명, 전역 상태 복구, 쓰기 진입·완료 표시 예외와 설치 경로/매니페스트 검사를 Excel 실행 없이 수행합니다. 설치 시험에는 한글·공백·작은따옴표·%·# 경로에서 실제 DLL을 로드하는 검사가 포함됩니다. 각 시험의 개수와 결과는 제작 폴더의 로그에 기록합니다. 이어서 ZIP 파일 목록/해시/PE 비트 수, COM 식별자, Ribbon 콜백과 프로덕션 오류 주입 필드 제외 여부를 검사합니다. 실행 중 Excel을 닫거나 설치하지 않습니다.
@@ -18,3 +18,15 @@ powershell -NoProfile -File tools/VisibleCellsPaste/build/verify-package.ps1 -Zi
 ~~~powershell
 powershell -NoProfile -File tools/VisibleCellsPaste/build/Build-ExcelTests.ps1 -Architecture x64
 ~~~
+
+## MSI 제작
+
+기본 제품 ZIP을 제작한 뒤 다음 명령으로 x86·x64 MSI를 만듭니다. 제작 환경에는 WiX와 C++ 빌드 도구·Windows SDK가 필요하며 사용자 PC의 실행 요구가 아닙니다. 도구 경로는 스크립트 인자로 지정할 수 있습니다.
+
+~~~powershell
+powershell -NoProfile -File tools/VisibleCellsPaste/build/build-msi.ps1 -Version 0.2.0-rc.1 -Architecture both
+~~~
+
+각 실행의 출력은 `artifacts/visible-cells-paste/0.2.0-rc.1/msi/<실행ID>`에 별도로 생성됩니다. `VisibleCellsPaste-0.2.0-rc.1-x64.msi`·`VisibleCellsPaste-0.2.0-rc.1-x86.msi`와 SHA256SUMS.txt를 확인합니다. 제작 스크립트가 각 MSI의 정적 검사를 실행하며 별도 재검사는 `verify-msi.ps1 -MsiPath <MSI경로>`입니다. 기본 ZIP 제작의 현재 소스 해시와 일치하지 않으면 MSI 제작을 거절합니다.
+
+MSI는 파일·등록을 Windows Installer로 관리하며 기존 Setup.exe를 호출하지 않습니다. ProductVersion은 0.2.0, 배포 표시는 0.2.0-rc.1입니다. `-RollbackTest`는 의도적인 설치 실패를 넣는 검증 전용 산출물이며 배포에 포함하지 않습니다. 제작·정적 검사 성공과 실제 설치·자동 로드·제거·공개 자산 확인은 별도 배포 기록으로 판정합니다.

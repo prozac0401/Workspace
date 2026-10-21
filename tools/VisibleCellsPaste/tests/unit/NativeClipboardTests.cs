@@ -31,8 +31,11 @@ internal static class NativeClipboardTests
     private static byte[] Xml(int rows, int cols, params string[] values)
     {
         string content = "";
-        if (rows == 1) content = "<Row>" + String.Join("", values) + "</Row>";
-        else foreach (string value in values) content += "<Row>" + value + "</Row>";
+        for (int row = 0; row < rows; row++) content += "<Row>" + String.Join("", values.Skip(row * cols).Take(cols)) + "</Row>";
+        return XmlContent(rows, cols, content);
+    }
+    private static byte[] XmlContent(int rows, int cols, string content)
+    {
         return Encoding.UTF8.GetBytes("<Workbook xmlns='urn:schemas-microsoft-com:office:spreadsheet' xmlns:ss='urn:schemas-microsoft-com:office:spreadsheet'><Worksheet ss:Name='Synthetic'><Table ss:ExpandedRowCount='"+rows+"' ss:ExpandedColumnCount='"+cols+"'>"+content+"</Table></Worksheet></Workbook>");
     }
     private static string Date { get { return "<Cell><Data ss:Type='DateTime'>1900-01-01T00:00:00.000</Data></Cell>"; } }
@@ -75,6 +78,60 @@ internal static class NativeClipboardTests
         Console.OutputEncoding=new UTF8Encoding(false);
         Test("actual Excel native date RK yields raw45200",delegate{var s=Parse(File.ReadAllBytes(Path.Combine(args[0],"date.xml")),File.ReadAllBytes(Path.Combine(args[0],"date.xlsb")));Check(s.Items[0].Equals(CellValue.Number(45200)));Check(s.SourceFormat=="XML Spreadsheet + Biff12");});
         Test("actual filtered copied cells map compact coordinates not selection extent",delegate{var values=new[]{CellValue.Number(85),CellValue.Number(78)};var s=XlsbDateSupplement.Complete(File.ReadAllBytes(Path.Combine(args[0],"filtered.xlsb")),2,1,values,new bool[2]);Check(s.SequenceEqual(values));});
+        Test("rectangular XML preserves row-major value types and blank positions",delegate{
+            var s=SpreadsheetXmlParser.Parse(Xml(2,3,Text("Number","85"),Text("String","00123"),"<Cell/>",Text("Boolean","1"),Text("Error","#N/A"),Text("String","")),1,"");
+            Check(s.SourceRows==2&&s.SourceColumns==3&&s.Items.SequenceEqual(new[]{CellValue.Number(85),CellValue.Text("00123"),CellValue.Empty(),CellValue.Boolean(true),CellValue.Error(2042),CellValue.Text("")}));
+        });
+        Test("rectangular sparse indexes preserve leading middle trailing blank rows and columns",delegate{
+            var s=SpreadsheetXmlParser.Parse(XmlContent(4,3,"<Row ss:Index='2'><Cell ss:Index='2'><Data ss:Type='String'>middle</Data></Cell></Row>"),1,"");
+            Check(s.Items.Count==12&&s.Items[4].Equals(CellValue.Text("middle"))&&s.Items.Where((value,index)=>index!=4).All(value=>value.Kind==CellValueKind.Empty));
+        });
+        Test("rectangular all blank source keeps its declared shape",delegate{
+            var s=SpreadsheetXmlParser.Parse(XmlContent(2,3,""),1,"");Check(s.SourceRows==2&&s.SourceColumns==3&&s.Items.Count==6&&s.Items.All(value=>value.Kind==CellValueKind.Empty));
+        });
+        Test("manual hidden source rows and columns compact independently in row-major order",delegate{
+            var s=SpreadsheetXmlParser.Parse(XmlContent(3,3,"<Column ss:Index='2' ss:Hidden='1'/><Row>"+Text("Number","11")+Text("Number","12")+Text("Number","13")+"</Row><Row ss:Hidden='true'>"+Text("Number","21")+Text("Number","22")+Text("Number","23")+"</Row><Row>"+Text("Number","31")+Text("Number","32")+Text("Number","33")+"</Row>"),1,"");
+            Check(s.SourceRows==2&&s.SourceColumns==2&&s.Items.SequenceEqual(new[]{CellValue.Number(11),CellValue.Number(13),CellValue.Number(31),CellValue.Number(33)}));
+        });
+        Test("hidden Column Span excludes repeated metadata without deleting adjacent blank cells",delegate{
+            var s=SpreadsheetXmlParser.Parse(XmlContent(2,5,"<Column ss:Index='2' ss:Span='1' ss:Hidden='1'/><Column ss:Hidden='0'/><Row ss:Index='2'><Cell ss:Index='5'><Data ss:Type='String'>last</Data></Cell></Row>"),1,"");
+            Check(s.SourceRows==2&&s.SourceColumns==3&&s.Items.Count==6&&s.Items[5].Equals(CellValue.Text("last"))&&s.Items.Take(5).All(value=>value.Kind==CellValueKind.Empty));
+        });
+        Test("hidden sparse first and last rows preserve visible all-blank row",delegate{
+            var s=SpreadsheetXmlParser.Parse(XmlContent(3,2,"<Row ss:Hidden='1'/><Row ss:Index='3' ss:Hidden='1'/>"),1,"");Check(s.SourceRows==1&&s.SourceColumns==2&&s.Items.All(value=>value.Kind==CellValueKind.Empty));
+        });
+        Test("all hidden source rows or columns reject",delegate{
+            Reject(()=>SpreadsheetXmlParser.Parse(XmlContent(1,2,"<Row ss:Hidden='1'/>"),1,""));
+            Reject(()=>SpreadsheetXmlParser.Parse(XmlContent(2,2,"<Column ss:Span='1' ss:Hidden='true'/>"),1,""));
+        });
+        Test("malformed source visibility rejects",delegate{
+            Reject(()=>SpreadsheetXmlParser.Parse(XmlContent(1,1,"<Row ss:Hidden='2'/>"),1,""));
+            Reject(()=>SpreadsheetXmlParser.Parse(XmlContent(1,1,"<Column ss:Hidden='hidden'/>"),1,""));
+        });
+        Test("rectangular source product limit applies before allocation or visibility compaction",delegate{
+            Check(SpreadsheetXmlParser.Parse(XmlContent(250,200,""),1,"").Items.Count==50000);
+            Reject(()=>SpreadsheetXmlParser.Parse(XmlContent(251,200,"<Column ss:Span='199' ss:Hidden='1'/>"),1,""));
+        });
+        Test("rectangular native dates crosscheck every row and column before supplement",delegate{
+            var native=Package(Book(10,11,8,10),Sheet(Rect(10,11,8,10),Row(10,8,10),Real(8,45200),R(6,I(9),I(0),S("00123")),Row(11,8,10),R(4,I(8),I(0),new byte[]{1}),Real(9,0.5),R(3,I(10),I(0),new byte[]{42})));
+            var s=Parse(Xml(2,3,Date,Text("String","00123"),"<Cell/>",Text("Boolean","1"),Date,Text("Error","#N/A")),native);
+            Check(s.SourceRows==2&&s.SourceColumns==3&&s.Items.SequenceEqual(new[]{CellValue.Number(45200),CellValue.Text("00123"),CellValue.Empty(),CellValue.Boolean(true),CellValue.Number(0.5),CellValue.Error(2042)}));
+        });
+        Test("rectangular dates preserve sparse leading and trailing blanks",delegate{
+            var s=Parse(XmlContent(3,3,"<Row ss:Index='2'><Cell ss:Index='2'><Data ss:Type='DateTime'>1900-01-01T00:00:00.000</Data></Cell></Row>"),Package(Book(20,22,10,12),Sheet(Rect(21,21,11,11),Row(21,11,11),Real(11,45200))));
+            Check(s.Items.Count==9&&s.Items[4].Equals(CellValue.Number(45200))&&s.Items.Where((value,index)=>index!=4).All(value=>value.Kind==CellValueKind.Empty));
+        });
+        Test("native date coordinates remain uncompressed until XML hidden rows and columns excluded",delegate{
+            var xml=XmlContent(2,2,"<Column ss:Hidden='1'/><Row ss:Hidden='1'>"+Date+Text("Number","7")+"</Row><Row>"+Text("String","hidden")+Date+"</Row>");
+            var native=Package(Book(5,6,9,10),Sheet(Rect(5,6,9,10),Row(5,9,10),Real(9,45200),Real(10,7),Row(6,9,10),R(6,I(9),I(0),S("hidden")),Real(10,0.75)));
+            var s=Parse(xml,native);Check(s.SourceRows==1&&s.SourceColumns==1&&s.Items[0].Equals(CellValue.Number(0.75)));
+            var wrong=Package(Book(5,6,9,10),Sheet(Rect(5,6,9,10),Row(5,9,10),Real(9,45200),Real(10,8),Row(6,9,10),R(6,I(9),I(0),S("hidden")),Real(10,0.75)));
+            Reject(()=>Parse(xml,wrong));
+        });
+        Test("filtered rectangular dates use compact native rows with original copy extent",delegate{
+            var s=Parse(Xml(2,2,Date,Text("Number","1"),Date,"<Cell/>"),Package(Book(3,7,8,9),Sheet(Rect(3,4,8,9),Row(3,8,9),Real(8,45200),Real(9,1),Row(4,8,9),Real(8,45202))));
+            Check(s.SourceRows==2&&s.SourceColumns==2&&s.Items.SequenceEqual(new[]{CellValue.Number(45200),CellValue.Number(1),CellValue.Number(45202),CellValue.Empty()}));
+        });
         Test("dates do not infer calendar or workbook date system",delegate{Check(Parse(Xml(1,1,Date),Simple(45200)).Items[0].Equals(CellValue.Number(45200)));Check(Parse(Xml(1,1,Date),Simple(43738)).Items[0].Equals(CellValue.Number(43738)));});
         Test("first middle trailing blanks and raw time percent formula result retained",delegate{
             var native=Package(Book(4,10,2,2),Sheet(Rect(5,9,2,2),Row(5,2,2),Real(2,45200),Row(7,2,2),Rk(2,0x3fe00000),Row(8,2,2),Real(2,0.12),Row(9,2,2),R(9,I(2),I(0),BitConverter.GetBytes(45200.125),new byte[2],I(1),new byte[]{0x1e},I(0))));
@@ -110,7 +167,7 @@ internal static class NativeClipboardTests
         Test("empty versus empty string disagreement rejects",delegate{Reject(()=>Parse(Xml(1,2,Date,"<Cell/>"),Package(Book(0,0,0,1),Sheet(Rect(0,0,0,1),Row(0,0,1),Real(0,45200),R(6,I(1),I(0),S(""))))));});
         Test("duplicate or backwards native cells reject",delegate{Reject(()=>Parse(Xml(1,1,Date),Package(Book(0,0,0,0),Sheet(Rect(0,0,0,0),Row(0,0,0),Real(0,1),Real(0,2)))));});
         Test("native cell outside XML shape rejects",delegate{Reject(()=>Parse(Xml(1,1,Date),Package(Book(0,0,0,1),Sheet(Rect(0,0,0,1),Row(0,0,1),Real(0,1),Real(1,2)))));});
-        Test("ambiguous2D embedded range rejects",delegate{Reject(()=>Parse(Xml(1,1,Date),Package(Book(0,1,0,1),Sheet(Rect(0,0,0,0),Row(0,0,0),Real(0,1)))));});
+        Test("native original extent smaller than XML rectangle rejects",delegate{Reject(()=>Parse(Xml(2,2,Date,Date,Date,Date),Package(Book(0,1,0,0),Sheet(Rect(0,1,0,1),Row(0,0,1),Real(0,1),Real(1,2),Row(1,0,1),Real(0,3),Real(1,4)))));});
         Test("shifted native origin rejects rather than matching values",delegate{Reject(()=>Parse(Xml(1,1,Date),Package(Book(1,1,0,0),Sheet(Rect(0,0,0,0),Row(0,0,0),Real(0,1)))));});
         Test("unknown cell table record rejects",delegate{Reject(()=>Parse(Xml(1,1,Date),Package(Book(0,0,0,0),Sheet(Rect(0,0,0,0),Row(0,0,0),R(49,I(1)),Real(0,1)))));});
         Test("nonfinite raw double rejects",delegate{Reject(()=>Parse(Xml(1,1,Date),Simple(Double.NaN)));Reject(()=>Parse(Xml(1,1,Date),Simple(Double.PositiveInfinity)));});

@@ -90,6 +90,7 @@ namespace VisibleCellsPaste
         public int LastRow { get; private set; }
         public int FirstColumn { get; private set; }
         public int ColumnCount { get; private set; }
+        public int LastColumn { get { return FirstColumn + ColumnCount - 1; } }
         public long CellCount { get; private set; }
         public int AreaCount { get; private set; }
         public bool ColumnHidden { get; private set; }
@@ -117,9 +118,13 @@ namespace VisibleCellsPaste
         public int StartIndex { get; private set; }
         public int Count { get; private set; }
         public int FirstRow { get; private set; }
-        public int LastRow { get { return FirstRow + Count - 1; } }
+        public int LastRow { get { return FirstRow + (Horizontal ? 0 : Count - 1); } }
         public int Column { get; private set; }
-        public PasteSegment(int start, int count, int row, int column) { StartIndex = start; Count = count; FirstRow = row; Column = column; }
+        public int LastColumn { get { return Column + (Horizontal ? Count - 1 : 0); } }
+        public bool Horizontal { get; private set; }
+        public PasteSegment(int start, int count, int row, int column) : this(start, count, row, column, false) { }
+        public PasteSegment(int start, int count, int row, int column, bool horizontal)
+        { StartIndex = start; Count = count; FirstRow = row; Column = column; Horizontal = horizontal; }
     }
 
     public sealed class PastePlan
