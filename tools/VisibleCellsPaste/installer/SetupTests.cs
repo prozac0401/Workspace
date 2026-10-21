@@ -69,19 +69,19 @@ internal static class SetupTests
             manifest.Root.Element("files").RemoveNodes(); manifest.Root.Element("registry").Add(new XElement("value", new XAttribute("key", @"Software\Microsoft\Office\16.0\Excel\Security"), new XAttribute("name", "VBAWarnings"), new XAttribute("kind", "DWord"), new XAttribute("data", "1"))); manifest.Save(manifestFile); Reject(() => Private("LoadManifest", basePath), "foreign registry entry");
             manifest.Root.Element("registry").RemoveNodes();
             string ownComRoot = @"Software\Classes\CLSID\" + Setup.Clsid + @"\InprocServer32\";
-            foreach (string assemblyVersion in new[] { "0.1.0.0", "0.1.1.0", "0.1.2.0", Setup.AssemblyVersion })
+            foreach (string assemblyVersion in new[] { "0.1.0.0", "0.1.1.0", "0.1.2.0", "0.2.0.0", Setup.AssemblyVersion })
             {
                 manifest.Root.Element("registry").RemoveNodes();
                 manifest.Root.Element("registry").Add(new XElement("value", new XAttribute("key", ownComRoot + assemblyVersion), new XAttribute("name", "Assembly"), new XAttribute("kind", "String"), new XAttribute("data", "VisibleCellsPaste.AddIn, Version=" + assemblyVersion + ", Culture=neutral, PublicKeyToken=null")));
                 manifest.Save(manifestFile);
                 Check(Private("LoadManifest", basePath) != null, "owned assembly manifest accepted " + assemblyVersion);
             }
-            manifest.Root.Element("registry").Element("value").SetAttributeValue("key", ownComRoot + "0.1.3.0");
+            manifest.Root.Element("registry").Element("value").SetAttributeValue("key", ownComRoot + "0.2.2.0");
             manifest.Save(manifestFile); Reject(() => Private("LoadManifest", basePath), "unknown future assembly registry path");
             manifest.Root.Element("registry").Element("value").SetAttributeValue("key", @"Software\Classes\CLSID\{00000000-0000-0000-0000-000000000000}\InprocServer32\0.1.0.0");
             manifest.Save(manifestFile); Reject(() => Private("LoadManifest", basePath), "foreign previous-version COM registry path");
-            object currentRegs = Private("Registration", basePath, Path.Combine(basePath, "new.dll"), "0.1.2");
-            foreach (string priorAssemblyVersion in new[] { "0.1.0.0", "0.1.1.0", "0.1.2.0" })
+            object currentRegs = Private("Registration", basePath, Path.Combine(basePath, "new.dll"), "0.2.1");
+            foreach (string priorAssemblyVersion in new[] { "0.1.0.0", "0.1.1.0", "0.1.2.0", "0.2.0.0" })
             {
                 string priorProductVersion = priorAssemblyVersion.Substring(0, priorAssemblyVersion.LastIndexOf('.'));
                 object priorRegs = Private("Registration", basePath, Path.Combine(basePath, "old.dll"), priorProductVersion);

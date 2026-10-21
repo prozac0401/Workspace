@@ -9,7 +9,7 @@
         "icon": "browser",
         "title": "배포 파일 목록 열기",
         "lines": [
-          "영역 붙여넣기·MSI 선택",
+          "시작 셀 확장·MSI 선택",
           "Assets에서 MSI 받기"
         ]
       },
@@ -30,7 +30,7 @@
         ]
       }
     ],
-    "caption": "배포 목록에서 영역 붙여넣기·MSI 배포를 고르고 Excel 비트 수에 맞는 MSI를 받습니다."
+    "caption": "배포 목록에서 시작 셀 확장·MSI 배포를 고르고 Excel 비트 수에 맞는 MSI를 받습니다."
   },
   {
     "page": "tools/visible-cells-paste/index.md",
@@ -84,10 +84,10 @@
       },
       {
         "icon": "sheet-filter",
-        "title": "대상 영역 선택",
+        "title": "시작 셀 하나 선택",
         "lines": [
-          "숨김 뺀 행·열 수 맞추기",
-          "시작 셀만 고르지 않기"
+          "왼쪽 위 한 칸 선택",
+          "보이는 행·열로 확장"
         ]
       },
       {
@@ -99,7 +99,7 @@
         ]
       }
     ],
-    "caption": "원본과 대상의 보이는 행 수·열 수를 각각 맞춥니다. 빈칸의 위치와 순서를 유지하며 숨긴 행·열을 건너뜁니다."
+    "caption": "시작 셀부터 원본과 같은 모양으로 보이는 행·열을 채웁니다. 대상 전체를 직접 선택할 수도 있습니다."
   },
   {
     "page": "tools/visible-cells-paste/index.md",

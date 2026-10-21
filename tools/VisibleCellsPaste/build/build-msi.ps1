@@ -1,6 +1,6 @@
 ﻿[CmdletBinding()]
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+(?:-[A-Za-z0-9.]+)?$')][string]$Version = '0.2.0-rc.1',
+    [ValidatePattern('^\d+\.\d+\.\d+(?:-[A-Za-z0-9.]+)?$')][string]$Version = '0.2.1-rc.1',
     [ValidateSet('x86','x64','both')][string]$Architecture = 'both',
     [string]$PackageDirectory,
     [string]$WixPath,

@@ -1,5 +1,7 @@
 # 설계 결정 목록
 
+- [ADR-0039 · 시작 셀에서 보이는 행·열로 대상 확장](0039-visible-cells-paste-anchor.md) — 단일 시작 셀·명시적 영역 선택 구분·원본 모양·확정 대상 전체 복구
+
 - [ADR-0038 · 보이는 칸 붙여넣기의 사용자별 MSI](0038-visible-cells-paste-msi.md) — 비트 수별 MSI·기존 설치 선제 제거·소유권 보호·실제 검증 분리
 
 - [ADR-0037 · 보이는 영역의 행·열 모양 유지](0037-visible-cells-paste-rectangles.md) — 숨김 행·열 제외·모양 일치·기존 한 행→한 열 호환

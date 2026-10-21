@@ -10,7 +10,7 @@ namespace VisibleCellsPaste {
  }
  public sealed class PreparedPaste : IDisposable {
   readonly ComScope references; public bool IsDisposed {get;private set;}
-  public object Book, Sheet, Selection; public string Address, SheetName; public PastePlan Plan; public CellState[] Before; public int Formulas, Clears;
+  public object Book, Sheet, Selection; public string Address, TargetAddress, SheetName; public PastePlan Plan; public CellState[] Before; public int Formulas, Clears;
   public PreparedPaste(){}
   internal PreparedPaste(ComScope acquiredReferences){references=acquiredReferences;}
   internal void CheckLive(){if(IsDisposed)throw new ObjectDisposedException("PreparedPaste");}
@@ -105,6 +105,49 @@ namespace VisibleCellsPaste {
     return prepared;
    }catch{if(prepared!=null)prepared.Dispose();throw;}
   }
+  static bool AxisPositionHidden(object worksheet,int position,bool rows) {
+   dynamic sheet=worksheet;
+   using(var refs=new ComScope()){
+    string address=rows ? "$A$"+position : "$"+CellSnapshotReader.ColumnLetters(position)+"$1";
+    dynamic range=refs.Own((object)sheet.Range[address]);
+    dynamic axis=refs.Own(rows ? (object)range.EntireRow : (object)range.EntireColumn);
+    object state=axis.Hidden;
+    if(state is bool)return (bool)state;
+    throw Reject("VCP-TARGET-VISIBILITY","대상 행·열의 숨김 상태를 확인할 수 없습니다.");
+   }
+  }
+  bool? AxisHidden(object worksheet,int first,int last,bool rows,int visibleOrthogonal) {
+   // Single-cell SpecialCells can query UsedRange instead, including outside this cell.
+   if(first==last)return AxisPositionHidden(worksheet,first,rows);
+   dynamic sheet=worksheet;
+   using(var refs=new ComScope()){
+    string address=rows ? "$"+CellSnapshotReader.ColumnLetters(visibleOrthogonal)+"$"+first+":$"+CellSnapshotReader.ColumnLetters(visibleOrthogonal)+"$"+last
+                        : "$"+CellSnapshotReader.ColumnLetters(first)+"$"+visibleOrthogonal+":$"+CellSnapshotReader.ColumnLetters(last)+"$"+visibleOrthogonal;
+    dynamic range=refs.Own((object)sheet.Range[address]);object visible;
+    try{visible=refs.Own((object)range.SpecialCells(12));}
+    catch(COMException error){if((uint)error.HResult==0x800A03EC)return true;throw;}
+    // Keep every visibility result within the exact strip being queried.
+    dynamic clipped=refs.Own((object)app.Intersect(range,visible));
+    if(clipped==null)return true;
+    long count=Convert.ToInt64(clipped.CountLarge);
+    if(count==last-first+1)return false;
+    return null;
+   }
+  }
+  void AnchorBounds(object sheet,ClipboardSnapshot source,int row,int column,out int lastRow,out int lastColumn) {
+   Planner.ValidateSource(source);
+   int columnLimit=Math.Min(Limits.ExcelColumns,column+Limits.MaxSelectionCells/source.SourceRows-1);
+   // Mixed EntireRow/EntireColumn.Hidden can report the first axis's state. Bootstrap
+   // one known-visible column, then count visible cells in narrow orthogonal strips.
+   int visibleColumn=column;
+   while(visibleColumn<=columnLimit&&AxisPositionHidden(sheet,visibleColumn,false))visibleColumn++;
+   if(visibleColumn>columnLimit)throw Reject("VCP-ANCHOR-SPACE","시작 셀부터 붙여넣을 보이는 칸이 부족하거나 대상 범위가 200,000칸을 넘습니다.");
+   int initialRowLimit=Math.Min(Limits.ExcelRows,row+Limits.MaxSelectionCells/(visibleColumn-column+1)-1);
+   int visibleRow=Planner.FindVisibleAxisEnd(row,initialRowLimit,1,delegate(int first,int last){return AxisHidden(sheet,first,last,true,visibleColumn);});
+   lastColumn=Planner.FindVisibleAxisEnd(column,columnLimit,source.SourceColumns,delegate(int first,int last){return AxisHidden(sheet,first,last,false,visibleRow);});
+   int rowLimit=Math.Min(Limits.ExcelRows,row+Limits.MaxSelectionCells/(lastColumn-column+1)-1);
+   lastRow=Planner.FindVisibleAxisEnd(row,rowLimit,source.SourceRows,delegate(int first,int last){return AxisHidden(sheet,first,last,true,visibleColumn);});
+  }
   private PreparedPaste PrepareCore(ClipboardSnapshot source) {
    var retained=new ComScope();
    try{using(var refs=new ComScope()){
@@ -117,12 +160,18 @@ namespace VisibleCellsPaste {
     dynamic columns=refs.Own((object)selected.Columns),selectedAreas=refs.Own((object)selected.Areas),rows=refs.Own((object)selected.Rows);
     long count=Convert.ToInt64(selected.CountLarge);int cols=(int)columns.Count,areas=(int)selectedAreas.Count;
     int first=(int)selected.Row,col=(int)selected.Column,rowCount=(int)rows.Count,last=first+rowCount-1,lastCol=col+cols-1;
-    if(areas!=1||rowCount==Limits.ExcelRows||cols==Limits.ExcelColumns||count>Limits.MaxSelectionCells)throw Reject("VCP-SELECTION-SHAPE","연속된 사각형 범위에서 최대 200,000칸을 선택해 주세요. 전체 행·열과 직접 만든 다중 선택은 지원하지 않습니다.");
-    dynamic entireColumn=refs.Own((object)selected.EntireColumn);object allColumnsHidden=entireColumn.Hidden;
-    if(allColumnsHidden is bool&&(bool)allColumnsHidden)throw Reject("VCP-HIDDEN-COLUMN","선택한 열이 모두 숨겨져 있습니다.");
+    if(areas!=1||rowCount==Limits.ExcelRows||cols==Limits.ExcelColumns||count>Limits.MaxSelectionCells)throw Reject("VCP-SELECTION-SHAPE","시작 셀 하나 또는 연속된 사각형 범위에서 최대 200,000칸을 선택해 주세요. 전체 행·열과 직접 만든 다중 선택은 지원하지 않습니다.");
+    bool anchorExpansion=count==1;dynamic target=selected;
+    if(anchorExpansion){
+     AnchorBounds((object)sheet,source,first,col,out last,out lastCol);
+     rowCount=last-first+1;cols=lastCol-col+1;count=(long)rowCount*cols;
+     string targetFirst="$"+CellSnapshotReader.ColumnLetters(col)+"$"+first,targetLast="$"+CellSnapshotReader.ColumnLetters(lastCol)+"$"+last;
+     target=refs.Own((object)sheet.Range[targetFirst,targetLast]);
+    }
     try{if(Convert.ToBoolean(book.MultiUserEditing))throw Reject("VCP-SHARED","공유 통합문서는 지원하지 않습니다.");}catch(COMException){}
-    dynamic visible;try{visible=refs.Own((object)selected.SpecialCells(12));}catch(COMException){throw Reject("VCP-NO-VISIBLE","선택한 범위에 보이는 칸이 없습니다.");}
-    dynamic clipped=refs.Own((object)app.Intersect(selected,visible));if(clipped==null)throw Reject("VCP-NO-VISIBLE","선택한 범위에 보이는 칸이 없습니다.");
+    dynamic visible;
+    try{visible=count==1 ? target : refs.Own((object)target.SpecialCells(12));}catch(COMException){throw Reject("VCP-NO-VISIBLE","대상 범위에 보이는 칸이 없습니다.");}
+    dynamic clipped=refs.Own((object)app.Intersect(target,visible));if(clipped==null)throw Reject("VCP-NO-VISIBLE","대상 범위에 보이는 칸이 없습니다.");
     dynamic visibleAreas=refs.Own((object)clipped.Areas);int visibleAreaCount=(int)visibleAreas.Count;
     if(visibleAreaCount>Limits.MaxSegments)throw Reject("VCP-SEGMENT-LIMIT","보이는 연속 구간은 최대 20,000개입니다.");
     var targets=new List<TargetCell>();string sheetKey=Guid.NewGuid().ToString("N");
@@ -140,12 +189,12 @@ namespace VisibleCellsPaste {
      try{object spill=area.HasSpill;if(!(spill is bool)||Convert.ToBoolean(spill))throw Reject("VCP-SPILL","동적 배열 spill 범위는 지원하지 않습니다.");}catch(COMException error){if((uint)error.HResult!=0x80020003)throw;}
      for(int row=start;row<=end;row++)for(int column=startCol;column<=endCol;column++)targets.Add(new TargetCell(sheetKey,row,column,false));
     }
-    object validation=null;try{validation=refs.Own((object)selected.SpecialCells(-4174));}catch(COMException error){if((uint)error.HResult!=0x800A03EC)throw;}
+    object validation=null;try{validation=refs.Own((object)target.SpecialCells(-4174));}catch(COMException error){if((uint)error.HResult!=0x800A03EC)throw;}
     if(validation!=null&&Intersects(clipped,validation))throw Reject("VCP-VALIDATION","데이터 유효성 검사 규칙이 있는 칸은 지원하지 않습니다.");
     // Inspect only cells we will write, while checking each targeted table column's full body.
     GuardTable(sheet,clipped);
-    var selection=new SelectionSnapshot(sheetKey,first,last,col,cols,count,areas,false,false,targets);var plan=Planner.Build(source,selection);
-    var prepared=new PreparedPaste(retained){Book=book,Sheet=sheet,Selection=selected,Address=(string)selected.Address,SheetName=(string)sheet.Name,Plan=plan};
+    var selection=new SelectionSnapshot(sheetKey,first,last,col,cols,count,areas,false,false,targets,anchorExpansion);var plan=Planner.Build(source,selection);
+    var prepared=new PreparedPaste(retained){Book=book,Sheet=sheet,Selection=selected,Address=(string)selected.Address,TargetAddress=(string)target.Address,SheetName=(string)sheet.Name,Plan=plan};
     app.StatusBar="보이는 칸 붙여넣기 · 백업 검사";prepared.Before=CellSnapshotReader.Capture(sheet,plan);
     for(int i=0;i<prepared.Before.Length;i++){var state=prepared.Before[i];if(state.Formula)prepared.Formulas++;if(source.Items[i].Kind==CellValueKind.Empty&&state.Value.Kind!=CellValueKind.Empty)prepared.Clears++;}
     return prepared;
@@ -221,7 +270,7 @@ namespace VisibleCellsPaste {
    }
    try{var current=CellSnapshotReader.Capture(p.Sheet,p.Plan);for(int i=0;i<p.Before.Length;i++)if(!EqualState(p.Before[i],current[i]))failure(p.Before[i],"VERIFY");}
    catch(Exception e){foreach(var state in p.Before)failure(state,e.HResult.ToString("X8"));}
-   if(failed.Count>0){RecoveryRequired=true;undoAllowed=false;KeepUndo(p);RecoveryDetail="영향 가능 범위: "+((dynamic)p.Book).Name+" / "+p.SheetName+" / "+p.Address+"\n복구 실패: "+String.Join(", ",failed)+"\n원래 오류: "+original+"\n복구 오류: "+String.Join(", ",codes);throw new RecoveryException(original,failed,codes);}
+   if(failed.Count>0){RecoveryRequired=true;undoAllowed=false;KeepUndo(p);RecoveryDetail="영향 가능 범위: "+((dynamic)p.Book).Name+" / "+p.SheetName+" / "+(p.TargetAddress??p.Address)+"\n복구 실패: "+String.Join(", ",failed)+"\n원래 오류: "+original+"\n복구 오류: "+String.Join(", ",codes);throw new RecoveryException(original,failed,codes);}
   }
   bool SortHistoryClear(object worksheet){
    try{dynamic sheet=worksheet;using(var refs=new ComScope()){

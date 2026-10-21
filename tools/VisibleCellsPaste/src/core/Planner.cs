@@ -16,8 +16,8 @@ namespace VisibleCellsPaste
                 throw new ValidationException("VCP-TARGET-SHAPE", "한 워크시트에서 연속된 직사각형 범위를 선택해 주세요. 변경된 셀은 없습니다.");
             if (selection.CellCount != ((long)selection.LastRow - selection.FirstRow + 1) * selection.ColumnCount)
                 throw new ValidationException("VCP-TARGET-COUNT", "대상 선택 크기가 일치하지 않습니다. 변경된 셀은 없습니다.");
-            if ((selection.FirstRow == 1 && selection.LastRow == Limits.ExcelRows) ||
-                (selection.FirstColumn == 1 && selection.ColumnCount == Limits.ExcelColumns))
+            if (!selection.IsAnchorExpansion && ((selection.FirstRow == 1 && selection.LastRow == Limits.ExcelRows) ||
+                (selection.FirstColumn == 1 && selection.ColumnCount == Limits.ExcelColumns)))
                 throw new ValidationException("VCP-TARGET-WHOLE", "전체 행·열은 지원하지 않습니다. 필요한 범위만 선택해 주세요. 변경된 셀은 없습니다.");
             if (selection.CellCount > Limits.MaxSelectionCells)
                 throw new ValidationException("VCP-TARGET-SCAN-LIMIT", "선택 범위는 최대 200,000칸입니다. 변경된 셀은 없습니다.");
@@ -25,16 +25,58 @@ namespace VisibleCellsPaste
                 throw new ValidationException("VCP-TARGET-HIDDEN-COLUMN", "숨긴 열에는 붙여넣을 수 없습니다. 변경된 셀은 없습니다.");
         }
 
-        public static PastePlan Build(ClipboardSnapshot source, SelectionSnapshot selection)
+        internal static void ValidateSource(ClipboardSnapshot source)
         {
             if (source == null) throw new ArgumentNullException("source");
-            ValidateSelectionShape(selection);
             if (!source.ShapeIsVerified || source.SourceRows < 1 || source.SourceColumns < 1 ||
                 source.SourceRows > Limits.ExcelRows || source.SourceColumns > Limits.ExcelColumns ||
                 (long)source.SourceRows * source.SourceColumns != source.Items.Count)
                 throw new ValidationException("VCP-SOURCE-SHAPE", "복사한 셀의 개수 또는 데이터 형식을 정확히 확인할 수 없습니다. 변경된 셀은 없습니다.");
             if (source.Items.Count > Limits.MaxItems)
                 throw new ValidationException("VCP-SOURCE-LIMIT", "복사 항목은 최대 50,000개입니다. 변경된 셀은 없습니다.");
+        }
+
+        // Visibility-only queries: grow the search window, then split mixed spans.
+        // Uniform visible/hidden spans need one query regardless of their length.
+        internal static int FindVisibleAxisEnd(int first, int last, int count, Func<int, int, bool?> hidden)
+        {
+            if (first < 1 || last < first || last > Limits.ExcelRows || count < 1 || count > Limits.MaxItems)
+                throw new ArgumentOutOfRangeException("count");
+            if (hidden == null) throw new ArgumentNullException("hidden");
+            int remaining = count, span = count;
+            for (int start = first; start <= last; )
+            {
+                int end = (int)Math.Min(last, (long)start + span - 1);
+                int found = FindVisibleAxisEndCore(start, end, ref remaining, hidden);
+                if (found != 0) return found;
+                start = end + 1;
+                span = Math.Min(last - first + 1, span * 2);
+            }
+            throw new ValidationException("VCP-ANCHOR-SPACE", "시작 셀부터 붙여넣을 보이는 칸이 부족하거나 대상 범위가 200,000칸을 넘습니다. 변경된 셀은 없습니다.");
+        }
+
+        private static int FindVisibleAxisEndCore(int first, int last, ref int remaining, Func<int, int, bool?> hidden)
+        {
+            bool? state = hidden(first, last);
+            if (state == true) return 0;
+            if (state == false)
+            {
+                int length = last - first + 1;
+                if (length >= remaining) return first + remaining - 1;
+                remaining -= length;
+                return 0;
+            }
+            if (first == last)
+                throw new ValidationException("VCP-TARGET-VISIBILITY", "대상 행·열의 숨김 상태를 확인할 수 없습니다. 변경된 셀은 없습니다.");
+            int middle = first + (last - first) / 2;
+            int found = FindVisibleAxisEndCore(first, middle, ref remaining, hidden);
+            return found != 0 ? found : FindVisibleAxisEndCore(middle + 1, last, ref remaining, hidden);
+        }
+
+        public static PastePlan Build(ClipboardSnapshot source, SelectionSnapshot selection)
+        {
+            ValidateSelectionShape(selection);
+            ValidateSource(source);
             var targets = new List<TargetCell>(selection.VisibleTargets);
             targets.Sort(delegate(TargetCell a, TargetCell b) {
                 if (a == null) return b == null ? 0 : -1;
@@ -59,7 +101,7 @@ namespace VisibleCellsPaste
                 throw new ValidationException("VCP-TARGET-GRID", "선택 범위의 보이는 칸이 직사각형 행·열 구성을 이루지 않습니다. 변경된 셀은 없습니다.");
             if (targets.Count != source.Items.Count)
                 throw new ValidationException("VCP-COUNT-MISMATCH", "붙여넣을 수 없습니다.\n복사한 항목: " + source.Items.Count + "개\n선택한 범위의 보이는 칸: " + targets.Count + "개\n변경된 셀은 없습니다.");
-            bool legacyRowToColumn = source.SourceRows == 1 && visibleColumns.Count == 1;
+            bool legacyRowToColumn = !selection.IsAnchorExpansion && source.SourceRows == 1 && visibleColumns.Count == 1;
             if (!legacyRowToColumn && (source.SourceRows != visibleRows.Count || source.SourceColumns != visibleColumns.Count))
                 throw new ValidationException("VCP-SHAPE-MISMATCH", "붙여넣을 수 없습니다.\n복사한 영역: " + source.SourceRows + "행 × " + source.SourceColumns + "열\n선택한 범위의 보이는 영역: " + visibleRows.Count + "행 × " + visibleColumns.Count + "열\n변경된 셀은 없습니다.");
             var segments = new List<PasteSegment>();

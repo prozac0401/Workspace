@@ -95,13 +95,15 @@ namespace VisibleCellsPaste
         public int AreaCount { get; private set; }
         public bool ColumnHidden { get; private set; }
         public bool GroupedSheets { get; private set; }
+        public bool IsAnchorExpansion { get; private set; }
         public ReadOnlyCollection<TargetCell> VisibleTargets { get; private set; }
         public SelectionSnapshot(string sheetKey, int firstRow, int lastRow, int firstColumn, int columnCount,
-            long cellCount, int areaCount, bool columnHidden, bool groupedSheets, IEnumerable<TargetCell> targets)
+            long cellCount, int areaCount, bool columnHidden, bool groupedSheets, IEnumerable<TargetCell> targets, bool isAnchorExpansion = false)
         {
             SheetKey = sheetKey; FirstRow = firstRow; LastRow = lastRow; FirstColumn = firstColumn;
             ColumnCount = columnCount; CellCount = cellCount; AreaCount = areaCount;
             ColumnHidden = columnHidden; GroupedSheets = groupedSheets;
+            IsAnchorExpansion = isAnchorExpansion;
             var copy = new List<TargetCell>();
             if (targets == null) throw new ArgumentNullException("targets");
             foreach (TargetCell target in targets)

@@ -1,8 +1,8 @@
 # 설치·제거와 보안 진단
 
-## 0.2.0-rc.1 사용자별 MSI
+## 0.2.1-rc.1 사용자별 MSI
 
-Excel 64비트에는 x64 MSI, Excel 32비트에는 x86 MSI를 사용합니다. 현재 사용자 계정의 `%LOCALAPPDATA%\Programs\VisibleCellsPaste`에 파일을 설치하고 HKCU에 COM·Excel 추가 기능을 등록합니다. MSI의 ProductVersion은 0.2.0이며 배포 버전은 0.2.0-rc.1입니다.
+Excel 64비트에는 x64 MSI, Excel 32비트에는 x86 MSI를 사용합니다. 현재 사용자 계정의 `%LOCALAPPDATA%\Programs\VisibleCellsPaste`에 파일을 설치하고 HKCU에 COM·Excel 추가 기능을 등록합니다. MSI의 ProductVersion은 0.2.1이며 배포 버전은 0.2.1-rc.1입니다. 이전 0.2.0-rc.1도 먼저 제거한 뒤 설치합니다.
 
 1. 파일을 저장하고 모든 Excel을 정상 종료합니다.
 2. 기존 EXE·ZIP 또는 다른 MSI 버전이 있다면 Windows **설치된 앱**에서 기존 제품을 먼저 제거합니다. 자동 이행·자동 업그레이드를 하지 않습니다.
@@ -13,7 +13,7 @@ Excel 실행 중에는 설치·복구·제거를 차단하며 Excel을 강제로
 
 소유 파일의 해시와 등록 값이 설치 시 기록과 다르면 복구·제거를 중단합니다. 사용자가 추가 기능을 비활성화해 LoadBehavior가 달라진 경우도 포함합니다. 해당 값을 임의로 되돌리지 않으며 알 수 없는 추가 파일·등록 값은 보존합니다. 서명은 없으며 Office 보안 정책을 변경하지 않습니다.
 
-이 문서는 MSI 제작 전 동결한 사용·설계 안내입니다. 최종 MSI의 실제 설치·자동 로드·제거·충돌·롤백 결과와 자산 해시는 패키지 밖 docs/delivery/visible-cells-paste-msi-020rc1-20261021.md 및 해당 릴리스 기록으로 확인합니다. 아래 과거 ZIP/EXE의 PASS를 새 MSI의 검증으로 대신하지 않습니다.
+이 문서는 MSI 제작 전 동결한 사용·설계 안내입니다. 최종 MSI의 실제 검사·자산·게시 결과는 패키지 밖 docs/delivery/visible-cells-paste-anchor-021rc1-20261021.md를 따릅니다. 이전 0.2.0-rc.1의 정상 설치·제거 성공과 늦은 실패 시 내부 등록 롤백 FAIL은 docs/delivery/visible-cells-paste-msi-020rc1-20261021.md에 보존하며, 새 버전에서 해결됐다고 판정하지 않습니다. 아래 과거 ZIP/EXE의 PASS도 새 MSI의 검증으로 대신하지 않습니다.
 
 ## 이전 ZIP·EXE 설치의 확인 이력
 

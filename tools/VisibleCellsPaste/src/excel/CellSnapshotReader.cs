@@ -106,7 +106,7 @@ namespace VisibleCellsPaste
         }
         private static ValidationException InvalidPlan()
         { return new ValidationException("VCP-SNAPSHOT-BOUNDARY", "백업 범위와 가시 셀 계획이 일치하지 않습니다. 변경된 셀은 없습니다."); }
-        private static string ColumnLetters(int column)
+        internal static string ColumnLetters(int column)
         {
             string letters = "";
             while (column > 0) { column--; letters = (char)('A' + column % 26) + letters; column /= 26; }
