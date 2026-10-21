@@ -47,3 +47,5 @@
 실행 결과는 [로컬 검증 기록](../delivery/visible-cells-paste-rectangles-20261021.md)과 [제품 시험 보고서](../../tools/VisibleCellsPaste/docs/test-report.md#rectangle-20261021)에 기록한다. 합성 입력 시험, COM Range.Copy, 실제 Ctrl+C·우클릭 메뉴, 설치·자동 로드를 별개로 판정한다. 미실행 환경은 미검증으로 남긴다.
 
 2026-10-21 후속 MSI 릴리스 요청은 [ADR-0038](0038-visible-cells-paste-msi.md)을 따른다. 위 로컬 평가판의 미설치·미게시 기록은 당시 상태로 보존하며, 공개 0.1.2의 수정이 반영된 통합 후보를 별도 검증한다. 로컬 초안 번호 ADR-0016은 공개 저장소의 기존 번호 충돌을 피해 ADR-0037로 이관했다.
+
+같은 날 후속 사용자 요청에 따른 단일 시작 셀 자동 확장은 [ADR-0039](0039-visible-cells-paste-anchor.md)가 대체한다. 위 ‘시작 셀 확장 제외’는 당시 계약이며, 명시적 영역 선택의 모양·경계 규칙은 계속 유지한다.

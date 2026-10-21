@@ -203,6 +203,45 @@ internal static class CoreTests
                 CheckSegmentCoverage(plan);
             }
         });
+        Test("anchor bounds can span sheet width without permitting explicit whole rows or reshaping", delegate {
+            var cells=new[]{new TargetCell("sheet",2,1,false),new TargetCell("sheet",2,Limits.ExcelColumns,false)};
+            var anchor=new SelectionSnapshot("sheet",2,2,1,Limits.ExcelColumns,Limits.ExcelColumns,1,false,false,cells,true);
+            Check(Planner.Build(Source(1,2),anchor).Targets.Count==2,"anchor full-width bounds");
+            Reject(()=>Planner.Build(Source(1,2),new SelectionSnapshot("sheet",2,2,1,Limits.ExcelColumns,Limits.ExcelColumns,1,false,false,cells)),"VCP-TARGET-WHOLE");
+            var vertical=new SelectionSnapshot("sheet",2,3,1,1,2,1,false,false,new[]{new TargetCell("sheet",2,1,false),new TargetCell("sheet",3,1,false)},true);
+            Reject(()=>Planner.Build(Source(1,2),vertical),"VCP-SHAPE-MISMATCH");
+        });
+        Test("anchor axis matches sequential visible positions for every small visibility pattern", delegate {
+            for(int mask=0;mask<256;mask++) for(int first=1;first<=3;first++) for(int needed=1;needed<=8;needed++) {
+                int pattern=mask,start=first,count=needed;
+                Func<int,int,bool?> hidden=delegate(int a,int b) {
+                    Check(a>=start&&b<=8&&a<=b,"axis query escaped bounds");
+                    int hiddenCount=Enumerable.Range(a,b-a+1).Count(i=>(pattern&(1<<(i-1)))!=0);
+                    return hiddenCount==0?(bool?)false:hiddenCount==b-a+1?(bool?)true:null;
+                };
+                int[] visible=Enumerable.Range(start,9-start).Where(i=>(pattern&(1<<(i-1)))==0).ToArray();
+                if(visible.Length<count) Reject(()=>Planner.FindVisibleAxisEnd(start,8,count,hidden),"VCP-ANCHOR-SPACE");
+                else Check(Planner.FindVisibleAxisEnd(start,8,count,hidden)==visible[count-1],"wrong nth visible position");
+            }
+        });
+        Test("anchor skips long hidden spans without per-cell metadata queries", delegate {
+            int queries=0;
+            int end=Planner.FindVisibleAxisEnd(1,200000,4,delegate(int first,int last) {
+                queries++;return last<=199990?(bool?)true:first>199990?(bool?)false:null;
+            });
+            Check(end==199994&&queries<80,"long hidden span scan");
+            queries=0;
+            Reject(()=>Planner.FindVisibleAxisEnd(1,200000,1,delegate(int first,int last){queries++;return true;}),"VCP-ANCHOR-SPACE");
+            Check(queries<20,"all-hidden scan was not bounded and batched");
+        });
+        Test("anchor respects worksheet edge and exact physical scan budget", delegate {
+            Check(Planner.FindVisibleAxisEnd(Limits.ExcelRows-2,Limits.ExcelRows,3,(a,b)=>false)==Limits.ExcelRows,"last visible row");
+            Reject(()=>Planner.FindVisibleAxisEnd(Limits.ExcelRows-2,Limits.ExcelRows,4,(a,b)=>false),"VCP-ANCHOR-SPACE");
+            Check(Planner.FindVisibleAxisEnd(1,200000,1,(a,b)=>b<200000?(bool?)true:a==200000?(bool?)false:null)==200000,"exact scan endpoint");
+        });
+        Test("anchor rejects indeterminate visibility for an individual axis position", delegate {
+            Reject(()=>Planner.FindVisibleAxisEnd(5,5,1,(a,b)=>null),"VCP-TARGET-VISIBILITY");
+        });
         Console.WriteLine("RESULT: " + passed + " passed; " + failed + " failed");
         return failed==0 ? 0 : 1;
     }

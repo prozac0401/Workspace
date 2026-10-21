@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
-<title id="title">프로그램 받기</title><desc id="desc">배포 목록에서 영역 붙여넣기·MSI 배포를 고르고 Excel 비트 수에 맞는 MSI를 받습니다.</desc>
+<title id="title">프로그램 받기</title><desc id="desc">배포 목록에서 시작 셀 확장·MSI 배포를 고르고 Excel 비트 수에 맞는 MSI를 받습니다.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="720" height="244" rx="4" fill="#fffdf9"/>
 <path d="M108 16H132" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <g transform="translate(48 25)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="14" y="10" width="116" height="71" rx="6" fill="#fffdf9" stroke="#8a622f" stroke-width="2"/><path d="M15 25H129" fill="none" stroke="#ded2c4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="18" r="2" fill="#b7894e"/><circle cx="31" cy="18" r="2" fill="#b7894e"/><circle cx="39" cy="18" r="2" fill="#b7894e"/><rect x="32" y="35" width="80" height="17" rx="4" fill="#f2e9dd" stroke="#ded2c4" stroke-width="2"/><text x="72" y="48" font-size="12" fill="#8a622f" font-weight="600" text-anchor="middle">https://</text><path d="M33 63H99M33 71H79" fill="none" stroke="#6e6258" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="120.0" y="155" font-size="18" fill="#2c2622" font-weight="700" text-anchor="middle">배포 파일 목록 열기</text>
-<text x="120.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">영역 붙여넣기·MSI 선택</text>
+<text x="120.0" y="182" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">시작 셀 확장·MSI 선택</text>
 <text x="120.0" y="205" font-size="15" fill="#6e6258" font-weight="400" text-anchor="middle">Assets에서 MSI 받기</text>
 <path d="M240 29V212" fill="none" stroke="#ded2c4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M348 16H372" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
