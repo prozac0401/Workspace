@@ -1,7 +1,7 @@
 # 보이는 칸 붙여넣기 · 0.2.0-rc.1 MSI 검증·배포 기록
 
 기록일: 2026-10-21 · 버전: 0.2.0-rc.1 · MSI ProductVersion: 0.2.0<br>
-상태: 서명 없는 사전 공개 후보 · 실제 게시·자산 확인 전<br>
+상태: 서명 없는 사전 공개 릴리스 게시·다운로드 해시·Pages 운영 반영 확인 완료<br>
 제품 책임: 도구 개발·검증 담당<br>
 관련 문서: [원본 명세](../tools/visible-cells-paste/original-specification.md), [현재 대응표](../tools/visible-cells-paste/acceptance.md), [영역 ADR-0037](../design/0037-visible-cells-paste-rectangles.md), [MSI ADR-0038](../design/0038-visible-cells-paste-msi.md), [이전 로컬 평가](visible-cells-paste-rectangles-20261021.md)
 
@@ -28,10 +28,10 @@
 | 통합 소스 집중 자동 검사 | PASS | core57·native48·snapshot15·COM36·lifecycle46·presentation41 = 243개. 실제 Excel을 실행하지 않은 검사 |
 | 전체 제품 제작·자동 검사 | PASS | 335회: core57·native48·snapshot15·lifecycle46·COM x64 36·COM x86 36·global20·presentation41·Setup36. 집중 검사와 중복 합산하지 않음 |
 | 최신 통합 소스 실제 Excel 영역 회귀 | PASS | Excel x64에서 18/18. 합성 타입 스냅샷을 제품 엔진에 전달한 시험이며 실제 Ctrl+C·우클릭 경로와 구분 |
-| x86/x64 MSI 제작·정적 검사·자산 해시 | PASS | 031400-bac791cc 후보 양쪽 제작·verify-msi 통과, native guard는 비트 수별 14/14. 아래 해시는 이 후보에만 해당 |
-| 현재 후보 일반 사용자 설치·파일 대조 | PASS | 031517-61ec7230에서 x64 설치 종료0, 설치 파일 해시·기존 알 수 없는 파일 보존 확인 |
-| 현재 후보 정상 Excel 시작·제거 | PASS · 일반 Explorer 실행 | Excel 16.0 Build20430 x64에서 시작·재시작 각각 자동 연결과 정상 종료 확인. 표준 제거 종료0, 제품 상태-1, 합성 업무 파일 보존. 도구 실행 환경의 앞선 자동 로드 FAIL은 이력에 유지 |
-| 잘못된 Excel 비트 수 차단 | PASS | 현재 후보는 예상 종료1603, 파일 미생성 확인 |
+| x86/x64 MSI 제작·정적 검사·자산 해시 | PASS | 031400-bac791cc의 양쪽 MSI 제작·verify-msi 통과, native guard는 비트 수별 14/14. 같은 파일을 게시하고 아래 해시를 대조 |
+| 게시한 MSI 일반 사용자 설치·파일 대조 | PASS | 031517-61ec7230에서 x64 설치 종료0, 설치 파일 해시·기존 알 수 없는 파일 보존 확인 |
+| 게시한 MSI 정상 Excel 시작·제거 | PASS · 일반 Explorer 실행 | Excel 16.0 Build20430 x64에서 시작·재시작 각각 자동 연결과 정상 종료 확인. 표준 제거 종료0, 제품 상태-1, 합성 업무 파일 보존. 도구 실행 환경의 앞선 자동 로드 FAIL은 이력에 유지 |
+| 잘못된 Excel 비트 수 차단 | PASS | 게시한 파일에서 예상 종료1603, 파일 미생성 확인 |
 | MSI 정상 수명주기·외부 변경 보호 | PASS | 일반 Explorer에서 시작한 032832-591ce8b1 시험 25/25. 설치 등록30개·자동 로드·누락 파일/표식 복구·변경 파일/LoadBehavior/경로 변조 차단·추가 파일/값 보존·정상 제거·재제거1605 확인. 늦은 실패 주입은 포함하지 않음 |
 | 실제 기존 EXE·다른 MSI 설치와 실행 중 Excel 충돌 | NOT RUN | 이번 25개 실기 시험에는 별도 기존 설치·실행 중 Excel 충돌 사례를 포함하지 않음. native guard 검사·과거 Setup 결과와 구분 |
 | 표준 쓰기 뒤 실패 주입의 전체 롤백 | FAIL · 일반 Explorer에서도 재현 | 초기 030632-4191e75d 및 일반 Explorer의 desktop-rollback-20261021-033144에서 제품 파일·소유 등록은 제거됐지만 내부 Installer 등록 롤백 접근 거부5와 제품 상태5가 남음. 최신 시험 설치는 독립 제품·위치 확인 후 표준 /x 종료0·제품 상태-1·합성 업무 파일 보존으로 정리 |
@@ -40,21 +40,25 @@
 | Office 32비트 실제 실행·새 PC·전체 공존 | NOT RUN | x86 제작·COM 자동 검사를 Office 32비트 실제 실행으로 확대하지 않음 |
 | 문서 strict·생성 링크·공개 범위 | PASS | 설치 실패 복구 안내 추가 후 MkDocs strict 종료0(2.70초), 생성 사이트 검사 종료0. 공개22페이지·이전주소2개·404, 검색·사이트맵·비공개 제외·로컬 경로/자산 확인. 변경 Markdown18개 상대링크191개 오류0, VCP SVG16개 XML 검사 통과. 동결한 동봉 문서9개 해시 불일치0 |
 | PR-34 최초 제출 CI | PASS · 해당 커밋 한정 | 258a3cd6dd5ee27e9bc7009f6e96da32ba08d13f에서 Windows 검사2개와 문서 verify 성공. 후속 커밋·Pages 배포·릴리스 게시 결과와 구분 |
-| GitHub 사전 공개 릴리스·다운로드 확인 | 확인 전 | 태그·게시 상태·자산 다운로드 SHA-256 확인 후 기록 |
+| PR-34 최종 제출 CI·병합 | PASS | 최종 head 7df45f74ebddda4f9c257cda03628a0e03ce5a3a에서 도구 MSI·일반 Windows·문서 verify 성공. 병합 커밋 b73ff5f0ab68a95cff27b14c67d67923578e0bef |
+| GitHub 사전 공개 릴리스·다운로드 확인 | PASS | 2026-10-21 03:43:01 UTC 게시, draft=false·prerelease=true. 공개 자산3개를 다시 내려받아 전부 로컬 SHA-256과 일치 확인 |
+| GitHub Pages 운영 반영 | PASS | 병합 커밋 b73ff5f의 운영 verify·build·deploy 성공. 03:44:06 UTC 배포 완료, 03:44:26 UTC 공개 안내 HTTP200·MSI·사각형 영역·Releases 목록 연결 확인 |
 
-이번 후보의 원격 대상은 `prozac0401/Workspace`, 태그는 `visible-cells-paste-v0.2.0-rc.1`이다. 이 문자열을 기록한 사실은 실제 게시 완료의 증거가 아니다.
+[0.2.0-rc.1 사전 공개 릴리스](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.2.0-rc.1)는 `prozac0401/Workspace`에 게시했다. 태그 `visible-cells-paste-v0.2.0-rc.1`과 PR 병합 커밋은 모두 `b73ff5f0ab68a95cff27b14c67d67923578e0bef`를 가리킨다. 공개 시각은 2026-10-21 03:43:01 UTC(한국 시각 12:43:01)다.
 
-[PR-34](https://github.com/prozac0401/Workspace/pull/34)의 최초 제출 CI 근거는 [Windows 검사](https://github.com/prozac0401/Workspace/actions/runs/39539300611), [도구 Windows 검사](https://github.com/prozac0401/Workspace/actions/runs/39539300607), [문서 verify](https://github.com/prozac0401/Workspace/actions/runs/39539300613)다. 이 실행의 Pages build·deploy는 SKIPPED였다. MSI는 사전 공개로 게시할 후보이며 실제 게시·다운로드 확인은 아직 남아 있다.
+[PR-34](https://github.com/prozac0401/Workspace/pull/34)의 최초 제출 CI 근거는 [Windows 검사](https://github.com/prozac0401/Workspace/actions/runs/39539300611), [도구 Windows 검사](https://github.com/prozac0401/Workspace/actions/runs/39539300607), [문서 verify](https://github.com/prozac0401/Workspace/actions/runs/39539300613)다. 최종 head의 [도구 MSI 검사](https://github.com/prozac0401/Workspace/actions/runs/39539788613), [일반 Windows 검사](https://github.com/prozac0401/Workspace/actions/runs/39539788605), [문서 verify](https://github.com/prozac0401/Workspace/actions/runs/39539788634)도 성공했다. 두 PR 문서 실행의 Pages build·deploy는 SKIPPED였으며 이를 공개 사이트 배포 성공으로 계산하지 않는다.
+
+병합 뒤 [Pages 운영 실행](https://github.com/prozac0401/Workspace/actions/runs/39540078195)은 같은 병합 커밋에서 verify·build·deploy를 모두 통과했다. [공개 설치·사용 안내](https://prozac0401.github.io/Workspace/tools/visible-cells-paste/)의 HTTP200 응답과 MSI·사각형 영역 안내, 기존 Releases 목록 연결을 확인했다. 실제 응답 검사 근거는 `artifacts/visible-cells-paste/0.2.0-rc.1/published-guide-check.json`이다.
 
 ## 산출물·해시
 
-현재 제작 후보는 `artifacts/visible-cells-paste/0.2.0-rc.1/msi/20261021-031400-bac791cc`다. 아래 값은 해당 로컬 파일의 SHA-256이며 원격 게시·다운로드 대조는 아직 하지 않았다. 후속 수정으로 다시 제작하면 새 파일과 검증 근거를 함께 기록한다. rollback-test MSI, 내부 manifest·실기 로그·개인 경로·합성 업무 자료는 공개 자산에 포함하지 않는다.
+게시한 파일은 `artifacts/visible-cells-paste/0.2.0-rc.1/msi/20261021-031400-bac791cc`의 검증한 산출물 그대로다. 릴리스에서 MSI2개와 SHA256SUMS.txt를 다시 내려받아 아래 로컬 SHA-256과 전부 일치함을 확인했다. 근거는 `artifacts/visible-cells-paste/0.2.0-rc.1/download-verified/verification.json`이다. 공개 자산은 이3개뿐이며 rollback-test MSI, 내부 manifest·실기 로그·개인 경로·합성 업무 자료는 포함하지 않았다.
 
 | 파일 | 최종 로컬 SHA-256 | 원격 다운로드 대조 |
 |---|---|---|
-| VisibleCellsPaste-0.2.0-rc.1-x64.msi | `660de50f9d379fccb4b4c9a3257902c9a917109bb1b981fae1c7fae81d6e4194` | 확인 전 |
-| VisibleCellsPaste-0.2.0-rc.1-x86.msi | `97a9332db7939eff2ff2ee144ea5af1401d4c7fc0db5bdc7d95eefaee10aed0c` | 확인 전 |
-| SHA256SUMS.txt | `934d52f7854c0cf60fd4d0eafb21a11b9f7eab8ec59fd1fc7a7768e75e1a17c8` | 확인 전 |
+| VisibleCellsPaste-0.2.0-rc.1-x64.msi | `660de50f9d379fccb4b4c9a3257902c9a917109bb1b981fae1c7fae81d6e4194` | MATCH |
+| VisibleCellsPaste-0.2.0-rc.1-x86.msi | `97a9332db7939eff2ff2ee144ea5af1401d4c7fc0db5bdc7d95eefaee10aed0c` | MATCH |
+| SHA256SUMS.txt | `934d52f7854c0cf60fd4d0eafb21a11b9f7eab8ec59fd1fc7a7768e75e1a17c8` | MATCH |
 
 MSI ProductVersion은 0.2.0, AssemblyVersion은 0.2.0.0이다. x64 MSI는 311,296바이트, x86 MSI는 278,528바이트다. 각 패키지는 제품 DLL과 동결한 안내 문서 9개를 포함한다. x86 제작·native 검사 성공은 Office 32비트의 실제 실행 성공을 뜻하지 않는다.
 

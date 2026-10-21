@@ -1,6 +1,6 @@
 # 배포·검증 안내
 
-[보이는 칸 붙여넣기 0.2.0-rc.1 영역·MSI 검증](visible-cells-paste-msi-020rc1-20261021.md)은 2026-10-21 후속 MSI 릴리스 작업 기록입니다. 제작·설치·실제 게시 결과를 구분하며 아래 기존 공개 0.1.2 기록을 보존합니다.
+[보이는 칸 붙여넣기 0.2.0-rc.1 영역·MSI 검증·게시](visible-cells-paste-msi-020rc1-20261021.md)는 2026-10-21 사전 공개 릴리스와 자산3개 다운로드 해시 일치, Pages 배포·공개 안내 반영을 확인한 기록입니다. MSI 정상 수명주기 성공, 실제 클립보드 미검증과 설치 실패 롤백 문제를 구분하며 기존 일반 배포 0.1.2 기록을 보존합니다.
 
 [정적 달력 1983~2099년 확장·운영 활성화](calendar-publication-20261011.md)는 최초 로컬 구현 이후 사용자가 승인한 후속 작업입니다. 2026-10-11 [PR #29](https://github.com/prozac0401/Workspace/pull/29)까지 병합됐으며, [GitHub Pages 운영 배포](https://github.com/prozac0401/Workspace/actions/runs/38112713824)의 build·deploy 성공을 2026-10-12에 확인했습니다. 단계별 검증과 미검증 범위는 해당 운영 기록과 PR의 실행 증거를 따릅니다.
 
@@ -18,7 +18,8 @@
 | Excel 명단 비교 0.2.1 | 일반 배포 | [설치·사용](../tools/excel-list-compare/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/excel-smart-list-compare-v0.2.1) · [0.2.1 제작·확인 기록](../../tools/ExcelSmartListCompare/docs/STABLE_RELEASE_REPORT.md) |
 | 선택범위 내보내기 0.1.0-rc.11 | 평가판 | [설치·사용](../tools/excel-selection-export/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/excel-selection-export-v0.1.0-rc.11) · [rc.11 확인 기록](excel-selection-export-rc11-20261003.md) |
 | 파일 목록을 Excel로 1.2.0 | 일반 배포 | [설치·사용](../tools/file-list-to-excel/index.md) | [별도 저장소의 배포 페이지](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) · [시험용 폴더의 실제 확인](filelist-synthetic-20260927.md) |
-| 보이는 칸 붙여넣기 0.1.2 | 일반 배포 | [설치·사용](../tools/visible-cells-paste/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.2) · [0.1.2 확인 기록](visible-cells-paste-012-20261003.md) |
+| 보이는 칸 붙여넣기 0.2.0-rc.1 | 사전 공개 · MSI | [설치·사용](../tools/visible-cells-paste/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.2.0-rc.1) · [영역·MSI 검증·게시 기록](visible-cells-paste-msi-020rc1-20261021.md) |
+| 보이는 칸 붙여넣기 0.1.2 | 기존 일반 배포 | [설치·사용](../tools/visible-cells-paste/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.2) · [0.1.2 확인 기록](visible-cells-paste-012-20261003.md) |
 | 업무 책갈피 0.2.14 | 일반 배포 | [설치·사용](../tools/bookmark/index.md) | [별도 저장소의 배포 페이지](https://github.com/prozac0401/BookMark/releases/tag/v0.2.14) · [0.2.9·0.2.10 안내 반영](bookmark-0210-publication-20261006.md) · [0.2.8 당시 안내 반영](bookmark-028-publication-20260927.md) |
 | 그림 복사·저장 0.2.1 | 일반 배포 | [설치·사용](../tools/image-copy-save/guide.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) · [0.2.1 제작·확인·게시 기록](image-copy-save-021-20261003.md) |
 | 내려받은 파일 관리 0.2.1 | 일반 배포 | [설치·사용](../tools/download-version-manager/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [0.2.1 정식 Release·Pages 게시 기록](download-version-manager-guide-update-20261006.md) · [0.2.0 당시 설치·파일 보존·게시 기록](download-version-manager-watcher-release-20261004.md) |
