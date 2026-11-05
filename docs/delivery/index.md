@@ -12,7 +12,7 @@
 
 현재 공개된 설치 파일과 당시 확인 기록을 구분해 안내합니다. 기존 도구는 **2026-10-05에 GitHub의 배포 페이지를 확인한 결과**입니다. 오피스 자동화 도구 0.3.1은 **2026-10-06의 공개 릴리스와 다운로드 확인**을 추가했습니다. 업무 책갈피는 **2026-10-06의 0.2.10 공개 릴리스 확인**과 별도로 **2026-10-16에 0.2.14 정식 릴리스·검증 근거를 확인**했습니다. [0.2.14 안내 갱신 기록](bookmark-0214-document-review-20261016.md) · [기존 호환성 안내 기록](bookmark-0213-document-review-20261015.md)에서 문서 검증과 Pages 반영 상태를 구분합니다. 내려받은 파일 관리는 **2026-10-06에 게시된 0.2.1 정식 릴리스**를 **2026-10-12에 확인**해 반영했습니다.
 
-업무 책갈피의 현재 안내는 **2026-11-02 공개된 0.2.18 정식 릴리스를 2026-11-03에 확인**해 갱신했습니다. [0.2.18 안내 갱신 기록](bookmark-0218-document-review-20261103.md)에서 제품 자동검사·실사용 미검증 범위와 이번 문서 검사·Pages 반영 상태를 구분합니다. 위 0.2.14 및 이전 기록은 당시 근거로 보존합니다.
+업무 책갈피의 현재 안내는 **2026-11-04 공개된 0.2.19 정식 릴리스**를 기준으로 갱신했습니다. [0.2.19 안내 갱신 기록](bookmark-0219-document-review-20261105.md)에서 제품 릴리스 검증과 문서 검사를 구분합니다. [0.2.18 안내 갱신 기록](bookmark-0218-document-review-20261103.md)과 이전 릴리스 기록은 당시 근거로 보존합니다.
 
 ## 현재 공개 버전
 
@@ -24,7 +24,7 @@
 | 파일 목록을 Excel로 1.2.0 | 일반 배포 | [설치·사용](../tools/file-list-to-excel/index.md) | [별도 저장소의 배포 페이지](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) · [시험용 폴더의 실제 확인](filelist-synthetic-20260927.md) |
 | 보이는 칸 붙여넣기 0.2.0-rc.1 | 사전 공개 · MSI | [설치·사용](../tools/visible-cells-paste/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.2.0-rc.1) · [영역·MSI 검증·게시 기록](visible-cells-paste-msi-020rc1-20261021.md) |
 | 보이는 칸 붙여넣기 0.1.2 | 기존 일반 배포 | [설치·사용](../tools/visible-cells-paste/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.2) · [0.1.2 확인 기록](visible-cells-paste-012-20261003.md) |
-| 업무 책갈피 0.2.18 | 일반 배포 | [설치·사용](../tools/bookmark/index.md) | [별도 저장소의 배포 페이지](https://github.com/prozac0401/BookMark/releases/tag/v0.2.18) · [0.2.18 안내 갱신·검증 범위](bookmark-0218-document-review-20261103.md) · [0.2.9·0.2.10 안내 반영](bookmark-0210-publication-20261006.md) · [0.2.8 당시 안내 반영](bookmark-028-publication-20260927.md) |
+| 업무 책갈피 0.2.19 | 일반 배포 | [설치·사용](../tools/bookmark/index.md) | [별도 저장소의 배포 페이지](https://github.com/prozac0401/BookMark/releases/tag/v0.2.19) · [0.2.19 안내 갱신·검증 범위](bookmark-0219-document-review-20261105.md) · [0.2.18 안내 갱신 기록](bookmark-0218-document-review-20261103.md) · [0.2.9·0.2.10 안내 반영](bookmark-0210-publication-20261006.md) · [0.2.8 당시 안내 반영](bookmark-028-publication-20260927.md) |
 | 그림 복사·저장 0.2.1 | 일반 배포 | [설치·사용](../tools/image-copy-save/guide.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) · [0.2.1 제작·확인·게시 기록](image-copy-save-021-20261003.md) |
 | 내려받은 파일 관리 0.2.1 | 일반 배포 | [설치·사용](../tools/download-version-manager/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [0.2.1 정식 Release·Pages 게시 기록](download-version-manager-guide-update-20261006.md) · [0.2.0 당시 설치·파일 보존·게시 기록](download-version-manager-watcher-release-20261004.md) |
 | 오피스 자동화 도구 0.3.1 | 평가판 | [받기·사용](../tools/office-automation/index.md) | [Workspace 공개 배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1) · [2026-10-06 배포·문서 게시 기록](probpacker-031-publication-20261006.md) |
