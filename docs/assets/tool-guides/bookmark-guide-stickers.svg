@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="244" viewBox="0 0 720 244" role="img" aria-labelledby="title desc">
-<title id="title">포스트잇 스티커로 보기</title><desc id="desc">스티커는 한 줄 메모와 왼쪽 이동 버튼를 표시합니다. 편집할 때만 필요한 높이로 늘고, 저장·취소 후 원래 크기로 돌아갑니다. 편집 중 직접 옮기거나 정렬한 위치는 유지합니다.</desc>
+<title id="title">포스트잇 스티커로 보기</title><desc id="desc">최상위 스티커는 한 줄 안에서 편집합니다. 폴더 안의 카드는 편집 중 해당 행만 높아지고 저장하거나 취소하면 원래 높이로 돌아갑니다.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="720" height="244" rx="4" fill="#fffdf9"/>
 <path d="M108 16H132" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
