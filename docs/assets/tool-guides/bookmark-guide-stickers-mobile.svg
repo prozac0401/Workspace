@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="432" viewBox="0 0 320 432" role="img" aria-labelledby="title desc">
-<title id="title">포스트잇 스티커로 보기</title><desc id="desc">스티커는 한 줄 메모와 왼쪽 이동 버튼를 표시합니다. 편집할 때만 필요한 높이로 늘고, 저장·취소 후 원래 크기로 돌아갑니다. 편집 중 직접 옮기거나 정렬한 위치는 유지합니다.</desc>
+<title id="title">포스트잇 스티커로 보기</title><desc id="desc">최상위 스티커는 한 줄 안에서 편집합니다. 폴더 안의 카드는 편집 중 해당 행만 높아지고 저장하거나 취소하면 원래 높이로 돌아갑니다.</desc>
 <g font-family="Noto Sans CJK KR, Noto Sans KR, Malgun Gothic, Segoe UI, sans-serif">
 <rect width="320" height="432" rx="4" fill="#fffdf9"/>
 <g transform="translate(9 19) scale(.72)"><ellipse cx="72" cy="91" rx="55" ry="5" fill="#ded2c4" opacity=".5"/><rect x="36" y="15" width="76" height="73" rx="5" fill="#f7edda" stroke="#b7894e" stroke-width="2"/><path d="M50 34H94" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 46H94" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 58H82" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 70H91" fill="none" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M104 88L112 79H104Z" fill="#ead7b9" stroke="#b7894e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
