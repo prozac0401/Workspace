@@ -1,6 +1,6 @@
 # 검증 기록
 
-현재 업무 책갈피의 배포 검증은 [0.2.20 검증 범위](index.md#workbookmark-0220-verification)에서 확인할 수 있습니다.
+현재 업무 책갈피의 배포 검증은 [0.2.21 검증 범위](index.md#workbookmark-0221-verification)에서 확인할 수 있습니다. [0.2.20 검증 범위](index.md#workbookmark-0220-verification)에는 당시 제품 창에서 직접 확인한 결과가 포함되어 있습니다.
 
 ## 정식 릴리스 채널 전환 · 2026-10-05
 
