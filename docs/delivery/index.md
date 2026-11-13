@@ -12,7 +12,7 @@
 
 현재 공개된 설치 파일과 당시 확인 기록을 구분해 안내합니다. 기존 도구는 **2026-10-05에 GitHub의 배포 페이지를 확인한 결과**입니다. 오피스 자동화 도구 0.3.1은 **2026-10-06의 공개 릴리스와 다운로드 확인**을 추가했습니다. 업무 책갈피는 **2026-10-06의 0.2.10 공개 릴리스 확인**과 별도로 **2026-10-16에 0.2.14 정식 릴리스·검증 근거를 확인**했습니다. [0.2.14 안내 갱신 기록](bookmark-0214-document-review-20261016.md) · [기존 호환성 안내 기록](bookmark-0213-document-review-20261015.md)에서 문서 검증과 Pages 반영 상태를 구분합니다. 내려받은 파일 관리는 **2026-10-06에 게시된 0.2.1 정식 릴리스**를 **2026-10-12에 확인**해 반영했습니다.
 
-업무 책갈피의 현재 안내는 **2026-11-06 23:20(KST) 공개된 0.2.20 정식 릴리스**를 기준으로 합니다. 첫 실행에서 이전 전 자동 백업을 만들고 기존 DB를 v9로 이전합니다. 0.2.19로 복귀하려면 [이전 전 v8 백업을 복원](../tools/bookmark/index.md#rollback)해야 합니다. [0.2.19 안내 갱신 기록](bookmark-0219-document-review-20261105.md)과 [0.2.18 안내 갱신 기록](bookmark-0218-document-review-20261103.md)은 당시 검증 근거입니다.
+업무 책갈피의 현재 안내는 **2026-11-13 16:38(KST) 공개된 0.2.21 정식 릴리스**를 기준으로 합니다. 목록과 스티커에서 Ctrl+클릭으로 여러 책갈피를 선택해 함께 옮기고, Ctrl+Z 한 번으로 전체 이동을 되돌립니다. 0.2.20에서 업데이트하면 DB v9를 그대로 사용합니다. 0.2.19 이하에서 바로 업데이트하면 기존 DB를 백업한 뒤 v9로 이전합니다. 0.2.19 이하로 복귀하려면 [해당 버전과 호환되는 이전 전 백업을 복원](../tools/bookmark/index.md#rollback)해야 합니다.
 
 ## 현재 공개 버전
 
@@ -24,7 +24,7 @@
 | 파일 목록을 Excel로 1.2.0 | 일반 배포 | [설치·사용](../tools/file-list-to-excel/index.md) | [별도 저장소의 배포 페이지](https://github.com/prozac0401/File-List-To-Excel/releases/tag/v1.2.0) · [시험용 폴더의 실제 확인](filelist-synthetic-20260927.md) |
 | 보이는 칸 붙여넣기 0.2.0-rc.1 | 사전 공개 · MSI | [설치·사용](../tools/visible-cells-paste/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.2.0-rc.1) · [영역·MSI 검증·게시 기록](visible-cells-paste-msi-020rc1-20261021.md) |
 | 보이는 칸 붙여넣기 0.1.2 | 기존 일반 배포 | [설치·사용](../tools/visible-cells-paste/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/visible-cells-paste-v0.1.2) · [0.1.2 확인 기록](visible-cells-paste-012-20261003.md) |
-| 업무 책갈피 0.2.20 | 일반 배포 · MSI·포터블 ZIP | [설치·사용](../tools/bookmark/index.md) | [배포 페이지](https://github.com/prozac0401/BookMark/releases/tag/v0.2.20) · [MSI](https://github.com/prozac0401/BookMark/releases/download/v0.2.20/WorkBookmark-0.2.20-win-x64.msi) · [ZIP](https://github.com/prozac0401/BookMark/releases/download/v0.2.20/WorkBookmark-0.2.20-win-x64.zip) · [SHA-256](https://github.com/prozac0401/BookMark/releases/download/v0.2.20/SHA256SUMS.txt) · [검증 범위](#workbookmark-0220-verification) |
+| 업무 책갈피 0.2.21 | 일반 배포 · MSI·포터블 ZIP | [설치·사용](../tools/bookmark/index.md) | [배포 페이지](https://github.com/prozac0401/BookMark/releases/tag/v0.2.21) · [MSI](https://github.com/prozac0401/BookMark/releases/download/v0.2.21/WorkBookmark-0.2.21-win-x64.msi) · [ZIP](https://github.com/prozac0401/BookMark/releases/download/v0.2.21/WorkBookmark-0.2.21-win-x64.zip) · [SHA-256](https://github.com/prozac0401/BookMark/releases/download/v0.2.21/SHA256SUMS.txt) · [검증 범위](#workbookmark-0221-verification) |
 | 그림 복사·저장 0.2.1 | 일반 배포 | [설치·사용](../tools/image-copy-save/guide.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/image-copy-save-v0.2.1) · [0.2.1 제작·확인·게시 기록](image-copy-save-021-20261003.md) |
 | 내려받은 파일 관리 0.2.1 | 일반 배포 | [설치·사용](../tools/download-version-manager/index.md) | [배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/download-version-manager-v0.2.1) · [0.2.1 정식 Release·Pages 게시 기록](download-version-manager-guide-update-20261006.md) · [0.2.0 당시 설치·파일 보존·게시 기록](download-version-manager-watcher-release-20261004.md) |
 | 오피스 자동화 도구 0.3.1 | 평가판 | [받기·사용](../tools/office-automation/index.md) | [Workspace 공개 배포 페이지](https://github.com/prozac0401/Workspace/releases/tag/office-automation-tools-v0.3.1) · [2026-10-06 배포·문서 게시 기록](probpacker-031-publication-20261006.md) |
@@ -39,11 +39,25 @@ FolderState 0.1.3과 업무 책갈피 0.2.8은 기존 설치 파일을 그대로
 
 [2026-10-05 교육 업무 예시 화면 제작·확인](education-example-screens-20261005.md)에서 설명용 그림의 제작 방식과 실제 확인 범위를 읽을 수 있습니다.
 
-## 업무 책갈피 0.2.20 검증 범위 {#workbookmark-0220-verification}
+<a name="workbookmark-0221-verification"></a>
+
+## 업무 책갈피 0.2.21 검증 범위
+
+제품 릴리스의 **전체 자동검사 1,218개**가 통과했습니다. 다중 선택·드래그 집중검사 **45개는 전체 수치에 포함**됩니다. **MSI 구조 검사 54/54**와 관리 추출 후 파일 지문 대조를 통과했고, 공개 자산 6개의 서버 SHA-256과 크기가 릴리스 검증 기록과 일치했습니다. [0.2.21 릴리스 검증 기록](https://github.com/prozac0401/BookMark/blob/76f53a18fd2c7c9153a289b2f6424bb445eee9e3/docs/evidence/release-0.2.21-2026-11-13/release-verification.json) · [MSI 검증 JSON](https://github.com/prozac0401/BookMark/releases/download/v0.2.21/WorkBookmark-0.2.21-win-x64.validation.json)
+
+**0.2.21에서 사람이 직접 수행하는 Ctrl 다중 선택·드래그, 한글 IME 입력, 혼합 배율 모니터 간 이동, 실제 MSI 설치·업데이트·제거·재로그인 전주기는 미실행**입니다. [0.2.20 실기 기록](#workbookmark-0220-verification)은 해당 버전의 확인 결과입니다.
+
+Workspace 문서 검토에서는 MkDocs strict 빌드와 사이트 내부 링크 검사를 통과했습니다. 0.2.21 릴리스·다운로드·검증 기록 링크의 HTTP 응답과 공개 자산 6종의 크기·SHA-256을 GitHub 릴리스 메타데이터와 제품 검증 기록으로 확인했습니다.
+
+<a name="workbookmark-0220-verification"></a>
+
+## 업무 책갈피 0.2.20 검증 범위
+
+0.2.20은 2026-11-06 23:20(KST)에 공개됐습니다.
 
 제품 릴리스 기록에서 **자동검사 1,164개와 MSI 구조 검사 54/54 통과**, MSI 관리 추출·파일 지문 대조, 배포 자산 6개의 서버 SHA-256·크기 일치를 확인했습니다. 사람이 실제 제품 창에서 폴더 묶기·이동·분리·되돌리기, 100%↔125% 배율 이동, 한글 저장·취소·자동 저장을 확인한 범위는 실기 기록에 남아 있습니다. [최종 릴리스 검증 기록](https://github.com/prozac0401/BookMark/blob/8e1da41bf54daf257949a34c49fd9840c04ef1e7/docs/evidence/tree-policy-2026-11-06/release-verification.json) · [제품 창 실기 기록](https://github.com/prozac0401/BookMark/blob/v0.2.20/docs/evidence/tree-policy-2026-11-06/README.md)
 
-**실제 MSI 설치·업데이트·제거·재로그인 전주기와 Office·탐색기 50회 실기 행렬은 0.2.20에서 미실행**입니다. 위 검사 수치는 제품 릴리스의 결과입니다. 이번 Workspace 문서 검토에서는 MkDocs strict 빌드와 로컬 링크 검사를 수행하고, 다운로드 URL과 게시 자산 6종의 크기·SHA-256을 GitHub Release 메타데이터와 제품 검증 기록에서 대조했습니다.
+**실제 MSI 설치·업데이트·제거·재로그인 전주기와 Office·탐색기 50회 실기 행렬은 0.2.20에서 미실행**입니다. 위 검사 수치는 제품 릴리스의 결과입니다. 당시 Workspace 문서 검토에서는 MkDocs strict 빌드와 로컬 링크 검사를 수행하고, 다운로드 URL과 게시 자산 6종의 크기·SHA-256을 GitHub Release 메타데이터와 제품 검증 기록에서 대조했습니다.
 
 이전 안내와 확인 근거는 [0.2.19](bookmark-0219-document-review-20261105.md) · [0.2.18](bookmark-0218-document-review-20261103.md) · [0.2.9·0.2.10](bookmark-0210-publication-20261006.md) · [0.2.8](bookmark-028-publication-20260927.md) 기록에서 확인할 수 있습니다.
 
