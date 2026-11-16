@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -125,10 +125,12 @@ namespace ExcelPasswordSafe
                 case "FolderChangedOrUnsupported": return "검색 중 폴더가 바뀌었거나 지원하지 않는 경로입니다.";
                 case "AppDataExcluded": return "프로그램의 백업·기록 폴더는 제외했습니다.";
                 case "NotProcessed": return "앞선 작업 중단으로 처리하지 않았습니다.";
+                case "Cancelled": return "사용자 요청으로 취소했습니다. 완료된 파일은 유지합니다.";
+                case "MissingResult": case "InvalidChildResult": case "MissingChildResult": return "처리 결과를 확인하지 못했습니다. 다시 실행하기 전에 백업과 현재 파일을 확인하세요.";
                 case "FailureReportFailed": return "실패 기록 Excel을 저장하지 못했습니다. 백업·기록 폴더의 JSON 기록을 확인하세요.";
                 case "TemporaryCleanupIncomplete": return "작업용 파일을 정리하지 못했습니다. 백업·기록 보기에서 남은 파일과 접근 권한을 확인하세요.";
                 case "Completed": case "ReplacedAndVerified": return "완료";
-                default: return PasswordWindow.CategoryMessage(category);
+                default: return ResultMessages.CategoryMessage(category);
             }
         }
     }

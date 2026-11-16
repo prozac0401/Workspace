@@ -15,10 +15,11 @@ if($UpgradeMsiPath) {
 }
 $menuKeys=@('.xls','.xlsx','.xlsm','.xlsb') | ForEach-Object { 'HKCU:\Software\Classes\SystemFileAssociations\'+$_+'\shell\Workspace.ExcelPasswordSafe' }
 $folderMenuKey='HKCU:\Software\Classes\Directory\shell\Workspace.ExcelPasswordSafe'
+$backgroundMenuKey='HKCU:\Software\Classes\Directory\Background\shell\Workspace.ExcelPasswordSafe'
 $stateKey='HKCU:\Software\Workspace\ExcelPasswordSafe'
 $defaultInstall=Join-Path $env:LOCALAPPDATA 'Programs\ExcelPasswordSafe'
 $shortcutFolder=Join-Path ([Environment]::GetFolderPath('Programs')) 'ExcelPasswordSafe'
-foreach($path in (@($menuKeys)+@($folderMenuKey,$stateKey,$defaultInstall,$shortcutFolder))) {
+foreach($path in (@($menuKeys)+@($folderMenuKey,$backgroundMenuKey,$stateKey,$defaultInstall,$shortcutFolder))) {
     if(Test-Path -LiteralPath $path) { throw ('Preflight refused: existing product data/menu/installation at '+$path) }
 }
 foreach($policyPath in @('HKCU:\Software\Policies\Microsoft\Windows\Installer','HKLM:\Software\Policies\Microsoft\Windows\Installer')) {
@@ -33,7 +34,8 @@ $testRoot=Join-Path $repoRoot ('artifacts\excel-password-safe\installer-'+(Get-D
 $allowed=[IO.Path]::GetFullPath((Join-Path $repoRoot 'artifacts\excel-password-safe'))+[IO.Path]::DirectorySeparatorChar
 $resolved=[IO.Path]::GetFullPath($testRoot)
 if(-not $resolved.StartsWith($allowed,[StringComparison]::OrdinalIgnoreCase)) { throw 'Installer test output is outside the intended artifacts directory.' }
-$install=Join-Path $testRoot 'installed'
+$install=Join-Path $testRoot '사용자 지정 경로'
+$redirectedInstall=Join-Path $testRoot 'must-not-relocate'
 $fixtures=Join-Path $testRoot 'preserved-files'
 New-Item -ItemType Directory -Path $fixtures -Force | Out-Null
 $business=Join-Path $fixtures 'keep.xlsx'
@@ -59,32 +61,42 @@ function Check-Menus([bool]$Present) {
     foreach($key in $menuKeys) {
         Check ('menu '+$key+' present='+$Present) ((Test-Path -LiteralPath $key) -eq $Present)
         if($Present) {
-            $command=(Get-Item -LiteralPath ($key+'\command')).GetValue('')
-            Check ('quoted command '+$key) ($command -ceq ('"'+$install+'\ExcelPasswordSafe.exe" --file "%1"'))
             Check ('single selection '+$key) ((Get-ItemProperty -LiteralPath $key).MultiSelectModel -ceq 'Single')
+            if($menuVersion -lt [version]'2.0.0') {
+                $command=(Get-Item -LiteralPath ($key+'\command')).GetValue('')
+                Check ('quoted legacy file command '+$key) ($command -ceq ('"'+$install+'\ExcelPasswordSafe.exe" --file "%1"'))
+            } else {
+                Check ('legacy root command removed '+$key) (-not (Test-Path -LiteralPath ($key+'\command')))
+            }
         }
     }
-    $folderPresent=$Present -and $menuVersion -ge [version]'1.4.0'
-    Check ('folder cascade present='+$folderPresent) ((Test-Path -LiteralPath $folderMenuKey) -eq $folderPresent)
+    $cascades=@(@{key=$folderMenuKey;minimum=[version]'1.4.0';argument='%1';name='folder';kind='folder'},@{key=$backgroundMenuKey;minimum=[version]'2.0.0';argument='%V\.';name='background';kind='folder'})
+    if($menuVersion -ge [version]'2.0.0') { foreach($key in $menuKeys) { $cascades+=@{key=$key;minimum=[version]'2.0.0';argument='%1';name=('file '+$key);kind='file'} } }
+    foreach($cascade in $cascades) {
+    $folderPresent=$Present -and $menuVersion -ge $cascade.minimum
+    Check ($cascade.name+' cascade present='+$folderPresent) ((Test-Path -LiteralPath $cascade.key) -eq $folderPresent)
     if($folderPresent) {
-        $folder=(Get-Item -LiteralPath $folderMenuKey)
+        $folder=(Get-Item -LiteralPath $cascade.key)
         Check 'folder cascade label' ($folder.GetValue('MUIVerb') -ceq 'Excel 암호 관리')
         Check 'folder cascade single selection' ($folder.GetValue('MultiSelectModel') -ceq 'Single')
         Check 'folder cascade uses local subcommands' ($folder.GetValue('SubCommands',$null) -ceq '')
         $verbs=@(@{id='01Encrypt';mode='Encrypt';label='암호 설정'},@{id='02Decrypt';mode='Decrypt';label='암호 해제'},@{id='03ChangePassword';mode='ChangePassword';label='암호 변경'})
         foreach($verb in $verbs) {
-            $key=$folderMenuKey+'\shell\'+$verb.id
+            $key=$cascade.key+'\shell\'+$verb.id
             Check ('folder action '+$verb.mode) (Test-Path -LiteralPath $key)
             if(Test-Path -LiteralPath $key) {
                 $properties=Get-Item -LiteralPath $key
                 Check ('folder label '+$verb.mode) ($properties.GetValue('MUIVerb') -ceq $verb.label)
                 Check ('folder single selection '+$verb.mode) ($properties.GetValue('MultiSelectModel') -ceq 'Single')
                 $command=(Get-Item -LiteralPath ($key+'\command')).GetValue('')
-                Check ('quoted folder command '+$verb.mode) ($command -ceq ('"'+$install+'\ExcelPasswordSafe.exe" --folder "%1" --mode '+$verb.mode))
+                Check ('quoted folder command '+$verb.mode) ($command -ceq ('"'+$install+'\ExcelPasswordSafe.exe" --'+$cascade.kind+' "'+$cascade.argument+'" --mode '+$verb.mode))
             }
         }
+        Check ($cascade.name+' icon points to application') ($folder.GetValue('Icon') -ceq ('"'+$install+'\ExcelPasswordSafe.exe",0'))
         Check 'installed batch engine present' (Test-Path -LiteralPath (Join-Path $install 'runtime\BatchEngine.ps1'))
     }
+    }
+    if($Present) { Check 'remembered custom installation path' ((Get-Item -LiteralPath $stateKey).GetValue('InstallFolder').TrimEnd('\') -ieq $install.TrimEnd('\')) }
 }
 function Check-Preserved {
     Check 'business sentinel preserved' ((Get-FileHash -LiteralPath $business -Algorithm SHA256).Hash -eq $businessHash)
@@ -92,7 +104,7 @@ function Check-Preserved {
 }
 function Default-Associations {
     $snapshot=@()
-    foreach($ext in @('.xls','.xlsx','.xlsm','.xlsb','Directory')) {
+    foreach($ext in @('.xls','.xlsx','.xlsm','.xlsb','Directory','Directory\Background')) {
         foreach($base in @('Registry::HKEY_CLASSES_ROOT\','HKCU:\Software\Classes\')) {
             $path=$base+$ext
             $value=if(Test-Path -LiteralPath $path) { (Get-Item -LiteralPath $path).GetValue('') } else { $null }
@@ -161,11 +173,17 @@ try {
     $exeResolved=[IO.Path]::GetFullPath($exe)
     if(-not $exeResolved.StartsWith(([IO.Path]::GetFullPath($install)+'\'),[StringComparison]::OrdinalIgnoreCase)) { throw 'Refusing a repair-test deletion outside the installation fixture.' }
     Remove-Item -LiteralPath $exeResolved -Force
-    Invoke-Msi 'repair' @('/fa',('"'+$package+'"'))
+    $repairArgs=@('/fa',('"'+$package+'"'))
+    if($menuVersion -ge [version]'2.0.0') { $repairArgs+=('INSTALLFOLDER="'+$redirectedInstall+'"') }
+    Invoke-Msi 'repair' $repairArgs
+    Check 'repair did not relocate installation' (-not (Test-Path -LiteralPath $redirectedInstall))
     Check 'repair restored executable' (Test-Path -LiteralPath $exe)
     Check-Menus $true
     if($upgrade) {
-        Invoke-Msi 'upgrade' @('/i',('"'+$upgrade+'"'))
+        $upgradeArgs=@('/i',('"'+$upgrade+'"'))
+        if([version]$upgradeDetails.version -ge [version]'2.0.0') { $upgradeArgs+=('INSTALLFOLDER="'+$redirectedInstall+'"') }
+        Invoke-Msi 'upgrade' $upgradeArgs
+        Check 'upgrade ignored a different requested install location' (-not (Test-Path -LiteralPath $redirectedInstall))
         $activePackage=$upgrade
         $menuVersion=[version]$upgradeDetails.version
         Check 'upgrade remembered install directory' (Test-Path -LiteralPath $exe)
@@ -195,6 +213,6 @@ try {
     if($activePackage) {
         try { Invoke-Msi 'cleanup-uninstall' @('/x',('"'+$activePackage+'"')) } catch { $results.Add(@{name='cleanup-uninstall';passed=$false;message=$_.Exception.Message}) }
     }
-    [ordered]@{status=$status;timestamp=[DateTimeOffset]::Now.ToString('O');os=[Environment]::OSVersion.VersionString;elevated=$isElevated;msi=$package;sha256=$details.sha256;upgrade=$upgrade;rollbackMode=$RollbackMode;rollbackProductCode=$rollbackProductCode;fixture=$testRoot;results=$results.ToArray();explorerClick='NotRun';productionRelease=$false} | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $testRoot 'installer-results.json') -Encoding UTF8
+    [ordered]@{status=$status;timestamp=[DateTimeOffset]::Now.ToString('O');os=[Environment]::OSVersion.VersionString;elevated=$isElevated;msi=$package;sha256=$details.sha256;upgrade=$upgrade;rollbackMode=$RollbackMode;rollbackProductCode=$rollbackProductCode;fixture=$testRoot;customInstallPath=$install;pathValidationUi='NotRun';results=$results.ToArray();explorerClick='NotRun';productionRelease=$false} | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $testRoot 'installer-results.json') -Encoding UTF8
 }
 Write-Output ('Installer lifecycle passed. Evidence: '+$testRoot)

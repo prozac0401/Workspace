@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
@@ -59,7 +59,7 @@ public static class AppTests
         var acl = Directory.GetAccessControl(privatePath);
         Assert(acl.AreAccessRulesProtected, "Backup directory disables inherited ACL");
         Assert(acl.GetAccessRules(true, true, typeof(SecurityIdentifier)).Count == 2, "Only current user and SYSTEM access");
-        Assert(PasswordWindow.CategoryMessage("CommitUncertain").Contains("재시도하지"), "Uncertain commit needs inspection");
+        Assert(ResultMessages.CategoryMessage("CommitUncertain").Contains("재시도하지"), "Uncertain commit needs inspection");
         string tree = Path.Combine(directory, "folder scope & 한글"); Directory.CreateDirectory(tree);
         string nested = Path.Combine(tree, "sub", "deeper"); Directory.CreateDirectory(nested);
         File.WriteAllText(Path.Combine(tree, "top.XLSX"), "synthetic");
