@@ -1,7 +1,7 @@
 # ExcelPasswordSafe · 제품 명세
 
 도구 ID: ExcelPasswordSafe  
-버전·상태: 2 · 구현·검증 중
+버전·상태: 2 · 구현 완료·사용자 요청으로 우선 릴리스 준비
 제품 책임: 도구 개발·검증 담당  
 적용 정책: [추가 도구 개발 기준](../../policies/tools.md), [정책 문서 작성 규칙](../../policies/documentation.md)  
 관련 ADR: [파일 처리 설계](../../design/0018-excel-password-safe-explorer.md), [폴더 일괄 처리](../../design/0040-excel-password-safe-folder-batch.md), [ADR-0041 단계형 화면과 설치](../../design/0041-excel-password-safe-wizard.md)
@@ -123,4 +123,4 @@ Windows x64용 MSI의 기본 설치 위치는 현재 사용자의 `%LocalAppData
 
 ## 명세 대응표와 배포 기록
 
-이 문서는 구현 목표와 계약이다. 버전 2의 실제 구현·시험·패키지·서명 상태와 게시 결과는 [버전 2 검증 기록](../../delivery/excel-password-safe-v2-20261117.md)에 구분한다. [1.4.0 폴더 기록](../../delivery/excel-password-safe-folder-20261116.md), [1.3.0 UI 기록](../../delivery/excel-password-safe-ui-20261116.md), [1.2.0 기록](../../delivery/excel-password-safe-20261116.md)은 당시 결과로 보존한다. 완료 후 릴리스는 사용자에게 승인받았으며, 실제 게시 확인 후에만 게시 완료로 기록한다. [사용 안내](index.md)는 같은 기능명과 제한을 사용한다.
+이 문서는 구현 계약이다. 버전 2의 실제 구현·시험·패키지·서명 상태와 게시 결과는 [버전 2 검증 기록](../../delivery/excel-password-safe-v2-20261117.md)에 구분한다. [1.4.0 폴더 기록](../../delivery/excel-password-safe-folder-20261116.md), [1.3.0 UI 기록](../../delivery/excel-password-safe-ui-20261116.md), [1.2.0 기록](../../delivery/excel-password-safe-20261116.md)은 당시 결과로 보존한다. 사용자는 현재 검증한 패키지를 우선 릴리스하고 직접 사용 후 추가 피드백하겠다고 명시했다. 남은 실제 설치 화면·탐색기 클릭·최종 설치 앱의 암호 실행·수동 재시도는 미실행으로 기록하며 통과로 간주하지 않는다. 실제 게시 확인 후에만 게시 완료를 별도 기록한다. [사용 안내](index.md)는 같은 기능명과 제한을 사용한다.
