@@ -1,0 +1,19 @@
+{
+  "scope": "fixture creation and structure inspection ONLY, not Excel SaveAs",
+  "fixtures": [
+    {
+      "name": "picture_biff8.xls",
+      "bytes": 9728,
+      "sha256": "74fc36ffd2e2cc7a020a59d5d029cdf1a66869dffe54234a4cee4931513a63e1"
+    },
+    {
+      "name": "picture_ooxml.xlsx",
+      "bytes": 6184,
+      "sha256": "cb3b4920a17ba8835fda128ec3815d92b7a60d6ea0fd239d267f089ac4fd38fa"
+    }
+  ],
+  "checks": [
+    "XLS OLE Workbook stream + BIFF IMDATA",
+    "XLSX embedded media + formula + image readback"
+  ]
+}

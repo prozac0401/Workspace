@@ -1,0 +1,1 @@
+PASS: 45 assertions (PowerShell 7.4.7, Unix); Excel COM NOT tested.
