@@ -1,12 +1,13 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 [CmdletBinding()]
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '1.3.0',
+    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '1.4.0',
     [string]$Wix,
     [switch]$SkipTests
 )
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
+if([version]$Version -lt [version]'1.4.0') { throw 'This source requires package version 1.4.0 or later. Use the preserved earlier source for an earlier version.' }
 $toolRoot = Split-Path -Parent $PSScriptRoot
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $toolRoot '..\..'))
 $framework = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319'
@@ -63,7 +64,7 @@ try {
     $compileArgs = @('/nologo','/target:winexe','/platform:anycpu','/optimize+','/warnaserror+','/utf8output',('/out:'+$exe),('/win32manifest:'+$buildManifest)) + $references + @($sources.FullName) + @($assemblyInfo)
     Invoke-Checked $compiler $compileArgs (Join-Path $outRoot 'compile.log')
     [IO.File]::WriteAllText((Join-Path $stage 'ExcelPasswordSafe.exe.config'), '<?xml version="1.0" encoding="utf-8"?><configuration><startup useLegacyV2RuntimeActivationPolicy="true"><supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8"/></startup></configuration>', $utf8)
-    foreach ($name in @('Common.ps1','Engine.ps1','ExcelPassword.Worker.ps1')) {
+    foreach ($name in @('Common.ps1','Engine.ps1','ExcelPassword.Worker.ps1','BatchEngine.ps1')) {
         Copy-Item -LiteralPath (Join-Path $toolRoot ('runtime\'+$name)) -Destination (Join-Path $runtime $name)
     }
     Copy-Item -LiteralPath (Join-Path $toolRoot 'README.md') -Destination (Join-Path $stage 'README.md')
@@ -71,12 +72,13 @@ try {
         $ps = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-Core.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'core-tests')) (Join-Path $outRoot 'core-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-ControllerFailures.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'controller-faults')) (Join-Path $outRoot 'controller-faults.log')
+        Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-Batch.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'batch-tests')) (Join-Path $outRoot 'batch-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-App.ps1'),'-AppPath',$exe,'-OutputDirectory',(Join-Path $outRoot 'app-tests')) (Join-Path $outRoot 'app-tests.log')
         $smoke = Join-Path $outRoot 'ui-smoke'
         $process = Start-Process -FilePath $exe -ArgumentList ('--smoke "'+$smoke+'"') -PassThru -WindowStyle Hidden
         if (-not $process.WaitForExit(60000)) { throw 'UI smoke did not finish in 60 seconds. Inspect the test process manually.' }
         if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath (Join-Path $smoke 'smoke-result.json'))) { throw 'UI smoke failed or produced no result.' }
-        $record.tests = 'Core/controller faults/App/UI smoke passed'
+        $record.tests = 'Core/controller faults/batch/App/UI smoke passed'
     }
     $files = @(Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullName)
     $fragment = New-Object Text.StringBuilder
@@ -96,6 +98,24 @@ try {
         [void]$fragment.AppendLine(('<RegistryValue Root="HKCU" Key="{0}" Name="Icon" Value="&quot;[INSTALLFOLDER]ExcelPasswordSafe.exe&quot;,0" Type="string"/>' -f $key))
         [void]$fragment.AppendLine(('<RegistryValue Root="HKCU" Key="{0}\command" Value="&quot;[INSTALLFOLDER]ExcelPasswordSafe.exe&quot; --file &quot;%1&quot;" Type="string"/></Component>' -f $key))
     }
+    $folderKey='Software\Classes\Directory\shell\Workspace.ExcelPasswordSafe'
+    [void]$fragment.AppendLine('<Component Id="FolderMenu" Directory="INSTALLFOLDER" Guid="*">')
+    [void]$fragment.AppendLine(('<RegistryValue Root="HKCU" Key="{0}" Name="MUIVerb" Value="Excel &#xC554;&#xD638; &#xAD00;&#xB9AC;" Type="string" KeyPath="yes"/>' -f $folderKey))
+    [void]$fragment.AppendLine(('<RegistryValue Root="HKCU" Key="{0}" Name="SubCommands" Value="" Type="string"/>' -f $folderKey))
+    [void]$fragment.AppendLine(('<RegistryValue Root="HKCU" Key="{0}" Name="MultiSelectModel" Value="Single" Type="string"/>' -f $folderKey))
+    [void]$fragment.AppendLine(('<RegistryValue Root="HKCU" Key="{0}" Name="Icon" Value="&quot;[INSTALLFOLDER]ExcelPasswordSafe.exe&quot;,0" Type="string"/>' -f $folderKey))
+    $folderVerbs=@(
+        @{id='01Encrypt';mode='Encrypt';label='&#xC554;&#xD638; &#xC124;&#xC815;'},
+        @{id='02Decrypt';mode='Decrypt';label='&#xC554;&#xD638; &#xD574;&#xC81C;'},
+        @{id='03ChangePassword';mode='ChangePassword';label='&#xC554;&#xD638; &#xBCC0;&#xACBD;'}
+    )
+    foreach($verb in $folderVerbs) {
+        $key=$folderKey+'\shell\'+$verb.id
+        [void]$fragment.AppendLine(('<RegistryValue Root="HKCU" Key="{0}" Name="MUIVerb" Value="{1}" Type="string"/>' -f $key,$verb.label))
+        [void]$fragment.AppendLine(('<RegistryValue Root="HKCU" Key="{0}" Name="MultiSelectModel" Value="Single" Type="string"/>' -f $key))
+        [void]$fragment.AppendLine(('<RegistryValue Root="HKCU" Key="{0}\command" Value="&quot;[INSTALLFOLDER]ExcelPasswordSafe.exe&quot; --folder &quot;%1&quot; --mode {1}" Type="string"/>' -f $key,$verb.mode))
+    }
+    [void]$fragment.AppendLine('</Component>')
     [void]$fragment.AppendLine('</ComponentGroup></Fragment></Wix>')
     $payloadWxs = Join-Path $outRoot 'Payload.wxs'
     [IO.File]::WriteAllText($payloadWxs,$fragment.ToString(),$utf8)
@@ -111,7 +131,7 @@ try {
     }
     if((Source-Stamp) -cne $sourceBefore) { throw 'Sources changed during the build. Rebuild from the completed source state.' }
     [IO.File]::WriteAllText((Join-Path $outRoot 'source-sha256.txt'),$sourceBefore,$utf8)
-    $record.embeddedPayload='All six extracted file hashes match staging'
+    $record.embeddedPayload=('All '+$files.Count+' extracted file hashes match staging')
     $record.msi = $msi
     $record.sha256 = (Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash
     ($record.sha256+'  '+[IO.Path]::GetFileName($msi)) | Set-Content -LiteralPath ($msi+'.sha256') -Encoding ASCII

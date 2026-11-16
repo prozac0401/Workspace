@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 [CmdletBinding()]
 param([Parameter(Mandatory=$true)][string]$MsiPath,[string]$UpgradeMsiPath,[ValidateSet('None','DeferredBeforePublish','LateAfterPublish')][string]$RollbackMode='None')
 Set-StrictMode -Version 2.0
@@ -6,6 +6,7 @@ $ErrorActionPreference='Stop'
 $repoRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..'))
 $package=(Resolve-Path -LiteralPath $MsiPath).Path
 $details=(& (Join-Path $PSScriptRoot 'verify-msi.ps1') -MsiPath $package) | ConvertFrom-Json
+$menuVersion=[version]$details.version
 $upgrade=$null
 if($UpgradeMsiPath) {
     $upgrade=(Resolve-Path -LiteralPath $UpgradeMsiPath).Path
@@ -13,10 +14,11 @@ if($UpgradeMsiPath) {
     if([version]$upgradeDetails.version -le [version]$details.version) { throw 'The upgrade package must have a greater version.' }
 }
 $menuKeys=@('.xls','.xlsx','.xlsm','.xlsb') | ForEach-Object { 'HKCU:\Software\Classes\SystemFileAssociations\'+$_+'\shell\Workspace.ExcelPasswordSafe' }
+$folderMenuKey='HKCU:\Software\Classes\Directory\shell\Workspace.ExcelPasswordSafe'
 $stateKey='HKCU:\Software\Workspace\ExcelPasswordSafe'
 $defaultInstall=Join-Path $env:LOCALAPPDATA 'Programs\ExcelPasswordSafe'
 $shortcutFolder=Join-Path ([Environment]::GetFolderPath('Programs')) 'ExcelPasswordSafe'
-foreach($path in (@($menuKeys)+@($stateKey,$defaultInstall,$shortcutFolder))) {
+foreach($path in (@($menuKeys)+@($folderMenuKey,$stateKey,$defaultInstall,$shortcutFolder))) {
     if(Test-Path -LiteralPath $path) { throw ('Preflight refused: existing product data/menu/installation at '+$path) }
 }
 foreach($policyPath in @('HKCU:\Software\Policies\Microsoft\Windows\Installer','HKLM:\Software\Policies\Microsoft\Windows\Installer')) {
@@ -62,6 +64,27 @@ function Check-Menus([bool]$Present) {
             Check ('single selection '+$key) ((Get-ItemProperty -LiteralPath $key).MultiSelectModel -ceq 'Single')
         }
     }
+    $folderPresent=$Present -and $menuVersion -ge [version]'1.4.0'
+    Check ('folder cascade present='+$folderPresent) ((Test-Path -LiteralPath $folderMenuKey) -eq $folderPresent)
+    if($folderPresent) {
+        $folder=(Get-Item -LiteralPath $folderMenuKey)
+        Check 'folder cascade label' ($folder.GetValue('MUIVerb') -ceq 'Excel 암호 관리')
+        Check 'folder cascade single selection' ($folder.GetValue('MultiSelectModel') -ceq 'Single')
+        Check 'folder cascade uses local subcommands' ($folder.GetValue('SubCommands',$null) -ceq '')
+        $verbs=@(@{id='01Encrypt';mode='Encrypt';label='암호 설정'},@{id='02Decrypt';mode='Decrypt';label='암호 해제'},@{id='03ChangePassword';mode='ChangePassword';label='암호 변경'})
+        foreach($verb in $verbs) {
+            $key=$folderMenuKey+'\shell\'+$verb.id
+            Check ('folder action '+$verb.mode) (Test-Path -LiteralPath $key)
+            if(Test-Path -LiteralPath $key) {
+                $properties=Get-Item -LiteralPath $key
+                Check ('folder label '+$verb.mode) ($properties.GetValue('MUIVerb') -ceq $verb.label)
+                Check ('folder single selection '+$verb.mode) ($properties.GetValue('MultiSelectModel') -ceq 'Single')
+                $command=(Get-Item -LiteralPath ($key+'\command')).GetValue('')
+                Check ('quoted folder command '+$verb.mode) ($command -ceq ('"'+$install+'\ExcelPasswordSafe.exe" --folder "%1" --mode '+$verb.mode))
+            }
+        }
+        Check 'installed batch engine present' (Test-Path -LiteralPath (Join-Path $install 'runtime\BatchEngine.ps1'))
+    }
 }
 function Check-Preserved {
     Check 'business sentinel preserved' ((Get-FileHash -LiteralPath $business -Algorithm SHA256).Hash -eq $businessHash)
@@ -69,7 +92,7 @@ function Check-Preserved {
 }
 function Default-Associations {
     $snapshot=@()
-    foreach($ext in @('.xls','.xlsx','.xlsm','.xlsb')) {
+    foreach($ext in @('.xls','.xlsx','.xlsm','.xlsb','Directory')) {
         foreach($base in @('Registry::HKEY_CLASSES_ROOT\','HKCU:\Software\Classes\')) {
             $path=$base+$ext
             $value=if(Test-Path -LiteralPath $path) { (Get-Item -LiteralPath $path).GetValue('') } else { $null }
@@ -144,6 +167,7 @@ try {
     if($upgrade) {
         Invoke-Msi 'upgrade' @('/i',('"'+$upgrade+'"'))
         $activePackage=$upgrade
+        $menuVersion=[version]$upgradeDetails.version
         Check 'upgrade remembered install directory' (Test-Path -LiteralPath $exe)
         Check-Menus $true
         Invoke-Msi 'downgrade-blocked' @('/i',('"'+$package+'"')) @(1638,1603)
@@ -160,6 +184,7 @@ try {
     Check-Preserved
     Invoke-Msi 'reinstall' @('/i',('"'+$package+'"'),('INSTALLFOLDER="'+$install+'"'))
     $activePackage=$package
+    $menuVersion=[version]$details.version
     Check-Menus $true
     Invoke-Msi 'remove-reinstall' @('/x',('"'+$activePackage+'"'))
     $activePackage=$null

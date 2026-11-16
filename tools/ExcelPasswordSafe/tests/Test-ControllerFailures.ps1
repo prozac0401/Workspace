@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 #requires -PSEdition Desktop
 [CmdletBinding()]
 param([string]$EvidenceDirectory)
@@ -60,7 +60,7 @@ foreach($case in @('InterruptedWorker','TamperedOutput','TamperedSnapshot','Exte
     }
     $passed=$result.category -eq $expected -and (Get-Sha $result.backup) -eq $before -and -not [IO.File]::Exists($request) -and -not [IO.File]::Exists((Join-Path $run 'worker-job.json'))
     if($case -eq 'SuccessfulTransaction') {
-        $passed=$passed -and $result.status -eq 'Success' -and (Get-Sha $result.recovery) -eq $before -and [IO.File]::ReadAllText($source) -eq 'synthetic validated output'
+        $passed=$passed -and $result.status -eq 'Success' -and $result.recoveryRemoved -and -not [IO.File]::Exists($result.recovery) -and [IO.File]::ReadAllText($source) -eq 'synthetic validated output'
     } elseif($case -eq 'ExternalSourceReplace') {
         $passed=$passed -and [IO.File]::ReadAllText($source) -eq 'external newer source'
     } else { $passed=$passed -and (Get-Sha $source) -eq $before }

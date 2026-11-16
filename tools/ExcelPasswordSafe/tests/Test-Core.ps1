@@ -32,10 +32,12 @@ function New-TestRequest([string]$Path,[string]$Mode='Encrypt',[string]$Old='',[
     Write-Json $request (Join-Path $dir 'request.json')
     return $dir
 }
-function Invoke-TestEngine([string]$RunDir,[string]$Expected) {
+function Invoke-TestEngine([string]$RunDir,[string]$Expected,[string]$CancellationPath='') {
     $script=Join-Path $toolRoot 'runtime/Engine.ps1'
     $request=Join-Path $RunDir 'request.json'
-    $p=Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList ('-NoProfile -NonInteractive -STA -ExecutionPolicy Bypass -File "'+$script+'" -RequestPath "'+$request+'"') -PassThru -WindowStyle Hidden
+    $arguments='-NoProfile -NonInteractive -STA -ExecutionPolicy Bypass -File "'+$script+'" -RequestPath "'+$request+'"'
+    if($CancellationPath) { $arguments+=' -CancellationPath "'+$CancellationPath+'"' }
+    $p=Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $arguments -PassThru -WindowStyle Hidden
     try {
         if(-not $p.WaitForExit(15000)) { $p.Kill(); throw 'Preflight test unexpectedly timed out.' }
     } finally { $p.Dispose() }
@@ -79,6 +81,7 @@ try {
     try { Assert-Throws { Write-Json @{state='CommitIntent'} $json } 'interrupted journal replacement fails closed' }
     finally { $jsonLock.Dispose() }
     Assert ((Get-Sha $json) -eq $prior) 'previous complete journal retained on replacement failure'
+    Assert (@(Get-ChildItem -LiteralPath $EvidenceDirectory -Filter '*.pending').Count -eq 0) 'failed journal write cleans its pending file'
     Assert ((Get-Content -LiteralPath $json -Raw | ConvertFrom-Json).state -eq 'BackedUp') 'retained journal remains readable'
     Write-Json @{state='CommitIntent';value=2} $json
     Assert ((Get-Content -LiteralPath $json -Raw | ConvertFrom-Json).state -eq 'CommitIntent') 'journal atomic replacement succeeds'
@@ -118,6 +121,10 @@ try {
     [IO.File]::WriteAllText((Join-Path $run 'cancel'),'cancel')
     $r=Invoke-TestEngine $run 'Cancelled'
     Assert ($r.status -eq 'Cancelled' -and -not [IO.File]::Exists((Join-Path $run 'original.xlsx'))) 'cancellation before backup preserves original'
+    $run=New-TestRequest $source
+    $externalCancel=Join-Path $EvidenceDirectory 'batch-cancel'; [IO.File]::WriteAllText($externalCancel,'cancel')
+    $r=Invoke-TestEngine $run 'Cancelled' $externalCancel
+    Assert ($r.status -eq 'Cancelled' -and -not [IO.File]::Exists((Join-Path $run 'original.xlsx'))) 'batch cancellation path stops engine before backup'
     $run=New-TestRequest $source
     $mutex=New-Object Threading.Mutex($false,(Get-EngineMutexName)); $owned=$mutex.WaitOne(0)
     if(-not $owned) { $mutex.Dispose(); throw 'Another real operation is running; stop core tests.' }
