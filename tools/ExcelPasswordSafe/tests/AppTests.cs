@@ -60,6 +60,33 @@ public static class AppTests
         Assert(acl.AreAccessRulesProtected, "Backup directory disables inherited ACL");
         Assert(acl.GetAccessRules(true, true, typeof(SecurityIdentifier)).Count == 2, "Only current user and SYSTEM access");
         Assert(PasswordWindow.CategoryMessage("CommitUncertain").Contains("재시도하지"), "Uncertain commit needs inspection");
+        string tree = Path.Combine(directory, "folder scope & 한글"); Directory.CreateDirectory(tree);
+        string nested = Path.Combine(tree, "sub", "deeper"); Directory.CreateDirectory(nested);
+        File.WriteAllText(Path.Combine(tree, "top.XLSX"), "synthetic");
+        File.WriteAllText(Path.Combine(nested, "macro.xlsm"), "synthetic");
+        File.WriteAllText(Path.Combine(nested, "binary.xlsb"), "synthetic");
+        File.WriteAllText(Path.Combine(nested, "legacy.xls"), "synthetic");
+        File.WriteAllText(Path.Combine(tree, "not-workbook.txt"), "synthetic");
+        File.WriteAllText(Path.Combine(tree, "~$open.xlsx"), "synthetic");
+        File.WriteAllText(Path.Combine(nested, ".eps-owned.xlsx"), "synthetic");
+        var found = BatchWorkflow.Discover(tree, System.Threading.CancellationToken.None);
+        Assert(found.Files.Count == 4 && found.Issues.Count == 0, "Recursive discovery includes all four workbook extensions only");
+        Assert(found.Files.Contains(Path.Combine(nested, "macro.xlsm")), "Nested paths are preserved");
+        Assert(!BatchWorkflow.IsWorkbookName(Path.Combine(tree, "~$open.xlsx")), "Discovery excludes Excel lock file");
+        Assert(!BatchWorkflow.IsWorkbookName(Path.Combine(nested, ".eps-owned.xlsx")), "Discovery does not pick up work files");
+        Assert(File.Exists(Path.Combine(nested, ".eps-owned.xlsx")), "Discovery never deletes previous work files by name");
+        Assert(BatchWorkflow.ContainsPath(tree, Path.Combine(nested, "macro.xlsm")), "Root descendant boundary accepted");
+        Assert(!BatchWorkflow.ContainsPath(tree, tree + "-other\\outside.xlsx"), "Root sibling prefix rejected");
+        Assert(BatchWorkflow.IsOwnedData(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ExcelPasswordSafe", "Runs", "report.xlsx")), "Application reports and backups excluded from input");
+        bool cancelled = false;
+        try { BatchWorkflow.Discover(tree, new System.Threading.CancellationToken(true)); } catch (OperationCanceledException) { cancelled = true; }
+        Assert(cancelled, "Recursive discovery can be cancelled before reads");
+        bool network = false;
+        try { BatchWorkflow.CheckDirectory(@"\\nonexistent-server\share"); } catch (ArgumentException) { network = true; }
+        Assert(network, "Folder network paths rejected before enumeration");
+        var batchStart = BatchWorkflow.StartInfo(@"C:\한글 & path\app", @"C:\한글 & path\run");
+        Assert(!batchStart.UseShellExecute && batchStart.CreateNoWindow && batchStart.Arguments.Contains("BatchEngine.ps1"), "Batch starts without shell or visible console");
+        Assert(!batchStart.Arguments.Contains("OldTest42!") && !batchStart.Arguments.Contains("New한글42!"), "Batch command line contains no password");
         Console.WriteLine("PASS total=" + count); return 0;
     }
 }

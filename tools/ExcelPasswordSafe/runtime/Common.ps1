@@ -5,12 +5,13 @@ function Write-Json($Value, [string]$Path) {
     $text=$Value | ConvertTo-Json -Depth 30
     $bytes=(New-Object Text.UTF8Encoding($false)).GetBytes($text)
     $pending=$Path+'.'+[guid]::NewGuid().ToString('N')+'.pending'
-    $stream=[IO.File]::Open($pending,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
-    try { $stream.Write($bytes,0,$bytes.Length); $stream.Flush($true) } finally { $stream.Dispose() }
+    $stream=$null
     try {
+        $stream=[IO.File]::Open($pending,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+        $stream.Write($bytes,0,$bytes.Length); $stream.Flush($true); $stream.Dispose(); $stream=$null
         if([IO.File]::Exists($Path)) { [IO.File]::Replace($pending,$Path,[Management.Automation.Language.NullString]::Value) }
         else { [IO.File]::Move($pending,$Path) }
-    } finally { if([IO.File]::Exists($pending)) { [IO.File]::Delete($pending) } }
+    } finally { if($null -ne $stream) { $stream.Dispose() }; if([IO.File]::Exists($pending)) { [IO.File]::Delete($pending) } }
 }
 function Get-Sha([string]$Path) { (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash }
 function Get-StreamSha($Stream) {
@@ -64,8 +65,8 @@ function Assert-Request($Request) {
         if($Request.mode -eq 'ChangePassword' -and $old -ceq $new) { throw 'PasswordUnchanged' }
     } finally { $old=''; $new='' }
 }
-function Assert-NotCancelled([string]$RunDirectory) {
-    if([IO.File]::Exists((Join-Path $RunDirectory 'cancel'))) { throw 'Cancelled' }
+function Assert-NotCancelled([string]$RunDirectory,[string]$CancellationPath='') {
+    if([IO.File]::Exists((Join-Path $RunDirectory 'cancel')) -or ($CancellationPath -and [IO.File]::Exists($CancellationPath))) { throw 'Cancelled' }
 }
 function Get-EngineMutexName {
     'Global\ExcelPasswordSafe.Controller.'+[Security.Principal.WindowsIdentity]::GetCurrent().User.Value

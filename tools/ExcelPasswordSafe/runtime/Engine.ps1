@@ -3,7 +3,8 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)][string]$RequestPath,
-    [ValidateRange(30,3600)][int]$TimeoutSeconds=180
+    [ValidateRange(30,3600)][int]$TimeoutSeconds=180,
+    [string]$CancellationPath=''
 )
 . (Join-Path $PSScriptRoot 'Common.ps1')
 
@@ -21,7 +22,7 @@ $workerResultPath=Join-Path $runDir 'worker-result.json'
 foreach($reserved in @($resultPath,$progressPath,$statePath,$jobPath,$workerResultPath)) {
     if(Test-Path -LiteralPath $reserved) { throw 'RunAlreadyUsed' }
 }
-$record=[ordered]@{schemaVersion=1;status='Failed';category='';message='';path='';mode='';backup='';recovery='';sourceHash='';resultHash='';stage='Preflight';hresults='';time='';temp='';inputCopy=''}
+$record=[ordered]@{schemaVersion=1;status='Failed';category='';message='';path='';mode='';backup='';recovery='';recoveryRemoved=$false;sourceHash='';resultHash='';stage='Preflight';hresults='';time='';temp='';inputCopy=''}
 $mutex=$null; $locked=$false; $hold=$null; $worker=$null; $inputCopy=''; $temp=''; $preserveTemp=$false; $request=$null
 function Set-Progress([string]$Stage,[string]$Message) {
     $script:record.stage=$Stage
@@ -37,7 +38,7 @@ try {
     $record.mode=[string]$request.mode
     $record.path=Assert-LocalWorkbook ([string]$request.path)
     $record.sourceHash=[string]$request.expectedHash
-    Assert-NotCancelled $runDir
+    Assert-NotCancelled $runDir $CancellationPath
     $mutex=New-Object Threading.Mutex($false,(Get-EngineMutexName))
     try { $locked=$mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $locked=$true }
     if(-not $locked) { throw 'AnotherOperationRunning' }
@@ -49,12 +50,12 @@ try {
     if(Test-Path -LiteralPath $record.backup) { throw 'RunAlreadyUsed' }
     Set-Progress 'Backup' '원본을 백업하고 있습니다.'
     Save-State 'Planned'
-    Assert-NotCancelled $runDir
+    Assert-NotCancelled $runDir $CancellationPath
     $out=[IO.File]::Open($record.backup,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
     try { $hold.Position=0; $hold.CopyTo($out); $out.Flush($true) } finally { $out.Dispose(); $hold.Position=0 }
     if((Get-Sha $record.backup) -ne $record.sourceHash) { throw 'BackupChanged' }
     Save-State 'BackedUp'
-    Assert-NotCancelled $runDir
+    Assert-NotCancelled $runDir $CancellationPath
     $id=[guid]::NewGuid().ToString('N')
     $parent=[IO.Path]::GetDirectoryName($record.path)
     $inputCopy=Join-Path $parent ('.eps-'+$id+'-source'+$ext)
@@ -73,7 +74,7 @@ try {
     $worker=Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $arguments -PassThru -WindowStyle Hidden
     $watch=[Diagnostics.Stopwatch]::StartNew()
     while(-not $worker.WaitForExit(250)) {
-        if([IO.File]::Exists((Join-Path $runDir 'cancel'))) { Set-Progress 'Cancelling' '현재 Excel 확인이 끝나면 원본을 바꾸지 않고 취소합니다.' }
+        if([IO.File]::Exists((Join-Path $runDir 'cancel')) -or ($CancellationPath -and [IO.File]::Exists($CancellationPath))) { Set-Progress 'Cancelling' '현재 Excel 확인이 끝나면 원본을 바꾸지 않고 취소합니다.' }
         if($watch.Elapsed.TotalSeconds -ge $TimeoutSeconds) {
             # Terminate only the PowerShell child that this invocation started.
             $preserveTemp=$true
@@ -86,7 +87,7 @@ try {
     $r=Get-Content -LiteralPath $workerResultPath -Raw -Encoding UTF8 | ConvertFrom-Json
     for($wait=0;$wait -lt 20 -and @(Get-Process EXCEL -ErrorAction SilentlyContinue).Count;$wait++) { Start-Sleep -Milliseconds 250 }
     if(@(Get-Process EXCEL -ErrorAction SilentlyContinue).Count) { $preserveTemp=$true; throw 'ExcelStillRunning' }
-    Assert-NotCancelled $runDir
+    Assert-NotCancelled $runDir $CancellationPath
     $record.hresults=$r.hresults
     if($r.status -eq 'Skipped') { $record.status='Skipped'; $record.category=$r.category; Save-State 'Skipped' }
     elseif($r.status -ne 'Validated') { $record.category=$r.category; throw 'WorkerFailed' }
@@ -100,7 +101,7 @@ try {
         if((Get-Sha $temp) -ne $r.tempHash) { throw 'TempChanged' }
         if((Get-Sha $record.path) -ne $record.sourceHash -or (Get-StreamSha $hold) -ne $record.sourceHash) { throw 'SourceChanged' }
         if((Get-Sha $record.backup) -ne $record.sourceHash) { throw 'BackupChanged' }
-        Assert-NotCancelled $runDir
+        Assert-NotCancelled $runDir $CancellationPath
         $record.recovery=Join-Path $parent ('.eps-'+$id+'.recovery')
         $preserveTemp=$true
         Save-State 'CommitIntent'
@@ -131,13 +132,20 @@ try {
     }
     if($null -ne $hold) { $hold.Dispose() }
     if($null -ne $worker) { $worker.Dispose() }
-    foreach($secretPath in @($RequestPath,$jobPath)) { if([IO.File]::Exists($secretPath)) { try { [IO.File]::Delete($secretPath) } catch {} } }
+    foreach($secretPath in @($RequestPath,$jobPath)) { if([IO.File]::Exists($secretPath)) { try { [IO.File]::Delete($secretPath) } catch { $record.message='TemporaryCleanupIncomplete' } } }
     $request=$null
     if(-not $preserveTemp) {
         foreach($ownedPath in @($inputCopy,$temp)) {
             if($ownedPath -and [IO.File]::Exists($ownedPath)) {
                 try { [IO.File]::Delete($ownedPath) } catch { $record.message='TemporaryCleanupIncomplete' }
             }
+        }
+        if($record.status -eq 'Success' -and $record.recovery -and [IO.File]::Exists($record.recovery)) {
+            try {
+                if((Get-Sha $record.backup) -ne $record.sourceHash -or (Get-Sha $record.recovery) -ne $record.sourceHash -or (Get-Sha $record.path) -ne $record.resultHash) { throw 'RecoveryCleanupNotSafe' }
+                [IO.File]::Delete($record.recovery)
+                $record.recoveryRemoved=$true
+            } catch { $record.message='TemporaryCleanupIncomplete' }
         }
     }
     if($null -ne $mutex) { if($locked) { $mutex.ReleaseMutex() }; $mutex.Dispose() }

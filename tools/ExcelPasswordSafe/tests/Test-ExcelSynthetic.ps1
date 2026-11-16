@@ -49,7 +49,7 @@ function Invoke-Case([string]$Path,[string]$Case,[string]$Mode,[string]$Old,[str
     if($CancelDuringWorker) { $passed=$passed -and $cancelSent }
     if($ExpectedStatus -eq 'Success') {
         $state=Get-Content -LiteralPath (Join-Path $run 'state.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-        $passed=$passed -and (Get-Sha $r.backup) -eq $before -and (Get-Sha $r.recovery) -eq $before -and (Get-Sha $Path) -eq $r.resultHash -and $state.state -eq 'Committed'
+        $passed=$passed -and (Get-Sha $r.backup) -eq $before -and $r.recoveryRemoved -and -not [IO.File]::Exists($r.recovery) -and (Get-Sha $Path) -eq $r.resultHash -and $state.state -eq 'Committed'
     } else { $passed=$passed -and (Get-Sha $Path) -eq $before }
     $passed=$passed -and -not [IO.File]::Exists($request) -and -not [IO.File]::Exists((Join-Path $run 'worker-job.json'))
     $record=[pscustomobject]@{fixture=[IO.Path]::GetFileName($Path);case=$Case;passed=$passed;status=$r.status;category=$r.category;stage=$r.stage;hresults=$r.hresults;run=$run;sourceHash=$before;resultHash=Get-Sha $Path}
