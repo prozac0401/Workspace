@@ -162,6 +162,7 @@ namespace ExcelPasswordSafe
                 case "UnsupportedOrMismatchedFormat": return "확장자와 실제 파일 형식이 다르거나 지원하지 않는 구형 형식입니다. 원본을 유지했습니다.";
                 case "Excel4MacroSheetUnsupported": return "Excel 4.0 매크로 시트가 있는 파일은 지원하지 않습니다. 원본을 유지했습니다.";
                 case "WorkerTimeout": return "Excel 응답 시간이 지났습니다. 원본·백업·임시 파일과 남아 있는 Excel을 확인한 뒤 다시 시도하세요.";
+                case "WorkerSessionUnsafe": return "Excel 상태를 확인할 수 없어 중단했습니다. 실행 기록과 열린 Excel을 확인하세요.";
                 case "ComRegistrationOrLibrary": return "데스크톱 Excel을 시작할 수 없습니다. Excel 설치 상태를 확인하세요.";
                 case "CommitUncertain": return "저장 완료 여부가 불확실합니다. 자동으로 재시도하지 말고 백업·복구본·기록을 확인하세요.";
                 case "SignedWorkbookUnsupported": return "서명된 파일은 처리하지 않았습니다. 원본의 서명을 유지합니다.";

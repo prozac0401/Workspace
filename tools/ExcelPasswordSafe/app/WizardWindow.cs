@@ -64,7 +64,7 @@ namespace ExcelPasswordSafe
             var brand = new DockPanel { Margin = new Thickness(0, 0, 0, 14) };
             brand.Children.Add(new Image { Source = Icon, Width = 22, Height = 22, Margin = new Thickness(0, 0, 8, 0) });
             brand.Children.Add(new TextBlock { Text = "Excel 암호 관리", FontWeight = FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center, FontSize = 12 });
-            brand.Children.Add(new TextBlock { Text = "2", HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center, Foreground = Brush("#7C879D"), FontSize = 12 });
+            brand.Children.Add(new TextBlock { Text = WizardRules.DisplayVersion, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center, Foreground = Brush("#7C879D"), FontSize = 12 });
             top.Children.Add(brand);
             heading.FontSize = 23; heading.FontWeight = FontWeights.SemiBold; heading.TextWrapping = TextWrapping.Wrap;
             subtitle.FontSize = 12; subtitle.Foreground = Brush("#69758A"); subtitle.TextWrapping = TextWrapping.Wrap; subtitle.Margin = new Thickness(0, 7, 0, 14);

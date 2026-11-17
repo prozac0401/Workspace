@@ -12,8 +12,18 @@ $testExe = Join-Path $OutputDirectory 'AppTests.exe'
 & (Join-Path $framework 'csc.exe') /nologo /target:exe "/out:$testExe" "/r:$AppPath" $references (Join-Path $PSScriptRoot 'AppTests.cs')
 if($LASTEXITCODE -ne 0) { throw 'App test compile failed' }
 Copy-Item -LiteralPath $AppPath -Destination (Join-Path $OutputDirectory 'ExcelPasswordSafe.exe')
-& $testExe $OutputDirectory | Tee-Object -Variable appOutput
-if($LASTEXITCODE -ne 0) { throw 'App tests failed' }
+$stdout=Join-Path $OutputDirectory 'app-tests.log'
+$stderr=Join-Path $OutputDirectory 'app-tests-error.log'
+# Use explicit streams, as the Wizard harness does: inherited PowerShell 5.1
+# console handles can fail inside Framework Console.WriteLine during a run.
+$process=Start-Process -FilePath $testExe -ArgumentList ('"'+$OutputDirectory+'"') -PassThru -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+[void]$process.Handle
+try {
+    if(-not $process.WaitForExit(60000)) { throw 'App tests timed out; inspect the test process.' }
+    if($process.ExitCode -ne 0) { throw 'App tests failed; see app-tests-error.log' }
+} finally { $process.Dispose() }
+$appOutput=@(Get-Content -LiteralPath $stdout -Encoding UTF8)
+$appOutput | Write-Output
 $totalLine=@($appOutput | Where-Object { $_ -match '^PASS total=\d+$' })
 if($totalLine.Count -ne 1) { throw 'App tests did not produce a count' }
 $assertionCount=[int]($totalLine[0] -replace '^PASS total=','')+1

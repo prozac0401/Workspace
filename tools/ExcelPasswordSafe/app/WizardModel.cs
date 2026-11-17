@@ -43,11 +43,11 @@ namespace ExcelPasswordSafe
 
     public static class WizardRules
     {
-        public const string DisplayVersion = "2";
+        public static string DisplayVersion { get { return typeof(WizardRules).Assembly.GetName().Version.Major.ToString(System.Globalization.CultureInfo.InvariantCulture); } }
         public static bool NeedsInspection(string category)
         {
             return new[] { "CommitUncertain", "SourceChanged", "WorkerTimeout", "WorkerInterrupted", "WorkerCrashed",
-                "ExcelStillRunning", "ExcelOwnershipOrExistingProcess", "MissingChildResult", "InvalidChildResult",
+                "ExcelStillRunning", "WorkerSessionUnsafe", "ExcelOwnershipOrExistingProcess", "MissingChildResult", "InvalidChildResult",
                 "TemporaryCleanupIncomplete", "BackupChanged", "TempChanged", "SnapshotChanged", "MissingResult" }.Contains(category);
         }
         public static bool Retryable(string category)

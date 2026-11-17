@@ -82,7 +82,7 @@ public static class WizardTests
 
             Assert(WizardRules.RetryPaths(new[] { Item(first,"Failed","FileInUse"), Item(@"C:\unapproved-root","NeedsInspection","Unrecognized") }, approved).Length == 0,
                 "Any inspection state blocks the entire retry, including a backend-only root record");
-            string[] unsafeCategories = { "CommitUncertain", "SourceChanged", "WorkerTimeout", "WorkerInterrupted", "WorkerCrashed", "ExcelStillRunning",
+            string[] unsafeCategories = { "CommitUncertain", "SourceChanged", "WorkerTimeout", "WorkerInterrupted", "WorkerCrashed", "ExcelStillRunning", "WorkerSessionUnsafe",
                 "ExcelOwnershipOrExistingProcess", "MissingChildResult", "InvalidChildResult", "TemporaryCleanupIncomplete", "BackupChanged", "TempChanged", "SnapshotChanged", "MissingResult" };
             foreach (string category in unsafeCategories)
             {

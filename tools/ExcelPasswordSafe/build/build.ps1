@@ -1,13 +1,13 @@
 ﻿#requires -Version 5.1
 [CmdletBinding()]
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '2.0.0',
+    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '3.0.0',
     [string]$Wix,
     [switch]$SkipTests
 )
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
-if([version]$Version -lt [version]'2.0.0') { throw 'This source requires package version 2.0.0 or later. Use the preserved earlier source for an earlier version.' }
+if([version]$Version -lt [version]'3.0.0') { throw 'This source requires package version 3.0.0 or later. Use the preserved earlier source for an earlier version.' }
 $displayVersion=([version]$Version).Major.ToString()
 $toolRoot = Split-Path -Parent $PSScriptRoot
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $toolRoot '..\..'))
@@ -75,6 +75,9 @@ try {
         $ps = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-Core.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'core-tests')) (Join-Path $outRoot 'core-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-ControllerFailures.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'controller-faults')) (Join-Path $outRoot 'controller-faults.log')
+        Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-Signature.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'signature-tests')) (Join-Path $outRoot 'signature-tests.log')
+        Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-SessionController.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'session-tests')) (Join-Path $outRoot 'session-tests.log')
+        Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-WorkerSession.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'worker-session-tests')) (Join-Path $outRoot 'worker-session-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-Batch.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'batch-tests')) (Join-Path $outRoot 'batch-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-App.ps1'),'-AppPath',$exe,'-OutputDirectory',(Join-Path $outRoot 'app-tests')) (Join-Path $outRoot 'app-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-Wizard.ps1'),'-AppPath',$exe,'-OutputDirectory',(Join-Path $outRoot 'wizard-tests')) (Join-Path $outRoot 'wizard-tests.log')
@@ -82,7 +85,7 @@ try {
         $process = Start-Process -FilePath $exe -ArgumentList ('--smoke "'+$smoke+'"') -PassThru -WindowStyle Hidden
         if (-not $process.WaitForExit(60000)) { throw 'UI smoke did not finish in 60 seconds. Inspect the test process manually.' }
         if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath (Join-Path $smoke 'smoke-result.json'))) { throw 'UI smoke failed or produced no result.' }
-        $record.tests = 'Core/controller faults/batch/App/Wizard/UI smoke passed'
+        $record.tests = 'Core/controller faults/signature/session/worker session/batch/App/Wizard/UI smoke passed'
     }
     $files = @(Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullName)
     $fragment = New-Object Text.StringBuilder

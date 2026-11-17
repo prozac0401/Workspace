@@ -1,6 +1,6 @@
-﻿# ExcelPasswordSafe MSI 만들기
+# ExcelPasswordSafe MSI 만들기
 
-제품 표시 버전은 **2**이며 MSI 내부 버전은 **2.0.0**입니다. 코드 서명 상태와 실제 검증 범위는 빌드·배포 기록에 별도로 남깁니다.
+제품 표시 버전은 **3**이며 MSI 내부 버전은 **3.0.0**입니다. 코드 서명 상태와 실제 성능·패키지·게시 결과는 `docs/delivery/excel-password-safe-performance-20261117.md`에 별도로 남깁니다.
 
 Windows 10 2004 이상 x64, Windows PowerShell 5.1, .NET Framework 4.8의 C# 컴파일러와 WiX Toolset 4가 필요합니다. 스크립트는 저장소의 `.tools/wix/wix.exe`를 기본 사용합니다. 사용자는 개발 SDK나 WiX를 설치하지 않습니다. 프로그램을 실행할 PC에는 데스크톱 Microsoft Excel이 필요합니다.
 
@@ -10,11 +10,11 @@ Windows 10 2004 이상 x64, Windows PowerShell 5.1, .NET Framework 4.8의 C# 컴
 powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File tools/ExcelPasswordSafe/build/build.ps1
 ```
 
-실행마다 `artifacts/excel-password-safe/build-버전-시각-ID`를 새로 만듭니다. 기존 결과를 삭제하거나 덮어쓰지 않습니다. 앱 컴파일 → 핵심 시험 → 격리된 컨트롤러 장애 시험 → 폴더 일괄 처리 시험 → 앱 시험 → 위자드 재시도 계약 시험 → WPF 화면 렌더링 → MSI 생성 → MSI 표 검사 → 내장 파일 추출·해시 비교를 실행합니다. 빌드 도중 소스가 바뀌면 실패합니다. 실제 Excel 시험은 별도이며 Excel 실행 상태를 충돌시키지 않도록 순서대로 수행합니다.
+실행마다 `artifacts/excel-password-safe/build-버전-시각-ID`를 새로 만듭니다. 기존 결과를 삭제하거나 덮어쓰지 않습니다. 앱 컴파일 → 핵심 시험 → 격리된 컨트롤러 장애 시험 → 내용 서명 시험(`Test-Signature.ps1`) → 세션 제어 시험(`Test-SessionController.ps1`) → worker 프로토콜 시험(`Test-WorkerSession.ps1`) → 폴더 일괄 처리 시험 → 앱 시험 → 위자드 재시도 계약 시험 → WPF 화면 렌더링 → MSI 생성 → MSI 표 검사 → 내장 파일 추출·해시 비교를 실행합니다. 빌드 도중 소스가 바뀌면 실패합니다. 실제 Excel 시험은 별도이며 Excel 실행 상태를 충돌시키지 않도록 순서대로 수행합니다. 성능 비교와도 겹쳐 실행하지 않습니다.
 
-`build-result.json`에는 실제 결과와 미검증 범위를 기록합니다. `source-sha256.txt`, `msi-verification.json`, `*.log`, `ui-smoke`, `app-tests`, `wizard-tests`, `batch-tests`는 로컬 검증 자료입니다. 설치 파일에는 자물쇠 아이콘을 내장한 실행 파일·실행 설정·런타임 스크립트 4개(`BatchEngine.ps1` 포함)·사용 안내만 포함합니다. 업무 파일, 테스트 파일, 암호, 로그는 넣지 않습니다.
+`build-result.json`에는 실제 결과와 미검증 범위를 기록합니다. `source-sha256.txt`, `msi-verification.json`, `*.log`, `ui-smoke`, `app-tests`, `wizard-tests`, `batch-tests`, `signature-tests`, `session-tests`, `worker-session-tests`는 로컬 검증 자료입니다. 설치 파일에는 자물쇠 아이콘을 내장한 실행 파일·실행 설정·런타임 스크립트 4개(`BatchEngine.ps1` 포함)·사용 안내만 포함합니다. 업무 파일, 테스트 파일, 암호, 로그는 넣지 않습니다.
 
-기본 내부 버전은 2.0.0이며 결과 파일은 `ExcelPasswordSafe-2-win-x64.msi`입니다. 표시 버전은 내부 버전의 정수 주 버전을 사용합니다. `-SkipTests`는 패키지 구성만 확인할 때 사용합니다. 그 결과를 시험 통과 패키지로 표시하지 않습니다. `-Version 2.0.1`은 별도 버전의 MSI를 만듭니다. 실행 파일과 내장 매니페스트의 버전도 함께 지정합니다. 이전 산출물은 새 빌드가 덮어쓰지 않습니다. WiX가 별도 위치에 있으면 `-Wix 'WiX 실행 파일의 전체 경로'`를 지정합니다.
+기본·최소 내부 버전은 3.0.0이며 결과 파일은 `ExcelPasswordSafe-3-win-x64.msi`입니다. 앱 화면의 표시 버전도 빌드된 Assembly의 정수 주 버전에서 읽습니다. `-SkipTests`는 패키지 구성만 확인할 때 사용합니다. 그 결과를 시험 통과 패키지로 표시하지 않습니다. `-Version 3.0.1`은 별도 내부 버전의 MSI를 만듭니다. 실행 파일과 내장 매니페스트의 버전도 함께 지정합니다. 3보다 이전 버전은 보존된 당시 소스로 빌드하며 이전 산출물은 덮어쓰지 않습니다. WiX가 별도 위치에 있으면 `-Wix 'WiX 실행 파일의 전체 경로'`를 지정합니다.
 
 ## 설치하지 않고 MSI 검사하기
 
@@ -42,7 +42,7 @@ powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File tools/ExcelPassword
 
 기존 ExcelPasswordSafe 설치·메뉴·등록 정보·기본 설치 폴더가 하나라도 있으면 시험을 거부합니다. 시험은 한글과 공백을 포함한 `artifacts/excel-password-safe/installer-시각-ID/사용자 지정 경로`에 설치하고 끝나면 제거합니다. 다른 도구의 설치 상태나 파일 연결은 변경하지 않습니다.
 
-1.4.0에서 2로 올리는 시험은 보존된 1.4.0 MSI를 `-MsiPath`, 새 MSI를 `-UpgradeMsiPath`로 전달합니다. 이전 버전에는 배경 메뉴가 없어야 하고, 업그레이드 후 세 배경 명령과 확장자별 파일 하위 명령 3개가 추가되고 이전 파일 메뉴의 루트 `command`가 제거되어야 합니다. 복구·업그레이드 명령에 다른 위치를 지정해도 저장한 기존 설치 위치를 유지하는지 확인합니다. 제거 시 자기 메뉴만 없어져야 합니다. 기존 사용자가 설치한 제품을 시험 스크립트가 제거하거나 시험 설치로 대체하지 않습니다.
+2에서 3으로 올리는 시험은 보존된 버전 2 MSI를 `-MsiPath`, 새 MSI를 `-UpgradeMsiPath`로 전달합니다. 파일·선택 폴더·빈 공간의 18명령과 저장된 설치 위치를 유지해야 합니다. 이전 1.4.0→2 시험의 메뉴 추가·레거시 루트 명령 제거 결과는 당시 기록으로 보존합니다. 복구·업그레이드 명령에 다른 위치를 지정해도 저장한 기존 설치 위치를 유지하는지 확인합니다. 제거 시 자기 메뉴만 없어져야 합니다. 기존 사용자가 설치한 제품을 시험 스크립트가 제거하거나 시험 설치로 대체하지 않습니다.
 
 기본값은 배포 MSI 그대로 설치, 설치된 앱의 화면 렌더링, 누락 실행 파일 복구, 선택한 경우 업그레이드·다운그레이드 차단, 제거, 재설치를 확인합니다. 합성 파일·백업의 해시와 기본 파일 연결을 전후 비교합니다. 실제 탐색기 우클릭과 Excel 데이터 처리는 별도 시험이며 이 스크립트가 통과로 표시하지 않습니다.
 
