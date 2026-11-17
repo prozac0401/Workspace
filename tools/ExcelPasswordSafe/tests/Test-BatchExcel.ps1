@@ -1,6 +1,6 @@
 ﻿#requires -Version 5.1
 #requires -PSEdition Desktop
-param([Parameter(Mandatory=$true)][string]$EvidenceDirectory,[string]$RuntimeDirectory,[switch]$ExpectSessionReuse)
+param([Parameter(Mandatory=$true)][string]$EvidenceDirectory,[string]$RuntimeDirectory,[switch]$ExpectSessionReuse,[switch]$MixedBackends)
 $ErrorActionPreference='Stop'
 $toolRoot=Split-Path -Parent $PSScriptRoot
 if(-not $RuntimeDirectory) { $RuntimeDirectory=Join-Path $toolRoot 'runtime' }
@@ -14,6 +14,11 @@ $sourceRoot=Join-Path $EvidenceDirectory 'files'; [void][IO.Directory]::CreateDi
 $fixture=Join-Path $toolRoot 'upstream/1.1.0/ExcelPasswordSafe/tests/fixtures/picture_ooxml.xlsx'
 $paths=@((Join-Path $sourceRoot '첫째.xlsx'),(Join-Path $sourceRoot 'nested/둘째.xlsx'))
 foreach($path in $paths) { [IO.File]::Copy($fixture,$path) }
+if($MixedBackends) {
+    $legacy=Join-Path $sourceRoot 'legacy.xls'
+    [IO.File]::Copy((Join-Path $toolRoot 'upstream/1.1.0/ExcelPasswordSafe/tests/fixtures/picture_biff8.xls'),$legacy)
+    $paths=@($paths[0],$legacy,$paths[1])
+}
 $checks=New-Object 'System.Collections.Generic.List[object]'
 $measurements=New-Object 'System.Collections.Generic.List[object]'
 function Assert($Condition,[string]$Name) { $checks.Add([pscustomobject]@{name=$Name;passed=[bool]$Condition}); if(-not $Condition) { throw ('ASSERT '+$Name) } }
@@ -38,6 +43,7 @@ function Run-Batch([string]$Root,[string[]]$Files,[string]$Mode,[string]$Old,[st
         if(-not $ExpectSuccess) { Assert ((Get-Sha $item.path) -eq $hashes[$item.path]) 'wrong-password original remains byte identical' }
     }
     $excelIds=New-Object 'System.Collections.Generic.List[int]'
+    $directCount=0
     foreach($attemptDir in Get-ChildItem -LiteralPath $dir -Directory) {
         $recordPath=Join-Path $attemptDir.FullName 'result.json'
         if(-not [IO.File]::Exists($recordPath)) { continue }
@@ -45,19 +51,23 @@ function Run-Batch([string]$Root,[string[]]$Files,[string]$Mode,[string]$Old,[st
         $workerPath=Join-Path $attemptDir.FullName 'worker-result.json'
         if([IO.File]::Exists($workerPath)) {
             $workerRecord=Get-Content -LiteralPath $workerPath -Raw -Encoding UTF8 | ConvertFrom-Json
-            $excelIds.Add([int]$workerRecord.excelPid)
-            if($ExpectSessionReuse) { Assert ($workerRecord.sessionReady -eq $true -and $workerRecord.workbooksClosed -eq $true) ($Mode+' worker closed all job workbooks') }
+            if($record.PSObject.Properties['backend'] -and $record.backend -eq 'DirectOoxml') { $directCount++ }
+            else {
+                $excelIds.Add([int]$workerRecord.excelPid)
+                if($ExpectSessionReuse) { Assert ($workerRecord.sessionReady -eq $true -and $workerRecord.workbooksClosed -eq $true) ($Mode+' worker closed all job workbooks') }
+            }
         }
         foreach($field in @('temp','inputCopy','recovery')) { $owned=[string]$record.$field; Assert (-not $owned -or -not [IO.File]::Exists($owned)) ($Mode+' removed '+$field) }
         Assert (-not [IO.File]::Exists((Join-Path $attemptDir.FullName 'request.json')) -and -not [IO.File]::Exists((Join-Path $attemptDir.FullName 'worker-job.json'))) ($Mode+' secret IPC removed')
     }
-    if($ExpectSessionReuse) {
+    if($MixedBackends -and $ExpectSuccess) { Assert ($directCount -eq 2 -and $excelIds.Count -eq 1) ($Mode+' direct then Excel then direct in one batch') }
+    if($ExpectSessionReuse -and $excelIds.Count -gt 0) {
         Assert (@($excelIds | Select-Object -Unique).Count -eq 1) ($Mode+' one Excel instance across files and retries')
         $finished=Get-Content -LiteralPath (Join-Path $dir 'worker-session/finished.json') -Raw -Encoding UTF8 | ConvertFrom-Json
         Assert ($finished.status -eq 'Stopped' -and $finished.excelExited -eq $true -and $finished.workbooksClosed -eq $true) ($Mode+' session stopped cleanly')
     }
     Assert (@(Get-Process EXCEL -ErrorAction SilentlyContinue).Count -eq 0) ($Mode+' Excel exited after batch')
-    $measurements.Add([pscustomobject]@{mode=$Mode;files=$Files.Count;expectedSuccess=$ExpectSuccess;milliseconds=[Math]::Round($watch.Elapsed.TotalMilliseconds,2);excelInstances=@($excelIds | Select-Object -Unique).Count;status=$r.status})
+    $measurements.Add([pscustomobject]@{mode=$Mode;files=$Files.Count;expectedSuccess=$ExpectSuccess;milliseconds=[Math]::Round($watch.Elapsed.TotalMilliseconds,2);excelInstances=@($excelIds | Select-Object -Unique).Count;directAttempts=$directCount;status=$r.status})
     Write-Json $measurements.ToArray() (Join-Path $EvidenceDirectory 'timings.json')
     Write-Host ($Mode+' / '+$r.status+' / '+$Files.Count+' file(s)')
     return $r
@@ -82,6 +92,6 @@ try {
         if($null -ne $book) { $book.Close($false); Release-Com $book }; Release-Com $books
         if($null -ne $app) { $app.Quit(); Release-Com $app }; [GC]::Collect(); [GC]::WaitForPendingFinalizers()
     }
-    Write-Json @{status='PASS';assertions=$checks.Count;checks=$checks.ToArray();measurements=$measurements.ToArray();filesPerOperation=2;operations=@('Encrypt','ChangePassword','Decrypt');failedFileAttempts=3;reportExcelOpen='PASS';timestamp=[DateTime]::UtcNow.ToString('o')} (Join-Path $EvidenceDirectory 'batch-excel-results.json')
+    Write-Json @{status='PASS';assertions=$checks.Count;checks=$checks.ToArray();measurements=$measurements.ToArray();filesPerOperation=$paths.Count;operations=@('Encrypt','ChangePassword','Decrypt');failedFileAttempts=3;reportExcelOpen='PASS';timestamp=[DateTime]::UtcNow.ToString('o')} (Join-Path $EvidenceDirectory 'batch-excel-results.json')
     Write-Output "PASS: $($checks.Count) real Excel batch assertions; $EvidenceDirectory"
 } catch { Write-Json @{status='FAIL';checks=$checks.ToArray();error=$_.Exception.Message} (Join-Path $EvidenceDirectory 'batch-excel-results.json'); throw }

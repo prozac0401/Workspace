@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "name": "OfficeIMO raw Agile crypto and CFB subset",
+  "repository": "https://github.com/EvotecIT/OfficeIMO",
+  "commit": "45ce514916aabe4eb65c0190e6df75f827acdf21",
+  "license": "MIT",
+  "sourceVersion": "3.6.0 development",
+  "sourcePolicy": "Exact Git blob bytes; vendored originals are not edited",
+  "files": [
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.Core/Internal/OfficeEncryption.cs",
+      "upstreamPath": "OfficeIMO.Core/Internal/OfficeEncryption.cs",
+      "sha256": "36C4FE9C5F5937C301B98E39877C8987A2387E048FB35824388875D00097D800",
+      "bytes": 31445
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.Core/Internal/OfficeEncryption.AgileDescriptor.cs",
+      "upstreamPath": "OfficeIMO.Core/Internal/OfficeEncryption.AgileDescriptor.cs",
+      "sha256": "52D079EEC2F6FB03AD59075DDBA19DBFF156D4B744BC1F0998552158CC32999C",
+      "bytes": 4988
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.Core/Internal/OfficeEncryption.Integrity.cs",
+      "upstreamPath": "OfficeIMO.Core/Internal/OfficeEncryption.Integrity.cs",
+      "sha256": "4CF110F6D2531C5C02936823C0BEBC91B3C7D799BB09E63774436E925AF1329E",
+      "bytes": 1495
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.Core/Internal/OfficeEncryption.PasswordDerivation.cs",
+      "upstreamPath": "OfficeIMO.Core/Internal/OfficeEncryption.PasswordDerivation.cs",
+      "sha256": "7EB4EE017DB60D72B3A71664E6F291DE8FA12841A68C5EB783481A2C79FF8F4A",
+      "bytes": 6493
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.Core/Internal/OfficeBoundedMemoryStream.cs",
+      "upstreamPath": "OfficeIMO.Core/Internal/OfficeBoundedMemoryStream.cs",
+      "sha256": "621F16D07E3B662A4E0AC9F1BFB87D69C5E300E78BABE219BAE7B19A8B6AAE84",
+      "bytes": 4138
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.Core/Documents/OfficeInspectionResourceLimitException.cs",
+      "upstreamPath": "OfficeIMO.Core/Documents/OfficeInspectionResourceLimitException.cs",
+      "sha256": "C84235B0FC00535FD62DE789589C458BCAD999C1D8EEE092A7D25DA1CA5D9963",
+      "bytes": 1197
+    },
+    {
+      "path": "vendor/OfficeIMO/LICENSE",
+      "upstreamPath": "LICENSE",
+      "sha256": "96FD82DDF9AC4B16FA90DE88D74C05D751DFD4FBDA352665033A8809EB9DC6BF",
+      "bytes": 1063
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundDocumentDetector.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundDocumentDetector.cs",
+      "sha256": "5AF22BEDD06881EA7C624FC02A30C45A6D82C2811C9340C056A29816A799D082",
+      "bytes": 6322
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundFile.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundFile.cs",
+      "sha256": "AC8335E662D37A1BF1577FCD965A95473EFD98FBBC5C2DFB7C133BAA06BEB5E2",
+      "bytes": 833
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundFileEntry.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundFileEntry.cs",
+      "sha256": "EC35394DF196568ECD6917E6DB5D5615C7F67BD4D366F68C7C775EB21396E244",
+      "bytes": 1753
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.cs",
+      "sha256": "9ECBA0C65713DD59C6D60862C16087670D59E3472A897634CAA5173D2DCFED83",
+      "bytes": 35970
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.Inspection.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.Inspection.cs",
+      "sha256": "315D6115C013C12CDD023761289622B815600A890B8BB19B2DC3EEC02CA2A483",
+      "bytes": 13969
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.Selective.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.Selective.cs",
+      "sha256": "CED1B3CDD672F12A71B195682A9B536B23051B7303515740AA0305FF8ECF6DF2",
+      "bytes": 17214
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.Session.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.Session.cs",
+      "sha256": "2B615DEDD275D391F19FBA0D1BD65328EB305D6E51FCC20A5825F52D99DC6C84",
+      "bytes": 12288
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.SessionAllocation.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.SessionAllocation.cs",
+      "sha256": "7390A181C67C303BDB1870B173286EC9109A048E36C3479145C2EED3FF809BC1",
+      "bytes": 7233
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.Stream.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundFileReader.Stream.cs",
+      "sha256": "3FD0974BCEA1FA920BDAD37C07CF3E8C70542E4AF67380D52FED97670E92E847",
+      "bytes": 22059
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundFileWriter.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundFileWriter.cs",
+      "sha256": "01EE034A3D763F700756AA586CD5EB853F805D9A29DAA4B4E0F9792259874FC3",
+      "bytes": 36030
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compound/OfficeCompoundWriterLayout.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compound/OfficeCompoundWriterLayout.cs",
+      "sha256": "0993B213309D5BABAFEEA1A66EDDC088097D6B3B3FBA6117EE485A0245E4A9BF",
+      "bytes": 10635
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/ArgumentExceptionPolyfill.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/ArgumentExceptionPolyfill.cs",
+      "sha256": "0EC49286A279B39E41C8FFC0B807391EFB6D840AA94601ED2F288FB2383A6B5B",
+      "bytes": 1671
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/ArgumentNullExceptionPolyfill.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/ArgumentNullExceptionPolyfill.cs",
+      "sha256": "8325AD1FE65498686CC2263D621C48306E35C95DFB87214FE1C7C4912172974C",
+      "bytes": 894
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/ArgumentOutOfRangeExceptionPolyfill.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/ArgumentOutOfRangeExceptionPolyfill.cs",
+      "sha256": "C8F1CC3F901CBB3AC9BCA85E6322C4BFB755479D02974C798E7A75AA7E061EB3",
+      "bytes": 3511
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/EmbeddedAttributes.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/EmbeddedAttributes.cs",
+      "sha256": "6EE74987D3FC03396D550E379972BD35BB1BD679FCEF637A38516D7A49D971F7",
+      "bytes": 1196
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/LICENSE.txt",
+      "upstreamPath": "OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/LICENSE.txt",
+      "sha256": "534E3B1F3CF7FB21185FD47DBEEEE07ED02144A950F0285874E3609492BC4435",
+      "bytes": 1063
+    },
+    {
+      "path": "vendor/OfficeIMO/OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/ObjectDisposedExceptionPolyfill.cs",
+      "upstreamPath": "OfficeIMO.SharedSource/Compatibility/ArgumentExceptions/ObjectDisposedExceptionPolyfill.cs",
+      "sha256": "CD0A354FD9E765624E468B844E2383A40C40FF94C0618A958D65BF094E46EA44",
+      "bytes": 1070
+    }
+  ]
+}

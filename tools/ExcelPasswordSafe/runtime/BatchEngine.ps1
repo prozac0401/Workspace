@@ -33,6 +33,9 @@ function Assert-OutsideAppData([string]$Path) {
 function Get-BatchReason([string]$Category) {
     switch($Category) {
         'OpenFailedPossiblePasswordOrCorruption' { '암호를 확인하고 Excel에서 파일이 정상으로 열리는지 확인하세요.' }
+        'IntegrityCheckFailed' { '암호화 정보나 파일 내용이 손상되어 원본을 유지했습니다.' }
+        'InvalidPackage' { '파일 구조를 확인할 수 없습니다. Excel에서 정상으로 열리는지 확인하세요.' }
+        'PackageValidationFailed' { '파일 구조를 확인할 수 없습니다. Excel에서 정상으로 열리는지 확인하세요.' }
         'FileInUse' { '파일을 사용 중인 프로그램을 닫고 다시 시도하세요.' }
         'ReadOnlyAttribute' { '읽기 전용 파일입니다. 파일 속성을 확인하세요.' }
         'AccessDenied' { '파일 또는 폴더 접근 권한이 없습니다.' }

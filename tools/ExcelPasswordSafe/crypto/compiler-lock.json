@@ -1,0 +1,5 @@
+{
+  "sdkVersion": "10.0.401",
+  "cscSha256": "89C788F615634094CC441593D167D9FBA9A9F049A5D1DDEA87D4FDE222D6F42C",
+  "purpose": "Build-time Roslyn only; the installed product targets Windows .NET Framework 4.8 and does not ship or require this SDK."
+}
