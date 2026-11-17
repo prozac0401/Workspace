@@ -23,7 +23,7 @@ $workerResultPath=Join-Path $runDir 'worker-result.json'
 foreach($reserved in @($resultPath,$progressPath,$statePath,$jobPath,$workerResultPath)) {
     if(Test-Path -LiteralPath $reserved) { throw 'RunAlreadyUsed' }
 }
-$record=[ordered]@{schemaVersion=1;status='Failed';category='';message='';path='';mode='';backup='';recovery='';recoveryRemoved=$false;sourceHash='';resultHash='';stage='Preflight';hresults='';time='';temp='';inputCopy=''}
+$record=[ordered]@{schemaVersion=1;status='Failed';category='';message='';path='';mode='';backup='';recovery='';recoveryRemoved=$false;sourceHash='';resultHash='';stage='Preflight';hresults='';time='';temp='';inputCopy='';backend='Excel'}
 $mutex=$null; $locked=$false; $hold=$null; $worker=$null; $inputCopy=''; $temp=''; $preserveTemp=$false; $request=$null
 $sessionBusy=$false
 function Assert-SessionOwner {
@@ -79,6 +79,36 @@ try {
     $record.inputCopy=$inputCopy; $record.temp=$temp
     [IO.File]::Copy($record.backup,$inputCopy,$false)
     if((Get-Sha $inputCopy) -ne $record.sourceHash) { throw 'SnapshotChanged' }
+    # The direct codec only writes a new temporary file. Both backends converge
+    # on the same approval, backup, cancellation and atomic replacement checks.
+    # An unsupported format may use Excel; a password/integrity failure may not.
+    $r=$null
+    $cryptoAssembly=Join-Path $PSScriptRoot 'ExcelPasswordSafe.Crypto.dll'
+    if($ext -in @('.xlsx','.xlsm') -and [IO.File]::Exists($cryptoAssembly)) {
+        Set-Progress 'Worker' '암호와 파일 내용을 확인하고 있습니다.'
+        Save-State 'WorkerStarted'
+        if(-not ('ExcelPasswordSafe.Crypto.DirectCrypto' -as [type])) { Add-Type -Path $cryptoAssembly }
+        $old=''; $new=''
+        try {
+            $old=[string](Unprotect-Text $request.oldSecret); $new=[string](Unprotect-Text $request.newSecret)
+            $direct=[ExcelPasswordSafe.Crypto.DirectCrypto]::Operate($inputCopy,$temp,$ext,[string]$request.mode,$old,$new)
+        } finally { $old=''; $new='' }
+        Assert-SessionOwner
+        Assert-NotCancelled $runDir $CancellationPath
+        Assert-SessionIdle
+        if($direct.Supported) {
+            $record.backend='DirectOoxml'
+            $r=[pscustomobject]@{status=$direct.Status;category=$direct.Category;message=$direct.Message;hresults='';tempHash=''}
+            if($r.status -eq 'Validated') {
+                if([string]$direct.TempHash -notmatch '^[0-9a-fA-F]{64}$') { throw 'InvalidDirectValidation' }
+                $r.tempHash=[string]$direct.TempHash
+            }
+            Write-Json $r $workerResultPath
+            [IO.File]::Delete($RequestPath)
+            $request.oldSecret=''; $request.newSecret=''
+        } elseif([IO.File]::Exists($temp)) { throw 'UnexpectedDirectOutput' }
+    }
+    if($null -eq $r) {
     Write-Json @{mode=$request.mode;input=$inputCopy;backup=$record.backup;temp=$temp;result=$workerResultPath;oldSecret=$request.oldSecret;newSecret=$request.newSecret} $jobPath
     # Do not retain even DPAPI ciphertext longer than the job needs it.
     [IO.File]::Delete($RequestPath)
@@ -133,6 +163,7 @@ try {
     } else {
         for($wait=0;$wait -lt 20 -and @(Get-Process EXCEL -ErrorAction SilentlyContinue).Count;$wait++) { Start-Sleep -Milliseconds 250 }
         if(@(Get-Process EXCEL -ErrorAction SilentlyContinue).Count) { $preserveTemp=$true; throw 'ExcelStillRunning' }
+    }
     }
     Assert-SessionOwner
     Assert-NotCancelled $runDir $CancellationPath

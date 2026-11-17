@@ -96,7 +96,14 @@ function Check-Menus([bool]$Present) {
         Check 'installed batch engine present' (Test-Path -LiteralPath (Join-Path $install 'runtime\BatchEngine.ps1'))
     }
     }
-    if($Present) { Check 'remembered custom installation path' ((Get-Item -LiteralPath $stateKey).GetValue('InstallFolder').TrimEnd('\') -ieq $install.TrimEnd('\')) }
+    if($Present) {
+        Check 'remembered custom installation path' ((Get-Item -LiteralPath $stateKey).GetValue('InstallFolder').TrimEnd('\') -ieq $install.TrimEnd('\'))
+        if($menuVersion -ge [version]'4.0.0') {
+            Check 'installed direct crypto DLL present' (Test-Path -LiteralPath (Join-Path $install 'runtime\ExcelPasswordSafe.Crypto.dll'))
+            Check 'installed third-party notices present' (Test-Path -LiteralPath (Join-Path $install 'THIRD-PARTY-NOTICES.txt'))
+            Check 'installed direct crypto assembly version matches product' ([Reflection.AssemblyName]::GetAssemblyName((Join-Path $install 'runtime\ExcelPasswordSafe.Crypto.dll')).Version.ToString() -ceq ($menuVersion.ToString()+'.0'))
+        }
+    }
 }
 function Check-Preserved {
     Check 'business sentinel preserved' ((Get-FileHash -LiteralPath $business -Algorithm SHA256).Hash -eq $businessHash)

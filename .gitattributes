@@ -12,3 +12,4 @@ tools/calendar/vendor/manifest.json text eol=lf
 *.ico binary
 tools/ExcelSmartListCompare/evidence/rc10/*.json text eol=lf
 tools/ExcelSmartListCompare/installer/RC10-Payload.json text eol=lf
+tools/ExcelPasswordSafe/crypto/vendor/** -text

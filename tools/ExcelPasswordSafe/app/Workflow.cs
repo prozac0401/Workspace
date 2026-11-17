@@ -169,6 +169,8 @@ namespace ExcelPasswordSafe
                 case "SharedWorkbookUnsupported": return "공유 통합 문서는 지원하지 않습니다. 원본을 유지했습니다.";
                 case "WriteReservedUnsupported": return "쓰기 암호가 있는 파일은 지원하지 않습니다. 원본을 유지했습니다.";
                 case "ValidationFailed": return "저장 후 확인을 통과하지 못했습니다. 원본을 바꾸지 않았습니다. 백업·기록을 확인하세요.";
+                case "IntegrityCheckFailed": return "파일의 암호화 정보나 내용이 손상되어 처리하지 않았습니다. 원본 또는 백업을 확인하세요.";
+                case "InvalidPackage": case "PackageValidationFailed": return "파일 구조를 확인할 수 없어 처리하지 않았습니다. Excel에서 정상으로 열리는지 확인하세요.";
                 default: return "작업을 완료하지 못했습니다. 백업·기록의 확인 코드를 확인하세요.";
             }
         }

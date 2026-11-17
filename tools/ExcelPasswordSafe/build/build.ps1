@@ -1,13 +1,14 @@
 ﻿#requires -Version 5.1
 [CmdletBinding()]
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '3.0.0',
+    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '4.0.0',
     [string]$Wix,
+    [string]$Dotnet,
     [switch]$SkipTests
 )
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
-if([version]$Version -lt [version]'3.0.0') { throw 'This source requires package version 3.0.0 or later. Use the preserved earlier source for an earlier version.' }
+if([version]$Version -lt [version]'4.0.0') { throw 'This source requires package version 4.0.0 or later. Use the preserved earlier source for an earlier version.' }
 $displayVersion=([version]$Version).Major.ToString()
 $toolRoot = Split-Path -Parent $PSScriptRoot
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $toolRoot '..\..'))
@@ -16,6 +17,8 @@ $compiler = Join-Path $framework 'csc.exe'
 if (-not (Test-Path -LiteralPath $compiler)) { throw 'The Windows .NET Framework 4.8 x64 compiler is required.' }
 if (-not $Wix) { $Wix = Join-Path $repoRoot '.tools\wix\wix.exe' }
 $Wix = (Resolve-Path -LiteralPath $Wix).Path
+if (-not $Dotnet) { $Dotnet = Join-Path $repoRoot '.tools\dotnet\dotnet.exe' }
+$Dotnet = (Resolve-Path -LiteralPath $Dotnet).Path
 $runId = (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [guid]::NewGuid().ToString('N').Substring(0,8)
 $outRoot = Join-Path $repoRoot ('artifacts\excel-password-safe\build-' + $Version + '-' + $runId)
 $stage = Join-Path $outRoot 'package'
@@ -34,7 +37,7 @@ function Component-Guid([string]$RelativePath) {
     return ([guid]::new($guidBytes)).ToString('D')
 }
 function Source-Stamp {
-    $inputs=@(Get-ChildItem -LiteralPath (Join-Path $toolRoot 'app'),(Join-Path $toolRoot 'runtime'),(Join-Path $toolRoot 'build'),(Join-Path $toolRoot 'installer'),(Join-Path $toolRoot 'tests'),(Join-Path $toolRoot 'assets') -Recurse -File)
+    $inputs=@(Get-ChildItem -LiteralPath (Join-Path $toolRoot 'app'),(Join-Path $toolRoot 'runtime'),(Join-Path $toolRoot 'build'),(Join-Path $toolRoot 'installer'),(Join-Path $toolRoot 'tests'),(Join-Path $toolRoot 'assets'),(Join-Path $toolRoot 'crypto') -Recurse -File)
     $inputs += Get-Item -LiteralPath (Join-Path $toolRoot 'README.md')
     return (@($inputs | Sort-Object FullName | ForEach-Object { $_.FullName.Substring($toolRoot.Length+1)+' '+(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }) -join "`n")
 }
@@ -53,6 +56,11 @@ function Invoke-Checked([string]$File,[string[]]$Arguments,[string]$Log) {
 }
 try {
     $sourceBefore=Source-Stamp
+    $cryptoOutput=Join-Path $outRoot 'crypto-build'
+    & (Join-Path $toolRoot 'crypto\build.ps1') -OutputDirectory $cryptoOutput -Version $Version -Dotnet $Dotnet | Out-File -LiteralPath (Join-Path $outRoot 'crypto-build.log') -Encoding utf8
+    Copy-Item -LiteralPath (Join-Path $cryptoOutput 'ExcelPasswordSafe.Crypto.dll') -Destination (Join-Path $runtime 'ExcelPasswordSafe.Crypto.dll')
+    Copy-Item -LiteralPath (Join-Path $toolRoot 'crypto\THIRD-PARTY-NOTICES.txt') -Destination (Join-Path $stage 'THIRD-PARTY-NOTICES.txt')
+    $record.cryptoBuild=Get-Content -LiteralPath (Join-Path $cryptoOutput 'crypto-build.json') -Raw | ConvertFrom-Json
     $sources = @(Get-ChildItem -LiteralPath (Join-Path $toolRoot 'app') -Filter '*.cs' -File | Sort-Object Name)
     if (-not $sources.Count) { throw 'No app/*.cs source files were found.' }
     $references = @('System.dll','System.Core.dll','System.Security.dll','System.Web.Extensions.dll','System.Xaml.dll','System.Xml.dll','System.Drawing.dll','System.Windows.Forms.dll') | ForEach-Object { '/reference:' + (Join-Path $framework $_) }
@@ -75,6 +83,9 @@ try {
         $ps = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-Core.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'core-tests')) (Join-Path $outRoot 'core-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-ControllerFailures.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'controller-faults')) (Join-Path $outRoot 'controller-faults.log')
+        Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-DirectController.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'direct-controller-tests')) (Join-Path $outRoot 'direct-controller-tests.log')
+        Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-PackageGuard.ps1'),'-OutputDirectory',(Join-Path $outRoot 'package-guard-tests'),'-Dotnet',$Dotnet) (Join-Path $outRoot 'package-guard-tests.log')
+        Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'crypto\Test-DirectCrypto.ps1'),'-AssemblyPath',(Join-Path $runtime 'ExcelPasswordSafe.Crypto.dll'),'-EvidenceDirectory',(Join-Path $outRoot 'direct-crypto-tests')) (Join-Path $outRoot 'direct-crypto-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-Signature.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'signature-tests')) (Join-Path $outRoot 'signature-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-SessionController.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'session-tests')) (Join-Path $outRoot 'session-tests.log')
         Invoke-Checked $ps @('-NoProfile','-NonInteractive','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $toolRoot 'tests\Test-WorkerSession.ps1'),'-EvidenceDirectory',(Join-Path $outRoot 'worker-session-tests')) (Join-Path $outRoot 'worker-session-tests.log')
@@ -85,7 +96,7 @@ try {
         $process = Start-Process -FilePath $exe -ArgumentList ('--smoke "'+$smoke+'"') -PassThru -WindowStyle Hidden
         if (-not $process.WaitForExit(60000)) { throw 'UI smoke did not finish in 60 seconds. Inspect the test process manually.' }
         if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath (Join-Path $smoke 'smoke-result.json'))) { throw 'UI smoke failed or produced no result.' }
-        $record.tests = 'Core/controller faults/signature/session/worker session/batch/App/Wizard/UI smoke passed'
+        $record.tests = 'Core/controller faults/direct controller/package guard/direct crypto/signature/session/worker session/batch/App/Wizard/UI smoke passed'
     }
     $files = @(Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullName)
     $fragment = New-Object Text.StringBuilder

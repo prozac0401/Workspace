@@ -169,7 +169,7 @@ try {
         $label=$pair[0]; $sourceRuntime=$pair[1]
         $runtime=Join-Path $EvidenceDirectory ($label+'-runtime'); [void][IO.Directory]::CreateDirectory($runtime)
         $hashes=@{}
-        foreach($file in Get-ChildItem -LiteralPath $sourceRuntime -File -Filter '*.ps1') { [IO.File]::Copy($file.FullName,(Join-Path $runtime $file.Name)); $hashes[$file.Name]=Get-Sha (Join-Path $runtime $file.Name) }
+        foreach($file in Get-ChildItem -LiteralPath $sourceRuntime -File | Where-Object { $_.Extension -in @('.ps1','.dll') }) { [IO.File]::Copy($file.FullName,(Join-Path $runtime $file.Name)); $hashes[$file.Name]=Get-Sha (Join-Path $runtime $file.Name) }
         $runtimeRecords.Add(@{label=$label;source=$sourceRuntime;files=$hashes})
     }
     # Freeze both runtime snapshots before any Excel operation. A single run is

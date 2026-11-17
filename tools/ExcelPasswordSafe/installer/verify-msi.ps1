@@ -79,8 +79,18 @@ try {
     $names=@($files | ForEach-Object { ($_[0] -split '\|')[-1] } | Sort-Object)
     $expected=@('Common.ps1','Engine.ps1','ExcelPassword.Worker.ps1','ExcelPasswordSafe.exe','ExcelPasswordSafe.exe.config','README.md')
     if($supportsFolder) { $expected+='BatchEngine.ps1' }
+    if([version]$properties['ProductVersion'] -ge [version]'4.0.0') { $expected+=@('ExcelPasswordSafe.Crypto.dll','THIRD-PARTY-NOTICES.txt') }
     $expected=@($expected | Sort-Object)
     if(($names -join '|') -cne ($expected -join '|')) { throw ('Unexpected MSI payload: '+($names -join ', ')) }
+    if([version]$properties['ProductVersion'] -ge [version]'4.0.0') {
+        $componentDirectories=@{}
+        foreach($row in (Query 'SELECT `Component`, `Directory_` FROM `Component`' 2)) { $componentDirectories[$row[0]]=$row[1] }
+        foreach($row in (Query 'SELECT `FileName`, `Component_` FROM `File`' 2)) {
+            $name=($row[0] -split '\|')[-1]
+            $expectedDirectory=if($name -eq 'ExcelPasswordSafe.Crypto.dll' -or $name -like '*.ps1') { 'RUNTIMEDIR' } else { 'INSTALLFOLDER' }
+            if($componentDirectories[$row[1]] -cne $expectedDirectory) { throw ('Unexpected installed payload directory: '+$name) }
+        }
+    }
     $tables=Query 'SELECT `Name` FROM `_Tables`' 1
     if(@($tables | Where-Object { $_[0] -eq 'RemoveRegistry' }).Count) {
         $removals=Query 'SELECT `Root`, `Key`, `Name` FROM `RemoveRegistry`' 3
