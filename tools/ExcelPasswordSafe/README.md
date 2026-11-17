@@ -1,4 +1,4 @@
-# ExcelPasswordSafe 4
+# ExcelPasswordSafe 5
 
 탐색기에서 Excel 파일·폴더의 **열기 암호를 설정·해제·변경**합니다. 작은 창에서 필요한 암호를 입력하고 진행 상황과 결과를 차례로 확인합니다.
 
@@ -53,17 +53,21 @@ Windows 11 메뉴는 **더 많은 옵션 표시** 안에 있습니다. 폴더 �
 
 ‘Excel 상태를 확인할 수 없어 중단했습니다’가 나오면 실행 기록과 열린 Excel을 먼저 확인하세요. 이 상태에서는 안전 여부를 확인하기 전 자동·수동 재시도를 제공하지 않습니다.
 
-설치 실패 후 앱 항목만 남거나 재설치해도 메뉴가 없으면 **같은 MSI를 다시 열어 프로그램 제거 후 재설치**하세요. 레지스트리나 Windows 보안 설정을 직접 바꾸지 마세요. 제거는 **Windows 설정 → 앱 → 설치된 앱 → ExcelPasswordSafe 4 → 제거**입니다. 프로그램과 자기 메뉴만 제거하고 문서·기본 연결·백업·보고서는 보존합니다.
+설치 실패 후 앱 항목만 남거나 재설치해도 메뉴가 없으면 **같은 MSI를 다시 열어 프로그램 제거 후 재설치**하세요. 레지스트리나 Windows 보안 설정을 직접 바꾸지 마세요. 제거는 **Windows 설정 → 앱 → 설치된 앱 → ExcelPasswordSafe 5 → 제거**입니다. 프로그램과 자기 메뉴만 제거하고 문서·기본 연결·백업·보고서는 보존합니다.
 
 ## 소스와 빌드
 
-버전 4는 작은 파일 하나의 지연을 줄이기 위해 `.xlsx`·`.xlsm`에 직접 처리 경로를 추가합니다. 64MiB 이하의 지원 OOXML·Agile 암호 조합에 적용하며, 새 암호 재복호화·전체 패키지 바이트 비교·무결성과 잘못된 암호 거절을 확인합니다. `.xls`·`.xlsb`, 큰 파일이나 지원 밖 암호 조합은 기존 Excel 경로를 사용합니다. 손상·암호 오류·무결성 실패를 다른 경로로 우회하지 않습니다. 직접 검사에는 ZIP 파트 10,000개·총 비압축 256MiB·메타데이터 XML 16MiB 제한이 있으며 이를 초과하거나 구조가 잘못된 파일은 원본을 유지하고 실패로 표시합니다.
+`.xlsx`·`.xlsm`의 직접 처리는 64MiB 이하의 지원 OOXML·Agile 암호 조합에 적용하며, 새 암호 재복호화·전체 패키지 바이트 비교·무결성과 잘못된 암호 거절을 확인합니다. `.xls`·`.xlsb`, 큰 파일이나 지원 밖 암호 조합은 기존 Excel 경로를 사용합니다. 손상·암호 오류·무결성 실패를 다른 경로로 우회하지 않습니다. 직접 검사에는 ZIP 파트 10,000개·총 비압축 256MiB·메타데이터 XML 16MiB 제한이 있으며 이를 초과하거나 구조가 잘못된 파일은 원본을 유지하고 실패로 표시합니다.
 
-Excel이 필요한 폴더 작업은 프로그램이 소유한 Excel 하나를 재사용합니다. 파일별 백업·검증·원자 교체와 최대 3회 안전한 재시도는 두 경로에서 유지합니다. 실제 단일 파일 시간과 검증 범위는 `docs/delivery/excel-password-safe-single-file-20261117.md`에 기록하며, 버전 3의 이전 수치를 새 경로의 성능으로 사용하지 않습니다.
+Excel이 필요한 폴더 작업은 프로그램이 소유한 Excel 하나를 재사용합니다. 파일별 백업·검증·원자 교체와 최대 3회 안전한 재시도는 두 경로에서 유지합니다.
 
-`app/`은 단계형 WPF 화면, `assets/`는 제품 아이콘, `runtime/`은 파일·폴더 엔진과 Excel worker, `crypto/`는 직접 암복호화와 읽기 전용 패키지 검사입니다. OfficeIMO의 고정 소스와 MIT 라이선스는 `crypto/THIRD-PARTY-NOTICES.txt`에 기록하며 설치본에도 고지를 포함합니다. `build/`·`installer/`는 제작·설치 검사, `tests/`는 합성 시험, `upstream/1.1.0/`은 수정하지 않은 첨부 원본입니다. 현재 근거는 `docs/delivery/excel-password-safe-single-file-20261117.md`, 버전 3의 당시 근거는 `docs/delivery/excel-password-safe-performance-20261117.md`에 구분합니다. 로컬 진단·사용자 기록·업무 자료는 배포하지 않습니다.
+버전 5는 암호 계산 안에서 Windows의 SHA 객체를 재사용하며 기존 100,000회 반복, 원본 백업·암호·무결성·전체 내용 검증을 유지합니다. 같은 작은 파일을 작업별로 3쌍씩 비교한 전체 엔진 시간의 중앙값은 설정 4.45→3.61초, 해제 3.76→3.03초, 변경 6.65→3.61초였습니다. 한 PC의 합성 표본이며 모든 파일의 보장 시간은 아닙니다. 사용 방법은 같으며 측정 조건과 최종 검증 범위는 [추가 지연 개선 기록](https://github.com/prozac0401/Workspace/blob/excel-password-safe-v5/docs/delivery/excel-password-safe-latency-20261117.md)을 참고하세요.
+
+`app/`은 단계형 WPF 화면, `assets/`는 제품 아이콘, `runtime/`은 파일·폴더 엔진과 Excel worker, `crypto/`는 직접 암복호화와 읽기 전용 패키지 검사입니다. OfficeIMO의 고정 소스와 MIT 라이선스는 `crypto/THIRD-PARTY-NOTICES.txt`에 기록하며 설치본에도 고지를 포함합니다. `build/`·`installer/`는 제작·설치 검사, `tests/`는 합성 시험, `upstream/1.1.0/`은 수정하지 않은 첨부 원본입니다. 현재 근거는 `docs/delivery/excel-password-safe-latency-20261117.md`, 버전 4의 당시 근거는 `docs/delivery/excel-password-safe-single-file-20261117.md`에 구분합니다. 로컬 진단·사용자 기록·업무 자료는 배포하지 않습니다.
 
 .NET Framework 4.8 참조와 WiX 4, `crypto/compiler-lock.json`의 고정 .NET SDK/Roslyn 컴파일러를 준비한 뒤 저장소 루트에서 실행합니다. 기본 위치는 `.tools/wix/wix.exe`, `.tools/dotnet/dotnet.exe`이며 다른 위치는 빌드의 `-Dotnet` 인수로 전달합니다. 설치된 제품의 직접 처리에는 SDK·Python·NuGet runtime이 필요하지 않습니다.
+
+KDF 구현은 Windows 시스템 `bcrypt.dll`을 사용합니다. vendor 원본은 보존하고 `crypto/kdf-patch.json`으로 해시가 고정된 빌드 사본의 호출 하나만 연결합니다. 적용 내용과 원본 MIT 고지는 설치본의 제3자 고지에 포함합니다.
 
 ```powershell
 powershell.exe -NoProfile -STA -File tools/ExcelPasswordSafe/build/build.ps1

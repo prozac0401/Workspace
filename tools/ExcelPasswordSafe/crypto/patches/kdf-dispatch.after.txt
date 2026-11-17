@@ -1,0 +1,2 @@
+                return ExcelPasswordSafe.Crypto.NativePasswordHash.Derive(initialInput, spinCount,
+                    hashName, cancellationToken);

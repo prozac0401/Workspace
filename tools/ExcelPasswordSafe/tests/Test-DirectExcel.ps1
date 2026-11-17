@@ -1,7 +1,7 @@
 ﻿#requires -Version 5.1
 #requires -PSEdition Desktop
 [CmdletBinding()]
-param([Parameter(Mandatory=$true)][string]$RuntimeDirectory,[Parameter(Mandatory=$true)][string]$EvidenceDirectory)
+param([Parameter(Mandatory=$true)][string]$RuntimeDirectory,[Parameter(Mandatory=$true)][string]$EvidenceDirectory,[switch]$SmallOnly)
 $ErrorActionPreference='Stop'
 $toolRoot=Split-Path -Parent $PSScriptRoot
 . (Join-Path $RuntimeDirectory 'Common.ps1')
@@ -76,6 +76,7 @@ $xlsx=Join-Path $EvidenceDirectory 'normal.xlsx'
 $xlsm=Join-Path $EvidenceDirectory 'macro.xlsm'
 $strict=Join-Path $EvidenceDirectory 'strict.xlsx'
 [IO.File]::Copy((Join-Path $fixtures 'picture_ooxml.xlsx'),$xlsx)
+if(-not $SmallOnly) {
 [IO.File]::Copy((Join-Path $fixtures 'picture_vba.xlsm'),$xlsm)
 $null=With-Excel $xlsx '' $strict 61 ''
 # Minimal, valid OOXML checks CFB mini-stream interoperability below 4096 bytes.
@@ -92,7 +93,9 @@ $parts=@{
 $zip=[IO.Compression.ZipFile]::Open($tiny,[IO.Compression.ZipArchiveMode]::Create)
 try { foreach($key in $parts.Keys) { $entry=$zip.CreateEntry($key);$writer=New-Object IO.StreamWriter($entry.Open(),(New-Object Text.UTF8Encoding($false)));try{$writer.Write($parts[$key])}finally{$writer.Dispose()} } } finally { $zip.Dispose() }
 Check ((Get-Item -LiteralPath $tiny).Length -lt 4096) 'tiny fixture is under mini-stream threshold'
-foreach($path in @($xlsx,$xlsm,$strict,$tiny)) {
+}
+$testFiles=if($SmallOnly){@($xlsx)}else{@($xlsx,$xlsm,$strict,$tiny)}
+foreach($path in $testFiles) {
     $original=Get-Sha $path
     $baseline=With-Excel $path ''
     Operate $path 'Encrypt' '' 'Test한글42!'
@@ -114,5 +117,5 @@ foreach($path in @($xlsx,$xlsm,$strict,$tiny)) {
     $opened=With-Excel $excelEncrypted ''
     Check ($opened.signature -ceq $baseline.signature -and -not $opened.hasPassword) 'direct backend decrypts Excel-produced encryption'
 }
-Write-Json @{status='PASS';count=$checks.Count;checks=$checks.ToArray();timings=$timings.ToArray();runtime=@(Get-ChildItem -LiteralPath $RuntimeDirectory -File | ForEach-Object {@{name=$_.Name;sha256=(Get-Sha $_.FullName)}})} (Join-Path $EvidenceDirectory 'direct-excel-results.json')
+Write-Json @{status='PASS';scope=$(if($SmallOnly){'normal xlsx only'}else{'normal xlsx, macro xlsm, Strict xlsx, tiny xlsx'});count=$checks.Count;checks=$checks.ToArray();timings=$timings.ToArray();runtime=@(Get-ChildItem -LiteralPath $RuntimeDirectory -File | ForEach-Object {@{name=$_.Name;sha256=(Get-Sha $_.FullName)}})} (Join-Path $EvidenceDirectory 'direct-excel-results.json')
 Write-Output ('PASS: '+$checks.Count+' real Excel interoperability checks; '+$EvidenceDirectory)

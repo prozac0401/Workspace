@@ -1,0 +1,2 @@
+                return DerivePasswordHashLegacy(initialInput, spinCount,
+                    hashName, cancellationToken);

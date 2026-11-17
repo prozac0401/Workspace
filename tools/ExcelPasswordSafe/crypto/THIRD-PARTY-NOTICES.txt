@@ -1,3 +1,5 @@
+Local build adaptation: vendored originals remain byte-exact. The build applies the recorded net48 KDF dispatch in a generated copy (see kdf-patch.json) to use Windows reusable SHA handles. The original MIT license and attribution below are retained.
+
 ExcelPasswordSafe direct OOXML codec third-party notices
 
 OfficeIMO selected source files are included unchanged from:
