@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "net48-reusable-windows-kdf",
+  "upstreamCommit": "45ce514916aabe4eb65c0190e6df75f827acdf21",
+  "sourcePath": "vendor/OfficeIMO/OfficeIMO.Core/Internal/OfficeEncryption.PasswordDerivation.cs",
+  "sourceSha256": "7EB4EE017DB60D72B3A71664E6F291DE8FA12841A68C5EB783481A2C79FF8F4A",
+  "beforePath": "patches/kdf-dispatch.before.txt",
+  "beforeSha256": "25BBCBA2851C70EF7B67AD0039F9763BBB840E4AD2D1C96AE26DD1AA5CC7F5BD",
+  "afterPath": "patches/kdf-dispatch.after.txt",
+  "afterSha256": "5471F21A190C1C6E79072BD4B50A660E0C29DFEF415D61B778F9E008352E7A5A",
+  "patchedSha256": "B672F5B919DE14F847A82235564B6384429F288934AB64D1B86EB6B221B929D1",
+  "scope": "Replace only the NET48 legacy KDF dispatch in a generated build copy. Vendored sources remain byte-exact; iteration count, input order, cipher, HMAC and verification calls remain unchanged."
+}
