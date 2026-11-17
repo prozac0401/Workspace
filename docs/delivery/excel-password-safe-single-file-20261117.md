@@ -117,6 +117,8 @@ OfficeIMO 원본 commit `45ce514916aabe4eb65c0190e6df75f827acdf21`의 raw Agile/
 
 ## 패키지와 게시 확인
 
+최종 stage를 포함한 `git diff --cached --check`에서는 새 `DirectCrypto.cs`, `Test-DirectCrypto.ps1`, `CryptoFixtureTools.cs`의 파일 끝 빈 줄 경고 3건이 있었다. 앞선 tracked 문서/변경 검사 PASS와 구분한다. 동작과 무관한 서식 경고이며 검증한 패키지의 소스 바이트를 보존했다.
+
 `build-4.0.0-20261117-205848-324b0e28`의 MSI는 보완 전 후보이며 최종 게시 자산에서 제외한다. 253,952바이트, SHA-256 `46AD544CA319A7CA8D9C996B7F11CB448C5E9B6303EA4C9643882C0C0683DF54`이고 DLL `216E5725…EA4EF0`를 포함했다. 9개 내장 파일의 해시와 HKCU 6메뉴 루트·18명령·설치 경로 정적 검사는 PASS였다. 빌드의 `-SkipTests`/`tests=NotRun`, `installerLifecycle=NotRun`, `explorerClick=NotRun`, `Unsigned`, `productionRelease=false`는 그대로 보존한다. 별도 시험을 이 빌드 내부에서 모두 실행한 것으로 표시하지 않는다.
 
 보완 후 현재 패키지는 `build-4.0.0-20261117-210736-5995acbb`다. `ExcelPasswordSafe-4-win-x64.msi`는 253,952바이트, SHA-256 `C71A5F8A989E3CF6A5182BA5C418BF0CFC4104453C123F48B13C035C56B4C267`이다. DLL SHA-256은 `E5629EDF466C6A4D972CB37226CACC54989092C0B74BB9AC91AF76E3EBAC6301`, EXE는 `C71E9954FCE41781FFC9B0E64B751D0B07B7EDF836EC63869FF04B758FCCE32D`다. 내장 파일 9개의 추출 해시와 6메뉴 루트·18명령 정적 검사가 PASS다. `-SkipTests`로 제작하여 빌드 자체 `tests=NotRun`을 유지하고 위 별도 시험과 연결한다. 새 MSI의 실제 수명주기·Explorer 클릭은 `NotRun`, 서명은 `Unsigned`, `productionRelease=false`다.
