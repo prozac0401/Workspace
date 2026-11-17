@@ -4,7 +4,8 @@
 param(
     [Parameter(Mandatory=$true)][string]$RequestPath,
     [ValidateRange(30,3600)][int]$TimeoutSeconds=180,
-    [string]$CancellationPath=''
+    [string]$CancellationPath='',
+    [hashtable]$WorkerSession=$null
 )
 . (Join-Path $PSScriptRoot 'Common.ps1')
 
@@ -24,6 +25,20 @@ foreach($reserved in @($resultPath,$progressPath,$statePath,$jobPath,$workerResu
 }
 $record=[ordered]@{schemaVersion=1;status='Failed';category='';message='';path='';mode='';backup='';recovery='';recoveryRemoved=$false;sourceHash='';resultHash='';stage='Preflight';hresults='';time='';temp='';inputCopy=''}
 $mutex=$null; $locked=$false; $hold=$null; $worker=$null; $inputCopy=''; $temp=''; $preserveTemp=$false; $request=$null
+$sessionBusy=$false
+function Assert-SessionOwner {
+    if($null -ne $WorkerSession -and $WorkerSession.userOwnerPid -gt 0 -and -not (Test-ProcessIdentity $WorkerSession.userOwnerPid $WorkerSession.userOwnerStart)) { throw 'OwnerExited' }
+}
+function Assert-SessionIdle {
+    if($null -ne $WorkerSession -and [IO.File]::Exists((Join-Path $WorkerSession.directory 'unsafe.json'))) { throw 'WorkerSessionUnsafe' }
+    if($null -eq $WorkerSession -or $null -eq $WorkerSession.process) {
+        if(@(Get-Process EXCEL -ErrorAction SilentlyContinue).Count) { throw 'ExistingExcel' }
+        return
+    }
+    if($WorkerSession.process.HasExited -or -not $WorkerSession.healthy) { throw 'WorkerSessionUnsafe' }
+    $excel=@(Get-Process EXCEL -ErrorAction SilentlyContinue)
+    if($excel.Count -ne 1 -or $excel[0].Id -ne $WorkerSession.excelPid -or -not (Test-ProcessIdentity $WorkerSession.excelPid $WorkerSession.excelStartTicks)) { throw 'WorkerSessionUnsafe' }
+}
 function Set-Progress([string]$Stage,[string]$Message) {
     $script:record.stage=$Stage
     Write-Json @{schemaVersion=1;stage=$Stage;message=$Message} $progressPath
@@ -42,7 +57,8 @@ try {
     $mutex=New-Object Threading.Mutex($false,(Get-EngineMutexName))
     try { $locked=$mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $locked=$true }
     if(-not $locked) { throw 'AnotherOperationRunning' }
-    if(@(Get-Process EXCEL -ErrorAction SilentlyContinue).Count) { throw 'ExistingExcel' }
+    Assert-SessionOwner
+    Assert-SessionIdle
     $hold=[IO.File]::Open($record.path,[IO.FileMode]::Open,[IO.FileAccess]::Read,([IO.FileShare]::Read -bor [IO.FileShare]::Delete))
     if((Get-StreamSha $hold) -ne $record.sourceHash) { throw 'SourceChanged' }
     $ext=[IO.Path]::GetExtension($record.path)
@@ -70,11 +86,30 @@ try {
     Set-Progress 'Worker' 'Excel에서 저장하고 암호와 내용을 확인하고 있습니다.'
     Save-State 'WorkerStarted'
     $workerScript=Join-Path $PSScriptRoot 'ExcelPassword.Worker.ps1'
-    $arguments='-NoLogo -NoProfile -NonInteractive -STA -ExecutionPolicy Bypass -File "'+$workerScript+'" -JobPath "'+$jobPath+'"'
-    $worker=Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $arguments -PassThru -WindowStyle Hidden
+    if($null -ne $WorkerSession) {
+        if($null -eq $WorkerSession.process) {
+            [void][IO.Directory]::CreateDirectory($WorkerSession.directory); Set-PrivateDirectory $WorkerSession.directory
+            $sessionPath=Join-Path $WorkerSession.directory 'session.json'
+            $controller=[Diagnostics.Process]::GetCurrentProcess()
+            try { $controllerStart=$controller.StartTime.ToUniversalTime().Ticks.ToString() } finally { $controller.Dispose() }
+            Write-Json @{schemaVersion=1;ownerPid=$PID;ownerStartTicks=$controllerStart;token=$WorkerSession.token} $sessionPath
+            $arguments='-NoLogo -NoProfile -NonInteractive -STA -ExecutionPolicy Bypass -File "'+$workerScript+'" -SessionPath "'+$sessionPath+'"'
+            $WorkerSession.process=Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $arguments -PassThru -WindowStyle Hidden
+        }
+        $worker=$WorkerSession.process
+        $WorkerSession.sequence++
+        $sessionBusy=$true; $WorkerSession.healthy=$false
+        Write-Json @{token=$WorkerSession.token;sequence=$WorkerSession.sequence;jobPath=$jobPath} (Join-Path $WorkerSession.directory 'next-job.json')
+    } else {
+        $arguments='-NoLogo -NoProfile -NonInteractive -STA -ExecutionPolicy Bypass -File "'+$workerScript+'" -JobPath "'+$jobPath+'"'
+        $worker=Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $arguments -PassThru -WindowStyle Hidden
+    }
     $watch=[Diagnostics.Stopwatch]::StartNew()
-    while(-not $worker.WaitForExit(250)) {
-        if([IO.File]::Exists((Join-Path $runDir 'cancel')) -or ($CancellationPath -and [IO.File]::Exists($CancellationPath))) { Set-Progress 'Cancelling' '현재 Excel 확인이 끝나면 원본을 바꾸지 않고 취소합니다.' }
+    while($true) {
+        if($null -ne $WorkerSession -and [IO.File]::Exists($workerResultPath)) { break }
+        if($worker.WaitForExit(100)) { break }
+        $ownerGone=$null -ne $WorkerSession -and $WorkerSession.userOwnerPid -gt 0 -and -not (Test-ProcessIdentity $WorkerSession.userOwnerPid $WorkerSession.userOwnerStart)
+        if($record.stage -ne 'Cancelling' -and ($ownerGone -or [IO.File]::Exists((Join-Path $runDir 'cancel')) -or ($CancellationPath -and [IO.File]::Exists($CancellationPath)))) { Set-Progress 'Cancelling' '현재 Excel 확인이 끝나면 원본을 바꾸지 않고 취소합니다.' }
         if($watch.Elapsed.TotalSeconds -ge $TimeoutSeconds) {
             # Terminate only the PowerShell child that this invocation started.
             $preserveTemp=$true
@@ -84,9 +119,22 @@ try {
     }
     [IO.File]::Delete($jobPath)
     if(-not [IO.File]::Exists($workerResultPath)) { $preserveTemp=$true; throw 'WorkerCrashed' }
+    if($null -ne $WorkerSession) { $preserveTemp=$true }
     $r=Get-Content -LiteralPath $workerResultPath -Raw -Encoding UTF8 | ConvertFrom-Json
-    for($wait=0;$wait -lt 20 -and @(Get-Process EXCEL -ErrorAction SilentlyContinue).Count;$wait++) { Start-Sleep -Milliseconds 250 }
-    if(@(Get-Process EXCEL -ErrorAction SilentlyContinue).Count) { $preserveTemp=$true; throw 'ExcelStillRunning' }
+    if($null -ne $WorkerSession) {
+        foreach($field in @('sessionToken','sequence','sessionReady','workbooksClosed','excelPid','excelStartTicks')) {
+            if($null -eq $r.PSObject.Properties[$field]) { throw 'WorkerSessionUnsafe' }
+        }
+        if($r.sessionToken -cne $WorkerSession.token -or $r.sequence -ne $WorkerSession.sequence -or $r.sessionReady -isnot [bool] -or $r.sessionReady -ne $true -or $r.workbooksClosed -isnot [bool] -or $r.workbooksClosed -ne $true) { throw 'WorkerSessionUnsafe' }
+        if($WorkerSession.excelPid -gt 0 -and ($r.excelPid -ne $WorkerSession.excelPid -or [string]$r.excelStartTicks -cne $WorkerSession.excelStartTicks)) { throw 'WorkerSessionUnsafe' }
+        $WorkerSession.excelPid=[int]$r.excelPid; $WorkerSession.excelStartTicks=[string]$r.excelStartTicks; $WorkerSession.healthy=$true
+        Assert-SessionIdle
+        $sessionBusy=$false; $preserveTemp=$false
+    } else {
+        for($wait=0;$wait -lt 20 -and @(Get-Process EXCEL -ErrorAction SilentlyContinue).Count;$wait++) { Start-Sleep -Milliseconds 250 }
+        if(@(Get-Process EXCEL -ErrorAction SilentlyContinue).Count) { $preserveTemp=$true; throw 'ExcelStillRunning' }
+    }
+    Assert-SessionOwner
     Assert-NotCancelled $runDir $CancellationPath
     $record.hresults=$r.hresults
     if($r.status -eq 'Skipped') { $record.status='Skipped'; $record.category=$r.category; Save-State 'Skipped' }
@@ -102,6 +150,8 @@ try {
         if((Get-Sha $record.path) -ne $record.sourceHash -or (Get-StreamSha $hold) -ne $record.sourceHash) { throw 'SourceChanged' }
         if((Get-Sha $record.backup) -ne $record.sourceHash) { throw 'BackupChanged' }
         Assert-NotCancelled $runDir $CancellationPath
+        Assert-SessionOwner
+        if($null -ne $WorkerSession) { Assert-SessionIdle }
         $record.recovery=Join-Path $parent ('.eps-'+$id+'.recovery')
         $preserveTemp=$true
         Save-State 'CommitIntent'
@@ -112,26 +162,36 @@ try {
         $record.status='Success'; $record.category='ReplacedAndVerified'; $preserveTemp=$false
     }
 } catch {
-    $known=@('InvalidRequest','CurrentPasswordRequired','NewPasswordLength','PasswordUnchanged','LocalPathRequired','FileNotFound','LocalNtfsRequired','UnsupportedExtension','TemporaryFileNotSupported','ReadOnlyAttribute','OfflineFileUnsupported','FileInUse','AnotherOperationRunning','ExistingExcel','SourceChanged','RunAlreadyUsed','BackupChanged','SnapshotChanged','WorkerTimeout','WorkerCrashed','ExcelStillRunning','TempChanged','Cancelled')
+    $known=@('InvalidRequest','CurrentPasswordRequired','NewPasswordLength','PasswordUnchanged','LocalPathRequired','FileNotFound','LocalNtfsRequired','UnsupportedExtension','TemporaryFileNotSupported','ReadOnlyAttribute','OfflineFileUnsupported','FileInUse','AnotherOperationRunning','ExistingExcel','SourceChanged','RunAlreadyUsed','BackupChanged','SnapshotChanged','WorkerTimeout','WorkerCrashed','ExcelStillRunning','WorkerSessionUnsafe','TempChanged','Cancelled','OwnerExited')
     if(-not $record.category) {
         if($_.Exception.Message -in $known) { $record.category=$_.Exception.Message }
         elseif($_.Exception.Message -like 'ReparsePoint:*') { $record.category='ReparsePoint' }
         else { $record.category=Get-Category $_ $record.stage }
     }
-    if($record.category -eq 'Cancelled') { $record.status='Cancelled' }
+    if($record.category -in @('Cancelled','OwnerExited')) { $record.status='Cancelled' }
+    if($record.category -eq 'WorkerSessionUnsafe') { $preserveTemp=$true; if($null -ne $WorkerSession) { $WorkerSession.healthy=$false } }
     if(-not $record.hresults) { $record.hresults=Get-HResults $_ }
     # Stable categories, not COM exception text: passwords cannot enter this log.
     $record.message=$record.category
 } finally {
     # Any failure while monitoring the child (for example a full log disk) must
     # not leave a live writer while its temporary files are being removed.
-    if($null -ne $worker -and -not $worker.HasExited) {
+    if($null -ne $worker -and -not $worker.HasExited -and ($null -eq $WorkerSession -or $sessionBusy)) {
         $preserveTemp=$true
+        if($null -ne $WorkerSession) { $WorkerSession.healthy=$false }
+        if($null -ne $WorkerSession -and [IO.File]::Exists($workerResultPath)) {
+            # An unsafe ACK can precede the worker's own graceful cleanup.
+            # Let it finish without abandoning its owned Excel instance.
+            try {
+                [IO.File]::WriteAllText((Join-Path $WorkerSession.directory 'stop'),'stop')
+                [void]$worker.WaitForExit(10000)
+            } catch {}
+        }
         try { $worker.Kill(); [void]$worker.WaitForExit(5000) } catch {}
-        if($record.category -ne 'WorkerTimeout') { $record.category='WorkerInterrupted'; $record.message='WorkerInterruptedExcelMayRemain' }
+        if($record.category -notin @('WorkerTimeout','WorkerSessionUnsafe')) { $record.category='WorkerInterrupted'; $record.message='WorkerInterruptedExcelMayRemain' }
     }
     if($null -ne $hold) { $hold.Dispose() }
-    if($null -ne $worker) { $worker.Dispose() }
+    if($null -ne $worker -and $null -eq $WorkerSession) { $worker.Dispose() }
     foreach($secretPath in @($RequestPath,$jobPath)) { if([IO.File]::Exists($secretPath)) { try { [IO.File]::Delete($secretPath) } catch { $record.message='TemporaryCleanupIncomplete' } } }
     $request=$null
     if(-not $preserveTemp) {

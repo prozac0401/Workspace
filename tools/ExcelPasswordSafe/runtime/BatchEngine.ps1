@@ -14,6 +14,7 @@ $batchItems=New-Object 'System.Collections.Generic.List[object]'
 $batchResult=[ordered]@{schemaVersion=1;status='Failed';category='';root='';mode='';items=@();reportPath='';failureCount=0;succeededCount=0;skippedCount=0;notProcessedCount=0;cancelledCount=0;time=''}
 $batchRequest=$null; $batchMutex=$null; $batchLocked=$false; $batchStop=''; $batchEntries=@()
 $batchOwnerPid=0; $batchOwnerStart=''
+$batchSession=@{directory=(Join-Path $batchDir 'worker-session');token=[guid]::NewGuid().ToString('N');sequence=0;process=$null;healthy=$false;excelPid=0;excelStartTicks='';userOwnerPid=0;userOwnerStart=''}
 
 function Get-BatchValue($Object,[string]$Name) {
     if($null -ne $Object -and $null -ne $Object.PSObject.Properties[$Name]) { return $Object.$Name }
@@ -50,6 +51,7 @@ function Get-BatchReason([string]$Category) {
         'TemporaryCleanupIncomplete' { '작업용 파일 정리가 끝나지 않았습니다. 실행 기록을 확인하세요.' }
         'WorkerTimeout' { 'Excel 응답 시간이 지났습니다. 남은 Excel과 작업 파일을 확인하세요.' }
         'ExcelStillRunning' { 'Excel이 종료되지 않았습니다. 정상 종료 후 실행 기록을 확인하세요.' }
+        'WorkerSessionUnsafe' { 'Excel 상태를 확인할 수 없어 중단했습니다. 실행 기록과 열린 Excel을 확인하세요.' }
         'SignedWorkbookUnsupported' { '서명된 통합 문서는 지원하지 않습니다.' }
         'SharedWorkbookUnsupported' { '공유 통합 문서는 지원하지 않습니다.' }
         'WriteReservedUnsupported' { '쓰기 암호가 있는 통합 문서는 지원하지 않습니다.' }
@@ -131,6 +133,7 @@ try {
         $batchOwnerPid=[int]$ownerValue; $batchOwnerStart=[string](Get-BatchValue $batchRequest 'ownerStartTicks')
         if($batchOwnerPid -lt 1 -or $batchOwnerStart -notmatch '^\d+$') { throw 'InvalidBatchRequest' }
     }
+    $batchSession.userOwnerPid=$batchOwnerPid; $batchSession.userOwnerStart=$batchOwnerStart
     $rootPath=[string]$batchRequest.root
     if($rootPath -notmatch '^[A-Za-z]:[\\/]' -or $rootPath.Substring(2).Contains(':')) { throw 'LocalPathRequired' }
     $rootPath=[IO.Path]::GetFullPath($rootPath).TrimEnd('\')
@@ -190,7 +193,7 @@ try {
                 Write-Json @{schemaVersion=1;path=$entry.path;mode=$batchRequest.mode;oldSecret=$batchRequest.oldSecret;newSecret=$batchRequest.newSecret;expectedHash=$entry.expectedHash} (Join-Path $attemptDir 'request.json')
                 # Same STA thread: the named mutex is reentrant. Engine releases
                 # only its acquisition; the batch retains ownership throughout.
-                & (Join-Path $PSScriptRoot 'Engine.ps1') -RequestPath (Join-Path $attemptDir 'request.json') -CancellationPath $batchCancel | Out-Null
+                & (Join-Path $PSScriptRoot 'Engine.ps1') -RequestPath (Join-Path $attemptDir 'request.json') -CancellationPath $batchCancel -WorkerSession $batchSession | Out-Null
                 $childPath=Join-Path $attemptDir 'result.json'
                 if(-not [IO.File]::Exists($childPath)) { throw 'MissingChildResult' }
                 $childResult=Get-Content -LiteralPath $childPath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -200,7 +203,7 @@ try {
                 if([IO.File]::Exists((Join-Path $attemptDir 'request.json')) -or [IO.File]::Exists((Join-Path $attemptDir 'worker-job.json'))) { throw 'TemporaryCleanupIncomplete' }
                 foreach($ownedProperty in @('temp','inputCopy')) {
                     $ownedPath=[string](Get-BatchValue $childResult $ownedProperty)
-                    if($ownedPath -and [IO.File]::Exists($ownedPath) -and $item.category -notin @('CommitUncertain','WorkerTimeout','WorkerInterrupted','WorkerCrashed','ExcelStillRunning')) { throw 'TemporaryCleanupIncomplete' }
+                    if($ownedPath -and [IO.File]::Exists($ownedPath) -and $item.category -notin @('CommitUncertain','WorkerTimeout','WorkerInterrupted','WorkerCrashed','ExcelStillRunning','WorkerSessionUnsafe')) { throw 'TemporaryCleanupIncomplete' }
                 }
                 if($item.status -eq 'Skipped' -and $item.category -notin @('AlreadyEncrypted','AlreadyUnencrypted')) { $item.status='Failed' }
             } catch {
@@ -218,7 +221,7 @@ try {
             }
             if($item.status -in @('Success','Skipped')) { break }
             if($item.status -eq 'Cancelled') { $batchStop=$item.category; break }
-            $unsafe=@('CommitUncertain','SourceChanged','WorkerTimeout','WorkerInterrupted','WorkerCrashed','ExcelStillRunning','ExistingExcel','ExcelOwnershipOrExistingProcess','MissingChildResult','InvalidChildResult','TemporaryCleanupIncomplete','BackupChanged','TempChanged','SnapshotChanged')
+            $unsafe=@('CommitUncertain','SourceChanged','WorkerTimeout','WorkerInterrupted','WorkerCrashed','ExcelStillRunning','WorkerSessionUnsafe','ExistingExcel','ExcelOwnershipOrExistingProcess','MissingChildResult','InvalidChildResult','TemporaryCleanupIncomplete','BackupChanged','TempChanged','SnapshotChanged')
             if($item.category -in $unsafe) { $item.status='NeedsInspection'; $batchStop=$item.category; break }
             $retry=@('OpenFailedPossiblePasswordOrCorruption','FileInUse','ReadOnlyAttribute','AccessDenied','ComServerError','ValidationFailed','FileNotFound','BatchFailed','PreflightFailed','BackupFailed','ComCleanupFailed','SaveAsFailed','ComStartFailed','CommitFailed')
             if($attempt -eq 3 -or $item.category -notin $retry) { break }
@@ -236,6 +239,28 @@ try {
     foreach($item in $batchItems) { [void]$done.Add($item.path) }
     foreach($entry in $batchEntries) { if(-not $done.Contains($entry.path)) { $batchItems.Add((New-BatchItem $entry.path 'NotProcessed' $batchResult.category)) } }
 } finally {
+    if($null -ne $batchSession.process) {
+        $sessionError=''
+        try {
+            [IO.File]::WriteAllText((Join-Path $batchSession.directory 'stop'),'stop')
+            if(-not $batchSession.process.WaitForExit(30000)) {
+                # This is our PowerShell child only; never terminate Excel.
+                $batchSession.process.Kill(); [void]$batchSession.process.WaitForExit(5000)
+                throw 'WorkerSessionUnsafe'
+            }
+            $finishedPath=Join-Path $batchSession.directory 'finished.json'
+            if(-not [IO.File]::Exists($finishedPath)) { throw 'WorkerSessionUnsafe' }
+            $finished=Get-Content -LiteralPath $finishedPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            if($finished.sessionToken -cne $batchSession.token -or $finished.status -ne 'Stopped' -or $finished.workbooksClosed -ne $true -or $finished.excelExited -ne $true) { throw 'WorkerSessionUnsafe' }
+            if($batchSession.excelPid -gt 0 -and ($finished.excelPid -ne $batchSession.excelPid -or [string]$finished.excelStartTicks -cne $batchSession.excelStartTicks -or (Test-ProcessIdentity $batchSession.excelPid $batchSession.excelStartTicks))) { throw 'WorkerSessionUnsafe' }
+        } catch { $sessionError='WorkerSessionUnsafe' }
+        finally { $batchSession.process.Dispose() }
+        if($sessionError) {
+            $batchResult.category=$sessionError
+            $sessionItem=New-BatchItem $(if($batchResult.root){$batchResult.root}else{$batchDir}) 'NeedsInspection' $sessionError
+            $sessionItem.runDirectory=$batchSession.directory; $batchItems.Add($sessionItem)
+        }
+    }
     try {
         if([IO.File]::Exists($RequestPath)) { [IO.File]::Delete($RequestPath) }
     } catch {

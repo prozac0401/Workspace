@@ -107,30 +107,126 @@ function Unprotect-Text([string]$Cipher) {
     try { [Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr) }
     finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr); $sec.Dispose() }
 }
+function Get-FormulaSignature([object]$Value) {
+    # Load only in processes that compute workbook signatures. The controller
+    # and batch preflight do not pay for a C# compilation they do not use.
+    if(-not ('ExcelPasswordSafe.FormulaSignatureV1' -as [type])) {
+        Add-Type -TypeDefinition @'
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
+public static class EpsWindow
+{
+    [DllImport("user32.dll")]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint pid);
+}
+namespace ExcelPasswordSafe
+{
+    public static class FormulaSignatureV1
+    {
+        public static string Compute(object value)
+        {
+            using (var hash = SHA256.Create())
+            using (var crypto = new CryptoStream(Stream.Null, hash, CryptoStreamMode.Write))
+            using (var buffer = new BufferedStream(crypto, 65536))
+            using (var writer = new BinaryWriter(buffer, Encoding.UTF8, true))
+            {
+                WriteText(writer, "EPS-FORMULA-SHA256-V1");
+                WriteValue(writer, value, 0);
+                writer.Flush(); buffer.Flush(); crypto.FlushFinalBlock();
+                return BitConverter.ToString(hash.Hash).Replace("-", "");
+            }
+        }
+        static void WriteText(BinaryWriter writer, string value)
+        {
+            // Length followed by UTF-16 code units is unambiguous and retains
+            // even an unmatched surrogate without replacement or normalization.
+            writer.Write(value.Length);
+            for (int i = 0; i < value.Length; i++) writer.Write((ushort)value[i]);
+        }
+        static bool SupportedElementType(Type type)
+        {
+            if (type == typeof(object) || type == typeof(DBNull) || type == typeof(ErrorWrapper)) return true;
+            if (type.IsArray) return SupportedElementType(type.GetElementType());
+            return !type.IsEnum && Type.GetTypeCode(type) != TypeCode.Object;
+        }
+        static void WriteValue(BinaryWriter writer, object value, int depth)
+        {
+            if (depth > 64) throw new InvalidOperationException("UnsupportedFormulaValueDepth");
+            if (value == null) { writer.Write((byte)0); return; }
+            if (value == DBNull.Value) { writer.Write((byte)1); return; }
+            Type type = value.GetType();
+            var array = value as Array;
+            if (array != null)
+            {
+                Type elementType = type.GetElementType();
+                if (!SupportedElementType(elementType)) throw new InvalidOperationException("UnsupportedFormulaArrayType");
+                writer.Write((byte)18); WriteText(writer, elementType.FullName);
+                writer.Write(array.Rank);
+                for (int dimension = 0; dimension < array.Rank; dimension++)
+                {
+                    writer.Write(array.GetLowerBound(dimension)); writer.Write(array.GetLength(dimension));
+                }
+                foreach (object item in array) WriteValue(writer, item, depth + 1);
+                return;
+            }
+            var error = value as ErrorWrapper;
+            if (error != null) { writer.Write((byte)17); writer.Write(error.ErrorCode); return; }
+            if (type.IsEnum) throw new InvalidOperationException("UnsupportedFormulaValueType");
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.String: writer.Write((byte)2); WriteText(writer, (string)value); return;
+                case TypeCode.Boolean: writer.Write((byte)3); writer.Write((bool)value); return;
+                case TypeCode.SByte: writer.Write((byte)4); writer.Write((sbyte)value); return;
+                case TypeCode.Byte: writer.Write((byte)5); writer.Write((byte)value); return;
+                case TypeCode.Int16: writer.Write((byte)6); writer.Write((short)value); return;
+                case TypeCode.UInt16: writer.Write((byte)7); writer.Write((ushort)value); return;
+                case TypeCode.Int32: writer.Write((byte)8); writer.Write((int)value); return;
+                case TypeCode.UInt32: writer.Write((byte)9); writer.Write((uint)value); return;
+                case TypeCode.Int64: writer.Write((byte)10); writer.Write((long)value); return;
+                case TypeCode.UInt64: writer.Write((byte)11); writer.Write((ulong)value); return;
+                case TypeCode.Single: writer.Write((byte)12); writer.Write((float)value); return;
+                case TypeCode.Double: writer.Write((byte)13); writer.Write((double)value); return;
+                case TypeCode.Decimal: writer.Write((byte)14); writer.Write((decimal)value); return;
+                case TypeCode.DateTime:
+                    var date = (DateTime)value;
+                    writer.Write((byte)15); writer.Write(date.Ticks); writer.Write((byte)date.Kind); return;
+                case TypeCode.Char: writer.Write((byte)16); writer.Write((ushort)(char)value); return;
+                default: throw new InvalidOperationException("UnsupportedFormulaValueType");
+            }
+        }
+    }
+}
+'@
+    }
+    [ExcelPasswordSafe.FormulaSignatureV1]::Compute($Value)
+}
 # Formula/constant values, sheet identity, visibility, shape and OLE inventory.
 # This is a semantic guard, NOT proof of byte-identical object payloads or rendering.
 function Get-WorkbookSignature($Book) {
     $sheets=$null; $records=New-Object 'System.Collections.Generic.List[object]'
     try {
         $sheets=$Book.Sheets
-        for($i=1;$i -le $sheets.Count;$i++) {
+        $sheetCount=[int]$sheets.Count
+        for($i=1;$i -le $sheetCount;$i++) {
             $sheet=$null; $range=$null; $rows=$null; $columns=$null; $shapes=$null
             try {
                 $sheet=$sheets.Item($i)
                 $row=[ordered]@{name=[string]$sheet.Name;type=[int]$sheet.Type;visible=[int]$sheet.Visible;shapes=@()}
-                if($sheet.Type -in @(3,4)) { throw 'Excel4MacroSheetNotSupported' }
-                if($sheet.Type -eq -4167) {
+                if($row.type -in @(3,4)) { throw 'Excel4MacroSheetNotSupported' }
+                if($row.type -eq -4167) {
                     $range=$sheet.UsedRange
-                    # PSSerializer keeps types, array ranks and element values; no cell COM loop.
-                    $xml=[Management.Automation.PSSerializer]::Serialize($range.Formula,100)
-                    $sha=[Security.Cryptography.SHA256]::Create()
-                    try { $row.formulaSha=[BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($xml))) }
-                    finally { $sha.Dispose() }
+                    # One bulk COM read; hash the typed values without creating
+                    # a complete CLI XML string and another UTF-8 byte array.
+                    $row.formulaSha=Get-FormulaSignature $range.Formula
                     $rows=$range.Rows; $columns=$range.Columns
                     $row.bounds=@([int]$range.Row,[int]$range.Column,[int]$rows.Count,[int]$columns.Count)
                 }
                 $shapes=$sheet.Shapes; $inventory=@()
-                for($j=1;$j -le $shapes.Count;$j++) {
+                $shapeCount=[int]$shapes.Count
+                for($j=1;$j -le $shapeCount;$j++) {
                     $shape=$null
                     try { $shape=$shapes.Item($j); $inventory+=[ordered]@{name=[string]$shape.Name;type=[int]$shape.Type} }
                     finally { Release-Com $shape }
@@ -142,11 +238,21 @@ function Get-WorkbookSignature($Book) {
     } finally { Release-Com $sheets }
 }
 
+function Test-ProcessIdentity([int]$ProcessId,[string]$StartTicks) {
+    $process=$null
+    try {
+        $process=[Diagnostics.Process]::GetProcessById($ProcessId)
+        return -not $process.HasExited -and $process.StartTime.ToUniversalTime().Ticks.ToString() -ceq $StartTicks
+    } catch { return $false }
+    finally { if($null -ne $process) { $process.Dispose() } }
+}
+
 function Invoke-GuardedReplace([string]$Source,[string]$Temp,[string]$Backup,[string]$Recovery,[string]$SourceHash,[string]$TempHash,$HeldStream) {
     if((Get-Sha $Temp) -ne $TempHash) { throw 'TempChanged' }
     if((Get-Sha $Source) -ne $SourceHash -or (Get-StreamSha $HeldStream) -ne $SourceHash) { throw 'SourceChanged' }
     if((Get-Sha $Backup) -ne $SourceHash) { throw 'BackupChanged' }
     [IO.File]::Replace($Temp,$Source,$Recovery,$false)
-    if((Get-Sha $Source) -ne $TempHash -or (Get-Sha $Recovery) -ne $SourceHash) { throw 'PostReplaceHashMismatch' }
-    Get-Sha $Source
+    $verifiedHash=Get-Sha $Source
+    if($verifiedHash -ne $TempHash -or (Get-Sha $Recovery) -ne $SourceHash) { throw 'PostReplaceHashMismatch' }
+    $verifiedHash
 }
